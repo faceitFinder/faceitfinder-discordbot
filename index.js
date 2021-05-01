@@ -19,7 +19,8 @@ bot.on('message', async message => {
   if (!message.content.startsWith(prefix) || message.author.bot) return
   else {
     const args = message.content.slice(prefix.length).trim().split(/ +/)
-    const firstArg = args.shift().toLowerCase()
+    const firstArg = args.shift().toLowerCase().split('/').filter(e => e).pop()
+
     const steamId = await fetch(`http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?key=${process.env.STEAM_TOKEN}&vanityurl=${firstArg}`)
       .then(res => {
         if (res.status == 200) return res.json()
