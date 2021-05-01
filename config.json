@@ -1,0 +1,19 @@
+{
+  "name": "FaceitFinder",
+  "prefix": ".ff",
+  "color": {
+    "levels": [
+      "#eeeeee",
+      "#1ce300",
+      "#1ce300",
+      "#ffc800",
+      "#ffc800",
+      "#ffc800",
+      "#ffc800",
+      "#fe630a",
+      "#fe630a",
+      "#d91a00"
+    ],
+    "error": "#770000"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "name": "faceitfinderdiscordbot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JustDams/faceitFinderDiscordBot.git"
+  },
+  "author": "Dams_",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JustDams/faceitFinderDiscordBot/issues"
+  },
+  "homepage": "https://github.com/JustDams/faceitFinderDiscordBot#readme",
+  "dependencies": {
+    "discord": "^0.8.2",
+    "discord.js": "^12.5.3",
+    "dotenv": "^8.2.0",
+    "fetch": "^1.1.0",
+    "node-fetch": "^2.6.1",
+    "nodemon": "^2.0.7"
+  }
+}
