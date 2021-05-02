@@ -22,9 +22,7 @@ bot.on('message', async message => {
     try {
       const playerId = await Player.getId(steamId)
       const playerDatas = await Player.getDatas(playerId)
-
       const playerStats = await Player.getStats(playerId)
-      console.log(playerStats)
 
       const faceitLevel = playerDatas.games.csgo.skill_level_label
       const faceitElo = playerDatas.games.csgo.faceit_elo
