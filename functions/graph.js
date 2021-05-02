@@ -1,19 +1,8 @@
-const fetch = require('node-fetch')
-
-require('dotenv').config()
+const Faceit = require('./faceit')
 
 const generateCanva = (playerId) => {
-  fetch(`https://open.faceit.com/data/v4/players/${playerId}/history?game=csgo&offset=0&limit=5`, {
-    method: 'GET',
-    headers: headerFaceit
-  })
-    .then(res => {
-      if (res.status == 200) return res.json()
-      else throw 'An error has occured'
-    })
-    .then(data => {
-      console.log(data)
-    })
+  const data = await Faceit.fetchData(`https://open.faceit.com/data/v4/players/${playerId}/history?game=csgo&offset=0&limit=5`)
+  console.log(data)
 }
 
 module.exports = {

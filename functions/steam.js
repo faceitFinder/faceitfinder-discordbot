@@ -2,7 +2,6 @@ const fetch = require('node-fetch')
 
 require('dotenv').config()
 
-
 const getId = async (arg) => {
   return await fetch(`http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?key=${process.env.STEAM_TOKEN}&vanityurl=${arg}`)
     .then(res => {
@@ -14,8 +13,6 @@ const getId = async (arg) => {
       else return arg
     })
 }
-
-
 
 module.exports = {
   getId
