@@ -23,27 +23,23 @@ bot.on('message', async message => {
       const playerId = await Player.getId(steamId)
       const playerDatas = await Player.getDatas(playerId)
 
+      const playerStats = await Player.getStats(playerId)
+      console.log(playerStats)
+
       const faceitLevel = playerDatas.games.csgo.skill_level_label
       const faceitElo = playerDatas.games.csgo.faceit_elo
 
       const card = new Discord.MessageEmbed()
         .setAuthor(playerDatas.nickname, playerDatas.avatar, `https://www.faceit.com/fr/players/${playerDatas.nickname}`)
         .setDescription(`
-        Level: **${faceitLevel}**, 
-        Elo: **${faceitElo}**, 
-        Games: **In progress**`)
+          Level: **${faceitLevel}**, 
+          Elo: **${faceitElo}**, 
+          Games: **${playerStats.lifetime.Matches} (${playerStats.lifetime['Win Rate %']}% Win)**,
+          K/D: **${playerStats.lifetime['Average K/D Ratio']}**
+        `)
         .setColor(color.levels[faceitLevel - 1])
 
       message.channel.send(card)
-      .then(async (sentCard) => {
-        const history = await Player.getHistory(playerId)
-        sentCard.edit(card.setDescription(`
-        Level: **${faceitLevel}**, 
-        Elo: **${faceitElo}**, 
-        Games: **${history.totalGames}**`))
-      })
-
-      const playerHistory = await Player.getHistory(playerId)
     } catch (error) {
       console.log(error)
       message.channel.send(
