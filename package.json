@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/JustDams/faceitFinderDiscordBot#readme",
   "dependencies": {
+    "big.js": "^6.1.1",
     "discord": "^0.8.2",
     "discord.js": "^12.5.3",
     "dotenv": "^8.2.0",
