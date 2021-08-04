@@ -1,6 +1,7 @@
 const { prefix, color, name } = require('./config.json')
 const Player = require('./functions/player')
 const Steam = require('./functions/steam')
+const Graph = require('./functions/graph')
 const RegexFun = require('./functions/regex')
 const Discord = require('discord.js')
 const bot = new Discord.Client()
@@ -37,26 +38,31 @@ bot.login(process.env.TOKEN)
 
 
 const sendCardWithInfos = async (message, steamParam) => {
-  const steamId = await Steam.getId(steamParam)
   try {
+    const steamId = await Steam.getId(steamParam)
     const playerId = await Player.getId(steamId)
     const playerDatas = await Player.getDatas(playerId)
     const playerStats = await Player.getStats(playerId)
+    const graphBuffer = await Graph.generateCanva(playerId)
 
     const faceitLevel = playerDatas.games.csgo.skill_level_label
-    const faceitElo = playerDatas.games.csgo.faceit_elo
 
     const card = new Discord.MessageEmbed()
       .setAuthor(playerDatas.nickname, playerDatas.avatar, `https://www.faceit.com/fr/players/${playerDatas.nickname}`)
       .setDescription(`
         Level: **${faceitLevel}**, 
-        Elo: **${faceitElo}**, 
+        Elo: **${playerDatas.games.csgo.faceit_elo}**, 
         Games: **${playerStats.lifetime.Matches} (${playerStats.lifetime['Win Rate %']}% Win)**,
         K/D: **${playerStats.lifetime['Average K/D Ratio']}**
       `)
       .setColor(color.levels[faceitLevel - 1])
 
     message.channel.send(card)
+    message.channel.send({
+      embeds: [new Discord.MessageEmbed()],
+      files: [new Discord.MessageAttachment(graphBuffer)]
+    })
+
   } catch (error) {
     console.log(error)
     message.channel.send(

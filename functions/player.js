@@ -1,5 +1,4 @@
 const Faceit = require('./faceit')
-const Match = require('./match')
 
 const getId = async (steamId) => {
   const data = await Faceit.fetchData(`https://open.faceit.com/data/v4/players?game=csgo&game_player_id=${steamId}`)
