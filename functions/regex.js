@@ -11,11 +11,8 @@ const findSteamId = (str) => {
       regex.lastIndex++
 
     const binaryId = `${decToBin(m[1], 8)}${staticBin}${decToBin(m[3], 32)}${m[2]}`
-
-    console.log(binToDec(binaryId).toString())
     res.push(binToDec(binaryId).toString())
   }
-
   return res
 }
 
