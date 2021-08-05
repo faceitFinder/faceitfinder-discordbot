@@ -1,9 +1,12 @@
 const Matches = require('./matches')
+const Player = require('./player')
 const Canvas = require('canvas')
 const { color } = require('../config.json')
 
 const generateCanva = async (playerId) => {
+  const playerDatas = await Player.getDatas(playerId)
   const elo = await getElo(playerId)
+
   const padding = 80
   const width = padding * (elo.length + 1)
   const height = Math.max(...elo) - Math.min(...elo) + padding * 2
@@ -31,6 +34,13 @@ const generateCanva = async (playerId) => {
     ctx.lineTo(padding * i, height)
     ctx.stroke()
   }
+
+  ctx.globalCompositeOperation = 'source-over'
+
+  // Player name
+  ctx.fillStyle = '#c5c5c5'
+  ctx.font = '50px sans-serif'
+  ctx.fillText(playerDatas.nickname, 10, 50)
 
   ctx.globalCompositeOperation = 'source-over'
 
