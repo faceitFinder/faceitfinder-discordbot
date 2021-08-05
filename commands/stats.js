@@ -39,7 +39,7 @@ const sendCardWithInfos = async (message, steamParam) => {
 module.exports = {
   name: 'stats',
   aliasses: ['stats'],
-  options: ' user steam id, steam custom url id, steam profile link, or csgo `status` ingame command with the users part',
+  options: ' [user steam id/ steam custom url id/ steam profile link/ csgo status ingame command with the users part]',
   description: 'Show the stats of the user(s) given',
   type: 'stats',
   async execute(message, args) {
