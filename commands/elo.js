@@ -29,7 +29,7 @@ const sendEloGraph = async (message, steamParam) => {
 module.exports = {
   name: 'elo',
   aliasses: ['elo'],
-  options: ' [user steam id/ steam custom url id/ steam profile link/ csgo `status` ingame command with the users part]',
+  options: ' [user steam id/ steam custom url id/ steam profile link/ csgo status ingame command with the users part]',
   description: 'Show a graph with the elo evolution of the user(s) given',
   type: 'stats',
   async execute(message, args) {
