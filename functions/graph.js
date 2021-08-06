@@ -2,12 +2,19 @@ const Matches = require('./matches')
 const Player = require('./player')
 const Canvas = require('canvas')
 const { color } = require('../config.json')
+const faceitEloColors = [
+  { "min": 0, "max": 800, "color": color.levels[0] },
+  { "min": 801, "max": 1100, "color": color.levels[1] },
+  { "min": 1101, "max": 1700, "color": color.levels[3] },
+  { "min": 1701, "max": 2000, "color": color.levels[7] },
+  { "min": 2001, "max": 100000, "color": color.levels[9] },
+]
 
 const generateCanva = async (playerId) => {
   const playerDatas = await Player.getDatas(playerId)
-  const elo = await getElo(playerId)
+  const elo = (await getElo(playerId)).reverse()
 
-  const padding = 80
+  const padding = 100
   const width = padding * (elo.length + 1)
   const height = Math.max(...elo) - Math.min(...elo) + padding * 2
 
@@ -47,27 +54,46 @@ const generateCanva = async (playerId) => {
   /**
    * Elo bar
    */
-  elo.reverse().forEach((e, i) => {
-    const coordinates = { x: padding * (i + 1), y: Math.max(...elo) - e + padding }
-
-    if (e < 801) ctx.fillStyle = color.levels[0]
-    else if (e >= 801 && e <= 1100) ctx.fillStyle = color.levels[1]
-    else if (e >= 1101 && e <= 1700) ctx.fillStyle = color.levels[3]
-    else if (e >= 1701 && e <= 2000) ctx.fillStyle = color.levels[7]
-    else if (e >= 2001) ctx.fillStyle = color.levels[9]
+  elo.forEach((e, i) => {
+    const coordinatesStart = { x: padding * i, y: Math.max(...elo) - elo[i - 1] + padding }
+    const coordinatesEnd = { x: padding * (i + 1), y: Math.max(...elo) - e + padding }
+    const color = getStrokeColors(ctx, elo, i, coordinatesStart, coordinatesEnd)
 
     ctx.font = '30px sans-serif'
     ctx.lineWidth = 5
-    ctx.strokeStyle = '#c5c5c5'
+    ctx.fillStyle = ctx.strokeStyle = color
 
     ctx.beginPath()
-    ctx.moveTo(padding * i, Math.max(...elo) - elo[i - 1] + padding)
-    ctx.lineTo(coordinates.x, coordinates.y)
+    ctx.moveTo(coordinatesStart.x, coordinatesStart.y)
+    ctx.lineTo(coordinatesEnd.x, coordinatesEnd.y)
     ctx.stroke()
-    ctx.fillText(e, padding * (i + 0.5), height)
+
+    ctx.fillText(e, padding * i + padding / 1.5, height)
   })
 
   return canvas.toBuffer()
+}
+
+const getStrokeColors = (ctx, elo, index, coordinatesStart, coordinatesEnd) => {
+  const current = elo[index]
+  const next = elo[index + 1]
+  const gradient = ctx.createLinearGradient(coordinatesStart.x, coordinatesStart.y, coordinatesEnd.x, coordinatesEnd.y)
+  let value
+
+  faceitEloColors.forEach((fc, i) => {
+    if (current >= fc.min && current <= fc.max)
+      if (next >= fc.min && next <= fc.max) value = fc.color
+      else if (next > fc.max) {
+        gradient.addColorStop(0, fc.color)
+        gradient.addColorStop(1, faceitEloColors[i + 1].color)
+        value = gradient
+      } else if (next < fc.min) {
+        gradient.addColorStop(0.6, fc.color)
+        gradient.addColorStop(1, faceitEloColors[i - 1].color)
+        value = gradient
+      }
+  })
+  return value
 }
 
 const getElo = async (playerId) => {
