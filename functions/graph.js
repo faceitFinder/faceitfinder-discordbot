@@ -57,7 +57,7 @@ const generateCanva = async (playerId) => {
   elo.forEach((e, i) => {
     const coordinatesStart = { x: padding * i, y: Math.max(...elo) - elo[i - 1] + padding }
     const coordinatesEnd = { x: padding * (i + 1), y: Math.max(...elo) - e + padding }
-    const color = getStrokeColors(ctx, elo, i, coordinatesStart, coordinatesEnd)
+    const color = getColors(elo[i - 1], e, ctx, coordinatesStart, coordinatesEnd)
 
     ctx.font = '30px sans-serif'
     ctx.lineWidth = 5
@@ -74,9 +74,8 @@ const generateCanva = async (playerId) => {
   return canvas.toBuffer()
 }
 
-const getStrokeColors = (ctx, elo, index, coordinatesStart, coordinatesEnd) => {
-  const current = elo[index]
-  const next = elo[index + 1]
+const getColors = (current, next, ctx, coordinatesStart, coordinatesEnd) => {
+  if (current === undefined) current = next
   const gradient = ctx.createLinearGradient(coordinatesStart.x, coordinatesStart.y, coordinatesEnd.x, coordinatesEnd.y)
   let value
 
@@ -85,10 +84,10 @@ const getStrokeColors = (ctx, elo, index, coordinatesStart, coordinatesEnd) => {
       if (next >= fc.min && next <= fc.max) value = fc.color
       else if (next > fc.max) {
         gradient.addColorStop(0, fc.color)
-        gradient.addColorStop(1, faceitEloColors[i + 1].color)
+        gradient.addColorStop(0.5, faceitEloColors[i + 1].color)
         value = gradient
       } else if (next < fc.min) {
-        gradient.addColorStop(0.6, fc.color)
+        gradient.addColorStop(0.5, fc.color)
         gradient.addColorStop(1, faceitEloColors[i - 1].color)
         value = gradient
       }
