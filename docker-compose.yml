@@ -1,0 +1,13 @@
+version: '3'
+services:
+  app:
+    build: 
+      context: app
+      dockerfile: Dockerfile
+    restart: on-failure
+    container_name: faceitfinder
+    command: npm start
+    volume: 
+      - ./app:/usr/src/app
+    env_file:
+      - .env
