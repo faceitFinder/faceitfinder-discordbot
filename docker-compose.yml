@@ -8,6 +8,7 @@ services:
     container_name: faceitfinder
     command: npm start
     volumes: 
+      - /usr/src/app/node_modules
       - ./:/usr/src/app
     env_file:
       - .env.local
