@@ -11,3 +11,4 @@ services:
       - ./:/usr/src/app
     env_file:
       - .env
+      - .env.local
