@@ -1,7 +1,9 @@
+const { color } = require('../config.json')
+const fs = require('fs')
 const Matches = require('./matches')
 const Player = require('./player')
 const Canvas = require('canvas')
-const { color } = require('../config.json')
+
 const faceitEloColors = [
   { "min": 0, "max": 800, "color": color.levels[0] },
   { "min": 801, "max": 1100, "color": color.levels[1] },
@@ -44,10 +46,21 @@ const generateCanva = async (playerId) => {
 
   ctx.globalCompositeOperation = 'source-over'
 
-  // Player name
+  /**
+   * Player name
+   */
   ctx.fillStyle = '#c5c5c5'
   ctx.font = '50px sans-serif'
   ctx.fillText(playerDatas.nickname, 10, 50)
+
+  /**
+   * Rank image
+   */
+  fs.readFileSync(`/images/faceit${playerDatas.games.csgo.skill_level_label}.svg`, 'utf-8', (img) => {
+    Canvas.loadImage(img.toBuffer()).then(e => {
+      ctx.drawImage(e)
+    })
+  })
 
   ctx.globalCompositeOperation = 'source-over'
 
