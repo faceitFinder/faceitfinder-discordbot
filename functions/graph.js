@@ -1,7 +1,9 @@
+const { color } = require('../config.json')
+const path = require('path')
 const Matches = require('./matches')
 const Player = require('./player')
 const Canvas = require('canvas')
-const { color } = require('../config.json')
+
 const faceitEloColors = [
   { "min": 0, "max": 800, "color": color.levels[0] },
   { "min": 801, "max": 1100, "color": color.levels[1] },
@@ -17,6 +19,7 @@ const generateCanva = async (playerId) => {
   const padding = 100
   const width = padding * (elo.length + 1)
   const height = Math.max(...elo) - Math.min(...elo) + padding * 2
+  const titleOptions = { "x": 10, "y": 50, "fontSize": 50 }
 
   const canvas = Canvas.createCanvas(width, height)
   const ctx = canvas.getContext('2d')
@@ -44,10 +47,21 @@ const generateCanva = async (playerId) => {
 
   ctx.globalCompositeOperation = 'source-over'
 
-  // Player name
-  ctx.fillStyle = '#c5c5c5'
-  ctx.font = '50px sans-serif'
-  ctx.fillText(playerDatas.nickname, 10, 50)
+  /**
+   * Player name
+   */
+  ctx.fillStyle = '#fff'
+  ctx.font = `${titleOptions.fontSize}px sans-serif`
+  ctx.fillText(playerDatas.nickname, titleOptions.x, titleOptions.y)
+
+  /**
+   * Rank image
+   */
+  const image = await Canvas.loadImage(
+    path.resolve(__dirname, `../images/faceit${playerDatas.games.csgo.skill_level_label}.svg`))
+  image.height = image.width = titleOptions.fontSize
+  ctx.drawImage(image, (titleOptions.x * 2) + ctx.measureText(playerDatas.nickname).width, titleOptions.x)
+
 
   ctx.globalCompositeOperation = 'source-over'
 
