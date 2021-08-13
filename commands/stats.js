@@ -65,14 +65,16 @@ module.exports = {
   description: "Displays the statistics of the given user (s), with a graph showing the evolution of his elo over his last 20 matches (or less if he has not played 20)",
   type: 'stats',
   async execute(message, args) {
-    const steamParam = args[0].split('/').filter(e => e).pop()
-    const steamIds = RegexFun.findSteamId(message)
+    const steamIds = RegexFun.findSteamUIds(message.content)
 
     if (steamIds.length > 0)
       steamIds.forEach(e => {
         sendCardWithInfos(message, e)
       })
     else
-      sendCardWithInfos(message, steamParam)
+      args.forEach(e => {
+        const steamParam = e.split('/').filter(e => e).pop()
+        sendCardWithInfos(message, steamParam)
+      })
   }
 }
