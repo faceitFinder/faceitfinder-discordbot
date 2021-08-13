@@ -4,11 +4,11 @@ const Matches = require('./matches')
 const Canvas = require('canvas')
 
 const faceitEloColors = [
-  { "min": 0, "max": 800, "color": color.levels[0] },
-  { "min": 801, "max": 1100, "color": color.levels[1] },
-  { "min": 1101, "max": 1700, "color": color.levels[3] },
-  { "min": 1701, "max": 2000, "color": color.levels[7] },
-  { "min": 2001, "max": 100000, "color": color.levels[9] },
+  { min: 0, max: 800, color: color.levels[0] },
+  { min: 801, max: 1100, color: color.levels[1] },
+  { min: 1101, max: 1700, color: color.levels[3] },
+  { min: 1701, max: 2000, color: color.levels[7] },
+  { min: 2001, max: 100000, color: color.levels[9] },
 ]
 
 const generateCanvas = async (playerId) => {
