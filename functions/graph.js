@@ -1,7 +1,6 @@
 const { color } = require('../config.json')
 const path = require('path')
 const Matches = require('./matches')
-const Player = require('./player')
 const Canvas = require('canvas')
 
 const faceitEloColors = [
@@ -12,14 +11,12 @@ const faceitEloColors = [
   { "min": 2001, "max": 100000, "color": color.levels[9] },
 ]
 
-const generateCanva = async (playerId) => {
-  const playerDatas = await Player.getDatas(playerId)
+const generateCanvas = async (playerId) => {
   const elo = (await getElo(playerId)).reverse()
 
   const padding = 100
   const width = padding * (elo.length + 1)
   const height = Math.max(...elo) - Math.min(...elo) + padding * 2
-  const titleOptions = { "x": 10, "y": 50, "fontSize": 50 }
 
   const canvas = Canvas.createCanvas(width, height)
   const ctx = canvas.getContext('2d')
@@ -28,12 +25,14 @@ const generateCanva = async (playerId) => {
    * Background
    */
   ctx.clearRect(0, 0, width, height);
-  ctx.fillStyle = '#2f2f2f'
+  ctx.fillStyle = '#2f3136'
   ctx.fillRect(0, 0, width, height)
 
   ctx.globalCompositeOperation = 'source-over'
   ctx.strokeStyle = '#383838'
   ctx.lineWidth = 5
+
+  ctx.globalCompositeOperation = 'source-over'
 
   /**
    * Grid
@@ -44,24 +43,6 @@ const generateCanva = async (playerId) => {
     ctx.lineTo(padding * i, height)
     ctx.stroke()
   }
-
-  ctx.globalCompositeOperation = 'source-over'
-
-  /**
-   * Player name
-   */
-  ctx.fillStyle = '#fff'
-  ctx.font = `${titleOptions.fontSize}px sans-serif`
-  ctx.fillText(playerDatas.nickname, titleOptions.x, titleOptions.y)
-
-  /**
-   * Rank image
-   */
-  const image = await Canvas.loadImage(
-    path.resolve(__dirname, `../images/faceit${playerDatas.games.csgo.skill_level_label}.svg`))
-  image.height = image.width = titleOptions.fontSize
-  ctx.drawImage(image, (titleOptions.x * 2) + ctx.measureText(playerDatas.nickname).width, titleOptions.x)
-
 
   ctx.globalCompositeOperation = 'source-over'
 
@@ -85,7 +66,15 @@ const generateCanva = async (playerId) => {
     ctx.fillText(e, padding * i + padding / 1.5, height)
   })
 
-  return canvas.toBuffer()
+  return canvas
+}
+
+const getRankImage = async (faceitLevel, size) => {
+  const image = await Canvas.loadImage(
+    path.resolve(__dirname, `../images/faceit${faceitLevel}.svg`))
+  image.height = image.width = size
+
+  return image
 }
 
 const getColors = (current, next, ctx, coordinatesStart, coordinatesEnd) => {
@@ -115,5 +104,6 @@ const getElo = async (playerId) => {
 }
 
 module.exports = {
-  generateCanva
+  generateCanvas,
+  getRankImage
 }
