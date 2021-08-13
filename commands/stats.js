@@ -32,6 +32,8 @@ const sendCardWithInfos = async (message, steamParam) => {
         new Discord.MessageAttachment(rankImageCanvas.toBuffer(), 'level.png')
       ])
       .setAuthor(playerDatas.nickname, playerDatas.avatar, `https://www.faceit.com/fr/players/${playerDatas.nickname}`)
+      .setTitle('Steam')
+      .setURL(steamDatas.profileurl)
       .setThumbnail('attachment://level.png')
       .addFields(
         { name: 'Games', value: `${playerStats.lifetime.Matches} (${playerStats.lifetime['Win Rate %']}% Win)`, inline: true },
