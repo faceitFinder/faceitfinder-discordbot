@@ -10,7 +10,7 @@ const getId = async (arg) => {
     })
     .then(data => {
       if (data.response.success == 1) return data.response.steamid
-      else throw 'Invalid argument'
+      else return arg
     })
 }
 
