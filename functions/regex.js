@@ -1,9 +1,8 @@
 const Big = require('big.js')
 
-const regex = /STEAM_([0-9]):([0-9]):([0-9]*)/gi
-const staticBin = '000100000000000000000001'
-
-const findSteamId = (str) => {
+const findSteamUIds = (str) => {
+  const regex = /STEAM_([0-9]):([0-9]):([0-9]*)/gi
+  const staticBin = '000100000000000000000001'
   const res = []
 
   while ((m = regex.exec(str)) !== null) {
@@ -44,5 +43,5 @@ const decToBin = (num, len) => {
 }
 
 module.exports = {
-  findSteamId,
+  findSteamUIds,
 }
