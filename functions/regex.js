@@ -27,9 +27,10 @@ const binToDec = (num) => {
 }
 
 const decToBin = (num, len) => {
-  if (num === 0)
-    return 0
+  if (!num) return num
+  
   const bin = []
+  
   while (num > 0) {
     let rem = num % 2
     bin.push(rem)
