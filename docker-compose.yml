@@ -7,8 +7,20 @@ services:
     restart: on-failure
     container_name: faceitfinder
     command: npm start
+    links:
+      - mongodb
     volumes: 
       - /usr/src/app/node_modules
-      - ./:/usr/src/app
+      - .:/usr/src/app
+    env_file:
+      - .env
+
+  mongodb:
+    image: mongo:latest
+    hostname: mongodb
+    ports:
+      - '27017:27017'
+    command:
+      [--auth]
     env_file:
       - .env
