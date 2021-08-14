@@ -1,12 +1,20 @@
 const { prefix, name, color } = require('./config.json')
 const Discord = require('discord.js')
 const fs = require('fs')
+const mongo = require('./database/mongo')
 const bot = new Discord.Client()
 
 require('dotenv').config()
 
 bot.on('ready', () => {
   console.log('🚀 Bot started!')
+  mongo().then(() => {
+    try {
+      console.log('🧱 Connected to mongo')
+    } catch (e) {
+      console.error(e)
+    }
+  })
 
   bot.user.setActivity(`${prefix}`, { type: 'PLAYING' })
 })
