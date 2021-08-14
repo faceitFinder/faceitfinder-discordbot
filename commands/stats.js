@@ -64,13 +64,19 @@ const sendCardWithInfos = async (message, steamParam) => {
 module.exports = {
   name: 'stats',
   aliasses: ['stats', 's', 'dodolegroscochon'],
-  options: ' [user steam id/ steam custom url id/ steam profile link/ csgo status ingame command with the users part]',
+  options: ' [user steam id/ steam custom url id/ steam profile link/ csgo status ingame command with the users part/ @ someone]',
   description: "Displays the statistics of the given user (s), with a graph showing the evolution of his elo over his last 20 matches (or less if he has not played 20)",
   type: 'command',
   async execute(message, args) {
     const steamIds = RegexFun.findSteamUIds(message.content)
 
-    if (steamIds.length > 0)
+    if (message.mentions.users)
+      message.mentions.users.forEach(async (e) => {
+        const user = await User.exists(e.id)
+        if (!user) message.channel.send(new Discord.MessageEmbed().setColor(color.error).setDescription('**No players found**').setFooter(`${name} Error`))
+        else sendCardWithInfos(message, user.steamId)
+      })
+    else if (steamIds.length > 0)
       steamIds.forEach(e => {
         sendCardWithInfos(message, e)
       })
