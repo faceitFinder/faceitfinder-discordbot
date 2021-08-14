@@ -30,7 +30,7 @@ module.exports = {
   name: 'link',
   aliasses: ['link', 'l'],
   options: ' [user steam id/ steam custom url id/ steam profile link/ csgo status ingame command with the users part]',
-  description: "Link steam id to the discord user",
+  description: "Link steam id to the discord user, so when you do .ffstats it displays directly your stats.",
   type: 'command',
   async execute(message, args) {
     const steamId = RegexFun.findSteamUIds(message.content)
