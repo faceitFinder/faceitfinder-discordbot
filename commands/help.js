@@ -17,8 +17,8 @@ const getCommandsHelp = (type, card) => {
     if (c.type === type) card.addFields({ name: `\`${prefix}${c.name}${c.options}\``, value: `${c.description}` })
   })
   
-  if (card.fields.length > 0) card.setTitle(`Help ${type}:`)
-  else card.addFields(defaultFields)
+  if (card.fields && !card.title) card.setTitle(`Help ${type}:`)
+  else if(!card.fields) card.addFields(defaultFields)
 
   return card
 }
