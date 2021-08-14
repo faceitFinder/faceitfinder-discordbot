@@ -70,7 +70,7 @@ module.exports = {
   async execute(message, args) {
     const steamIds = RegexFun.findSteamUIds(message.content)
 
-    if (message.mentions.users)
+    if (message.mentions.users.size > 0)
       message.mentions.users.forEach(async (e) => {
         const user = await User.exists(e.id)
         if (!user) message.channel.send(new Discord.MessageEmbed().setColor(color.error).setDescription('**No players found**').setFooter(`${name} Error`))
