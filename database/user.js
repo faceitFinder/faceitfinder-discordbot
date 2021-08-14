@@ -13,7 +13,7 @@ const create = (discordId, steamId) => {
 
 const get = async (discordId) => await User.findOne({ discordId: discordId }).exec()
 
-const exists = async (discordId) => (await get(discordId)).length >= 1
+const exists = async (discordId) => (await get(discordId))
 
 const update = async (discordId, steamId) => await User.updateOne({ discordId: discordId }, { steamId: steamId }).exec()
 

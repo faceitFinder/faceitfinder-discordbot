@@ -12,7 +12,7 @@ const sendCardWithInfos = async (message, steamParam) => {
     const playerDatas = await Player.getDatas(playerId)
     const discordId = message.author.id
 
-    await User.exists(discordId) ? await User.update(discordId, steamId) : await User.create(discordId, steamId)
+    await User.exists(discordId) ? await User.update(discordId, steamId) : User.create(discordId, steamId)
 
     message.channel.send(new Discord.MessageEmbed()
       .setDescription(`Your account has been linked to ${playerDatas.nickname}`))
