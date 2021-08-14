@@ -6,6 +6,7 @@ const Steam = require('../functions/steam')
 const Player = require('../functions/player')
 const Graph = require('../functions/graph')
 const Ladder = require('../functions/ladder')
+const User = require('../database/user')
 
 const sendCardWithInfos = async (message, steamParam) => {
   try {
@@ -65,7 +66,7 @@ module.exports = {
   aliasses: ['stats', 's', 'dodolegroscochon'],
   options: ' [user steam id/ steam custom url id/ steam profile link/ csgo status ingame command with the users part]',
   description: "Displays the statistics of the given user (s), with a graph showing the evolution of his elo over his last 20 matches (or less if he has not played 20)",
-  type: 'stats',
+  type: 'command',
   async execute(message, args) {
     const steamIds = RegexFun.findSteamUIds(message.content)
 
@@ -73,10 +74,11 @@ module.exports = {
       steamIds.forEach(e => {
         sendCardWithInfos(message, e)
       })
-    else
+    else if (args.length > 0)
       args.forEach(e => {
         const steamParam = e.split('/').filter(e => e).pop()
         sendCardWithInfos(message, steamParam)
       })
+    else if (await User.get(message.author.id)) sendCardWithInfos(message, (await User.get(message.author.id)).steamId)
   }
 }
