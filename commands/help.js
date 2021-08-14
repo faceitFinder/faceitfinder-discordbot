@@ -2,16 +2,24 @@ const { prefix, name } = require('../config.json')
 const Discord = require('discord.js')
 const fs = require('fs')
 
+const defaultFields = [
+  { name: `\`${prefix}help\``, value: 'Show this list' },
+  { name: `\`${prefix}help command\``, value: 'Show the command list' },
+  { name: `\`${prefix}help system\``, value: 'Show the system command list' }]
+
 const getCommandsHelp = (type, card) => {
   const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'))
   const commands = []
-  for (const cf of commandFiles)
-    commands.push(require(`./${cf}`))
+
+  for (const cf of commandFiles) commands.push(require(`./${cf}`))
 
   commands.forEach(c => {
-    if (c.type === type)
-      card.addFields({ name: `\`${prefix}${c.name}${c.options}\``, value: `${c.description}` },)
+    if (c.type === type) card.addFields({ name: `\`${prefix}${c.name}${c.options}\``, value: `${c.description}` })
   })
+  
+  if (card.fields.length > 0) card.setTitle(`Help ${type}:`)
+  else card.addFields(defaultFields)
+
   return card
 }
 
@@ -22,30 +30,11 @@ module.exports = {
   description: 'Display the command list.',
   type: 'system',
   execute(message, args) {
-    const helpCard = new Discord.MessageEmbed()
-      .setFooter(`${name} Help`)
-    helpCard.fields = []
+    const helpCard = new Discord.MessageEmbed().setFooter(`${name} Help`)
 
-    if (!args.length) message.channel.send(helpCard.setTitle('Command categories:')
-      .addFields(
-        { name: `\`${prefix}help\``, value: 'Show this list' },
-        { name: `\`${prefix}help stats\``, value: 'Show the stats command list' },
-        { name: `\`${prefix}help system\``, value: 'Show the system command list' },
-      ))
-    else {
-      helpCard.setDescription('Mandatory parameters: **[]**\nOptionnal parameters: **{}**')
-      switch (args[0]) {
-        case 'stats':
-          helpCard.setTitle('Stats commands:')
-          message.channel.send(getCommandsHelp('stats', helpCard))
-          break
-        case 'system':
-          helpCard.setTitle('System commands:')
-          message.channel.send(getCommandsHelp('system', helpCard))
-          break
-        default:
-          break
-      }
-    }
+    if (!args.length) helpCard.setTitle('Command categories:').addFields(defaultFields)
+    else helpCard.setDescription('Mandatory parameters: **[]**\nOptionnal parameters: **{}**')
+
+    message.channel.send(getCommandsHelp(args[0], helpCard))
   }
 }
