@@ -14,7 +14,9 @@ services:
       - .:/usr/src/app
     env_file:
       - .env
-
+    networks:
+      - app
+      
   mongodb:
     image: mongo:latest
     hostname: mongodb
@@ -24,3 +26,8 @@ services:
       [--auth]
     env_file:
       - .env
+    networks:
+      - app
+
+networks:
+  app:
