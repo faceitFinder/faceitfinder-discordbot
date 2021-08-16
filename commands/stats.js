@@ -16,11 +16,14 @@ const sendCardWithInfos = async (message, steamParam) => {
     const playerDatas = await Player.getDatas(playerId)
     const playerStats = await Player.getStats(playerId)
     const graphCanvas = await Graph.generateCanvas(playerId)
-    const ladderCountry = await Ladder.getDatas(playerId, playerDatas.country)
-    const ladderRegion = await Ladder.getDatas(playerId)
+
+    const playerCountry = playerDatas.country
+    const playerRegion = playerDatas.games.csgo.region
+    
+    const ladderCountry = await Ladder.getDatas(playerId, playerRegion, playerCountry)
+    const ladderRegion = await Ladder.getDatas(playerId, playerRegion)
 
     const faceitLevel = playerDatas.games.csgo.skill_level_label
-    const playerRegion = playerDatas.games.csgo.region
     const size = 40
 
     const rankImageCanvas = Canvas.createCanvas(size, size)
@@ -42,7 +45,7 @@ const sendCardWithInfos = async (message, steamParam) => {
         { name: 'HS', value: `${playerStats.lifetime['Average Headshots %']}%`, inline: true })
       .addFields(
         { name: 'Elo', value: playerDatas.games.csgo.faceit_elo, inline: true },
-        { name: `:flag_${playerDatas.country}:`, value: ladderCountry.position, inline: true },
+        { name: `:flag_${playerCountry}:`, value: ladderCountry.position, inline: true },
         { name: `:flag_${playerRegion.toLowerCase()}:`, value: ladderRegion.position, inline: true })
       .setImage('attachment://graph.png')
       .setColor(color.levels[faceitLevel - 1])
