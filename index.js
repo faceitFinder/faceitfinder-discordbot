@@ -15,8 +15,10 @@ bot.on('ready', () => {
       console.error(e)
     }
   })
+  
+  const Guilds = bot.guilds.cache.map(guild => guild.id)
 
-  bot.user.setActivity(`${prefix}`, { type: 'PLAYING' })
+  bot.user.setActivity(`${prefix}help | ${Guilds.length} servers`, { type: 'PLAYING' })
 })
 
 /**
