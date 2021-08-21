@@ -1,4 +1,4 @@
-const { name, color } = require('../config.json')
+const { name, color, prefix } = require('../config.json')
 const Discord = require('discord.js')
 const Player = require('../functions/player')
 const Steam = require('../functions/steam')
@@ -29,8 +29,8 @@ const sendCardWithInfos = async (message, steamParam) => {
 module.exports = {
   name: 'link',
   aliasses: ['link', 'l'],
-  options: ' [user steam id/ steam custom url id/ steam profile link/ csgo status ingame command with the users part]',
-  description: "Link steam id to the discord user, so when you do .ffstats it displays directly your stats.",
+  options: '<user steam id | steam custom id | steam profile link | csgo status ingame command with your user line>',
+  description: `Link steam id to the discord user, so when you do ${prefix}stats it displays directly your stats.`,
   type: 'command',
   async execute(message, args) {
     const steamId = RegexFun.findSteamUIds(message.content)
