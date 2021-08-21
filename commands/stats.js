@@ -19,7 +19,7 @@ const sendCardWithInfos = async (message, steamParam) => {
 
     const playerCountry = playerDatas.country
     const playerRegion = playerDatas.games.csgo.region
-    
+
     const ladderCountry = await Ladder.getDatas(playerId, playerRegion, playerCountry)
     const ladderRegion = await Ladder.getDatas(playerId, playerRegion)
 
@@ -66,9 +66,9 @@ const sendCardWithInfos = async (message, steamParam) => {
 
 module.exports = {
   name: 'stats',
-  aliasses: ['stats', 's', 'dodolegroscochon'],
-  options: ' [user steam id/ steam custom url id/ steam profile link/ csgo status ingame command with the users part/ @ someone]',
-  description: "Displays the statistics of the given user (s), with a graph showing the evolution of his elo over his last 20 matches (or less if he has not played 20)",
+  aliasses: ['stats', 's'],
+  options: '{user steam id | steam custom id | steam profile link | csgo status ingame command with the users part | @ someone}',
+  description: "Parameters are optional if you linked your account.\nDisplays the statistics of the given user (s), with a graph showing the evolution of his elo over his last 20 matches (or less if he has not played 20)",
   type: 'command',
   async execute(message, args) {
     const steamIds = RegexFun.findSteamUIds(message.content)
