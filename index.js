@@ -16,9 +16,7 @@ bot.on('ready', () => {
     }
   })
   
-  const Guilds = bot.guilds.cache.map(guild => guild.id)
-
-  bot.user.setActivity(`${prefix}help | ${Guilds.length} servers`, { type: 'PLAYING' })
+  setGuildsNumber()
 })
 
 /**
@@ -37,6 +35,7 @@ for (const file of commandFiles) {
 bot.on('message', async message => {
   if (!message.content.startsWith(prefix) || message.author.bot) return
   else {
+    setGuildsNumber()
     const msg = message.content.slice(prefix.length).trim()
     const args = msg.split(/ +/)
     const command = args.shift().toLowerCase()
@@ -63,6 +62,11 @@ bot.on('message', async message => {
     }
   }
 })
+
+const setGuildsNumber = () => {
+  const Guilds = bot.guilds.cache.map(guild => guild.id)
+  bot.user.setActivity(`${prefix}help | ${Guilds.length} servers`, { type: 'PLAYING' })
+}
 
 // Start the bot
 bot.login(process.env.TOKEN)
