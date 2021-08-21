@@ -45,6 +45,7 @@ module.exports = {
   type: 'system',
   execute(message, args) {
     const helpCard = new Discord.MessageEmbed()
+      .setColor(color.primary)
       .setTitle('Commands')
       .setDescription(`\`${prefix}help {command}\` for more info on a specific command`)
       .setFooter(`${name} Help`)

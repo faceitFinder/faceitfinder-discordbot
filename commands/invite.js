@@ -1,4 +1,4 @@
-const { name, invite } = require('../config.json')
+const { name, invite, color } = require('../config.json')
 const Discord = require('discord.js')
 
 module.exports = {
@@ -12,6 +12,7 @@ module.exports = {
       .attachFiles([
         new Discord.MessageAttachment('./images/logo.png', 'logo.png')
       ])
+      .setColor(color.primary)
       .setAuthor(`${name}`, 'attachment://logo.png')
       .setDescription(`Hey <@${message.author.id}> you can invite me by clicking on the following link\n${invite}`)
       .setFooter(`${name} Invite`))
