@@ -15,6 +15,7 @@ const sendCardWithInfos = async (message, steamParam) => {
     await User.exists(discordId) ? await User.update(discordId, steamId) : User.create(discordId, steamId)
 
     message.channel.send(new Discord.MessageEmbed()
+      .setColor(color.primary)
       .setDescription(`Your account has been linked to ${playerDatas.nickname}`))
 
   } catch (error) {
