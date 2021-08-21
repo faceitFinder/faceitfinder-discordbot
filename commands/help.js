@@ -1,24 +1,38 @@
-const { prefix, name } = require('../config.json')
+const { prefix, name, color } = require('../config.json')
 const Discord = require('discord.js')
 const fs = require('fs')
 
-const defaultFields = [
-  { name: `\`${prefix}help\``, value: 'Show this list' },
-  { name: `\`${prefix}help command\``, value: 'Show the command list' },
-  { name: `\`${prefix}help system\``, value: 'Show the system command list' }]
-
-const getCommandsHelp = (type, card) => {
+const getCommands = (card) => {
   const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'))
   const commands = []
+  const types = []
 
-  for (const cf of commandFiles) commands.push(require(`./${cf}`))
-
-  commands.forEach(c => {
-    if (c.type === type) card.addFields({ name: `\`${prefix}${c.name}${c.options}\``, value: `${c.description}` })
+  commandFiles.forEach(cf => commands.push(require(`./${cf}`)))
+  commands.forEach(c => { if (!types.includes(c.type)) types.push(c.type) })
+  types.forEach(t => {
+    let value = ''
+    commands.forEach(c => { if (c.type === t) value += `\`${prefix} ${c.name}\` ` })
+    card.addField(t, value)
   })
-  
-  if (card.fields && !card.title) card.setTitle(`Help ${type}:`)
-  else if(!card.fields) card.addFields(defaultFields)
+
+  return card
+}
+
+const getCommandsHelp = (commandName, card) => {
+  try {
+    command = require(`./${commandName}.js`)
+  } catch {
+    return new Discord.MessageEmbed()
+      .setColor(color.error)
+      .setDescription('**Command not found**')
+      .setFooter(`${name} Error`)
+  }
+
+  card.setDescription(`Informations about the ${command.name} command\n{}: Optionnal paramaters\n<>: Mandatory parameters`)
+    .addFields({ name: 'Aliases', value: command.aliasses.join(',') },
+      { name: 'Description', value: command.description },
+      { name: 'Options', value: command.options ? command.options : 'This command do not required options' },
+      { name: 'Usage', value: `${prefix}${command.name} ${command.options ? command.options : ''}` })
 
   return card
 }
@@ -26,15 +40,16 @@ const getCommandsHelp = (type, card) => {
 module.exports = {
   name: 'help',
   aliasses: ['help', 'h'],
-  options: '',
+  options: '{command}',
   description: 'Display the command list.',
   type: 'system',
   execute(message, args) {
-    const helpCard = new Discord.MessageEmbed().setFooter(`${name} Help`)
+    const helpCard = new Discord.MessageEmbed()
+      .setTitle('Commands')
+      .setDescription(`\`${prefix}help {command}\` for more info on a specific command`)
+      .setFooter(`${name} Help`)
 
-    if (!args.length) helpCard.setTitle('Command categories:').addFields(defaultFields)
-    else helpCard.setDescription('Mandatory parameters: **[]**\nOptionnal parameters: **{}**')
-
-    message.channel.send(getCommandsHelp(args[0], helpCard))
+    if (args.length === 0) message.channel.send(getCommands(helpCard))
+    else message.channel.send(getCommandsHelp(args[0], helpCard))
   }
 }
