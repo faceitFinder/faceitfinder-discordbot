@@ -92,7 +92,7 @@ module.exports = {
     else
       message.channel.send(new Discord.MessageEmbed()
         .setColor(color.error)
-        .setDescription(`You need to link your account to do that, do ${prefix}help link to see how.`)
+        .setDescription(`You need to link your account to do that without a parameter, do ${prefix}help link to see how.`)
         .setFooter(`${name} Error`))
   }
 }
