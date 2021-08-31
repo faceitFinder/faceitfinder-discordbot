@@ -15,6 +15,6 @@ module.exports = {
       .setColor(color.primary)
       .setAuthor(`${name}`, 'attachment://logo.png')
       .setDescription(`Hey <@${message.author.id}> you can join my server by clicking on the following link\n${join}`)
-      .setFooter(`${name} Invite`))
+      .setFooter(`${name} Join`))
   }
 }
