@@ -31,13 +31,16 @@ module.exports = {
   name: 'link',
   aliasses: ['link', 'l'],
   options: '<user steam id | steam custom id | steam profile link | csgo status ingame command with your user line>',
-  description: `Link steam id to the discord user, so when you do ${prefix}stats it displays directly your stats.`,
+  description: `Link steam id to the discord user, so when you do ${prefix}stats or ${prefix}last it displays directly your stats.`,
   type: 'command',
   async execute(message, args) {
     const steamId = RegexFun.findSteamUIds(message.content)
-    const steamParam = args[0].split('/').filter(e => e).pop()
 
     if (steamId.length > 0) sendCardWithInfos(message, steamId)
-    else sendCardWithInfos(message, steamParam)
+    else if (args.length > 0) sendCardWithInfos(message, args[0].split('/').filter(e => e).pop())
+    else message.channel.send(new Discord.MessageEmbed()
+      .setColor(color.error)
+      .setDescription(`A parameter is missing, please do ${prefix}help link, to see how to do.`)
+      .setFooter(`${name} Error`))
   }
 }
