@@ -1,8 +1,11 @@
 {
   "name": "FaceitFinder",
+  "creator": "275395358316560384",
+  "github": "https://github.com/JustDams/faceitFinder",
   "prefix": ".ff",
   "invite": "https://discord.com/oauth2/authorize?client_id=838088031222235197&permissions=0&redirect_uri=https%3A%2F%2Fdiscordapp.com%2Fapi%2Foauth2%2Fauthorize&scope=bot",
   "vote": "https://top.gg/bot/838088031222235197/vote",
+  "join": "https://discord.gg/uPAdfvfuTP",
   "color": {
     "primary": "#14578c",
     "levels": [
