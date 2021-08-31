@@ -6,8 +6,11 @@ const getDatas = async (playerId) => await Faceit.fetchData(`https://open.faceit
 
 const getStats = async (playerId) => await Faceit.fetchData(`https://open.faceit.com/data/v4/players/${playerId}/stats/csgo`)
 
+const getHistory = async (playerId, limit = 1) => await Faceit.fetchData(`https://open.faceit.com/data/v4/players/${playerId}/history?game=csgo&offset=0&limit=${limit}`)
+
 module.exports = {
   getDatas,
   getId,
-  getStats
+  getStats,
+  getHistory
 }

@@ -1,4 +1,4 @@
-const { color, name } = require('../config.json')
+const { color, name, prefix } = require('../config.json')
 const Discord = require('discord.js')
 const Canvas = require('canvas')
 const RegexFun = require('../functions/regex')
@@ -68,7 +68,7 @@ module.exports = {
   name: 'stats',
   aliasses: ['stats', 's'],
   options: '{user steam id | steam custom id | steam profile link | csgo status ingame command with the users part | @ someone}',
-  description: "Parameters are optional if you linked your account.\nDisplays the statistics of the given user (s), with a graph showing the evolution of his elo over his last 20 matches (or less if he has not played 20)",
+  description: "Parameters are optional if you linked your account.\nDisplays the statistics of the given user (s), with a graph showing the evolution of his elo over his last 20 games (or less if he has not played 20)",
   type: 'command',
   async execute(message, args) {
     const steamIds = RegexFun.findSteamUIds(message.content)
@@ -89,5 +89,10 @@ module.exports = {
         sendCardWithInfos(message, steamParam)
       })
     else if (await User.get(message.author.id)) sendCardWithInfos(message, (await User.get(message.author.id)).steamId)
+    else
+      message.channel.send(new Discord.MessageEmbed()
+        .setColor(color.error)
+        .setDescription(`You need to link your account to do that without a parameter, do ${prefix}help link to see how.`)
+        .setFooter(`${name} Error`))
   }
 }
