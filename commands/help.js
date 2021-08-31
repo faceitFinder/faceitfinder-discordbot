@@ -28,7 +28,7 @@ const getCommandsHelp = (commandName, card) => {
       .setFooter(`${name} Error`)
   }
 
-  card.setDescription(`Informations about the ${command.name} command\n{}: Optionnal paramaters\n<>: Mandatory parameters`)
+  card.setDescription(`Informations about the ${command.name} command\n{}: Optionnal parameters\n<>: Mandatory parameters`)
     .addFields({ name: 'Aliases', value: command.aliasses.join(',') },
       { name: 'Description', value: command.description },
       { name: 'Options', value: command.options ? command.options : 'This command do not required options' },
