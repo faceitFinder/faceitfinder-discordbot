@@ -1,6 +1,6 @@
 const { default: fetch } = require("node-fetch")
 
-const getMatches = async (playerId, limit = 20) => await fetch(`https://api.faceit.com/stats/api/v1/stats/time/users/${playerId}/games/csgo?size=${limit}`, {
+const getMatch = async (playerId, limit = 20) => await fetch(`https://api.faceit.com/stats/api/v1/stats/time/users/${playerId}/games/csgo?size=${limit}`, {
   method: 'GET',
 })
   .then(res => {
@@ -10,5 +10,5 @@ const getMatches = async (playerId, limit = 20) => await fetch(`https://api.face
   .then(data => data)
 
 module.exports = {
-  getMatches
+  getMatch
 }

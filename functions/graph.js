@@ -1,6 +1,6 @@
 const { color } = require('../config.json')
 const path = require('path')
-const Matches = require('./matches')
+const Match = require('./match')
 const Canvas = require('canvas')
 
 const faceitEloColors = [
@@ -99,7 +99,7 @@ const getColors = (current, next, ctx, coordinatesStart, coordinatesEnd) => {
 }
 
 const getElo = async (playerId) => {
-  const data = await Matches.getMatches(playerId)
+  const data = await Match.getMatch(playerId)
   return Array.from(data, e => e.elo).filter(e => e != undefined)
 }
 
