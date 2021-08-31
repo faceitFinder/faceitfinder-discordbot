@@ -99,7 +99,7 @@ const getColors = (current, next, ctx, coordinatesStart, coordinatesEnd) => {
 }
 
 const getElo = async (playerId) => {
-  const data = await Match.getMatch(playerId)
+  const data = await Match.getMatchElo(playerId)
   return Array.from(data, e => e.elo).filter(e => e != undefined)
 }
 
