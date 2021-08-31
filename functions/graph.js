@@ -71,7 +71,7 @@ const generateCanvas = async (playerId) => {
 
 const getRankImage = async (faceitLevel, size) => {
   const image = await Canvas.loadImage(
-    path.resolve(__dirname, `../images/faceit${faceitLevel}.svg`))
+    path.resolve(__dirname, `../images/faceit/faceit${faceitLevel}.svg`))
   image.height = image.width = size
 
   return image
