@@ -1,6 +1,6 @@
 {
-  "name": "faceitfinderdiscordbot",
-  "version": "1.0.0",
+  "name": "faceitfinder",
+  "version": "2.4.5",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/JustDams/faceitFinderDiscordBot.git"
+    "url": "git+https://github.com/JustDams/faceitFinder.git"
   },
   "author": "Dams_",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/JustDams/faceitFinderDiscordBot/issues"
+    "url": "https://github.com/JustDams/faceitFinder/issues"
   },
-  "homepage": "https://github.com/JustDams/faceitFinderDiscordBot#readme",
+  "homepage": "https://github.com/JustDams/faceitFinder#readme",
   "dependencies": {
     "big.js": "^6.1.1",
     "canvas": "^2.8.0",
