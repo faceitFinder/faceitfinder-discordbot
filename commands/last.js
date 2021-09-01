@@ -15,7 +15,18 @@ const sendCardWithInfos = async (message, steamParam) => {
     const steamDatas = await Steam.getDatas(steamId)
     const playerId = await Player.getId(steamId)
     const playerDatas = await Player.getDatas(playerId)
-    const lastMatchStats = await Match.getMatchStats((await Player.getHistory(playerId)).items[0].match_id)
+    const playerHistory = await Player.getHistory(playerId)
+
+    let lastMatchStats
+    if (playerHistory.items.length > 0) lastMatchStats = await Match.getMatchStats(playerHistory.items[0].match_id)
+    else {
+      message.channel.send(new Discord.MessageEmbed()
+        .setColor(color.error)
+        .setDescription('**Could not get your last match stats**')
+        .setFooter(`${name} Error`))
+      return
+    }
+
     const lastMatchElo = await Match.getMatchElo(playerId, 2)
 
     const faceitLevel = playerDatas.games.csgo.skill_level_label
