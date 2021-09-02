@@ -36,7 +36,7 @@ const sendCardWithInfos = async (message, steamParam) => {
     const ctx = rankImageCanvas.getContext('2d')
     ctx.drawImage(await Graph.getRankImage(faceitLevel, size), 0, 0)
 
-    const eloDiff = lastMatchElo[0].elo - lastMatchElo[1].elo
+    const eloDiff = playerDatas.games.csgo.faceit_elo - lastMatchElo[1].elo
 
     let card = new Discord.MessageEmbed()
     lastMatchStats.rounds.forEach((r, key) => {
