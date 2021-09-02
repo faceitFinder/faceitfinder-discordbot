@@ -17,9 +17,12 @@ const exists = async (discordId) => (await get(discordId))
 
 const update = async (discordId, steamId) => await User.updateOne({ discordId: discordId }, { steamId: steamId }).exec()
 
+const count = async () => await User.countDocuments({})
+
 module.exports = {
   create,
   get,
   exists,
-  update
+  update,
+  count
 }
