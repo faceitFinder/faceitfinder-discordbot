@@ -8,10 +8,11 @@ const Graph = require('../../functions/graph')
 
 module.exports = {
   name: 'mapSelector',
-  async execute(interaction) {
+  async execute(interaction, steamId) {
     try {
       const map = interaction.values[0].split(',')[0]
-      const steamId = interaction.values[0].split(',')[1]
+      const mode = interaction.values[0].split(',')[1]
+
       const steamDatas = await Steam.getDatas(steamId)
       const playerId = await Player.getId(steamId)
       const playerStats = await Player.getStats(playerId)
@@ -27,10 +28,10 @@ module.exports = {
       let mapThumbnail = `./images/maps/${map}.jpg`
       if (!fs.existsSync(mapThumbnail)) mapThumbnail = `./images/maps/unknown.png`
 
-      const card = new Discord.MessageEmbed()
-      const mapStats = playerStats.segments.filter(e => e.label === map)[0]
+      const mapStats = playerStats.segments.filter(e => e.label === map && e.mode == mode)[0]
 
-      card.setAuthor(playerDatas.nickname, playerDatas.avatar, `https://www.faceit.com/fr/players/${playerDatas.nickname}`)
+      const card = new Discord.MessageEmbed()
+        .setAuthor(playerDatas.nickname, playerDatas.avatar, `https://www.faceit.com/fr/players/${playerDatas.nickname}`)
         .setTitle('Steam')
         .setURL(steamDatas.profileurl)
         .setThumbnail('attachment://level.png')
