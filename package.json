@@ -20,7 +20,7 @@
   "dependencies": {
     "big.js": "^6.1.1",
     "canvas": "^2.8.0",
-    "discord.js": "^12.5.3",
+    "discord.js": "^13.1.0",
     "dotenv": "^8.2.0",
     "mongoose": "^5.13.7",
     "node-fetch": "^2.6.1",

@@ -7,14 +7,18 @@ module.exports = {
   options: '',
   description: "Get the link to vote for the bot on top.gg",
   type: 'system',
-  async execute(message, args) {
-    message.channel.send(new Discord.MessageEmbed()
-      .attachFiles([
+  async execute(message, args, client) {
+    message.channel.send({
+      embeds: [
+        new Discord.MessageEmbed()
+          .setColor(color.primary)
+          .setAuthor(`${name}`, 'attachment://logo.png')
+          .setDescription(`Hey <@${message.author.id}> you can vote for me on the following link\n${vote}`)
+          .setFooter(`${name} Vote`)
+      ],
+      files: [
         new Discord.MessageAttachment('./images/logo.png', 'logo.png')
-      ])
-      .setColor(color.primary)
-      .setAuthor(`${name}`, 'attachment://logo.png')
-      .setDescription(`Hey <@${message.author.id}> you can vote for me on the following link\n${vote}`)
-      .setFooter(`${name} Vote`))
+      ]
+    })
   }
 }

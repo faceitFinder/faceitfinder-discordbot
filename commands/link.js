@@ -14,16 +14,24 @@ const sendCardWithInfos = async (message, steamParam) => {
 
     await User.exists(discordId) ? await User.update(discordId, steamId) : User.create(discordId, steamId)
 
-    message.channel.send(new Discord.MessageEmbed()
-      .setColor(color.primary)
-      .setDescription(`Your account has been linked to ${playerDatas.nickname}`))
+    message.channel.send({
+      embeds: [
+        new Discord.MessageEmbed()
+          .setColor(color.primary)
+          .setDescription(`Your account has been linked to ${playerDatas.nickname}`)
+      ]
+    })
 
   } catch (error) {
     console.log(error)
-    message.channel.send(new Discord.MessageEmbed()
-      .setColor(color.error)
-      .setDescription('**No players found**')
-      .setFooter(`${name} Error`))
+    message.channel.send({
+      embeds: [
+        new Discord.MessageEmbed()
+          .setColor(color.error)
+          .setDescription('**No players found**')
+          .setFooter(`${name} Error`)
+      ]
+    })
   }
 }
 
@@ -33,14 +41,18 @@ module.exports = {
   options: '<user steam id | steam custom id | steam profile link | csgo status ingame command with your user line>',
   description: `Link steam id to the discord user, so when you do ${prefix}stats or ${prefix}last it displays directly your stats.`,
   type: 'command',
-  async execute(message, args) {
+  async execute(message, args, client) {
     const steamId = RegexFun.findSteamUIds(message.content)
 
     if (steamId.length > 0) sendCardWithInfos(message, steamId)
     else if (args.length > 0) sendCardWithInfos(message, args[0].split('/').filter(e => e).pop())
-    else message.channel.send(new Discord.MessageEmbed()
-      .setColor(color.error)
-      .setDescription(`A parameter is missing, please do ${prefix}help link, to see how to do.`)
-      .setFooter(`${name} Error`))
+    else message.channel.send({
+      embeds: [
+        new Discord.MessageEmbed()
+          .setColor(color.error)
+          .setDescription(`A parameter is missing, please do ${prefix}help link, to see how to do.`)
+          .setFooter(`${name} Error`)
+      ]
+    })
   }
 }

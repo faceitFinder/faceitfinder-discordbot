@@ -7,14 +7,18 @@ module.exports = {
   options: '',
   description: "Get the link to join the community server of the bot .",
   type: 'system',
-  async execute(message, args) {
-    message.channel.send(new Discord.MessageEmbed()
-      .attachFiles([
+  async execute(message, args, client) {
+    message.channel.send({
+      embeds: [
+        new Discord.MessageEmbed()
+          .setColor(color.primary)
+          .setAuthor(`${name}`, 'attachment://logo.png')
+          .setDescription(`Hey <@${message.author.id}> you can join my server by clicking on the following link\n${join}`)
+          .setFooter(`${name} Join`)
+      ],
+      files: [
         new Discord.MessageAttachment('./images/logo.png', 'logo.png')
-      ])
-      .setColor(color.primary)
-      .setAuthor(`${name}`, 'attachment://logo.png')
-      .setDescription(`Hey <@${message.author.id}> you can join my server by clicking on the following link\n${join}`)
-      .setFooter(`${name} Join`))
+      ]
+    })
   }
 }
