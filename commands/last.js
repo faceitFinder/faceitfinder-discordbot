@@ -68,7 +68,8 @@ const sendCardWithInfos = async (message, steamParam) => {
           { name: 'Kills', value: playerStats.Kills, inline: true },
           { name: 'Deaths', value: playerStats.Deaths, inline: true },
           { name: 'Assists', value: playerStats.Assists, inline: true },
-          { name: 'Elo', value: eloDiff > 0 ? `+${eloDiff}` : eloDiff })
+          { name: 'Elo', value: eloDiff > 0 ? `+${eloDiff}` : eloDiff, inline: true },
+          { name: 'Date', value: new Date(lastMatchElo[0].date), inline: true })
         .setThumbnail('attachment://level.png')
         .setImage('attachment://map.jpg')
         .setColor(color.levels[faceitLevel - 1])
