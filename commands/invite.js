@@ -7,7 +7,7 @@ module.exports = {
   options: '',
   description: "Get the link to invite the bot on your server.",
   type: 'system',
-  async execute(message, args, client) {
+  async execute(message, args) {
     message.channel.send({
       embeds: [
         new Discord.MessageEmbed()

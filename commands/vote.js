@@ -7,7 +7,7 @@ module.exports = {
   options: '',
   description: "Get the link to vote for the bot on top.gg",
   type: 'system',
-  async execute(message, args, client) {
+  async execute(message, args) {
     message.channel.send({
       embeds: [
         new Discord.MessageEmbed()

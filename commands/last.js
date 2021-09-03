@@ -102,7 +102,7 @@ module.exports = {
   options: '',
   description: "Get the stats of last game played by the given user (s).",
   type: 'command',
-  async execute(message, args, client) {
+  async execute(message, args) {
     const steamIds = RegexFun.findSteamUIds(message.content)
 
     if (message.mentions.users.size > 0)

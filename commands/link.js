@@ -41,7 +41,7 @@ module.exports = {
   options: '<user steam id | steam custom id | steam profile link | csgo status ingame command with your user line>',
   description: `Link steam id to the discord user, so when you do ${prefix}stats or ${prefix}last it displays directly your stats.`,
   type: 'command',
-  async execute(message, args, client) {
+  async execute(message, args) {
     const steamId = RegexFun.findSteamUIds(message.content)
 
     if (steamId.length > 0) sendCardWithInfos(message, steamId)

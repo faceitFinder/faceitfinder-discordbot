@@ -72,7 +72,7 @@ module.exports = {
   options: '{user steam id | steam custom id | steam profile link | csgo status ingame command with the users part | @ someone}',
   description: "Parameters are optional if you linked your account.\nDisplays the statistics of the given user (s), with a graph showing the evolution of his elo over his last 20 games (or less if he has not played 20)",
   type: 'command',
-  async execute(message, args, client) {
+  async execute(message, args) {
     const steamIds = RegexFun.findSteamUIds(message.content)
 
     if (message.mentions.users.size > 0)
