@@ -20,10 +20,14 @@ const sendCardWithInfos = async (message, steamParam) => {
     let lastMatchStats
     if (playerHistory.items.length > 0) lastMatchStats = await Match.getMatchStats(playerHistory.items[0].match_id)
     else {
-      message.channel.send(new Discord.MessageEmbed()
-        .setColor(color.error)
-        .setDescription('**Could not get your last match stats**')
-        .setFooter(`${name} Error`))
+      message.channel.send({
+        embeds: [
+          new Discord.MessageEmbed()
+            .setColor(color.error)
+            .setDescription('**Could not get your last match stats**')
+            .setFooter(`${name} Error`)
+        ]
+      })
       return
     }
 
@@ -39,6 +43,7 @@ const sendCardWithInfos = async (message, steamParam) => {
     const eloDiff = playerDatas.games.csgo.faceit_elo - lastMatchElo[1].elo
 
     let card = new Discord.MessageEmbed()
+    let mapThumbnail
     lastMatchStats.rounds.forEach((r, key) => {
       let playerStats
       for (const t of r.teams) {
@@ -47,28 +52,22 @@ const sendCardWithInfos = async (message, steamParam) => {
       }
 
       if (lastMatchStats.rounds.length > 1) card.addField({ name: 'round', value: key })
-
-      let mapThumbnail = `./images/maps/${r.round_stats.Map}.jpg`
+      mapThumbnail = `./images/maps/${r.round_stats.Map}.jpg`
       if (!fs.existsSync(mapThumbnail)) mapThumbnail = `./images/maps/unknown.png`
 
-      card
-        .attachFiles([
-          new Discord.MessageAttachment(rankImageCanvas.toBuffer(), 'level.png'),
-          new Discord.MessageAttachment(mapThumbnail, 'map.jpg'),
-        ])
-        .setAuthor(playerDatas.nickname, playerDatas.avatar, `https://www.faceit.com/fr/players/${playerDatas.nickname}`)
+      card.setAuthor(playerDatas.nickname, playerDatas.avatar, `https://www.faceit.com/fr/players/${playerDatas.nickname}`)
         .setTitle('Steam')
         .setURL(steamDatas.profileurl)
-        .addFields({ name: 'Score', value: r.round_stats.Score, inline: true },
-          { name: 'Map', value: r.round_stats.Map, inline: true },
-          { name: 'Status', value: parseInt(playerStats.Result) ? 'Won' : 'Lost', inline: true },
-          { name: 'K/D', value: playerStats['K/D Ratio'], inline: true },
+        .addFields({ name: 'Score', value: `${r.round_stats.Score}`, inline: true },
+          { name: 'Map', value: `${r.round_stats.Map}`, inline: true },
+          { name: 'Status', value: `${parseInt(playerStats.Result) ? 'Won' : 'Lost'}`, inline: true },
+          { name: 'K/D', value: `${playerStats['K/D Ratio']}`, inline: true },
           { name: 'HS', value: `${playerStats['Headshots %']}%`, inline: true },
-          { name: 'MVPs', value: playerStats.MVPs, inline: true },
-          { name: 'Kills', value: playerStats.Kills, inline: true },
-          { name: 'Deaths', value: playerStats.Deaths, inline: true },
-          { name: 'Assists', value: playerStats.Assists, inline: true },
-          { name: 'Elo', value: eloDiff > 0 ? `+${eloDiff}` : eloDiff, inline: true },
+          { name: 'MVPs', value: `${playerStats.MVPs}`, inline: true },
+          { name: 'Kills', value: `${playerStats.Kills}`, inline: true },
+          { name: 'Deaths', value: `${playerStats.Deaths}`, inline: true },
+          { name: 'Assists', value: `${playerStats.Assists}`, inline: true },
+          { name: 'Elo', value: `${eloDiff > 0 ? '+' + eloDiff : eloDiff}`, inline: true },
           { name: 'Date', value: new Date(lastMatchElo[0].date).toDateString(), inline: true })
         .setThumbnail('attachment://level.png')
         .setImage('attachment://map.jpg')
@@ -76,16 +75,24 @@ const sendCardWithInfos = async (message, steamParam) => {
         .setFooter(`Steam: ${steamDatas.personaname}`)
     })
 
-    message.channel.send(card)
+    message.channel.send({
+      embeds: [card],
+      files: [
+        new Discord.MessageAttachment(rankImageCanvas.toBuffer(), 'level.png'),
+        new Discord.MessageAttachment(mapThumbnail, 'map.jpg'),
+      ]
+    })
 
   } catch (error) {
     console.log(error)
-    message.channel.send(
-      new Discord.MessageEmbed()
-        .setColor(color.error)
-        .setDescription('**No players found**')
-        .setFooter(`${name} Error`)
-    )
+    message.channel.send({
+      embeds: [
+        new Discord.MessageEmbed()
+          .setColor(color.error)
+          .setDescription('**No players found**')
+          .setFooter(`${name} Error`)
+      ]
+    })
   }
 }
 
@@ -101,7 +108,11 @@ module.exports = {
     if (message.mentions.users.size > 0)
       message.mentions.users.forEach(async (e) => {
         const user = await User.exists(e.id)
-        if (!user) message.channel.send(new Discord.MessageEmbed().setColor(color.error).setDescription('**No players found**').setFooter(`${name} Error`))
+        if (!user) message.channel.send({
+          embeds: [
+            new Discord.MessageEmbed().setColor(color.error).setDescription('**No players found**').setFooter(`${name} Error`)
+          ]
+        })
         else sendCardWithInfos(message, user.steamId)
       })
     else if (steamIds.length > 0)
@@ -115,9 +126,13 @@ module.exports = {
       })
     else if (await User.get(message.author.id)) sendCardWithInfos(message, (await User.get(message.author.id)).steamId)
     else
-      message.channel.send(new Discord.MessageEmbed()
-        .setColor(color.error)
-        .setDescription(`You need to link your account to do that without a parameter, do ${prefix}help link to see how.`)
-        .setFooter(`${name} Error`))
+      message.channel.send({
+        embeds: [
+          new Discord.MessageEmbed()
+            .setColor(color.error)
+            .setDescription(`You need to link your account to do that without a parameter, do ${prefix}help link to see how.`)
+            .setFooter(`${name} Error`)
+        ]
+      })
   }
 }

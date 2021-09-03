@@ -2,11 +2,11 @@ const { prefix, name, color } = require('./config.json')
 const Discord = require('discord.js')
 const fs = require('fs')
 const mongo = require('./database/mongo')
-const bot = new Discord.Client()
+const client = new Discord.Client({ intents: [Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.GUILD_MESSAGES] })
 
 require('dotenv').config()
 
-bot.on('ready', () => {
+client.on('ready', () => {
   console.log('🚀 Bot started!')
   mongo().then(() => {
     try {
@@ -15,24 +15,35 @@ bot.on('ready', () => {
       console.error(e)
     }
   })
-  
+
   setGuildsNumber()
 })
 
 /**
  * Setup commands
  */
-bot.commands = new Discord.Collection()
+client.commands = new Discord.Collection()
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'))
 
 for (const file of commandFiles) {
   const command = require(`./commands/${file}`)
   command.aliasses.forEach(e => {
-    bot.commands.set(e, command)
+    client.commands.set(e, command)
   })
 }
 
-bot.on('message', async message => {
+/**
+ * Setup selectMenus
+ */
+client.selectMenus = new Discord.Collection()
+const selectMenus = fs.readdirSync('./interactions/selectmenu').filter(file => file.endsWith('.js'))
+
+for (const menuFileName of selectMenus) {
+  const menu = require(`./interactions/selectmenu/${menuFileName}`)
+  client.selectMenus.set(menu.name, menu)
+}
+
+client.on('messageCreate', async message => {
   if (!message.content.startsWith(prefix) || message.author.bot) return
   else {
     setGuildsNumber()
@@ -40,33 +51,43 @@ bot.on('message', async message => {
     const args = msg.split(/ +/)
     const command = args.shift().toLowerCase()
 
-    if (!bot.commands.has(command))
-      message.channel.send(
-        new Discord.MessageEmbed()
-          .setColor(color.error)
-          .setDescription('**Command not found**')
-          .setFooter(`${name} Error`)
-      )
-    else {
-      try {
-        bot.commands.get(command).execute(message, args)
-      } catch (error) {
-        console.log(error)
-        message.channel.send(
+    if (!client.commands.has(command))
+      message.channel.send({
+        embeds: [
           new Discord.MessageEmbed()
             .setColor(color.error)
-            .setDescription('**An error has occured**')
+            .setDescription('**Command not found**')
             .setFooter(`${name} Error`)
-        )
+        ]
+      })
+    else {
+      try {
+        client.commands.get(command).execute(message, args)
+      } catch (error) {
+        console.log(error)
+        message.channel.send({
+          embeds: [
+            new Discord.MessageEmbed()
+              .setColor(color.error)
+              .setDescription('**An error has occured**')
+              .setFooter(`${name} Error`)
+          ]
+        })
       }
     }
   }
 })
 
+client.on('interactionCreate', async (interaction) => {
+  if (interaction.isSelectMenu())
+    if (client.selectMenus.has(interaction.customId))
+      client.selectMenus.get(interaction.customId).execute(interaction)
+})
+
 const setGuildsNumber = () => {
-  const Guilds = bot.guilds.cache.map(guild => guild.id)
-  bot.user.setActivity(`${prefix}help | ${Guilds.length} servers`, { type: 'PLAYING' })
+  const Guilds = client.guilds.cache.map(guild => guild.id)
+  client.user.setActivity(`${prefix}help | ${Guilds.length} servers`, { type: 'PLAYING' })
 }
 
 // Start the bot
-bot.login(process.env.TOKEN)
+client.login(process.env.TOKEN)
