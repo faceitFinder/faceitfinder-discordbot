@@ -79,7 +79,9 @@ module.exports = {
       message.mentions.users.forEach(async (e) => {
         const user = await User.exists(e.id)
         if (!user) message.channel.send({
-          embeds: new Discord.MessageEmbed().setColor(color.error).setDescription('**No players found**').setFooter(`${name} Error`)
+          embeds: [
+            new Discord.MessageEmbed().setColor(color.error).setDescription('**No players found**').setFooter(`${name} Error`)
+          ]
         })
         else sendCardWithInfos(message, user.steamId)
       })

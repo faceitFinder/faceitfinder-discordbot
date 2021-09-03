@@ -53,10 +53,12 @@ client.on('messageCreate', async message => {
 
     if (!client.commands.has(command))
       message.channel.send({
-        embeds: new Discord.MessageEmbed()
-          .setColor(color.error)
-          .setDescription('**Command not found**')
-          .setFooter(`${name} Error`)
+        embeds: [
+          new Discord.MessageEmbed()
+            .setColor(color.error)
+            .setDescription('**Command not found**')
+            .setFooter(`${name} Error`)
+        ]
       })
     else {
       try {
@@ -64,10 +66,12 @@ client.on('messageCreate', async message => {
       } catch (error) {
         console.log(error)
         message.channel.send({
-          embeds: new Discord.MessageEmbed()
-            .setColor(color.error)
-            .setDescription('**An error has occured**')
-            .setFooter(`${name} Error`)
+          embeds: [
+            new Discord.MessageEmbed()
+              .setColor(color.error)
+              .setDescription('**An error has occured**')
+              .setFooter(`${name} Error`)
+          ]
         })
       }
     }
