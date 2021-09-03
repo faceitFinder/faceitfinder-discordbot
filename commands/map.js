@@ -8,13 +8,10 @@ const Steam = require('../functions/steam')
 const sendCardWithInfos = async (message, steamParam) => {
   try {
     const steamId = await Steam.getId(steamParam)
-    console.log(steamId)
     const playerId = await Player.getId(steamId)
     const playerStats = await Player.getStats(playerId)
 
     const options = []
-
-    console.log(playerStats)
 
     playerStats.segments.forEach(e => options.push({
       label: `${e.label} ${e.mode}`,
@@ -24,7 +21,7 @@ const sendCardWithInfos = async (message, steamParam) => {
     const row = new Discord.MessageActionRow()
       .addComponents(
         new Discord.MessageSelectMenu()
-          .setCustomId(message.author.id + message.createdTimestamp)
+          .setCustomId('mapSelector')
           .setPlaceholder('No maps selected')
           .addOptions(options),
       )
