@@ -16,7 +16,12 @@ const sendCardWithInfos = async (message, steamParam) => {
 
     playerStats.segments.forEach(e => options.push({
       label: `${e.label} ${e.mode}`,
-      value: `${e.label},${e.mode},${steamId}`
+      value: JSON.stringify({
+        map: e.label,
+        mode: e.mode,
+        steamId: steamId,
+        userId: message.author.id
+      })
     }))
 
     const row = new Discord.MessageActionRow()
