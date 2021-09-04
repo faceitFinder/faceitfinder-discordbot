@@ -21,14 +21,14 @@ module.exports = {
 
       const faceitLevel = playerDatas.games.csgo.skill_level_label
       const size = 40
+      const filesAtt = []
 
       const rankImageCanvas = Canvas.createCanvas(size, size)
       const ctx = rankImageCanvas.getContext('2d')
       ctx.drawImage(await Graph.getRankImage(faceitLevel, size), 0, 0)
+      filesAtt.push(new Discord.MessageAttachment(rankImageCanvas.toBuffer(), 'level.png'))
 
-      let mapThumbnail = `./images/maps/${map}.jpg`
-      if (!fs.existsSync(mapThumbnail)) mapThumbnail = `./images/maps/unknown.png`
-
+      const mapThumbnail = `./images/maps/${map}.jpg`
       const mapStats = playerStats.segments.filter(e => e.label === map && e.mode == mode)[0]
 
       const card = new Discord.MessageEmbed()
@@ -43,16 +43,17 @@ module.exports = {
           { name: 'Average Deaths', value: `${mapStats.stats['Average Deaths']}`, inline: true },
           { name: 'Average Assists', value: `${mapStats.stats['Average Assists']}`, inline: true },
           { name: 'Average MVPs', value: `${mapStats.stats['Average MVPs']}`, inline: true })
-        .setImage('attachment://map.jpg')
         .setColor(color.levels[faceitLevel - 1])
         .setFooter(`Steam: ${steamDatas.personaname}`)
 
+      if (fs.existsSync(mapThumbnail)) {
+        filesAtt.push(new Discord.MessageAttachment(mapThumbnail, 'map.jpg'),)
+        card.setImage('attachment://map.jpg')
+      }
+
       interaction.reply({
         embeds: [card],
-        files: [
-          new Discord.MessageAttachment(mapThumbnail, 'map.jpg'),
-          new Discord.MessageAttachment(rankImageCanvas.toBuffer(), 'level.png')
-        ]
+        files: filesAtt
       })
     } catch (error) {
       console.log(error)
