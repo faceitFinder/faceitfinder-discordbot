@@ -41,10 +41,10 @@ module.exports = {
           { name: 'Mode', value: `${mode}`, inline: true },
           { name: 'Average K/D', value: `${mapStats.stats['Average K/D Ratio']}`, inline: true },
           { name: 'Average HS', value: `${mapStats.stats['Average Headshots %']}%`, inline: true },
+          { name: 'Average MVPs', value: `${mapStats.stats['Average MVPs']}`, inline: true },
           { name: 'Average Kills', value: `${mapStats.stats['Average Kills']}`, inline: true },
           { name: 'Average Deaths', value: `${mapStats.stats['Average Deaths']}`, inline: true },
-          { name: 'Average Assists', value: `${mapStats.stats['Average Assists']}`, inline: true },
-          { name: 'Average MVPs', value: `${mapStats.stats['Average MVPs']}`, inline: true })
+          { name: 'Average Assists', value: `${mapStats.stats['Average Assists']}`, inline: true })
         .setColor(color.levels[faceitLevel - 1])
         .setFooter(`Steam: ${steamDatas.personaname}`)
 
