@@ -28,7 +28,7 @@ const sendCardWithInfos = async (message, steamParam) => {
 
     const filter = (interaction) => interaction.isSelectMenu() && interaction.user.id === message.author.id
 
-    const collector = message.channel.createMessageComponentCollector({ filter, max: 1 })
+    const collector = message.channel.createMessageComponentCollector({ filter })
     collector.on('collect', async (collected) => require('../interactions/selectmenu/mapSelector').execute(collected, steamId))
 
     message.channel.send({
@@ -58,7 +58,7 @@ module.exports = {
     const steamIds = RegexFun.findSteamUIds(message.content)
 
     if (message.mentions.users.size > 0) {
-      const user = await User.exists(message.mentions.users[0])
+      const user = await User.exists(message.mentions.users.first().id)
       if (!user) message.channel.send({
         embeds: [
           new Discord.MessageEmbed().setColor(color.error).setDescription('**No players found**').setFooter(`${name} Error`)
