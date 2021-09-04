@@ -35,10 +35,12 @@ const sendCardWithInfos = async (message, steamParam) => {
 
     const faceitLevel = playerDatas.games.csgo.skill_level_label
     const size = 40
+    const filesAtt = []
 
     const rankImageCanvas = Canvas.createCanvas(size, size)
     const ctx = rankImageCanvas.getContext('2d')
     ctx.drawImage(await Graph.getRankImage(faceitLevel, size), 0, 0)
+    filesAtt.push(new Discord.MessageAttachment(rankImageCanvas.toBuffer(), 'level.png'))
 
     const eloDiff = playerDatas.games.csgo.faceit_elo - lastMatchElo[1].elo
 
@@ -53,7 +55,6 @@ const sendCardWithInfos = async (message, steamParam) => {
 
       if (lastMatchStats.rounds.length > 1) card.addField({ name: 'round', value: key })
       mapThumbnail = `./images/maps/${r.round_stats.Map}.jpg`
-      if (!fs.existsSync(mapThumbnail)) mapThumbnail = `./images/maps/unknown.png`
 
       card.setAuthor(playerDatas.nickname, playerDatas.avatar, `https://www.faceit.com/fr/players/${playerDatas.nickname}`)
         .setTitle('Steam')
@@ -73,14 +74,16 @@ const sendCardWithInfos = async (message, steamParam) => {
         .setImage('attachment://map.jpg')
         .setColor(color.levels[faceitLevel - 1])
         .setFooter(`Steam: ${steamDatas.personaname}`)
+
+      if (fs.existsSync(mapThumbnail)) {
+        filesAtt.push(new Discord.MessageAttachment(mapThumbnail, 'map.jpg'),)
+        card.setImage('attachment://map.jpg')
+      }
     })
 
     message.channel.send({
       embeds: [card],
-      files: [
-        new Discord.MessageAttachment(rankImageCanvas.toBuffer(), 'level.png'),
-        new Discord.MessageAttachment(mapThumbnail, 'map.jpg'),
-      ]
+      files: filesAtt
     })
 
   } catch (error) {
