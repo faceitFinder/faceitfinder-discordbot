@@ -32,6 +32,17 @@ for (const file of commandFiles) {
   })
 }
 
+/**
+ * Setup selectMenus
+ */
+client.selectMenus = new Discord.Collection()
+const selectMenus = fs.readdirSync('./interactions/selectmenu').filter(file => file.endsWith('.js'))
+
+for (const menuFileName of selectMenus) {
+  const menu = require(`./interactions/selectmenu/${menuFileName}`)
+  client.selectMenus.set(menu.name, menu)
+}
+
 client.on('messageCreate', async message => {
   if (!message.content.startsWith(prefix) || message.author.bot) return
   else {
@@ -65,6 +76,12 @@ client.on('messageCreate', async message => {
       }
     }
   }
+})
+
+client.on('interactionCreate', async (interaction) => {
+  if (interaction.isSelectMenu())
+    if (client.selectMenus.has(interaction.customId))
+      client.selectMenus.get(interaction.customId).execute(interaction)
 })
 
 const setGuildsNumber = () => {

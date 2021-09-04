@@ -15,7 +15,7 @@ const sendCardWithInfos = async (message, steamParam) => {
 
     playerStats.segments.forEach(e => options.push({
       label: `${e.label} ${e.mode}`,
-      value: `${e.label},${e.mode}`
+      value: `${e.label},${e.mode},${steamId}`
     }))
 
     const row = new Discord.MessageActionRow()
@@ -26,15 +26,11 @@ const sendCardWithInfos = async (message, steamParam) => {
           .addOptions(options),
       )
 
-    const filter = (interaction) => interaction.isSelectMenu() && interaction.user.id === message.author.id
-
-    const collector = message.channel.createMessageComponentCollector({ filter })
-    collector.on('collect', async (collected) => require('../interactions/selectmenu/mapSelector').execute(collected, steamId))
-
     message.channel.send({
       content: "**Select one of the following maps to get the stats related**",
       components: [row]
     })
+
   } catch (error) {
     console.log(error)
     message.channel.send({

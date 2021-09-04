@@ -8,10 +8,11 @@ const Graph = require('../../functions/graph')
 
 module.exports = {
   name: 'mapSelector',
-  async execute(interaction, steamId) {
+  async execute(interaction) {
     try {
       const map = interaction.values[0].split(',')[0]
       const mode = interaction.values[0].split(',')[1]
+      const steamId = interaction.values[0].split(',')[2]
 
       const steamDatas = await Steam.getDatas(steamId)
       const playerId = await Player.getId(steamId)
