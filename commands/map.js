@@ -10,6 +10,7 @@ const sendCardWithInfos = async (message, steamParam) => {
     const steamId = await Steam.getId(steamParam)
     const playerId = await Player.getId(steamId)
     const playerStats = await Player.getStats(playerId)
+    const playerDatas = await Player.getDatas(playerId)
 
     const options = []
 
@@ -27,7 +28,7 @@ const sendCardWithInfos = async (message, steamParam) => {
       )
 
     message.channel.send({
-      content: "**Select one of the following maps to get the stats related**",
+      content: `Select one of the following maps to get the stats related (${playerDatas.nickname})`,
       components: [row]
     })
 
