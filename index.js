@@ -1,5 +1,6 @@
 const { prefix, name, color } = require('./config.json')
 const Discord = require('discord.js')
+const { AutoPoster } = require('topgg-autoposter')
 const fs = require('fs')
 const mongo = require('./database/mongo')
 const client = new Discord.Client({ intents: [Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.GUILD_MESSAGES] })
@@ -88,6 +89,11 @@ const setGuildsNumber = () => {
   const Guilds = client.guilds.cache.map(guild => guild.id)
   client.user.setActivity(`${prefix}help | ${Guilds.length} servers`, { type: 'PLAYING' })
 }
+
+// Send datas to top.gg
+if (process.env.TOPGG_TOKEN) AutoPoster(process.env.TOPGG_TOKEN, client).on('posted', () => {
+  console.log('Posted stats to Top.gg!')
+})
 
 // Start the bot
 client.login(process.env.TOKEN)
