@@ -1,7 +1,8 @@
 const { color } = require('../config.json')
 const path = require('path')
-const Match = require('./match')
 const Canvas = require('canvas')
+const Match = require('./match')
+const Player = require('./player')
 
 const faceitEloColors = [
   { min: 0, max: 800, color: color.levels[0] },
@@ -100,6 +101,11 @@ const getColors = (current, next, ctx, coordinatesStart, coordinatesEnd) => {
 
 const getElo = async (playerId) => {
   const data = await Match.getMatchElo(playerId)
+  const history = await Player.getHistory(playerId, 1)
+  const playerDatas = await Player.getDatas(playerId)
+
+  if (history.items[0].match_id !== data[0].matchId) data.unshift({ elo: playerDatas.games.csgo.faceit_elo })
+
   return Array.from(data, e => e.elo).filter(e => e != undefined)
 }
 
