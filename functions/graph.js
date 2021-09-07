@@ -104,7 +104,7 @@ const getElo = async (playerId) => {
   const history = await Player.getHistory(playerId, 1)
   const playerDatas = await Player.getDatas(playerId)
 
-  if (history.items[0].match_id !== data[0].matchId) data.unshift({ elo: playerDatas.games.csgo.faceit_elo })
+  if (data[0].elo === undefined) data.unshift({ elo: playerDatas.games.csgo.faceit_elo })
 
   return Array.from(data, e => e.elo).filter(e => e != undefined)
 }
