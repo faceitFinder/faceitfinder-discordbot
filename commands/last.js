@@ -1,4 +1,4 @@
-const { name, color } = require('../config.json')
+const { name, color, emojis } = require('../config.json')
 const Discord = require('discord.js')
 const Canvas = require('canvas')
 const fs = require('fs')
@@ -61,7 +61,7 @@ const sendCardWithInfos = async (message, steamParam) => {
         .setURL(steamDatas.profileurl)
         .addFields({ name: 'Score', value: `${r.round_stats.Score}`, inline: true },
           { name: 'Map', value: `${r.round_stats.Map}`, inline: true },
-          { name: 'Status', value: `${parseInt(playerStats.Result) ? 'Won' : 'Lost'}`, inline: true },
+          { name: 'Status', value: `${parseInt(playerStats.Result) ? emojis.won.balise : emojis.lost.balise}`, inline: true },
           { name: 'K/D', value: `${playerStats['K/D Ratio']}`, inline: true },
           { name: 'HS', value: `${playerStats['Headshots %']}%`, inline: true },
           { name: 'MVPs', value: `${playerStats.MVPs}`, inline: true },
