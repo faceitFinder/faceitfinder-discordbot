@@ -1,6 +1,7 @@
 const { prefix, name, color } = require('../config.json')
 const Discord = require('discord.js')
 const fs = require('fs')
+const ErrorCard = require('../templates/errorCard')
 
 const getCommands = (card) => {
   const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'))
@@ -19,14 +20,8 @@ const getCommands = (card) => {
 }
 
 const getCommandsHelp = (commandName, card) => {
-  try {
-    command = require(`./${commandName}.js`)
-  } catch {
-    return new Discord.MessageEmbed()
-      .setColor(color.error)
-      .setDescription('**Command not found**')
-      .setFooter(`${name} Error`)
-  }
+  try { command = require(`./${commandName}.js`) }
+  catch { return ErrorCard('**Command not found**') }
 
   card.setDescription(`Informations about the ${command.name} command\n{}: Optionnal parameters\n<>: Mandatory parameters`)
     .addFields({ name: 'Aliases', value: `${command.aliasses.join(',')}` },

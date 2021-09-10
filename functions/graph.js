@@ -101,7 +101,6 @@ const getColors = (current, next, ctx, coordinatesStart, coordinatesEnd) => {
 
 const getElo = async (playerId) => {
   const data = await Match.getMatchElo(playerId)
-  const history = await Player.getHistory(playerId, 1)
   const playerDatas = await Player.getDatas(playerId)
 
   if (data[0].elo === undefined) data.unshift({ elo: playerDatas.games.csgo.faceit_elo })

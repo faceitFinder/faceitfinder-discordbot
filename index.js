@@ -3,6 +3,8 @@ const Discord = require('discord.js')
 const { AutoPoster } = require('topgg-autoposter')
 const fs = require('fs')
 const mongo = require('./database/mongo')
+const ErrorCard = require('./templates/errorCard')
+const GuildCount = require('./templates/guildCount')
 const client = new Discord.Client({ intents: [Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.GUILD_MESSAGES] })
 
 require('dotenv').config()
@@ -17,7 +19,7 @@ client.on('ready', () => {
     }
   })
 
-  setGuildsNumber()
+  GuildCount(client)
 })
 
 /**
@@ -47,35 +49,14 @@ for (const menuFileName of selectMenus) {
 client.on('messageCreate', async message => {
   if (!message.content.startsWith(prefix) || message.author.bot) return
   else {
-    setGuildsNumber()
+    GuildCount(client)
     const msg = message.content.slice(prefix.length).trim()
     const args = msg.split(/ +/)
     const command = args.shift().toLowerCase()
 
-    if (!client.commands.has(command))
-      message.channel.send({
-        embeds: [
-          new Discord.MessageEmbed()
-            .setColor(color.error)
-            .setDescription('**Command not found**')
-            .setFooter(`${name} Error`)
-        ]
-      })
-    else {
-      try {
-        client.commands.get(command).execute(message, args)
-      } catch (error) {
-        console.log(error)
-        message.channel.send({
-          embeds: [
-            new Discord.MessageEmbed()
-              .setColor(color.error)
-              .setDescription('**An error has occured**')
-              .setFooter(`${name} Error`)
-          ]
-        })
-      }
-    }
+    if (!client.commands.has(command)) message.channel.send({ embeds: [ErrorCard('**Command not found**')] })
+    else try { client.commands.get(command).execute(message, args) }
+    catch (error) { message.channel.send({ embeds: [ErrorCard('**An error has occured**')] }) }
   }
 })
 
@@ -84,11 +65,6 @@ client.on('interactionCreate', async (interaction) => {
     if (client.selectMenus.has(interaction.customId))
       client.selectMenus.get(interaction.customId).execute(interaction)
 })
-
-const setGuildsNumber = () => {
-  const Guilds = client.guilds.cache.map(guild => guild.id)
-  client.user.setActivity(`${prefix}help | ${Guilds.length} servers`, { type: 'PLAYING' })
-}
 
 // Send datas to top.gg
 if (process.env.TOPGG_TOKEN) AutoPoster(process.env.TOPGG_TOKEN, client).on('posted', () => {
