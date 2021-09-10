@@ -1,4 +1,4 @@
-const { name, color, prefix } = require('../config.json')
+const { color, prefix } = require('../config.json')
 const Discord = require('discord.js')
 const Player = require('../functions/player')
 const Steam = require('../functions/steam')
