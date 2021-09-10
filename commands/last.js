@@ -1,4 +1,4 @@
-const { name, color, emojis } = require('../config.json')
+const { color, emojis } = require('../config.json')
 const Discord = require('discord.js')
 const Canvas = require('canvas')
 const fs = require('fs')

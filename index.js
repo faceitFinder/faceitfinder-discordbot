@@ -1,4 +1,4 @@
-const { prefix, name, color } = require('./config.json')
+const { prefix } = require('./config.json')
 const Discord = require('discord.js')
 const { AutoPoster } = require('topgg-autoposter')
 const fs = require('fs')

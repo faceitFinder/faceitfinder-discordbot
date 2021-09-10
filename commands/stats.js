@@ -1,4 +1,4 @@
-const { color, name, prefix } = require('../config.json')
+const { color, prefix } = require('../config.json')
 const Discord = require('discord.js')
 const Canvas = require('canvas')
 const RegexFun = require('../functions/regex')
