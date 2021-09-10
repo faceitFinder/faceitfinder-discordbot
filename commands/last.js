@@ -90,7 +90,7 @@ const sendCardWithInfos = async (message, steamParam) => {
 
 module.exports = {
   name: 'last',
-  aliasses: ['last'],
+  aliasses: ['last', 'l', 'lst'],
   options: '{user steam id | steam custom id | steam profile link | csgo status ingame command with the users part | @ someone}',
   description: "Get the stats of last game played by the given user (s).",
   type: 'command',

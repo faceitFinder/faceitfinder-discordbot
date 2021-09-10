@@ -30,7 +30,7 @@ const sendCardWithInfos = async (message, steamParam) => {
 
 module.exports = {
   name: 'link',
-  aliasses: ['link', 'l'],
+  aliasses: ['link'],
   options: '<user steam id | steam custom id | steam profile link | csgo status ingame command with your user line>',
   description: `Link steam id to the discord user, so when you do ${prefix}stats or ${prefix}last it displays directly your stats.`,
   type: 'command',
