@@ -46,7 +46,7 @@ for (const menuFileName of selectMenus) {
 }
 
 client.on('messageCreate', async message => {
-  if (!message.content.startsWith(prefix) || message.author.bot) return
+  if (!message.content.toLowerCase().startsWith(prefix) || message.author.bot) return
   else {
     GuildCount(client)
     const msg = message.content.slice(prefix.length).trim()
@@ -60,9 +60,12 @@ client.on('messageCreate', async message => {
 })
 
 client.on('interactionCreate', async (interaction) => {
-  if (interaction.isSelectMenu())
-    if (client.selectMenus.has(interaction.customId))
-      client.selectMenus.get(interaction.customId).execute(interaction)
+  if (interaction.isSelectMenu()) client.selectMenus.get(interaction.customId)?.execute(interaction)
+})
+
+// Send datas to top.gg
+if (process.env.TOPGG_TOKEN) AutoPoster(process.env.TOPGG_TOKEN, client).on('posted', () => {
+  console.log('Posted stats to Top.gg!')
 })
 
 // Start the bot
