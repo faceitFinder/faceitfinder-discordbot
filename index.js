@@ -1,5 +1,6 @@
 const { prefix, name, color } = require('./config.json')
 const Discord = require('discord.js')
+const { AutoPoster } = require('topgg-autoposter')
 const fs = require('fs')
 const mongo = require('./database/mongo')
 const ErrorCard = require('./templates/errorCard')
@@ -63,6 +64,11 @@ client.on('interactionCreate', async (interaction) => {
   if (interaction.isSelectMenu())
     if (client.selectMenus.has(interaction.customId))
       client.selectMenus.get(interaction.customId).execute(interaction)
+})
+
+// Send datas to top.gg
+if (process.env.TOPGG_TOKEN) AutoPoster(process.env.TOPGG_TOKEN, client).on('posted', () => {
+  console.log('Posted stats to Top.gg!')
 })
 
 // Start the bot
