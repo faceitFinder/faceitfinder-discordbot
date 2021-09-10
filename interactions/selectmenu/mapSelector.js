@@ -5,6 +5,7 @@ const fs = require('fs')
 const Player = require('../../functions/player')
 const Steam = require('../../functions/steam')
 const Graph = require('../../functions/graph')
+const ErrorCard = require('../../templates/errorCard')
 
 module.exports = {
   name: 'mapSelector',
@@ -57,14 +58,7 @@ module.exports = {
         })
       } catch (error) {
         console.log(error)
-        interaction.reply({
-          embeds: [
-            new Discord.MessageEmbed()
-              .setColor(color.error)
-              .setDescription(`**${error.toString()}**`)
-              .setFooter(`${name} Error`)
-          ]
-        })
+        interaction.reply({ embeds: [ErrorCard(`**${error.toString()}**`)] })
       }
   }
 }

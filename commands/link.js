@@ -24,14 +24,7 @@ const sendCardWithInfos = async (message, steamParam) => {
 
   } catch (error) {
     console.log(error)
-    message.channel.send({
-      embeds: [
-        new Discord.MessageEmbed()
-          .setColor(color.error)
-          .setDescription('**No players found**')
-          .setFooter(`${name} Error`)
-      ]
-    })
+    message.channel.send({ embeds: [ErrorCard('**No players found**')] })
   }
 }
 
@@ -46,13 +39,6 @@ module.exports = {
 
     if (steamId.length > 0) sendCardWithInfos(message, steamId)
     else if (args.length > 0) sendCardWithInfos(message, args[0].split('/').filter(e => e).pop())
-    else message.channel.send({
-      embeds: [
-        new Discord.MessageEmbed()
-          .setColor(color.error)
-          .setDescription(`A parameter is missing, please do ${prefix}help link, to see how to do.`)
-          .setFooter(`${name} Error`)
-      ]
-    })
+    else message.channel.send({ embeds: [ErrorCard(`A parameter is missing, please do ${prefix}help link, to see how to do.`)] })
   }
 }

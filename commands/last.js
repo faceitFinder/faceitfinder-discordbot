@@ -8,6 +8,7 @@ const Player = require('../functions/player')
 const Graph = require('../functions/graph')
 const RegexFun = require('../functions/regex')
 const User = require('../database/user')
+const ErrorCard = require('../templates/errorCard')
 
 const sendCardWithInfos = async (message, steamParam) => {
   try {
@@ -21,12 +22,7 @@ const sendCardWithInfos = async (message, steamParam) => {
     if (playerHistory.items.length > 0) lastMatchStats = await Match.getMatchStats(playerHistory.items[0].match_id)
     else {
       message.channel.send({
-        embeds: [
-          new Discord.MessageEmbed()
-            .setColor(color.error)
-            .setDescription('**Could not get your last match stats**')
-            .setFooter(`${name} Error`)
-        ]
+        embeds: [ErrorCard('**Could not get your last match stats**')]
       })
       return
     }
@@ -88,14 +84,7 @@ const sendCardWithInfos = async (message, steamParam) => {
 
   } catch (error) {
     console.log(error)
-    message.channel.send({
-      embeds: [
-        new Discord.MessageEmbed()
-          .setColor(color.error)
-          .setDescription('**No players found**')
-          .setFooter(`${name} Error`)
-      ]
-    })
+    message.channel.send({ embeds: [ErrorCard('**No players found**')] })
   }
 }
 
@@ -111,31 +100,16 @@ module.exports = {
     if (message.mentions.users.size > 0)
       message.mentions.users.forEach(async (e) => {
         const user = await User.exists(e.id)
-        if (!user) message.channel.send({
-          embeds: [
-            new Discord.MessageEmbed().setColor(color.error).setDescription('**No players found**').setFooter(`${name} Error`)
-          ]
-        })
+        if (!user) message.channel.send({ embeds: [ErrorCard('**No players found**')] })
         else sendCardWithInfos(message, user.steamId)
       })
-    else if (steamIds.length > 0)
-      steamIds.forEach(e => {
-        sendCardWithInfos(message, e)
-      })
+    else if (steamIds.length > 0) steamIds.forEach(e => { sendCardWithInfos(message, e) })
     else if (args.length > 0)
       args.forEach(e => {
         const steamParam = e.split('/').filter(e => e).pop()
         sendCardWithInfos(message, steamParam)
       })
     else if (await User.get(message.author.id)) sendCardWithInfos(message, (await User.get(message.author.id)).steamId)
-    else
-      message.channel.send({
-        embeds: [
-          new Discord.MessageEmbed()
-            .setColor(color.error)
-            .setDescription(`You need to link your account to do that without a parameter, do ${prefix}help link to see how.`)
-            .setFooter(`${name} Error`)
-        ]
-      })
+    else message.channel.send({ embeds: [ErrorCard(`You need to link your account to do that without a parameter, do ${prefix}help link to see how.`)] })
   }
 }
