@@ -48,7 +48,6 @@ for (const menuFileName of selectMenus) {
 client.on('messageCreate', async message => {
   if (!message.content.toLowerCase().startsWith(prefix) || message.author.bot) return
   else {
-    GuildCount(client)
     const msg = message.content.slice(prefix.length).trim()
     const args = msg.split(/ +/)
     const command = args.shift().toLowerCase()
@@ -64,9 +63,7 @@ client.on('interactionCreate', async (interaction) => {
 })
 
 // Send datas to top.gg
-if (process.env.TOPGG_TOKEN) AutoPoster(process.env.TOPGG_TOKEN, client).on('posted', () => {
-  console.log('Posted stats to Top.gg!')
-})
+if (process.env.TOPGG_TOKEN) AutoPoster(process.env.TOPGG_TOKEN, client).on('posted', () => { GuildCount(client) })
 
 // Start the bot
 client.login(process.env.TOKEN)
