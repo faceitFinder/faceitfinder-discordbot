@@ -66,10 +66,5 @@ client.on('interactionCreate', async (interaction) => {
 // Send datas to top.gg
 if (process.env.TOPGG_TOKEN) AutoPoster(process.env.TOPGG_TOKEN, client).on('posted', () => { GuildCount(client) })
 
-// Send datas to top.gg
-if (process.env.TOPGG_TOKEN) AutoPoster(process.env.TOPGG_TOKEN, client).on('posted', () => {
-  console.log('Posted stats to Top.gg!')
-})
-
 // Start the bot
 client.login(process.env.TOKEN)
