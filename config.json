@@ -8,18 +8,58 @@
   "join": "https://discord.gg/uPAdfvfuTP",
   "color": {
     "primary": "#14578c",
-    "levels": [
-      "#eeeeee",
-      "#1ce300",
-      "#1ce300",
-      "#ffc800",
-      "#ffc800",
-      "#ffc800",
-      "#ffc800",
-      "#fe630a",
-      "#fe630a",
-      "#d91a00"
-    ],
+    "levels": {
+      "1": {
+        "min": 0,
+        "max": 800,
+        "color": "#eeeeee"
+      },
+      "2": {
+        "min": 801,
+        "max": 950,
+        "color": "#1ce300"
+      },
+      "3": {
+        "min": 951,
+        "max": 1100,
+        "color": "#1ce300"
+      },
+      "4": {
+        "min": 1101,
+        "max": 1250,
+        "color": "#ffc800"
+      },
+      "5": {
+        "min": 1251,
+        "max": 1400,
+        "color": "#ffc800"
+      },
+      "6": {
+        "min": 1401,
+        "max": 1550,
+        "color": "#ffc800"
+      },
+      "7": {
+        "min": 1551,
+        "max": 1700,
+        "color": "#ffc800"
+      },
+      "8": {
+        "min": 1701,
+        "max": 1850,
+        "color": "#fe630a"
+      },
+      "9": {
+        "min": 1851,
+        "max": 2000,
+        "color": "#fe630a"
+      },
+      "10": {
+        "min": 2001,
+        "max": 100000,
+        "color": "#d91a00"
+      }
+    },
     "error": "#770000"
   },
   "emojis": {

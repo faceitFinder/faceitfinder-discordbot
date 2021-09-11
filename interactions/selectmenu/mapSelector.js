@@ -44,7 +44,7 @@ module.exports = {
             { name: 'Average Kills', value: `${mapStats.stats['Average Kills']}`, inline: true },
             { name: 'Average Deaths', value: `${mapStats.stats['Average Deaths']}`, inline: true },
             { name: 'Average Assists', value: `${mapStats.stats['Average Assists']}`, inline: true })
-          .setColor(color.levels[faceitLevel - 1])
+          .setColor(color.levels[faceitLevel].color)
           .setFooter(`Steam: ${steamDatas.personaname}`)
 
         if (fs.existsSync(mapThumbnail)) {

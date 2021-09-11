@@ -4,14 +4,6 @@ const Canvas = require('canvas')
 const Match = require('./match')
 const Player = require('./player')
 
-const faceitEloColors = [
-  { min: 0, max: 800, color: color.levels[0] },
-  { min: 801, max: 1100, color: color.levels[1] },
-  { min: 1101, max: 1700, color: color.levels[3] },
-  { min: 1701, max: 2000, color: color.levels[7] },
-  { min: 2001, max: 100000, color: color.levels[9] },
-]
-
 const generateCanvas = async (playerId) => {
   const elo = (await getElo(playerId)).reverse()
 
@@ -50,21 +42,23 @@ const generateCanvas = async (playerId) => {
   /**
    * Elo bar
    */
-  elo.forEach((e, i) => {
+  elo.forEach((current, i) => {
+    const prev = elo[i - 1] === undefined ? current : elo[i - 1]
     const coordinatesStart = { x: padding * i, y: Math.max(...elo) - elo[i - 1] + padding }
-    const coordinatesEnd = { x: padding * (i + 1), y: Math.max(...elo) - e + padding }
-    const color = getColors(elo[i - 1], e, ctx, coordinatesStart, coordinatesEnd)
+    const coordinatesEnd = { x: padding * (i + 1), y: Math.max(...elo) - current + padding }
+    const [level, values] = Object.entries(color.levels).filter(fc => current >= fc[1].min && current <= fc[1].max)[0]
 
     ctx.font = '30px sans-serif'
     ctx.lineWidth = 5
-    ctx.fillStyle = ctx.strokeStyle = color
+    ctx.fillStyle = values.color
+    ctx.strokeStyle = getColors(prev, current, ctx, coordinatesStart, coordinatesEnd)
 
     ctx.beginPath()
     ctx.moveTo(coordinatesStart.x, coordinatesStart.y)
     ctx.lineTo(coordinatesEnd.x, coordinatesEnd.y)
     ctx.stroke()
 
-    ctx.fillText(e, padding * i + padding / 1.5, height)
+    ctx.fillText(current, padding * i + padding / 1.5, height)
   })
 
   return canvas
@@ -78,26 +72,22 @@ const getRankImage = async (faceitLevel, size) => {
   return image
 }
 
-const getColors = (current, next, ctx, coordinatesStart, coordinatesEnd) => {
-  if (current === undefined) current = next
+const getColors = (prev, current, ctx, coordinatesStart, coordinatesEnd) => {
   const gradient = ctx.createLinearGradient(coordinatesStart.x, coordinatesStart.y, coordinatesEnd.x, coordinatesEnd.y)
-  let value
+  const [prevLevel, prevValues] = Object.entries(color.levels).filter(fc => prev >= fc[1].min && prev <= fc[1].max)[0]
 
-  faceitEloColors.forEach((fc, i) => {
-    if (current >= fc.min && current <= fc.max)
-      if (next >= fc.min && next <= fc.max) value = fc.color
-      else if (next > fc.max) {
-        gradient.addColorStop(0, fc.color)
-        gradient.addColorStop(0.5, faceitEloColors[i + 1].color)
-        value = gradient
-      } else if (next < fc.min) {
-        gradient.addColorStop(0.5, fc.color)
-        gradient.addColorStop(1, faceitEloColors[i - 1].color)
-        value = gradient
-      }
-  })
-  return value
+  if (current >= prevValues.min && current <= prevValues.max) gradient.addColorStop(0, prevValues.color)
+  else if (current > prevValues.max) {
+    gradient.addColorStop(0.5, prevValues.color)
+    gradient.addColorStop(1, color.levels[parseInt(prevLevel) + 1].color)
+  } else if (current < prevValues.min) {
+    gradient.addColorStop(0, prevValues.color)
+    gradient.addColorStop(0.5, color.levels[parseInt(prevLevel) - 1].color)
+  }
+
+  return gradient
 }
+
 
 const getElo = async (playerId) => {
   const data = await Match.getMatchElo(playerId)

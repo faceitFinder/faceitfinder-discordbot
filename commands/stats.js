@@ -43,7 +43,7 @@ const sendCardWithInfos = async (message, steamParam) => {
         { name: `:flag_${playerCountry}:`, value: `${ladderCountry.position}`, inline: true },
         { name: `:flag_${playerRegion.toLowerCase()}:`, value: `${ladderRegion.position}`, inline: true })
       .setImage('attachment://graph.png')
-      .setColor(color.levels[faceitLevel - 1])
+      .setColor(color.levels[faceitLevel].color)
       .setFooter(`Steam: ${steamDatas.personaname}`)
 
     message.channel.send({
