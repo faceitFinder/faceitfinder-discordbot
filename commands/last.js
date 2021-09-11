@@ -68,7 +68,7 @@ const sendCardWithInfos = async (message, steamParam) => {
           { name: 'Date', value: new Date(lastMatchElo[0].date).toDateString(), inline: true })
         .setThumbnail('attachment://level.png')
         .setImage('attachment://map.jpg')
-        .setColor(color.levels[faceitLevel - 1])
+        .setColor(color.levels[faceitLevel].color)
         .setFooter(`Steam: ${steamDatas.personaname}`)
 
       if (fs.existsSync(mapThumbnail)) {
