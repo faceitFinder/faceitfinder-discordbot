@@ -4,6 +4,7 @@ const Player = require('../functions/player')
 const Steam = require('../functions/steam')
 const RegexFun = require('../functions/regex')
 const User = require('../database/user')
+const ErrorCard = require('../templates/errorCard')
 
 const sendCardWithInfos = async (message, steamParam) => {
   try {
