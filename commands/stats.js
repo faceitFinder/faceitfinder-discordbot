@@ -55,7 +55,7 @@ const sendCardWithInfos = async (steamParam) => {
     }
   } catch (error) {
     console.log(error)
-    return { embeds: [errorCard('**No players found**')] }
+    return errorCard('**No players found**')
   }
 }
 
@@ -103,7 +103,7 @@ module.exports = {
     if (message.mentions.users.size > 0)
       message.mentions.users.forEach(async e => {
         const user = await User.exists(e.id)
-        if (!user) message.channel.send({ embeds: [errorCard('**No players found**')] })
+        if (!user) message.channel.send(errorCard('**No players found**'))
         else message.channel.send(await sendCardWithInfos(user.steamId))
       })
     else if (steamIds.length > 0) steamIds.forEach(async e => { message.channel.send(await sendCardWithInfos(e)) })
@@ -113,6 +113,6 @@ module.exports = {
         message.channel.send(await sendCardWithInfos(steamParam))
       })
     else if (await User.get(message.author.id)) message.channel.send(await sendCardWithInfos((await User.get(message.author.id)).steamId))
-    else message.channel.send({ embeds: [errorCard(`You need to link your account to do that without a parameter, do ${prefix}help link to see how.`)] })
+    else message.channel.send(errorCard(`You need to link your account to do that without a parameter, do ${prefix}help link to see how.`))
   }
 }

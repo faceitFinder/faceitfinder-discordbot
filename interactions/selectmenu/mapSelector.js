@@ -58,7 +58,7 @@ module.exports = {
         })
       } catch (error) {
         console.log(error)
-        interaction.reply({ embeds: [errorCard(`**${error.toString()}**`)] })
+        interaction.reply(errorCard(`**${error.toString()}**`))
       }
   }
 }

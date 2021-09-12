@@ -20,7 +20,7 @@ const sendCardWithInfos = async (steamParam) => {
 
     let lastMatchStats
     if (playerHistory.items.length > 0) lastMatchStats = await Match.getMatchStats(playerHistory.items[0].match_id)
-    else return { embeds: [errorCard('**Could not get your last match stats**')] }
+    else return errorCard('**Could not get your last match stats**')
 
     const lastMatchElo = await Match.getMatchElo(playerId, 2)
 
@@ -78,7 +78,7 @@ const sendCardWithInfos = async (steamParam) => {
 
   } catch (error) {
     console.log(error)
-    return { embeds: [errorCard('**No players found**')] }
+    return errorCard('**No players found**')
   }
 }
 
@@ -126,16 +126,16 @@ module.exports = {
     if (message.mentions.users.size > 0)
       message.mentions.users.forEach(async e => {
         const user = await User.exists(e.id)
-        if (!user) message.channel.send({ embeds: [errorCard('**No players found**')] })
-        else message.channel.send(await sendCardWithInfos(message, user.steamId))
+        if (!user) message.channel.send(errorCard('**No players found**'))
+        else message.channel.send(await sendCardWithInfos(user.steamId))
       })
-    else if (steamIds.length > 0) steamIds.forEach(async e => { message.channel.send(await sendCardWithInfos(message, e)) })
+    else if (steamIds.length > 0) steamIds.forEach(async e => { message.channel.send(await sendCardWithInfos(e)) })
     else if (args.length > 0)
       args.forEach(async e => {
         const steamParam = e.split('/').filter(e => e).pop()
         message.channel.send(await sendCardWithInfos(message, steamParam))
       })
-    else if (await User.get(message.author.id)) message.channel.send(await sendCardWithInfos(message, (await User.get(message.author.id)).steamId))
-    else message.channel.send({ embeds: [errorCard(`You need to link your account to do that without a parameter, do ${prefix}help link to see how.`)] })
+    else if (await User.get(message.author.id)) message.channel.send(await sendCardWithInfos(await User.get(message.author.id).steamId))
+    else message.channel.send(errorCard(`You need to link your account to do that without a parameter, do ${prefix}help link to see how.`))
   }
 }

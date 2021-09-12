@@ -25,7 +25,7 @@ const sendCardWithInfos = async (message, steamParam) => {
 
   } catch (error) {
     console.log(error)
-    return { embeds: [errorCard('**No players found**')] }
+    return errorCard('**No players found**')
   }
 }
 
@@ -66,6 +66,6 @@ module.exports = {
 
     if (steamId.length > 0) message.channel.send(await sendCardWithInfos(message, steamId))
     else if (args.length > 0) message.channel.send(await sendCardWithInfos(message, args[0].split('/').filter(e => e).pop()))
-    else message.channel.send({ embeds: [errorCard(`A parameter is missing, please do ${prefix}help link, to see how to do.`)] })
+    else message.channel.send(errorCard(`A parameter is missing, please do ${prefix}help link, to see how to do.`))
   }
 }
