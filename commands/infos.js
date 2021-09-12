@@ -10,7 +10,7 @@ module.exports = {
   usage: '',
   type: 'system',
   async execute(message, args) {
-    message.channel.send({
+    return {
       embeds: [
         new Discord.MessageEmbed()
           .setColor(color.primary)
@@ -27,6 +27,6 @@ module.exports = {
       files: [
         new Discord.MessageAttachment('./images/logo.png', 'logo.png')
       ]
-    })
+    }
   }
 }

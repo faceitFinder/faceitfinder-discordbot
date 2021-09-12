@@ -5,6 +5,7 @@ const RegexFun = require('../functions/regex')
 const Player = require('../functions/player')
 const Steam = require('../functions/steam')
 const errorCard = require('../templates/errorCard')
+const { getCardsMentions, getCardsParams } = require('../functions/commands')
 
 const sendCardWithInfos = async (message, steamParam) => {
   try {
@@ -85,14 +86,10 @@ module.exports = {
   async execute(message, args) {
     const steamIds = RegexFun.findSteamUIds(message.content)
 
-    if (message.mentions.users.size > 0) {
-      const user = await User.exists(message.mentions.users.first().id)
-      if (!user) message.channel.send(errorCard('**No players found**'))
-      else message.channel.send(await sendCardWithInfos(message, user.steamId))
-    }
-    else if (steamIds.length > 0) message.channel.send(await sendCardWithInfos(message, steamIds[0]))
-    else if (args.length > 0) message.channel.send(await sendCardWithInfos(message, args[0].split('/').filter(e => e).pop()))
-    else if (await User.get(message.author.id)) message.channel.send(await sendCardWithInfos(message, (await User.get(message.author.id)).steamId))
-    else message.channel.send(errorCard(`You need to link your account to do that without a parameter, do ${prefix}help link to see how.`))
+    if (message.mentions.users.size > 0) return getCardsMentions(message, [message.mentions.users.first()], sendCardWithInfos)
+    else if (steamIds.length > 0) return getCardsParams(message, [steamIds[0]], sendCardWithInfos)
+    else if (args.length > 0) return getCardsParams(message, [args[0].split('/').filter(e => e).pop()], sendCardWithInfos)
+    else if (await User.get(message.author.id)) return getCardsMentions(message, [message.author], sendCardWithInfos)
+    else return errorCard(`You need to link your account to do that without a parameter, do ${prefix}help link to see how.`)
   }
 }

@@ -57,7 +57,7 @@ module.exports = {
       .setDescription(`\`${prefix}help {command}\` for more info on a specific command`)
       .setFooter(`${name} Help`)
 
-    if (args.length === 0) message.channel.send(getCommands(helpCard))
-    else message.channel.send(getCommandsHelp(args[0], helpCard))
+    if (args.length === 0) return getCommands(helpCard)
+    else return getCommandsHelp(args[0], helpCard)
   }
 }

@@ -122,8 +122,7 @@ module.exports = {
   type: 'command',
   async execute(message, args) {
     const steamIds = RegexFun.findSteamUIds(message.content)
-    const data = { embeds: [], files: [] }
-
+    
     if (message.mentions.users.size > 0) return await getCardsMentions(message, message.mentions.users, sendCardWithInfos)
     else if (steamIds.length > 0) return getCardsParams(message, steamIds, sendCardWithInfos)
     else if (args.length > 0) {
