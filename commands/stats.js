@@ -8,7 +8,7 @@ const Graph = require('../functions/graph')
 const Ladder = require('../functions/ladder')
 const User = require('../database/user')
 const errorCard = require('../templates/errorCard')
-const { getCardsMentions, getCardsParams } = require('../functions/commands')
+const { getCards } = require('../functions/commands')
 
 const sendCardWithInfos = async (message, steamParam) => {
   try {
@@ -101,14 +101,14 @@ module.exports = {
   async execute(message, args) {
     const steamIds = RegexFun.findSteamUIds(message.content)
 
-    if (message.mentions.users.size > 0) return await getCardsMentions(message, message.mentions.users, sendCardWithInfos)
-    else if (steamIds.length > 0) return getCardsParams(message, steamIds, sendCardWithInfos)
+    if (message.mentions.users.size > 0) return await getCards(message, message.mentions.users, sendCardWithInfos, 1)
+    else if (steamIds.length > 0) return getCards(message, steamIds, sendCardWithInfos)
     else if (args.length > 0) {
       const params = []
       await args.forEach(async e => { params.push(e.split('/').filter(e => e).pop()) })
-      return getCardsParams(message, params, sendCardWithInfos)
+      return getCards(message, params, sendCardWithInfos)
     }
-    else if (await User.get(message.author.id)) return await getCardsMentions(message, [message.author], sendCardWithInfos)
+    else if (await User.get(message.author.id)) return await getCards(message, [message.author], sendCardWithInfos, 1)
     else return errorCard(`You need to link your account to do that without a parameter, do ${prefix}help link to see how.`)
   }
 }
