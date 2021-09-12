@@ -133,7 +133,7 @@ module.exports = {
     else if (args.length > 0)
       args.forEach(async e => {
         const steamParam = e.split('/').filter(e => e).pop()
-        message.channel.send(await sendCardWithInfos(message, steamParam))
+        message.channel.send(await sendCardWithInfos(steamParam))
       })
     else if (await User.get(message.author.id)) message.channel.send(await sendCardWithInfos(await User.get(message.author.id).steamId))
     else message.channel.send(errorCard(`You need to link your account to do that without a parameter, do ${prefix}help link to see how.`))
