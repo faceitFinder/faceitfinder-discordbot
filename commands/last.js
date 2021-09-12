@@ -53,8 +53,7 @@ const sendCardWithInfos = async (message, steamParam) => {
       mapThumbnail = `./images/maps/${r.round_stats.Map}.jpg`
 
       card.setAuthor(playerDatas.nickname, playerDatas.avatar, `https://www.faceit.com/fr/players/${playerDatas.nickname}`)
-        .setTitle('Steam')
-        .setURL(steamDatas.profileurl)
+        .setDescription(`[Steam](${steamDatas.profileurl}), [Game Lobby](https://www.faceit.com/fr/csgo/room/${playerHistory.items[0].match_id}/scoreboard)`)
         .addFields({ name: 'Score', value: `${r.round_stats.Score}`, inline: true },
           { name: 'Map', value: `${r.round_stats.Map}`, inline: true },
           { name: 'Status', value: `${parseInt(playerStats.Result) ? emojis.won.balise : emojis.lost.balise}`, inline: true },
