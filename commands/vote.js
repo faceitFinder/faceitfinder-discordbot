@@ -4,8 +4,9 @@ const Discord = require('discord.js')
 module.exports = {
   name: 'vote',
   aliasses: ['vote'],
-  options: '',
+  options: [],
   description: "Get the link to vote for the bot on top.gg",
+  usage: '',
   type: 'system',
   async execute(message, args) {
     message.channel.send({

@@ -4,8 +4,9 @@ const Discord = require('discord.js')
 module.exports = {
   name: 'invite',
   aliasses: ['invite', 'inv'],
-  options: '',
+  options: [],
   description: "Get the link to invite the bot on your server.",
+  usage: '',
   type: 'system',
   async execute(message, args) {
     message.channel.send({

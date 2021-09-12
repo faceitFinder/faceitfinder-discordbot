@@ -4,7 +4,7 @@ const User = require('../database/user')
 const RegexFun = require('../functions/regex')
 const Player = require('../functions/player')
 const Steam = require('../functions/steam')
-const ErrorCard = require('../templates/errorCard')
+const errorCard = require('../templates/errorCard')
 
 const sendCardWithInfos = async (message, steamParam) => {
   try {
@@ -40,27 +40,59 @@ const sendCardWithInfos = async (message, steamParam) => {
 
   } catch (error) {
     console.log(error)
-    message.channel.send({ embeds: [ErrorCard('**No players found**')] })
+    message.channel.send({ embeds: [errorCard('**No players found**')] })
   }
 }
 
 module.exports = {
   name: 'map',
   aliasses: ['map'],
-  options: '{user steam id | steam custom id | steam profile link | csgo status ingame command with the users part | @ someone}',
+  options: [
+    {
+      name: 'user_steam_id',
+      description: 'Steam id of a user.',
+      required: false,
+      type: 3
+    },
+    {
+      name: 'user_custom_steam_id',
+      description: 'Custom steam id of a user.',
+      required: false,
+      type: 3
+    },
+    {
+      name: 'steam_profile_link',
+      description: 'Url of a steam profile.',
+      required: false,
+      type: 3
+    },
+    {
+      name: 'csgo_status',
+      description: 'The result of the "status" command in CS:GO that contains the user part.',
+      required: false,
+      type: 3
+    },
+    {
+      name: 'user_mention',
+      description: 'Mention a user that has linked his profile to the bot.',
+      required: false,
+      type: 6
+    }
+  ],
   description: "Displays your stats of the map given, or the stats of the user tagged. (only 1 user by command)",
+  usage: 'one of the options',
   type: 'command',
   async execute(message, args) {
     const steamIds = RegexFun.findSteamUIds(message.content)
 
     if (message.mentions.users.size > 0) {
       const user = await User.exists(message.mentions.users.first().id)
-      if (!user) message.channel.send({ embeds: [ErrorCard('**No players found**')] })
+      if (!user) message.channel.send({ embeds: [errorCard('**No players found**')] })
       else sendCardWithInfos(message, user.steamId)
     }
     else if (steamIds.length > 0) sendCardWithInfos(message, steamIds[0])
     else if (args.length > 0) sendCardWithInfos(message, args[0].split('/').filter(e => e).pop())
     else if (await User.get(message.author.id)) sendCardWithInfos(message, (await User.get(message.author.id)).steamId)
-    else message.channel.send({ embeds: [ErrorCard(`You need to link your account to do that without a parameter, do ${prefix}help link to see how.`)] })
+    else message.channel.send({ embeds: [errorCard(`You need to link your account to do that without a parameter, do ${prefix}help link to see how.`)] })
   }
 }

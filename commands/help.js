@@ -1,7 +1,7 @@
 const { prefix, name, color } = require('../config.json')
 const Discord = require('discord.js')
 const fs = require('fs')
-const ErrorCard = require('../templates/errorCard')
+const errorCard = require('../templates/errorCard')
 
 const getCommands = (card) => {
   const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'))
@@ -21,13 +21,17 @@ const getCommands = (card) => {
 
 const getCommandsHelp = (commandName, card) => {
   try { command = require(`./${commandName}.js`) }
-  catch { return ErrorCard('**Command not found**') }
+  catch { return errorCard('**Command not found**') }
 
-  card.setDescription(`Informations about the ${command.name} command\n{}: Optionnal parameters\n<>: Mandatory parameters`)
+  let optionsDesc = ''
+
+  command.options.forEach(o => { optionsDesc += `\`${o.name}\`: ${o.description}\n` })
+
+  card.setDescription(`Informations about the ${command.name} command`)
     .addFields({ name: 'Aliases', value: `${command.aliasses.join(',')}` },
       { name: 'Description', value: `${command.description}` },
-      { name: 'Options', value: `${command.options ? command.options : 'This command do not required options'}` },
-      { name: 'Usage', value: `${prefix}${command.name} ${command.options ? command.options : ''}` })
+      { name: 'Options', value: `${optionsDesc.length > 0 ? optionsDesc : 'This command do not required options'}` },
+      { name: 'Usage', value: `${prefix}${command.name} ${command.usage}` })
 
   return card
 }
@@ -35,8 +39,16 @@ const getCommandsHelp = (commandName, card) => {
 module.exports = {
   name: 'help',
   aliasses: ['help', 'h'],
-  options: '{command}',
+  options: [
+    {
+      name: 'command',
+      description: 'One of the command name.',
+      required: false,
+      type: 3
+    }
+  ],
   description: 'Display the command list.',
+  usage: 'command name',
   type: 'system',
   execute(message, args) {
     const helpCard = new Discord.MessageEmbed()

@@ -5,8 +5,9 @@ const User = require('../database/user')
 module.exports = {
   name: 'infos',
   aliasses: ['infos', 'info', 'inf'],
-  options: '',
+  options: [],
   description: "Get the infos about the bot.",
+  usage: '',
   type: 'system',
   async execute(message, args) {
     message.channel.send({
