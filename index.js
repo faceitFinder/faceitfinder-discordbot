@@ -44,7 +44,11 @@ client.on('messageCreate', async message => {
     const command = args.shift().toLowerCase()
 
     if (!client.commands.has(command)) message.channel.send(errorCard('**Command not found**'))
-    else try { message.channel.send(await client.commands.get(command).execute(message, args)) }
+    else try {
+      const msg = await client.commands.get(command).execute(message, args)
+      if (msg.length !== undefined) msg.forEach(m => message.channel.send(m))
+      else message.channel.send(msg)
+    }
     catch (error) {
       console.log(error)
       message.channel.send(errorCard('**An error has occured**'))
