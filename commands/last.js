@@ -9,8 +9,10 @@ const Graph = require('../functions/graph')
 const RegexFun = require('../functions/regex')
 const User = require('../database/user')
 const errorCard = require('../templates/errorCard')
+const { resolve } = require('path')
+const { getCardsMentions, getCardsParams } = require('../functions/commands')
 
-const sendCardWithInfos = async (steamParam) => {
+const sendCardWithInfos = async (message = null, steamParam) => {
   try {
     const steamId = await Steam.getId(steamParam)
     const steamDatas = await Steam.getDatas(steamId)
@@ -32,7 +34,7 @@ const sendCardWithInfos = async (steamParam) => {
     const rankImageCanvas = Canvas.createCanvas(size, size)
     const ctx = rankImageCanvas.getContext('2d')
     ctx.drawImage(await Graph.getRankImage(faceitLevel, size), 0, 0)
-    filesAtt.push(new Discord.MessageAttachment(rankImageCanvas.toBuffer(), 'level.png'))
+    filesAtt.push(new Discord.MessageAttachment(rankImageCanvas.toBuffer(), `${faceitLevel}.png`))
 
     const eloDiff = playerDatas.games.csgo.faceit_elo - lastMatchElo[1].elo
 
@@ -61,15 +63,12 @@ const sendCardWithInfos = async (steamParam) => {
           { name: 'Assists', value: `${playerStats.Assists}`, inline: true },
           { name: 'Elo', value: `${eloDiff > 0 ? '+' + eloDiff : eloDiff}`, inline: true },
           { name: 'Date', value: new Date(lastMatchElo[0].date).toDateString(), inline: true })
-        .setThumbnail('attachment://level.png')
-        .setImage('attachment://map.jpg')
+        .setThumbnail(`attachment://${faceitLevel}.png`)
+        .setImage(`attachment://${r.round_stats.Map}.jpg`)
         .setColor(color.levels[faceitLevel].color)
         .setFooter(`Steam: ${steamDatas.personaname}`)
 
-      if (fs.existsSync(mapThumbnail)) {
-        filesAtt.push(new Discord.MessageAttachment(mapThumbnail, 'map.jpg'),)
-        card.setImage('attachment://map.jpg')
-      }
+      if (fs.existsSync(mapThumbnail)) filesAtt.push(new Discord.MessageAttachment(mapThumbnail, `${r.round_stats.Map}.jpg`))
     })
 
     return {
@@ -123,20 +122,15 @@ module.exports = {
   type: 'command',
   async execute(message, args) {
     const steamIds = RegexFun.findSteamUIds(message.content)
-
-    if (message.mentions.users.size > 0)
-      message.mentions.users.forEach(async u => {
-        const user = await User.get(u.id)
-        if (!user) message.channel.send(errorCard('**No players found**'))
-        else message.channel.send(await sendCardWithInfos(user.steamId))
-      })
-    else if (steamIds.length > 0) steamIds.forEach(async e => { message.channel.send(await sendCardWithInfos(e)) })
-    else if (args.length > 0)
-      args.forEach(async e => {
-        const steamParam = e.split('/').filter(e => e).pop()
-        message.channel.send(await sendCardWithInfos(steamParam))
-      })
-    else if (await User.get(message.author.id)) message.channel.send(await sendCardWithInfos((await User.get(message.author.id)).steamId))
-    else message.channel.send(errorCard(`You need to link your account to do that without a parameter, do ${prefix}help link to see how.`))
+    
+    if (message.mentions.users.size > 0) return await getCardsMentions(message, message.mentions.users, sendCardWithInfos)
+    else if (steamIds.length > 0) return getCardsParams(message, steamIds, sendCardWithInfos)
+    else if (args.length > 0) {
+      const params = []
+      await args.forEach(async e => { params.push(e.split('/').filter(e => e).pop()) })
+      return getCardsParams(message, params, sendCardWithInfos)
+    }
+    else if (await User.get(message.author.id)) return await getCardsMentions(message, [message.author], sendCardWithInfos)
+    else return errorCard(`You need to link your account to do that without a parameter, do ${prefix}help link to see how.`)
   }
 }
