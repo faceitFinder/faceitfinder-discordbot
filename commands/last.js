@@ -10,7 +10,7 @@ const RegexFun = require('../functions/regex')
 const User = require('../database/user')
 const errorCard = require('../templates/errorCard')
 
-const sendCardWithInfos = async (message, steamParam) => {
+const sendCardWithInfos = async (steamParam) => {
   try {
     const steamId = await Steam.getId(steamParam)
     const steamDatas = await Steam.getDatas(steamId)
@@ -20,12 +20,7 @@ const sendCardWithInfos = async (message, steamParam) => {
 
     let lastMatchStats
     if (playerHistory.items.length > 0) lastMatchStats = await Match.getMatchStats(playerHistory.items[0].match_id)
-    else {
-      message.channel.send({
-        embeds: [errorCard('**Could not get your last match stats**')]
-      })
-      return
-    }
+    else return { embeds: [errorCard('**Could not get your last match stats**')] }
 
     const lastMatchElo = await Match.getMatchElo(playerId, 2)
 
@@ -76,14 +71,14 @@ const sendCardWithInfos = async (message, steamParam) => {
       }
     })
 
-    message.channel.send({
+    return {
       embeds: [card],
       files: filesAtt
-    })
+    }
 
   } catch (error) {
     console.log(error)
-    message.channel.send({ embeds: [errorCard('**No players found**')] })
+    return { embeds: [errorCard('**No players found**')] }
   }
 }
 
@@ -129,18 +124,18 @@ module.exports = {
     const steamIds = RegexFun.findSteamUIds(message.content)
 
     if (message.mentions.users.size > 0)
-      message.mentions.users.forEach(async (e) => {
+      message.mentions.users.forEach(async e => {
         const user = await User.exists(e.id)
         if (!user) message.channel.send({ embeds: [errorCard('**No players found**')] })
-        else sendCardWithInfos(message, user.steamId)
+        else message.channel.send(await sendCardWithInfos(message, user.steamId))
       })
-    else if (steamIds.length > 0) steamIds.forEach(e => { sendCardWithInfos(message, e) })
+    else if (steamIds.length > 0) steamIds.forEach(async e => { message.channel.send(await sendCardWithInfos(message, e)) })
     else if (args.length > 0)
-      args.forEach(e => {
+      args.forEach(async e => {
         const steamParam = e.split('/').filter(e => e).pop()
-        sendCardWithInfos(message, steamParam)
+        message.channel.send(await sendCardWithInfos(message, steamParam))
       })
-    else if (await User.get(message.author.id)) sendCardWithInfos(message, (await User.get(message.author.id)).steamId)
+    else if (await User.get(message.author.id)) message.channel.send(await sendCardWithInfos(message, (await User.get(message.author.id)).steamId))
     else message.channel.send({ embeds: [errorCard(`You need to link your account to do that without a parameter, do ${prefix}help link to see how.`)] })
   }
 }

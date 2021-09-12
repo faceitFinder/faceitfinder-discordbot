@@ -15,17 +15,17 @@ const sendCardWithInfos = async (message, steamParam) => {
 
     await User.exists(discordId) ? await User.update(discordId, steamId) : User.create(discordId, steamId)
 
-    message.channel.send({
+    return {
       embeds: [
         new Discord.MessageEmbed()
           .setColor(color.primary)
           .setDescription(`Your account has been linked to ${playerDatas.nickname}`)
       ]
-    })
+    }
 
   } catch (error) {
     console.log(error)
-    message.channel.send({ embeds: [errorCard('**No players found**')] })
+    return { embeds: [errorCard('**No players found**')] }
   }
 }
 
@@ -64,8 +64,8 @@ module.exports = {
   async execute(message, args) {
     const steamId = RegexFun.findSteamUIds(message.content)
 
-    if (steamId.length > 0) sendCardWithInfos(message, steamId)
-    else if (args.length > 0) sendCardWithInfos(message, args[0].split('/').filter(e => e).pop())
+    if (steamId.length > 0) message.channel.send(await sendCardWithInfos(message, steamId))
+    else if (args.length > 0) message.channel.send(await sendCardWithInfos(message, args[0].split('/').filter(e => e).pop()))
     else message.channel.send({ embeds: [errorCard(`A parameter is missing, please do ${prefix}help link, to see how to do.`)] })
   }
 }

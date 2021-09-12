@@ -33,14 +33,14 @@ const sendCardWithInfos = async (message, steamParam) => {
           .addOptions(options),
       )
 
-    message.channel.send({
+    return {
       content: `Select one of the following maps to get the stats related (${playerDatas.nickname})`,
       components: [row]
-    })
+    }
 
   } catch (error) {
     console.log(error)
-    message.channel.send({ embeds: [errorCard('**No players found**')] })
+    return { embeds: [errorCard('**No players found**')] }
   }
 }
 
@@ -88,11 +88,11 @@ module.exports = {
     if (message.mentions.users.size > 0) {
       const user = await User.exists(message.mentions.users.first().id)
       if (!user) message.channel.send({ embeds: [errorCard('**No players found**')] })
-      else sendCardWithInfos(message, user.steamId)
+      else message.channel.send(await sendCardWithInfos(message, user.steamId))
     }
-    else if (steamIds.length > 0) sendCardWithInfos(message, steamIds[0])
-    else if (args.length > 0) sendCardWithInfos(message, args[0].split('/').filter(e => e).pop())
-    else if (await User.get(message.author.id)) sendCardWithInfos(message, (await User.get(message.author.id)).steamId)
+    else if (steamIds.length > 0) message.channel.send(await sendCardWithInfos(message, steamIds[0]))
+    else if (args.length > 0) message.channel.send(await sendCardWithInfos(message, args[0].split('/').filter(e => e).pop()))
+    else if (await User.get(message.author.id)) message.channel.send(await sendCardWithInfos(message, (await User.get(message.author.id)).steamId))
     else message.channel.send({ embeds: [errorCard(`You need to link your account to do that without a parameter, do ${prefix}help link to see how.`)] })
   }
 }

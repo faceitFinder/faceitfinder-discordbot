@@ -16,7 +16,7 @@ const getCommands = (card) => {
     card.addField(t, value)
   })
 
-  return card
+  return { embeds: [card] }
 }
 
 const getCommandsHelp = (commandName, card) => {
@@ -33,7 +33,7 @@ const getCommandsHelp = (commandName, card) => {
       { name: 'Options', value: `${optionsDesc.length > 0 ? optionsDesc : 'This command do not required options'}` },
       { name: 'Usage', value: `${prefix}${command.name} ${command.usage}` })
 
-  return card
+  return { embeds: [card] }
 }
 
 module.exports = {
@@ -57,15 +57,7 @@ module.exports = {
       .setDescription(`\`${prefix}help {command}\` for more info on a specific command`)
       .setFooter(`${name} Help`)
 
-    if (args.length === 0) message.channel.send({
-      embeds: [
-        getCommands(helpCard)
-      ]
-    })
-    else message.channel.send({
-      embeds: [
-        getCommandsHelp(args[0], helpCard)
-      ]
-    })
+    if (args.length === 0) message.channel.send(getCommands(helpCard))
+    else message.channel.send(getCommandsHelp(args[0], helpCard))
   }
 }
