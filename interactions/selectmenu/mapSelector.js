@@ -5,7 +5,7 @@ const fs = require('fs')
 const Player = require('../../functions/player')
 const Steam = require('../../functions/steam')
 const Graph = require('../../functions/graph')
-const ErrorCard = require('../../templates/errorCard')
+const errorCard = require('../../templates/errorCard')
 
 module.exports = {
   name: 'mapSelector',
@@ -58,7 +58,7 @@ module.exports = {
         })
       } catch (error) {
         console.log(error)
-        interaction.reply({ embeds: [ErrorCard(`**${error.toString()}**`)] })
+        interaction.reply(errorCard(`**${error.toString()}**`))
       }
   }
 }

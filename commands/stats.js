@@ -7,9 +7,9 @@ const Player = require('../functions/player')
 const Graph = require('../functions/graph')
 const Ladder = require('../functions/ladder')
 const User = require('../database/user')
-const ErrorCard = require('../templates/errorCard')
+const errorCard = require('../templates/errorCard')
 
-const sendCardWithInfos = async (message, steamParam) => {
+const sendCardWithInfos = async (steamParam) => {
   try {
     const steamId = await Steam.getId(steamParam)
     const steamDatas = await Steam.getDatas(steamId)
@@ -46,42 +46,73 @@ const sendCardWithInfos = async (message, steamParam) => {
       .setColor(color.levels[faceitLevel].color)
       .setFooter(`Steam: ${steamDatas.personaname}`)
 
-    message.channel.send({
+    return {
       embeds: [card],
       files: [
         new Discord.MessageAttachment(graphCanvas.toBuffer(), 'graph.png'),
         new Discord.MessageAttachment(rankImageCanvas.toBuffer(), 'level.png')
       ]
-    })
-
+    }
   } catch (error) {
     console.log(error)
-    message.channel.send({ embeds: [ErrorCard('**No players found**')] })
+    return errorCard('**No players found**')
   }
 }
 
 module.exports = {
   name: 'stats',
   aliasses: ['stats', 's'],
-  options: '{user steam id | steam custom id | steam profile link | csgo status ingame command with the users part | @ someone}',
-  description: "Parameters are optional if you linked your account.\nDisplays the statistics of the given user (s), with a graph showing the evolution of his elo over his last 20 games (or less if he has not played 20)",
+  options: [
+    {
+      name: 'user_steam_id',
+      description: 'Steam id of a user.',
+      required: false,
+      type: 3
+    },
+    {
+      name: 'user_custom_steam_id',
+      description: 'Custom steam id of a user.',
+      required: false,
+      type: 3
+    },
+    {
+      name: 'steam_profile_link',
+      description: 'Url of a steam profile.',
+      required: false,
+      type: 3
+    },
+    {
+      name: 'csgo_status',
+      description: 'The result of the "status" command in CS:GO that contains the user part.',
+      required: false,
+      type: 3
+    },
+    {
+      name: 'user_mention',
+      description: 'Mention a user that has linked his profile to the bot.',
+      required: false,
+      type: 6
+    }
+  ],
+  description: "Displays general stats of the user(s) given, including a graph that show the elo evolution.",
+  usage: 'one of the options',
   type: 'command',
   async execute(message, args) {
     const steamIds = RegexFun.findSteamUIds(message.content)
 
     if (message.mentions.users.size > 0)
-      message.mentions.users.forEach(async (e) => {
+      message.mentions.users.forEach(async e => {
         const user = await User.exists(e.id)
-        if (!user) message.channel.send({ embeds: [ErrorCard('**No players found**')] })
-        else sendCardWithInfos(message, user.steamId)
+        if (!user) message.channel.send(errorCard('**No players found**'))
+        else message.channel.send(await sendCardWithInfos(user.steamId))
       })
-    else if (steamIds.length > 0) steamIds.forEach(e => { sendCardWithInfos(message, e) })
+    else if (steamIds.length > 0) steamIds.forEach(async e => { message.channel.send(await sendCardWithInfos(e)) })
     else if (args.length > 0)
-      args.forEach(e => {
+      args.forEach(async e => {
         const steamParam = e.split('/').filter(e => e).pop()
-        sendCardWithInfos(message, steamParam)
+        message.channel.send(await sendCardWithInfos(steamParam))
       })
-    else if (await User.get(message.author.id)) sendCardWithInfos(message, (await User.get(message.author.id)).steamId)
-    else message.channel.send({ embeds: [ErrorCard(`You need to link your account to do that without a parameter, do ${prefix}help link to see how.`)] })
+    else if (await User.get(message.author.id)) message.channel.send(await sendCardWithInfos((await User.get(message.author.id)).steamId))
+    else message.channel.send(errorCard(`You need to link your account to do that without a parameter, do ${prefix}help link to see how.`))
   }
 }

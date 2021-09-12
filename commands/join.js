@@ -4,8 +4,9 @@ const Discord = require('discord.js')
 module.exports = {
   name: 'join',
   aliasses: ['join'],
-  options: '',
+  options: [],
   description: "Get the link to join the community server of the bot .",
+  usage: '',
   type: 'system',
   async execute(message, args) {
     message.channel.send({

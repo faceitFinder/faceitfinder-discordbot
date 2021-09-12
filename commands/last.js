@@ -1,4 +1,4 @@
-const { color, emojis } = require('../config.json')
+const { color, emojis, prefix } = require('../config.json')
 const Discord = require('discord.js')
 const Canvas = require('canvas')
 const fs = require('fs')
@@ -8,9 +8,9 @@ const Player = require('../functions/player')
 const Graph = require('../functions/graph')
 const RegexFun = require('../functions/regex')
 const User = require('../database/user')
-const ErrorCard = require('../templates/errorCard')
+const errorCard = require('../templates/errorCard')
 
-const sendCardWithInfos = async (message, steamParam) => {
+const sendCardWithInfos = async (steamParam) => {
   try {
     const steamId = await Steam.getId(steamParam)
     const steamDatas = await Steam.getDatas(steamId)
@@ -18,14 +18,10 @@ const sendCardWithInfos = async (message, steamParam) => {
     const playerDatas = await Player.getDatas(playerId)
     const playerHistory = await Player.getHistory(playerId)
 
+
     let lastMatchStats
     if (playerHistory.items.length > 0) lastMatchStats = await Match.getMatchStats(playerHistory.items[0].match_id)
-    else {
-      message.channel.send({
-        embeds: [ErrorCard('**Could not get your last match stats**')]
-      })
-      return
-    }
+    else return errorCard('**Could not get your last match stats**')
 
     const lastMatchElo = await Match.getMatchElo(playerId, 2)
 
@@ -53,8 +49,7 @@ const sendCardWithInfos = async (message, steamParam) => {
       mapThumbnail = `./images/maps/${r.round_stats.Map}.jpg`
 
       card.setAuthor(playerDatas.nickname, playerDatas.avatar, `https://www.faceit.com/fr/players/${playerDatas.nickname}`)
-        .setTitle('Steam')
-        .setURL(steamDatas.profileurl)
+        .setDescription(`[Steam](${steamDatas.profileurl}), [Game Lobby](https://www.faceit.com/fr/csgo/room/${playerHistory.items[0].match_id}/scoreboard)`)
         .addFields({ name: 'Score', value: `${r.round_stats.Score}`, inline: true },
           { name: 'Map', value: `${r.round_stats.Map}`, inline: true },
           { name: 'Status', value: `${parseInt(playerStats.Result) ? emojis.won.balise : emojis.lost.balise}`, inline: true },
@@ -77,39 +72,71 @@ const sendCardWithInfos = async (message, steamParam) => {
       }
     })
 
-    message.channel.send({
+    return {
       embeds: [card],
       files: filesAtt
-    })
+    }
 
   } catch (error) {
     console.log(error)
-    message.channel.send({ embeds: [ErrorCard('**No players found**')] })
+    return errorCard('**No players found**')
   }
 }
 
 module.exports = {
   name: 'last',
   aliasses: ['last', 'l', 'lst'],
-  options: '{user steam id | steam custom id | steam profile link | csgo status ingame command with the users part | @ someone}',
+  options: [
+    {
+      name: 'user_steam_id',
+      description: 'Steam id of a user.',
+      required: false,
+      type: 3
+    },
+    {
+      name: 'user_custom_steam_id',
+      description: 'Custom steam id of a user.',
+      required: false,
+      type: 3
+    },
+    {
+      name: 'steam_profile_link',
+      description: 'Url of a steam profile.',
+      required: false,
+      type: 3
+    },
+    {
+      name: 'csgo_status',
+      description: 'The result of the "status" command in CS:GO that contains the user part.',
+      required: false,
+      type: 3
+    },
+    {
+      name: 'user_mention',
+      description: 'Mention a user that has linked his profile to the bot.',
+      required: false,
+      type: 6
+    }
+  ],
   description: "Get the stats of last game played by the given user (s).",
+  usage: 'one of the options',
   type: 'command',
   async execute(message, args) {
     const steamIds = RegexFun.findSteamUIds(message.content)
 
     if (message.mentions.users.size > 0)
-      message.mentions.users.forEach(async (e) => {
-        const user = await User.exists(e.id)
-        if (!user) message.channel.send({ embeds: [ErrorCard('**No players found**')] })
-        else sendCardWithInfos(message, user.steamId)
+      message.mentions.users.forEach(async u => {
+        const user = await User.get(u.id)
+        if (!user) message.channel.send(errorCard('**No players found**'))
+        else message.channel.send(await sendCardWithInfos(user.steamId))
       })
-    else if (steamIds.length > 0) steamIds.forEach(e => { sendCardWithInfos(message, e) })
+    else if (steamIds.length > 0) steamIds.forEach(async e => { message.channel.send(await sendCardWithInfos(e)) })
     else if (args.length > 0)
-      args.forEach(e => {
+      args.forEach(async e => {
         const steamParam = e.split('/').filter(e => e).pop()
-        sendCardWithInfos(message, steamParam)
+        message.channel.send(await sendCardWithInfos(steamParam))
       })
-    else if (await User.get(message.author.id)) sendCardWithInfos(message, (await User.get(message.author.id)).steamId)
-    else message.channel.send({ embeds: [ErrorCard(`You need to link your account to do that without a parameter, do ${prefix}help link to see how.`)] })
+    else if (await User.get(message.author.id)) message.channel.send(await sendCardWithInfos((await User.get(message.author.id)).steamId))
+    else message.channel.send(errorCard(`You need to link your account to do that without a parameter, do ${prefix}help link to see how.`))
   }
 }
