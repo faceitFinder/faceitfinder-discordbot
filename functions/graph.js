@@ -78,16 +78,15 @@ const getColors = (prev, current, ctx, coordinatesStart, coordinatesEnd) => {
 
   if (current >= prevValues.min && current <= prevValues.max) gradient.addColorStop(0, prevValues.color)
   else if (current > prevValues.max) {
-    gradient.addColorStop(0.5, prevValues.color)
-    gradient.addColorStop(1, color.levels[parseInt(prevLevel) + 1].color)
-  } else if (current < prevValues.min) {
     gradient.addColorStop(0, prevValues.color)
-    gradient.addColorStop(0.5, color.levels[parseInt(prevLevel) - 1].color)
+    gradient.addColorStop(0.5, color.levels[parseInt(prevLevel) + 1].color)
+  } else if (current < prevValues.min) {
+    gradient.addColorStop(0.5, prevValues.color)
+    gradient.addColorStop(1, color.levels[parseInt(prevLevel) - 1].color)
   }
 
   return gradient
 }
-
 
 const getElo = async (playerId) => {
   const data = await Match.getMatchElo(playerId)
