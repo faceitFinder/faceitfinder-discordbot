@@ -18,6 +18,7 @@ const sendCardWithInfos = async (steamParam) => {
     const playerDatas = await Player.getDatas(playerId)
     const playerHistory = await Player.getHistory(playerId)
 
+
     let lastMatchStats
     if (playerHistory.items.length > 0) lastMatchStats = await Match.getMatchStats(playerHistory.items[0].match_id)
     else return errorCard('**Could not get your last match stats**')
@@ -124,8 +125,8 @@ module.exports = {
     const steamIds = RegexFun.findSteamUIds(message.content)
 
     if (message.mentions.users.size > 0)
-      message.mentions.users.forEach(async e => {
-        const user = await User.exists(e.id)
+      message.mentions.users.forEach(async u => {
+        const user = await User.get(u.id)
         if (!user) message.channel.send(errorCard('**No players found**'))
         else message.channel.send(await sendCardWithInfos(user.steamId))
       })
@@ -135,7 +136,7 @@ module.exports = {
         const steamParam = e.split('/').filter(e => e).pop()
         message.channel.send(await sendCardWithInfos(steamParam))
       })
-    else if (await User.get(message.author.id)) message.channel.send(await sendCardWithInfos(await User.get(message.author.id).steamId))
+    else if (await User.get(message.author.id)) message.channel.send(await sendCardWithInfos((await User.get(message.author.id)).steamId))
     else message.channel.send(errorCard(`You need to link your account to do that without a parameter, do ${prefix}help link to see how.`))
   }
 }
