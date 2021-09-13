@@ -21,7 +21,16 @@ client.on('ready', () => {
   client.commands = new Discord.Collection()
   fs.readdirSync('./commands').filter(file => file.endsWith('.js')).forEach(async (file) => {
     const command = require(`./commands/${file}`)
-    command.aliasses.forEach(e => { client.commands.set(e, command) })
+    command.aliasses.forEach(e => {
+      client.commands.set(e, command)
+    })
+    getApp(client, "882210656328228895").commands.post({
+      data: {
+        name: command.name,
+        description: command.description,
+        options: command.options
+      }
+    })
   })
 
   /**
@@ -58,6 +67,8 @@ client.on('messageCreate', async message => {
 
 client.on('interactionCreate', async (interaction) => {
   if (interaction.isSelectMenu()) client.selectMenus.get(interaction.customId)?.execute(interaction)
+  if (client.commands.has(interaction.commandName))
+    console.log(interaction)
 })
 
 // Send datas to top.gg
