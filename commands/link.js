@@ -5,7 +5,7 @@ const Steam = require('../functions/steam')
 const RegexFun = require('../functions/regex')
 const User = require('../database/user')
 const errorCard = require('../templates/errorCard')
-const { getCards } = require('../functions/commands')
+const { getCardsConditions } = require('../functions/commands')
 
 const sendCardWithInfos = async (message, steamParam) => {
   try {
@@ -64,9 +64,10 @@ module.exports = {
   type: 'command',
   async execute(message, args) {
     const steamId = RegexFun.findSteamUIds(message.content)
-
-    if (steamId.length > 0) return getCards(message, [steamId[0]], sendCardWithInfos)
-    else if (args.length > 0) return getCards(message, [args[0].split('/').filter(e => e).pop()], sendCardWithInfos)
-    else return errorCard(`A parameter is missing, please do ${prefix}help link, to see how to do.`)
+    return await getCardsConditions([],
+      steamId.length > 0 ? [steamId[0]] : [],
+      [args[0].split('/').filter(e => e).pop()],
+      message,
+      sendCardWithInfos)
   }
 }

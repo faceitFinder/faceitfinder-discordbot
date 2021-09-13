@@ -1,3 +1,4 @@
+const { prefix } = require('../config.json')
 const User = require('../database/user')
 const errorCard = require('../templates/errorCard')
 
@@ -6,6 +7,7 @@ const getCards = async (message, array, fn, mention = 0) => {
 
   return await Promise.all(array.map(async u => {
     if (mention) {
+      console.log(u)
       const user = await User.exists(u.id)
       if (user) return await fn(message, user.steamId)
       else return errorCard('**No players found**')
@@ -20,6 +22,14 @@ const getCards = async (message, array, fn, mention = 0) => {
   })).then(() => messages)
 }
 
+const getCardsConditions = async (mentions, steamIds, args, message, fn) => {
+  if (mentions.size > 0) return getCards(message, mentions, fn, 1)
+  else if (steamIds.length > 0) return getCards(message, steamIds, fn)
+  else if (args.length > 0) return getCards(message, args, fn)
+  else if (await User.get(message.author.id)) return getCards(message, [message.author], fn, 1)
+  else return errorCard(`You need to link your account to do that without a parameter, do ${prefix}help link to see how.`)
+}
+
 module.exports = {
-  getCards
+  getCardsConditions
 }
