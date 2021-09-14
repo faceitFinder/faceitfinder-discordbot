@@ -36,14 +36,14 @@ module.exports = {
           .setURL(steamDatas.profileurl)
           .setThumbnail('attachment://level.png')
           .addFields({ name: 'Games', value: `${mapStats.stats.Matches} (${mapStats.stats['Win Rate %']}% Win)`, inline: true },
-            { name: 'Map', value: `${values.map}`, inline: true },
-            { name: 'Mode', value: `${values.mode}`, inline: true },
-            { name: 'Average K/D', value: `${mapStats.stats['Average K/D Ratio']}`, inline: true },
+            { name: 'Map', value: values.map, inline: true },
+            { name: 'Mode', value: values.mode, inline: true },
+            { name: 'Average K/D', value: mapStats.stats['Average K/D Ratio'], inline: true },
             { name: 'Average HS', value: `${mapStats.stats['Average Headshots %']}%`, inline: true },
-            { name: 'Average MVPs', value: `${mapStats.stats['Average MVPs']}`, inline: true },
-            { name: 'Average Kills', value: `${mapStats.stats['Average Kills']}`, inline: true },
-            { name: 'Average Deaths', value: `${mapStats.stats['Average Deaths']}`, inline: true },
-            { name: 'Average Assists', value: `${mapStats.stats['Average Assists']}`, inline: true })
+            { name: 'Average MVPs', value: mapStats.stats['Average MVPs'], inline: true },
+            { name: 'Average Kills', value: mapStats.stats['Average Kills'], inline: true },
+            { name: 'Average Deaths', value: mapStats.stats['Average Deaths'], inline: true },
+            { name: 'Average Assists', value: mapStats.stats['Average Assists'], inline: true })
           .setColor(color.levels[faceitLevel].color)
           .setFooter(`Steam: ${steamDatas.personaname}`)
 

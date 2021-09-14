@@ -28,9 +28,9 @@ const getCommandsHelp = (commandName, card) => {
   command.options.forEach(o => { optionsDesc += `\`${o.name}\`: ${o.description}\n` })
 
   card.setDescription(`Informations about the ${command.name} command`)
-    .addFields({ name: 'Aliases', value: `${command.aliasses.join(',')}` },
-      { name: 'Description', value: `${command.description}` },
-      { name: 'Options', value: `${optionsDesc.length > 0 ? optionsDesc : 'This command do not required options'}` },
+    .addFields({ name: 'Aliases', value: command.aliasses.join(', ') },
+      { name: 'Description', value: command.description },
+      { name: 'Options', value: optionsDesc.length > 0 ? optionsDesc : 'This command do not required options' },
       { name: 'Usage', value: `${prefix}${command.name} ${command.usage}` })
 
   return { embeds: [card] }

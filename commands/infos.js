@@ -14,14 +14,14 @@ module.exports = {
       embeds: [
         new Discord.MessageEmbed()
           .setColor(color.primary)
-          .setAuthor(`${name}`, 'attachment://logo.png')
+          .setAuthor(name, 'attachment://logo.png')
           .setDescription(`**Bot infos**`)
           .addFields({ name: 'Creator', value: `<@${creator}>` },
-            { name: 'Github', value: `${github}` },
-            { name: 'Invitation link', value: `${invite}` },
-            { name: 'Vote link', value: `${vote}` },
-            { name: 'Server link', value: `${join}` },
-            { name: 'Account linked', value: `${await User.count()}` })
+            { name: 'Github', value: github },
+            { name: 'Invitation link', value: invite },
+            { name: 'Vote link', value: vote },
+            { name: 'Server link', value: join },
+            { name: 'Account linked', value: (await User.count()).toString() })
           .setFooter(`${name} Infos`)
       ],
       files: [

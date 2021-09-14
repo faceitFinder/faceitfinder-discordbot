@@ -51,16 +51,16 @@ const sendCardWithInfos = async (message = null, steamParam) => {
 
       card.setAuthor(playerDatas.nickname, playerDatas.avatar, `https://www.faceit.com/fr/players/${playerDatas.nickname}`)
         .setDescription(`[Steam](${steamDatas.profileurl}), [Game Lobby](https://www.faceit.com/fr/csgo/room/${playerHistory.items[0].match_id}/scoreboard)`)
-        .addFields({ name: 'Score', value: `${r.round_stats.Score}`, inline: true },
-          { name: 'Map', value: `${r.round_stats.Map}`, inline: true },
-          { name: 'Status', value: `${parseInt(playerStats.Result) ? emojis.won.balise : emojis.lost.balise}`, inline: true },
-          { name: 'K/D', value: `${playerStats['K/D Ratio']}`, inline: true },
+        .addFields({ name: 'Score', value: r.round_stats.Score, inline: true },
+          { name: 'Map', value: r.round_stats.Map, inline: true },
+          { name: 'Status', value: parseInt(playerStats.Result) ? emojis.won.balise : emojis.lost.balise, inline: true },
+          { name: 'K/D', value: playerStats['K/D Ratio'], inline: true },
           { name: 'HS', value: `${playerStats['Headshots %']}%`, inline: true },
-          { name: 'MVPs', value: `${playerStats.MVPs}`, inline: true },
-          { name: 'Kills', value: `${playerStats.Kills}`, inline: true },
-          { name: 'Deaths', value: `${playerStats.Deaths}`, inline: true },
-          { name: 'Assists', value: `${playerStats.Assists}`, inline: true },
-          { name: 'Elo', value: `${eloDiff > 0 ? '+' + eloDiff : eloDiff}`, inline: true },
+          { name: 'MVPs', value: playerStats.MVPs, inline: true },
+          { name: 'Kills', value: playerStats.Kills, inline: true },
+          { name: 'Deaths', value: playerStats.Deaths, inline: true },
+          { name: 'Assists', value: playerStats.Assists, inline: true },
+          { name: 'Elo', value: eloDiff > 0 ? '+' + eloDiff : eloDiff, inline: true },
           { name: 'Date', value: new Date(lastMatchElo[0].date).toDateString(), inline: true })
         .setThumbnail(`attachment://${faceitLevel}.png`)
         .setImage(`attachment://${r.round_stats.Map}.jpg`)
