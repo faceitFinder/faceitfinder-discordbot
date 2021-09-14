@@ -8,7 +8,7 @@ const Graph = require('../functions/graph')
 const Ladder = require('../functions/ladder')
 const User = require('../database/user')
 const errorCard = require('../templates/errorCard')
-const { getCards } = require('../functions/commands')
+const { getCards, getCardsConditions } = require('../functions/commands')
 
 const sendCardWithInfos = async (message, steamParam) => {
   try {
@@ -38,11 +38,11 @@ const sendCardWithInfos = async (message, steamParam) => {
       .setURL(steamDatas.profileurl)
       .setThumbnail(`attachment://${faceitLevel}level.png`)
       .addFields({ name: 'Games', value: `${playerStats.lifetime.Matches} (${playerStats.lifetime['Win Rate %']}% Win)`, inline: true },
-        { name: 'K/D', value: `${playerStats.lifetime['Average K/D Ratio']}`, inline: true },
+        { name: 'K/D', value: playerStats.lifetime['Average K/D Ratio'], inline: true },
         { name: 'HS', value: `${playerStats.lifetime['Average Headshots %']}%`, inline: true },
-        { name: 'Elo', value: `${playerDatas.games.csgo.faceit_elo}`, inline: true },
-        { name: `:flag_${playerCountry}:`, value: `${ladderCountry.position}`, inline: true },
-        { name: `:flag_${playerRegion.toLowerCase()}:`, value: `${ladderRegion.position}`, inline: true })
+        { name: 'Elo', value: playerDatas.games.csgo.faceit_elo.toString(), inline: true },
+        { name: `:flag_${playerCountry}:`, value: ladderCountry.position.toString(), inline: true },
+        { name: `:flag_${playerRegion.toLowerCase()}:`, value: ladderRegion.position.toString(), inline: true })
       .setImage(`attachment://${steamId}graph.png`)
       .setColor(color.levels[faceitLevel].color)
       .setFooter(`Steam: ${steamDatas.personaname}`)
@@ -56,7 +56,7 @@ const sendCardWithInfos = async (message, steamParam) => {
     }
   } catch (error) {
     console.log(error)
-    return errorCard('**No players found**')
+    return errorCard('No players found')
   }
 }
 
@@ -96,19 +96,14 @@ module.exports = {
     }
   ],
   description: "Displays general stats of the user(s) given, including a graph that show the elo evolution.",
+  slashDescription: "Displays your general stats, including a graph that show your elo evolution.",
   usage: 'one of the options',
-  type: 'command',
+  type: 'stats',
   async execute(message, args) {
     const steamIds = RegexFun.findSteamUIds(message.content)
+    const params = []
+    await args.forEach(async e => { params.push(e.split('/').filter(e => e).pop()) })
 
-    if (message.mentions.users.size > 0) return await getCards(message, message.mentions.users, sendCardWithInfos, 1)
-    else if (steamIds.length > 0) return getCards(message, steamIds, sendCardWithInfos)
-    else if (args.length > 0) {
-      const params = []
-      await args.forEach(async e => { params.push(e.split('/').filter(e => e).pop()) })
-      return getCards(message, params, sendCardWithInfos)
-    }
-    else if (await User.get(message.author.id)) return await getCards(message, [message.author], sendCardWithInfos, 1)
-    else return errorCard(`You need to link your account to do that without a parameter, do ${prefix}help link to see how.`)
+    return await getCardsConditions(message.mentions.users, steamIds, params, message, sendCardWithInfos)
   }
 }

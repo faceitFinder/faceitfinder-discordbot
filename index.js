@@ -21,7 +21,16 @@ client.on('ready', () => {
   client.commands = new Discord.Collection()
   fs.readdirSync('./commands').filter(file => file.endsWith('.js')).forEach(async (file) => {
     const command = require(`./commands/${file}`)
-    command.aliasses.forEach(e => { client.commands.set(e, command) })
+    command.aliasses.forEach(e => {
+      client.commands.set(e, command)
+    })
+    getApp(client, "882210656328228895").commands.post({
+      data: {
+        name: command.name,
+        description: command.slashDescription !== undefined ? command.slashDescription : command.description,
+        options: ['system', 'utility'].includes(command.type) ? command.options : []
+      }
+    })
   })
 
   /**
@@ -43,7 +52,7 @@ client.on('messageCreate', async message => {
     const args = msg.split(/ +/)
     const command = args.shift().toLowerCase()
 
-    if (!client.commands.has(command)) message.channel.send(errorCard('**Command not found**'))
+    if (!client.commands.has(command)) message.channel.send(errorCard('Command not found'))
     else try {
       const msg = await client.commands.get(command).execute(message, args)
       if (msg.length !== undefined) msg.forEach(m => message.channel.send(m))
@@ -51,13 +60,33 @@ client.on('messageCreate', async message => {
     }
     catch (error) {
       console.log(error)
-      message.channel.send(errorCard('**An error has occured**'))
+      message.channel.send(errorCard('An error has occured'))
     }
   }
 })
 
 client.on('interactionCreate', async (interaction) => {
   if (interaction.isSelectMenu()) client.selectMenus.get(interaction.customId)?.execute(interaction)
+  if (client.commands.has(interaction.commandName)) {
+    const message = {
+      author: interaction.user,
+      mentions: {
+        users: new Discord.Collection()
+      },
+      content: ''
+    }
+    const args = []
+    interaction.options['_hoistedOptions'].filter(o => o.type === 'STRING').forEach(o => {
+      args.push(o.value)
+      message.content += o.value
+    })
+    interaction.options['_hoistedOptions'].filter(o => o.type === 'USER').forEach(o => message.mentions.users.set(o.user.id, o.user))
+
+    const response = await client.commands.get(interaction.commandName).execute(message, args)
+
+    if (Array.isArray(response)) interaction.reply(response[0])
+    else interaction.reply(response)
+  }
 })
 
 // Send datas to top.gg

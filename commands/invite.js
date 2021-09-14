@@ -13,7 +13,7 @@ module.exports = {
       embeds: [
         new Discord.MessageEmbed()
           .setColor(color.primary)
-          .setAuthor(`${name}`, 'attachment://logo.png')
+          .setAuthor(name, 'attachment://logo.png')
           .setDescription(`Hey <@${message.author.id}> you can invite me by clicking on the following link\n${invite}`)
           .setFooter(`${name} Invite`)
       ],

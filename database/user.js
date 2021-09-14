@@ -13,6 +13,8 @@ const create = (discordId, steamId) => {
 
 const get = async (discordId) => await User.findOne({ discordId: discordId }).exec()
 
+const remove = async (discordId) => await User.deleteOne({ discordId: discordId }).exec()
+
 const exists = async (discordId) => (await get(discordId))
 
 const update = async (discordId, steamId) => await User.updateOne({ discordId: discordId }, { steamId: steamId }).exec()
@@ -24,5 +26,6 @@ module.exports = {
   get,
   exists,
   update,
-  count
+  count,
+  remove
 }
