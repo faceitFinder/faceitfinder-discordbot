@@ -26,7 +26,7 @@ const sendCardWithInfos = async (message, steamParam) => {
 
   } catch (error) {
     console.log(error)
-    return errorCard('**No players found**')
+    return errorCard('No players found')
   }
 }
 
@@ -35,39 +35,27 @@ module.exports = {
   aliasses: ['link'],
   options: [
     {
-      name: 'user_steam_id',
-      description: 'Steam id of a user.',
-      required: false,
-      type: 3
-    },
-    {
-      name: 'user_custom_steam_id',
-      description: 'Custom steam id of a user.',
-      required: false,
-      type: 3
-    },
-    {
-      name: 'steam_profile_link',
-      description: 'Url of a steam profile.',
-      required: false,
-      type: 3
-    },
-    {
-      name: 'csgo_status',
-      description: 'The result of the "status" command in CS:GO that contains the user part.',
-      required: false,
+      name: 'user_steam_parameter',
+      description: 'Steam id / custom steam id / url of a steam profile / csgo status users part',
+      required: true,
       type: 3
     }
   ],
   description: `Link steam id to the discord user, to get your stats directly (no parameters needed).`,
   usage: 'one of the options',
-  type: 'command',
+  type: 'utility',
   async execute(message, args) {
     const steamId = RegexFun.findSteamUIds(message.content)
-    return await getCardsConditions([],
-      steamId.length > 0 ? [steamId[0]] : [],
-      [args[0].split('/').filter(e => e).pop()],
-      message,
-      sendCardWithInfos)
+    try {
+      [args[0].split('/').filter(e => e).pop()]
+
+      return await getCardsConditions([],
+        steamId.length > 0 ? [steamId[0]] : [],
+        [args[0].split('/').filter(e => e).pop()],
+        message,
+        sendCardWithInfos)
+    } catch (e) {
+      return errorCard(`A parameter is missing, do \`.ffhelp link\` to see how the command works.`)
+    }
   }
 }
