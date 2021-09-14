@@ -7,7 +7,6 @@ const getCards = async (message, array, fn, mention = 0) => {
 
   return await Promise.all(array.map(async u => {
     if (mention) {
-      console.log(u)
       const user = await User.exists(u.id)
       if (user) return await fn(message, user.steamId)
       else return errorCard('**No players found**')
