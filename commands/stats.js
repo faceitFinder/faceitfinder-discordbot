@@ -56,7 +56,7 @@ const sendCardWithInfos = async (message, steamParam) => {
     }
   } catch (error) {
     console.log(error)
-    return errorCard('**No players found**')
+    return errorCard('No players found')
   }
 }
 
@@ -96,8 +96,9 @@ module.exports = {
     }
   ],
   description: "Displays general stats of the user(s) given, including a graph that show the elo evolution.",
+  slashDescription: "Displays your general stats, including a graph that show your elo evolution.",
   usage: 'one of the options',
-  type: 'command',
+  type: 'stats',
   async execute(message, args) {
     const steamIds = RegexFun.findSteamUIds(message.content)
     const params = []

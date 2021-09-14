@@ -42,7 +42,7 @@ const sendCardWithInfos = async (message, steamParam) => {
 
   } catch (error) {
     console.log(error)
-    return errorCard('**No players found**')
+    return errorCard('No players found')
   }
 }
 
@@ -81,9 +81,10 @@ module.exports = {
       type: 6
     }
   ],
-  description: "Displays your stats of the map given, or the stats of the user tagged. (only 1 user by command)",
+  description: "Displays your stats of the choosen map, or the stats of the user tagged. (only 1 user by command)",
+  slashDescription: "Displays your stats of the choosen map.",
   usage: 'one of the options',
-  type: 'command',
+  type: 'stats',
   async execute(message, args) {
     const steamIds = RegexFun.findSteamUIds(message.content)
     const params = []

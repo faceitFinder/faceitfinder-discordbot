@@ -17,7 +17,7 @@ const sendCardWithInfos = async (message) => {
         ]
       }
     }
-    else return errorCard('**Your account is not linked to a user.**')
+    else return errorCard('Your account is not linked to a user.')
 
   } catch (error) {
     console.log(error)
@@ -31,7 +31,7 @@ module.exports = {
   options: [],
   description: `Unlink your steam id to the discord bot.`,
   usage: '',
-  type: 'command',
+  type: 'utility',
   async execute(message, args) {
     return sendCardWithInfos(message)
   }

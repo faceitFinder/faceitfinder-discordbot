@@ -9,7 +9,7 @@ const getCards = async (message, array, fn, mention = 0) => {
     if (mention) {
       const user = await User.exists(u.id)
       if (user) return await fn(message, user.steamId)
-      else return errorCard('**No players found**')
+      else return errorCard('No players found')
     } else return await fn(message, u)
   })).then(msgs => msgs.forEach(msg => {
     const data = { embeds: [], files: [], components: [] }
@@ -26,7 +26,7 @@ const getCardsConditions = async (mentions, steamIds, args, message, fn) => {
   else if (steamIds.length > 0) return getCards(message, steamIds, fn)
   else if (args.length > 0) return getCards(message, args, fn)
   else if (await User.get(message.author.id)) return getCards(message, [message.author], fn, 1)
-  else return errorCard(`You need to link your account to do that without a parameter, do ${prefix}help link to see how.`)
+  else return errorCard(`You need to link your account to do that without a parameter, do \`${prefix}help link\` to see how.`)
 }
 
 module.exports = {

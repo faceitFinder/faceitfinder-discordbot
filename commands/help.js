@@ -21,7 +21,7 @@ const getCommands = (card) => {
 
 const getCommandsHelp = (commandName, card) => {
   try { command = require(`./${commandName}.js`) }
-  catch { return errorCard('**Command not found**') }
+  catch { return errorCard('Command not found') }
 
   let optionsDesc = ''
 

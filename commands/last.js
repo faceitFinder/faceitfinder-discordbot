@@ -22,7 +22,7 @@ const sendCardWithInfos = async (message = null, steamParam) => {
 
     let lastMatchStats
     if (playerHistory.items.length > 0) lastMatchStats = await Match.getMatchStats(playerHistory.items[0].match_id)
-    else return errorCard('**Could not get your last match stats**')
+    else return errorCard('Could not get your last match stats')
 
     const lastMatchElo = await Match.getMatchElo(playerId, 2)
 
@@ -77,7 +77,7 @@ const sendCardWithInfos = async (message = null, steamParam) => {
 
   } catch (error) {
     console.log(error)
-    return errorCard('**No players found**')
+    return errorCard('No players found')
   }
 }
 
@@ -117,8 +117,9 @@ module.exports = {
     }
   ],
   description: "Get the stats of last game played by the given user (s).",
+  slashDescription: "Get the stats of the last game you played.",
   usage: 'one of the options',
-  type: 'command',
+  type: 'stats',
   async execute(message, args) {
     const steamIds = RegexFun.findSteamUIds(message.content)
     const params = []
