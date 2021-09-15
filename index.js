@@ -75,11 +75,10 @@ client.on('messageCreate', async message => {
     else try {
       const msg = await client.commands.get(command).execute(message, args)
       if (msg.length !== undefined) msg.forEach(m => message.channel.send(m))
-      else message.channel.send(msg)
-    }
-    catch (error) {
+      else message.channel.send(msg).catch((err) => console.log(err))
+    } catch (error) {
       console.log(error)
-      message.channel.send(errorCard('An error has occured'))
+      message.channel.send(errorCard('An error has occured')).catch((err) => console.log(err))
     }
   }
 })
@@ -103,8 +102,8 @@ client.on('interactionCreate', async (interaction) => {
 
     const response = await client.commands.get(interaction.commandName).execute(message, args)
 
-    if (Array.isArray(response)) interaction.reply(response[0])
-    else interaction.reply(response)
+    if (Array.isArray(response)) interaction.reply(response[0]).catch((err) => console.log(err))
+    else interaction.reply(response).catch((err) => console.log(err))
   }
 })
 
