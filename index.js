@@ -1,11 +1,14 @@
-const { prefix } = require('./config.json')
+const { prefix, id } = require('./config.json')
 const Discord = require('discord.js')
 const { AutoPoster } = require('topgg-autoposter')
+const { REST } = require('@discordjs/rest')
+const { Routes } = require('discord-api-types/v9')
 const fs = require('fs')
 const mongo = require('./database/mongo')
 const errorCard = require('./templates/errorCard')
 const { guildCount, getApp } = require('./functions/client')
 const client = new Discord.Client({ intents: [Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.GUILD_MESSAGES] })
+const slashCommands = []
 
 require('dotenv').config()
 
@@ -24,16 +27,30 @@ client.on('ready', () => {
     command.aliasses.forEach(e => {
       client.commands.set(e, command)
     })
-    try {
-      getApp(client).commands.post({
-        data: {
-          name: command.name,
-          description: command?.slashDescription || command.description,
-          options: ['system', 'utility'].includes(command.type) ? command.options : []
-        }
-      })
-    } catch (error) { console.log(error) }
+    slashCommands.push({
+      name: command.name,
+      description: command?.slashDescription || command.description,
+      options: ['system', 'utility'].includes(command.type) ? command.options : []
+    })
   })
+
+  /**
+   * Setup / commands
+   */
+  const rest = new REST({ version: '9' }).setToken(process.env.TOKEN);
+
+  (async () => {
+    try {
+      console.log('🚧 Started refreshing application (/) commands.');
+
+      await rest.put(
+        Routes.applicationCommands(process.env.CLIENT_ID),
+        { body: slashCommands },
+      )
+
+      console.log('🎉 Successfully reloaded application (/) commands.');
+    } catch (error) { console.error(error) }
+  })()
 
   /**
    * Setup selectMenus
