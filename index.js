@@ -24,13 +24,15 @@ client.on('ready', () => {
     command.aliasses.forEach(e => {
       client.commands.set(e, command)
     })
-    getApp(client, "882210656328228895").commands.post({
-      data: {
-        name: command.name,
-        description: command.slashDescription !== undefined ? command.slashDescription : command.description,
-        options: ['system', 'utility'].includes(command.type) ? command.options : []
-      }
-    })
+    try {
+      getApp(client).commands.post({
+        data: {
+          name: command.name,
+          description: command?.slashDescription || command.description,
+          options: ['system', 'utility'].includes(command.type) ? command.options : []
+        }
+      })
+    } catch (error) { console.log(error) }
   })
 
   /**
