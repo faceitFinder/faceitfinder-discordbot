@@ -1,4 +1,4 @@
-const { prefix, id } = require('./config.json')
+const { prefix } = require('./config.json')
 const Discord = require('discord.js')
 const { AutoPoster } = require('topgg-autoposter')
 const { REST } = require('@discordjs/rest')
@@ -6,7 +6,7 @@ const { Routes } = require('discord-api-types/v9')
 const fs = require('fs')
 const mongo = require('./database/mongo')
 const errorCard = require('./templates/errorCard')
-const { guildCount, getApp } = require('./functions/client')
+const { guildCount } = require('./functions/client')
 const client = new Discord.Client({ intents: [Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.GUILD_MESSAGES] })
 const slashCommands = []
 
