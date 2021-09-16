@@ -41,14 +41,14 @@ client.on('ready', () => {
 
   (async () => {
     try {
-      console.log('🚧 Started refreshing application (/) commands.');
+      console.log('🚧 Started refreshing application (/) commands.')
 
       await rest.put(
         Routes.applicationCommands(process.env.CLIENT_ID),
         { body: slashCommands },
       )
 
-      console.log('🎉 Successfully reloaded application (/) commands.');
+      console.log('🎉 Successfully reloaded application (/) commands.')
     } catch (error) { console.error(error) }
   })()
 
@@ -71,10 +71,10 @@ client.on('messageCreate', async message => {
     const args = msg.split(/ +/)
     const command = args.shift().toLowerCase()
 
-    if (!client.commands.has(command)) message.channel.send(errorCard('Command not found'))
+    if (!client.commands.has(command)) message.channel.send(errorCard('Command not found')).catch((err) => console.log(err))
     else try {
       const msg = await client.commands.get(command).execute(message, args)
-      if (msg.length !== undefined) msg.forEach(m => message.channel.send(m))
+      if (msg.length !== undefined) msg.forEach(m => message.channel.send(m).catch((err) => console.log(err)))
       else message.channel.send(msg).catch((err) => console.log(err))
     } catch (error) {
       console.log(error)
