@@ -44,7 +44,7 @@ client.on('ready', () => {
       console.log('🚧 Started refreshing application (/) commands.')
 
       await rest.put(
-        Routes.applicationCommands(process.env.CLIENT_ID),
+        Routes.applicationCommands(client.user.id),
         { body: slashCommands },
       )
 
