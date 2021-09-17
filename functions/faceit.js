@@ -6,13 +6,13 @@ const headerFaceit = {
   Authorization: `Bearer ${process.env.FACEIT_TOKEN}`
 }
 
-const fetchData = async (url) => await fetch(url, {
+const fetchData = async (url, error) => await fetch(url, {
   method: 'GET',
   headers: headerFaceit
 })
   .then(res => {
     if (res.status == 200) return res.json()
-    else throw 'An error has occured'
+    else throw error
   })
   .then(data => data)
 

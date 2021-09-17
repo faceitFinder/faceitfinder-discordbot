@@ -9,7 +9,7 @@ const getCards = async (message, array, fn, mention = 0) => {
     if (mention) {
       const user = await User.exists(u.id)
       if (user) return await fn(message, user.steamId)
-      else return errorCard('No players found')
+      else return errorCard('This user hasn\'t linked his profile')
     } else return await fn(message, u)
   })).then(msgs => msgs.forEach(msg => {
     const data = { embeds: [], files: [], components: [] }
