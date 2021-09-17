@@ -6,11 +6,11 @@ const getMatchElo = async (playerId, limit = 20) => await fetch(`https://api.fac
 })
   .then(res => {
     if (res.status == 200) return res.json()
-    else throw 'An error has occured'
+    else throw 'Couldn\'t not get last matches'
   })
   .then(data => data)
 
-const getMatchStats = async (matchid) => await Faceit.fetchData(`https://open.faceit.com/data/v4/matches/${matchid}/stats`)
+const getMatchStats = async (matchid) => await Faceit.fetchData(`https://open.faceit.com/data/v4/matches/${matchid}/stats`, 'Couldn\'t matches stats')
 
 module.exports = {
   getMatchElo,

@@ -26,7 +26,7 @@ const sendCardWithInfos = async (message, steamParam) => {
 
   } catch (error) {
     console.log(error)
-    return errorCard('No players found')
+    return errorCard(error)
   }
 }
 
