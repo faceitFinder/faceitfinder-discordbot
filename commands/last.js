@@ -21,7 +21,7 @@ const sendCardWithInfos = async (message = null, steamParam) => {
 
     let lastMatchStats
     if (playerHistory.items.length > 0) lastMatchStats = await Match.getMatchStats(playerHistory.items[0].match_id)
-    else return errorCard('Could not get your last match stats')
+    else return errorCard(`Couldn\'t get the last match of ${steamDatas.personaname}`)
 
     const lastMatchElo = await Match.getMatchElo(playerId, 2)
 
@@ -34,7 +34,7 @@ const sendCardWithInfos = async (message = null, steamParam) => {
     ctx.drawImage(await Graph.getRankImage(faceitLevel, size), 0, 0)
     filesAtt.push(new Discord.MessageAttachment(rankImageCanvas.toBuffer(), `${faceitLevel}.png`))
 
-    let eloDiff = playerDatas.games.csgo.faceit_elo - lastMatchElo[1].elo
+    let eloDiff = playerDatas.games.csgo.faceit_elo - lastMatchElo[1].elo || 0
     eloDiff = isNaN(eloDiff) ? '0' : eloDiff > 0 ? `+${eloDiff}` : eloDiff.toString()
     const cards = []
 
