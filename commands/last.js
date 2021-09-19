@@ -34,7 +34,7 @@ const sendCardWithInfos = async (message = null, steamParam) => {
     ctx.drawImage(await Graph.getRankImage(faceitLevel, size), 0, 0)
     filesAtt.push(new Discord.MessageAttachment(rankImageCanvas.toBuffer(), `${faceitLevel}.png`))
 
-    let eloDiff = playerDatas.games.csgo.faceit_elo - lastMatchElo[1].elo || 0
+    let eloDiff = playerDatas.games.csgo.faceit_elo - lastMatchElo[1]?.elo || 0
     eloDiff = isNaN(eloDiff) ? '0' : eloDiff > 0 ? `+${eloDiff}` : eloDiff.toString()
     const cards = []
 
