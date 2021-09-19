@@ -21,7 +21,7 @@ const sendCardWithInfos = async (message = null, steamParam) => {
 
     let lastMatchStats
     if (playerHistory.items.length > 0) lastMatchStats = await Match.getMatchStats(playerHistory.items[0].match_id)
-    else return errorCard('Could not get your last match stats')
+    else return errorCard(`Couldn\'t get the last match of ${steamDatas.personaname}`)
 
     const lastMatchElo = await Match.getMatchElo(playerId, 2)
 
