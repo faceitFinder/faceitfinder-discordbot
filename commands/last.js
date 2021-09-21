@@ -1,4 +1,4 @@
-const { color, emojis, prefix } = require('../config.json')
+const { color, emojis } = require('../config.json')
 const Discord = require('discord.js')
 const Canvas = require('canvas')
 const fs = require('fs')
@@ -7,9 +7,8 @@ const Steam = require('../functions/steam')
 const Player = require('../functions/player')
 const Graph = require('../functions/graph')
 const RegexFun = require('../functions/regex')
-const User = require('../database/user')
 const errorCard = require('../templates/errorCard')
-const { getCards, getCardsConditions } = require('../functions/commands')
+const { getCardsConditions } = require('../functions/commands')
 
 const sendCardWithInfos = async (message = null, steamParam) => {
   try {
