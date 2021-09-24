@@ -31,7 +31,6 @@ const sendCardWithInfos = async (message = null, steamParam) => {
     const rankImageCanvas = Canvas.createCanvas(size, size)
     const ctx = rankImageCanvas.getContext('2d')
     ctx.drawImage(await Graph.getRankImage(faceitLevel, size), 0, 0)
-    filesAtt.push(new Discord.MessageAttachment(rankImageCanvas.toBuffer(), `${faceitLevel}.png`))
 
     let eloDiff = playerDatas.games.csgo.faceit_elo - lastMatchElo[1]?.elo || 0
     eloDiff = isNaN(eloDiff) ? '0' : eloDiff > 0 ? `+${eloDiff}` : eloDiff.toString()
@@ -46,30 +45,36 @@ const sendCardWithInfos = async (message = null, steamParam) => {
         if (stats.length > 0) playerStats = stats[0].player_stats
       }
 
+      if (playerStats === undefined) cards.push(errorCard(`Couldn\'t get the stats of ${steamDatas.personaname} from his last match`).embeds[0])
       if (lastMatchStats.rounds.length > 1) card.addFields({ name: 'round', value: `${r.match_round}/${lastMatchStats.rounds.length}` })
       mapThumbnail = `./images/maps/${r.round_stats.Map}.jpg`
 
-      card.setAuthor(playerDatas.nickname, playerDatas.avatar, `https://www.faceit.com/fr/players/${playerDatas.nickname}`)
-        .setDescription(`[Steam](${steamDatas.profileurl}), [Game Lobby](https://www.faceit.com/fr/csgo/room/${playerHistory.items[0].match_id}/scoreboard)`)
-        .addFields({ name: 'Score', value: r.round_stats.Score.toString(), inline: true },
-          { name: 'Map', value: r.round_stats.Map, inline: true },
-          { name: 'Status', value: parseInt(playerStats.Result) ? emojis.won.balise : emojis.lost.balise, inline: true },
-          { name: 'K/D', value: playerStats['K/D Ratio'], inline: true },
-          { name: 'HS', value: `${playerStats['Headshots %']}%`, inline: true },
-          { name: 'MVPs', value: playerStats.MVPs, inline: true },
-          { name: 'Kills', value: playerStats.Kills, inline: true },
-          { name: 'Deaths', value: playerStats.Deaths, inline: true },
-          { name: 'Assists', value: playerStats.Assists, inline: true },
-          { name: 'Elo', value: eloDiff.toString(), inline: true },
-          { name: 'Date', value: new Date(lastMatchElo[0].date).toDateString(), inline: true })
-        .setThumbnail(`attachment://${faceitLevel}.png`)
-        .setImage(`attachment://${r.round_stats.Map}.jpg`)
-        .setColor(color.levels[faceitLevel].color)
-        .setFooter(`Steam: ${steamDatas.personaname}`)
+      if (playerStats !== undefined && playerDatas !== undefined) {
+        filesAtt.push(new Discord.MessageAttachment(rankImageCanvas.toBuffer(), `${faceitLevel}.png`))
 
-      if (fs.existsSync(mapThumbnail)) filesAtt.push(new Discord.MessageAttachment(mapThumbnail, `${r.round_stats.Map}.jpg`))
+        card.setAuthor(playerDatas.nickname, playerDatas.avatar, `https://www.faceit.com/fr/players/${playerDatas.nickname}`)
+          .setDescription(`[Steam](${steamDatas.profileurl}), [Game Lobby](https://www.faceit.com/fr/csgo/room/${playerHistory.items[0].match_id}/scoreboard)`)
+          .addFields({ name: 'Score', value: r.round_stats.Score.toString(), inline: true },
+            { name: 'Map', value: r.round_stats.Map, inline: true },
+            { name: 'Status', value: parseInt(playerStats.Result) ? emojis.won.balise : emojis.lost.balise, inline: true },
+            { name: 'K/D', value: playerStats['K/D Ratio'], inline: true },
+            { name: 'HS', value: `${playerStats['Headshots %']}%`, inline: true },
+            { name: 'MVPs', value: playerStats.MVPs, inline: true },
+            { name: 'Kills', value: playerStats.Kills, inline: true },
+            { name: 'Deaths', value: playerStats.Deaths, inline: true },
+            { name: 'Assists', value: playerStats.Assists, inline: true },
+            { name: 'Elo', value: eloDiff.toString(), inline: true },
+            { name: 'Date', value: new Date(lastMatchElo[0].date).toDateString(), inline: true })
+          .setThumbnail(`attachment://${faceitLevel}.png`)
+          .setImage(`attachment://${r.round_stats.Map}.jpg`)
+          .setColor(parseInt(playerStats.Result) ? color.won : color.lost)
+          .setFooter(`Steam: ${steamDatas.personaname}`)
 
-      cards.push(card)
+        if (fs.existsSync(mapThumbnail))
+          filesAtt.push(new Discord.MessageAttachment(mapThumbnail, `${r.round_stats.Map}.jpg`))
+
+        cards.push(card)
+      }
     })
 
     return {
