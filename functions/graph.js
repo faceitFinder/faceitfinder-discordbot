@@ -3,9 +3,13 @@ const path = require('path')
 const Canvas = require('canvas')
 const Match = require('./match')
 const Player = require('./player')
+const errorCard = require('../templates/errorCard')
 
-const generateCanvas = async (playerId) => {
-  const elo = (await getElo(playerId)).reverse()
+const generateCanvas = async (playerId, limit = 20, from = null) => {
+  let elo
+  try { elo = await getElo(playerId, limit, from) }
+  catch (error) { return errorCard(error) }
+  elo.reverse()
 
   const padding = 100
   const width = padding * (elo.length + 1)
@@ -88,16 +92,18 @@ const getColors = (prev, current, ctx, coordinatesStart, coordinatesEnd) => {
   return gradient
 }
 
-const getElo = async (playerId) => {
-  const data = await Match.getMatchElo(playerId)
+const getElo = async (playerId, limit, from) => {
+  const data = await Match.getMatchElo(playerId, limit, from)
   const playerDatas = await Player.getDatas(playerId)
 
-  if (data[0].elo === undefined) data.unshift({ elo: playerDatas.games.csgo.faceit_elo })
+  if (data.length > 0 && data[0].elo === undefined) data.unshift({ elo: playerDatas.games.csgo.faceit_elo })
+  else if (data.length === 0) throw 'Couldn\'t get today matches'
 
-  return Array.from(data, e => e.elo).filter(e => e != undefined)
+  return Array.from(data, e => e.elo).filter(e => e !== undefined)
 }
 
 module.exports = {
   generateCanvas,
-  getRankImage
+  getRankImage,
+  getElo,
 }
