@@ -1,11 +1,9 @@
-const { prefix } = require('../config.json')
 const Discord = require('discord.js')
-const User = require('../database/user')
 const RegexFun = require('../functions/regex')
 const Player = require('../functions/player')
 const Steam = require('../functions/steam')
 const errorCard = require('../templates/errorCard')
-const { getCards, getCardsConditions } = require('../functions/commands')
+const { getCardsConditions } = require('../functions/commands')
 
 
 const sendCardWithInfos = async (message, steamParam) => {

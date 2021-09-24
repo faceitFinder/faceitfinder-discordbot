@@ -8,6 +8,8 @@
   "join": "https://discord.gg/uPAdfvfuTP",
   "color": {
     "primary": "#14578c",
+    "won": "#64AC30",
+    "lost": "#AD4142",
     "levels": {
       "1": {
         "min": 0,
