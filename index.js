@@ -84,7 +84,10 @@ client.on('messageCreate', async message => {
 })
 
 client.on('interactionCreate', async (interaction) => {
-  if (interaction.isSelectMenu()) client.selectMenus.get(interaction.customId)?.execute(interaction)
+  if (interaction.isSelectMenu()) {
+    interaction.deferReply()
+    interaction.editReply(await client.selectMenus.get(interaction.customId)?.execute(interaction))
+  }
   if (client.commands.has(interaction.commandName)) {
     const message = {
       author: interaction.user,
@@ -102,8 +105,8 @@ client.on('interactionCreate', async (interaction) => {
 
     const response = await client.commands.get(interaction.commandName).execute(message, args)
 
-    if (Array.isArray(response)) interaction.reply(response[0]).catch((err) => console.log(err))
-    else interaction.reply(response).catch((err) => console.log(err))
+    if (Array.isArray(response)) interaction.deferReply(response[0]).catch((err) => console.log(err))
+    else interaction.deferReply((response).catch((err) => console.log(err)))
   }
 })
 

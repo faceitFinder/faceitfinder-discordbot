@@ -52,10 +52,10 @@ module.exports = {
           card.setImage('attachment://map.jpg')
         }
 
-        interaction.reply({
+        return {
           embeds: [card],
           files: filesAtt
-        })
+        }
       } catch (error) {
         console.log(error)
         interaction.reply(errorCard(`**${error.toString()}**`))

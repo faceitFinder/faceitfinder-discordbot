@@ -1,77 +1,52 @@
-const { color } = require('../config.json')
 const Discord = require('discord.js')
-const Canvas = require('canvas')
-const Match = require('../functions/match')
 const Steam = require('../functions/steam')
 const Player = require('../functions/player')
-const Graph = require('../functions/graph')
 const errorCard = require('../templates/errorCard')
 const { getCardsConditions } = require('../functions/commands')
-
-const generatePlayerStats = async (playerHistory, playerId) => {
-  const playerStats = { wins: [0], games: [0], 'Average K/D Ratio': [0.0], 'Average Headshots %': [0] }
-
-  for (const e of playerHistory.items)
-    await Match.getMatchStats(e.match_id).then(ms =>
-      ms.rounds.forEach(r => r.teams.forEach(t => {
-        const ps = t.players.filter(p => p.player_id === playerId)
-
-        if (ps.length > 0) {
-          playerStats.games[0] += 1
-          playerStats['Average Headshots %'][0] += parseFloat(ps.at(0).player_stats['Headshots %'])
-          playerStats['Average K/D Ratio'][0] += parseInt(ps.at(0).player_stats['K/D Ratio'])
-          if (ps.at(0).Result == 1) playerStats.wins[0] += 1
-        }
-      })))
-
-  return playerStats
-}
 
 const sendCardWithInfos = async (message, steamParam) => {
   try {
     const steamId = await Steam.getId(steamParam)
-    const steamDatas = await Steam.getDatas(steamId)
     const playerId = await Player.getId(steamId)
     const playerDatas = await Player.getDatas(playerId)
 
-    const today = new Date().setHours(0, 0, 0, 0)
-    const playerHistory = await Player.getHistory(playerId, 100, parseInt(today.toString().slice(0, -3)))
-    const playerStats = await generatePlayerStats(playerHistory, playerId)
+    const options = []
+    const dates = []
+    const maxMatch = 100
 
-    if (playerStats.games.at(0) === 0) return errorCard('Couldn\'t get today matches')
-    const graphCanvas = await Graph.generateCanvas(playerId, playerStats.games.at(0) + 1)
-    const elo = await Graph.getElo(playerId, playerStats.games.at(0) + 1)
-    const startElo = elo.shift()
+    const playerHistory = await Player.getHistory(playerId, maxMatch)
 
-    const faceitLevel = playerDatas.games.csgo.skill_level_label
-    const size = 40
+    for (const e of playerHistory.items) {
+      const matchDate = new Date(e.started_at * 1000).setHours(0, 0, 0, 0)
+      dates.filter(e => e === matchDate).length > 0 ? null : dates.push(matchDate)
+    }
 
-    const rankImageCanvas = Canvas.createCanvas(size, size)
-    const ctx = rankImageCanvas.getContext('2d')
-    ctx.drawImage(await Graph.getRankImage(faceitLevel, size), 0, 0)
+    dates.sort().reverse().every((d, k) => {
+      if (k <= 24) {
+        options.push({
+          label: new Date(d).toDateString(),
+          value: JSON.stringify({
+            steamId: steamId,
+            date: parseInt(d.toString().slice(0, -3)),
+            userId: message.author.id,
+            maxMatch: maxMatch
+          })
+        })
+        return true
+      } else return false
+    })
 
-    const card = new Discord.MessageEmbed()
-      .setAuthor(playerDatas.nickname, playerDatas.avatar, `https://www.faceit.com/fr/players/${playerDatas.nickname}`)
-      .setTitle('Steam')
-      .setURL(steamDatas.profileurl)
-      .setThumbnail(`attachment://${faceitLevel}level.png`)
-      .addFields({ name: 'From', value: new Date(today).toDateString(), inline: false },
-        { name: 'Games', value: `${elo.length} (${Math.ceil((playerStats.wins / playerStats.games) * 100)}% Win)`, inline: true },
-        { name: 'Elo', value: (startElo - elo.at(-1)).toString(), inline: true },
-        { name: '\u200B', value: '\u200B', inline: true },
-        { name: 'Average K/D', value: (playerStats['Average K/D Ratio'] / playerStats.games).toFixed(2).toString(), inline: true },
-        { name: 'Average Headshots %', value: `${(playerStats['Average Headshots %'] / playerStats.games).toFixed(2)}%`, inline: true },
-        { name: '\u200B', value: '\u200B', inline: true })
-      .setImage(`attachment://${steamId}graph.png`)
-      .setColor(color.levels[faceitLevel].color)
-      .setFooter(`Steam: ${steamDatas.personaname}`)
+    if (options.length === 0) return errorCard(`Couldn\'t get today matches of ${playerDatas.nickname}`)
+    const row = new Discord.MessageActionRow()
+      .addComponents(
+        new Discord.MessageSelectMenu()
+          .setCustomId('dailyStatsSelector')
+          .setPlaceholder('No dates selected')
+          .addOptions(options))
 
     return {
-      embeds: [card],
-      files: [
-        new Discord.MessageAttachment(graphCanvas.toBuffer(), `${steamId}graph.png`),
-        new Discord.MessageAttachment(rankImageCanvas.toBuffer(), `${faceitLevel}level.png`)
-      ]
+      content: `Select one of the following dates to get the stats related (${playerDatas.nickname})`,
+      components: [row]
     }
   } catch (error) {
     console.log(error)
