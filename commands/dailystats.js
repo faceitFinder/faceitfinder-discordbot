@@ -20,7 +20,7 @@ const generatePlayerStats = async (playerHistory, playerId) => {
           playerStats.games[0] += 1
           playerStats['Average Headshots %'][0] += parseFloat(ps.at(0).player_stats['Headshots %'])
           playerStats['Average K/D Ratio'][0] += parseInt(ps.at(0).player_stats['K/D Ratio'])
-          if (ps.at(0).Result == 1) playerStats.wins[0] += 1
+          if (ps.at(0).player_stats.Result == 1) playerStats.wins[0] += 1
         }
       })))
 
