@@ -9,7 +9,7 @@ const errorCard = require('../templates/errorCard')
 const { getCardsConditions } = require('../functions/commands')
 
 const generatePlayerStats = async (playerHistory, playerId) => {
-  const playerStats = { wins: [0], games: [0], 'Average K/D Ratio': [0.0], 'Average Headshots %': [0] }
+  const playerStats = { wins: [0], games: [0], 'Average K/D Ratio': [0.0], 'Average Headshots': [0] }
 
   for (const e of playerHistory.items)
     await Match.getMatchStats(e.match_id).then(ms =>
@@ -18,8 +18,8 @@ const generatePlayerStats = async (playerHistory, playerId) => {
 
         if (ps.length > 0) {
           playerStats.games[0] += 1
-          playerStats['Average Headshots %'][0] += parseFloat(ps.at(0).player_stats['Headshots %'])
-          playerStats['Average K/D Ratio'][0] += parseInt(ps.at(0).player_stats['K/D Ratio'])
+          playerStats['Average Headshots'][0] += parseFloat(ps.at(0).player_stats['Headshots %'])
+          playerStats['Average K/D Ratio'][0] += parseFloat(ps.at(0).player_stats['K/D Ratio'])
           if (ps.at(0).player_stats.Result == 1) playerStats.wins[0] += 1
         }
       })))
