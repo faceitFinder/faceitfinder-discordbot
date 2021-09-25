@@ -60,7 +60,7 @@ const sendCardWithInfos = async (message, steamParam) => {
         { name: 'Elo', value: (startElo - elo.at(-1)).toString(), inline: true },
         { name: '\u200B', value: '\u200B', inline: true },
         { name: 'Average K/D', value: (playerStats['Average K/D Ratio'] / playerStats.games).toFixed(2).toString(), inline: true },
-        { name: 'Average Headshots %', value: `${(playerStats['Average Headshots %'] / playerStats.games).toFixed(2)}%`, inline: true },
+        { name: 'Average Headshots', value: `${(playerStats['Average Headshots'] / playerStats.games).toFixed(2)}%`, inline: true },
         { name: '\u200B', value: '\u200B', inline: true })
       .setImage(`attachment://${steamId}graph.png`)
       .setColor(color.levels[faceitLevel].color)
