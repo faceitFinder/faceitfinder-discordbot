@@ -12,7 +12,7 @@ const sendCardWithInfos = async (message, steamParam) => {
 
     const options = []
     const dates = []
-    const maxMatch = 100
+    const maxMatch = 85
 
     const playerHistory = await Player.getHistory(playerId, maxMatch)
 

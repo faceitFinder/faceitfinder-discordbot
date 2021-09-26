@@ -5,10 +5,11 @@ const Match = require('./match')
 const Player = require('./player')
 const errorCard = require('../templates/errorCard')
 
-const generateCanvas = async (playerId, limit = 20, from = null, to = null) => {
+const generateCanvas = async (playerId, limit = 20, to = null, maxMatch = 20) => {
   let elo
-  try { elo = await getElo(playerId, limit, from, to) }
-  catch (error) { return errorCard(error) }
+  try { elo = await getElo(playerId, limit, to, maxMatch) }
+  catch (error) { throw error }
+  if (elo.length === 0) throw 'No match found on this date'
   elo.reverse()
 
   const padding = 100
@@ -92,7 +93,8 @@ const getColors = (prev, current, ctx, coordinatesStart, coordinatesEnd) => {
   return gradient
 }
 
-const getElo = async (playerId, limit, from, to) => {
+const getElo = async (playerId, limit, to, maxMatch) => {
+  if (to === null) to = new Date().setHours(24)
   const data = await Match.getMatchElo(playerId, limit)
   const playerDatas = await Player.getDatas(playerId)
   const playerElo = playerDatas.games.csgo.faceit_elo
@@ -100,12 +102,9 @@ const getElo = async (playerId, limit, from, to) => {
   if (data.length > 0 && data[0].elo === undefined || data[0].elo != playerElo) data.unshift({ elo: playerElo })
   else if (data.length === 0) throw 'Couldn\'t get today matches'
 
-  return Array.from(data.filter(e => {
-    if (from === null && to === null) return e !== undefined
-    if (from !== null && to === null) return e !== undefined && e.date >= from * 1000
-    if (from === null && to !== null) return e !== undefined && e.date <= to * 1000
-    if (from !== null && to !== null) return e !== undefined && e.date >= from * 1000 && e.date <= to * 1000
-  }), e => e.elo).filter(e => e !== undefined)
+  const elo = Array.from(data.filter(e => e.date < to && e.elo !== undefined), e => e.elo).filter(e => e !== undefined)
+
+  return elo.slice(0, maxMatch)
 }
 
 module.exports = {
