@@ -6,7 +6,7 @@ const getDatas = async (playerId) => await Faceit.fetchData(`https://open.faceit
 
 const getStats = async (playerId) => await Faceit.fetchData(`https://open.faceit.com/data/v4/players/${playerId}/stats/csgo`, 'Couldn\'t get faceit csgo stats')
 
-const getHistory = async (playerId, limit = 1, from = null) => await Faceit.fetchData(`https://open.faceit.com/data/v4/players/${playerId}/history?game=csgo&from=${from}&offset=0&limit=${limit}`, 'Couldn\'t get csgo history')
+const getHistory = async (playerId, limit = 1, from = null, to = null) => await Faceit.fetchData(`https://open.faceit.com/data/v4/players/${playerId}/history?game=csgo&offset=0&from=${from}&to=${to}&limit=${limit}`, 'Couldn\'t get csgo history')
 
 module.exports = {
   getDatas,
