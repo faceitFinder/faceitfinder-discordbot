@@ -70,6 +70,9 @@ module.exports = {
   usage: '',
   type: 'stats',
   async execute(message, args) {
-    return await getCardsConditions(message.mentions.users, [], [], message, sendCardWithInfos)
+    const params = []
+    await args.forEach(async e => { params.push(e.split('/').filter(e => e).pop()) })
+
+    return await getCardsConditions(message.mentions.users, [], params, message, sendCardWithInfos)
   }
 }

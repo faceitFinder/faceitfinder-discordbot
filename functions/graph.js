@@ -99,7 +99,7 @@ const getElo = async (playerId, limit, to, maxMatch) => {
   const playerDatas = await Player.getDatas(playerId)
   const playerElo = playerDatas.games.csgo.faceit_elo
 
-  if (data.length > 0 && data[0].elo === undefined || data[0].elo != playerElo) data.unshift({ elo: playerElo })
+  if (data.length > 0 && data[0].elo === undefined || data[0].elo != playerElo) data.unshift({ elo: playerElo, date: new Date() })
   else if (data.length === 0) throw 'Couldn\'t get today matches'
 
   const elo = Array.from(data.filter(e => e.date < to && e.elo !== undefined), e => e.elo).filter(e => e !== undefined)
