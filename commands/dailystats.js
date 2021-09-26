@@ -65,7 +65,7 @@ module.exports = {
       type: 6
     }
   ],
-  description: "Displays the stats of the current of the user(s) given, including a graph that show the elo evolution.",
+  description: "Displays the stats of the current day of the user(s) given, including a graph that show the elo evolution.",
   slashDescription: "Displays your stats of the current day, including a graph that show your elo evolution.",
   usage: '',
   type: 'stats',
