@@ -60,5 +60,6 @@ module.exports = {
         console.log(error)
         interaction.editReply(errorCard(error.toString()))
       }
+    else return false
   }
 }

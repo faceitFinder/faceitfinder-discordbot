@@ -87,8 +87,7 @@ client.on('interactionCreate', async (interaction) => {
   if (interaction.isSelectMenu()) {
     interaction.deferReply()
     interaction.editReply(await client.selectMenus.get(interaction.customId)?.execute(interaction))
-  }
-  if (client.commands.has(interaction.commandName)) {
+  } if (client.commands.has(interaction.commandName)) {
     const message = {
       author: interaction.user,
       mentions: {
@@ -103,10 +102,11 @@ client.on('interactionCreate', async (interaction) => {
     })
     interaction.options['_hoistedOptions'].filter(o => o.type === 'USER').forEach(o => message.mentions.users.set(o.user.id, o.user))
 
-    const response = await client.commands.get(interaction.commandName).execute(message, args)
-
-    if (Array.isArray(response)) interaction.reply(response[0]).catch((err) => console.log(err))
-    else interaction.reply((response).catch((err) => console.log(err)))
+    try {
+      const response = await client.commands.get(interaction.commandName).execute(message, args)
+      if (Array.isArray(response)) interaction.reply(response[0])
+      else interaction.reply(response)
+    } catch (err) { interaction.reply(errorCard(err.toString())) }
   }
 })
 
