@@ -58,7 +58,7 @@ module.exports = {
         }
       } catch (error) {
         console.log(error)
-        interaction.reply(errorCard(`**${error.toString()}**`))
+        interaction.editReply(errorCard(error.toString()))
       }
   }
 }
