@@ -44,7 +44,7 @@ client.on('ready', () => {
       console.log('🚧 Started refreshing application (/) commands.')
 
       await rest.put(
-        Routes.applicationCommands(client.user.id),
+        Routes.applicationGuildCommands(client.user.id, '473493614282932225'),
         { body: slashCommands },
       )
 
@@ -85,8 +85,7 @@ client.on('messageCreate', async message => {
 
 client.on('interactionCreate', async (interaction) => {
   if (interaction.isSelectMenu()) {
-    interaction.deferReply()
-    interaction.editReply(await client.selectMenus.get(interaction.customId)?.execute(interaction))
+    interaction.update(await client.selectMenus.get(interaction.customId)?.execute(interaction))
   } if (client.commands.has(interaction.commandName)) {
     const message = {
       author: interaction.user,
