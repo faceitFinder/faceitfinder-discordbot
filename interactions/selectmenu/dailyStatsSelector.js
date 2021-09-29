@@ -76,7 +76,7 @@ module.exports = {
           .setThumbnail(`attachment://${faceitLevel}level.png`)
           .addFields({ name: 'From', value: new Date(values.date * 1000).toDateString(), inline: false },
             { name: 'Games', value: `${playerStats.games.at(0)} (${getAverage(playerStats.wins, playerStats.games, 4) * 100}% Win)`, inline: true },
-            { name: 'Elo', value: eloDiff > 0 ? `+${eloDiff}` : eloDiff.toString(), inline: true },
+            { name: 'Elo', value: isNaN(eloDiff) ? '0' : eloDiff > 0 ? `+${eloDiff}` : eloDiff.toString(), inline: true },
             { name: '\u200B', value: '\u200B', inline: true },
             { name: 'Average K/D', value: getAverage(playerStats['Average K/D'], playerStats.games), inline: true },
             { name: 'Average HS', value: `${getAverage(playerStats['Average HS'], playerStats.games)}%`, inline: true },
