@@ -48,13 +48,15 @@ module.exports = {
           .setFooter(`Steam: ${steamDatas.personaname}`)
 
         if (fs.existsSync(mapThumbnail)) {
-          filesAtt.push(new Discord.MessageAttachment(mapThumbnail, 'map.jpg'),)
-          card.setImage('attachment://map.jpg')
+          filesAtt.push(new Discord.MessageAttachment(mapThumbnail, `${values.map}.jpg`),)
+          card.setImage(`attachment://${values.map}.jpg`)
         }
 
         return {
           embeds: [card],
-          files: filesAtt
+          files: filesAtt,
+          components: [],
+          content: null,
         }
       } catch (error) {
         console.log(error)
