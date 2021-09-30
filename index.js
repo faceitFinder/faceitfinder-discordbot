@@ -87,29 +87,31 @@ client.on('messageCreate', async message => {
 })
 
 client.on('interactionCreate', async (interaction) => {
-  if (antispam.isIgnored(interaction.user.id, interaction.createdAt, interaction.channel)) return
-  else if (interaction.isSelectMenu()) {
+  if (interaction.isSelectMenu()) {
     interaction.update(await client.selectMenus.get(interaction.customId)?.execute(interaction))
   } if (client.commands.has(interaction.commandName)) {
-    const message = {
-      author: interaction.user,
-      mentions: {
-        users: new Discord.Collection()
-      },
-      content: ''
-    }
-    const args = []
-    interaction.options['_hoistedOptions'].filter(o => o.type === 'STRING').forEach(o => {
-      args.push(o.value)
-      message.content += o.value
-    })
-    interaction.options['_hoistedOptions'].filter(o => o.type === 'USER').forEach(o => message.mentions.users.set(o.user.id, o.user))
+    if (antispam.isIgnored(interaction.user.id, interaction.createdAt, interaction.channel)) return
+    else {
+      const message = {
+        author: interaction.user,
+        mentions: {
+          users: new Discord.Collection()
+        },
+        content: ''
+      }
+      const args = []
+      interaction.options['_hoistedOptions'].filter(o => o.type === 'STRING').forEach(o => {
+        args.push(o.value)
+        message.content += o.value
+      })
+      interaction.options['_hoistedOptions'].filter(o => o.type === 'USER').forEach(o => message.mentions.users.set(o.user.id, o.user))
 
-    try {
-      const response = await client.commands.get(interaction.commandName).execute(message, args)
-      if (Array.isArray(response)) interaction.reply(response[0])
-      else interaction.reply(response)
-    } catch (err) { interaction.reply(errorCard(err.toString())) }
+      try {
+        const response = await client.commands.get(interaction.commandName).execute(message, args)
+        if (Array.isArray(response)) interaction.reply(response[0])
+        else interaction.reply(response)
+      } catch (err) { interaction.reply(errorCard(err.toString())) }
+    }
   }
 })
 
