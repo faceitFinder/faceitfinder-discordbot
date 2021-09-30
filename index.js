@@ -7,7 +7,9 @@ const fs = require('fs')
 const mongo = require('./database/mongo')
 const errorCard = require('./templates/errorCard')
 const { guildCount } = require('./functions/client')
+const AntiSpam = require('./functions/antispam')
 const client = new Discord.Client({ intents: [Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.GUILD_MESSAGES] })
+const antispam = new AntiSpam()
 const slashCommands = []
 
 require('dotenv').config()
@@ -66,6 +68,7 @@ client.on('ready', () => {
 
 client.on('messageCreate', async message => {
   if (!message.content.toLowerCase().startsWith(prefix) || message.author.bot) return
+  else if (antispam.isIgnored(message.author.id, message.createdAt, message.channel)) return
   else {
     const msg = message.content.slice(prefix.length).trim()
     const args = msg.split(/ +/)
@@ -84,7 +87,8 @@ client.on('messageCreate', async message => {
 })
 
 client.on('interactionCreate', async (interaction) => {
-  if (interaction.isSelectMenu()) {
+  if (antispam.isIgnored(interaction.user.id, interaction.createdAt, interaction.channel)) return
+  else if (interaction.isSelectMenu()) {
     interaction.update(await client.selectMenus.get(interaction.customId)?.execute(interaction))
   } if (client.commands.has(interaction.commandName)) {
     const message = {
