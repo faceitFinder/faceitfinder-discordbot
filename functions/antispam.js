@@ -4,7 +4,7 @@ module.exports = class AntiSpam {
   constructor(
     msgInARow = 3,
     maxInterval = 2500,
-    warnMessage = 'Slow down please :)',
+    warnMessage = 'slow down please.',
     timeIgnored = 10000,
     playersIgnored = new Map(),
     players = new Map()) {
@@ -21,13 +21,12 @@ module.exports = class AntiSpam {
     else if (this.players.has(userId)) {
       let ignored = false
       const newPlayer = this.players.get(userId)
-      newPlayer.messageCount += 1
 
-      if (createdAt - newPlayer.lastMessageDate < this.maxInterval
-        && newPlayer.messageCount >= this.msgInARow)
+      if (createdAt - newPlayer.lastMessageDate < this.maxInterval) {
+        newPlayer.messageCount += 1
         if (newPlayer.messageCount > this.msgInARow) {
           this.playersIgnored.set(userId, true)
-          channel.send(errorCard(`<@${userId}> your messages will not be executed during the following ${this.timeIgnored / 1000}s`))
+          channel.send(`<@${userId}> your messages will not be executed during the following ${this.timeIgnored / 1000}s`)
 
           setTimeout(() => {
             this.playersIgnored.delete(userId)
@@ -35,10 +34,14 @@ module.exports = class AntiSpam {
           }, this.timeIgnored)
 
           ignored = true
-        } else {
-          channel.send(errorCard(this.warnMessage))
+        } else if (newPlayer.messageCount === this.msgInARow) {
+          channel.send(`<@${userId}> ${this.warnMessage}`)
           ignored = false
         }
+      } else {
+        newPlayer.messageCount = 1
+        ignored = false
+      }
 
       newPlayer.lastMessageDate = createdAt
       this.players.set(userId, newPlayer)

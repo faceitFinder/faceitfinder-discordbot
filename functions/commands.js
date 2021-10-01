@@ -1,6 +1,8 @@
 const { prefix } = require('../config.json')
 const User = require('../database/user')
 const errorCard = require('../templates/errorCard')
+const Discord = require('discord.js')
+const maxUser = 10
 
 const getCards = async (message, array, fn, mention = 0) => {
   const messages = []
@@ -22,6 +24,8 @@ const getCards = async (message, array, fn, mention = 0) => {
 }
 
 const getCardsConditions = async (mentions, steamIds, args, message, fn) => {
+  mentions = new Discord.Collection(Array.from(mentions).slice(0, maxUser)),
+    steamIds = steamIds.slice(0, maxUser), steamIds = args.slice(0, maxUser)
   if (mentions.size > 0) return getCards(message, mentions, fn, 1)
   else if (steamIds.length > 0) return getCards(message, steamIds, fn)
   else if (args.length > 0) return getCards(message, args, fn)
