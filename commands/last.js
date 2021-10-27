@@ -24,7 +24,7 @@ const sendCardWithInfos = async (message = null, steamParam) => {
 
     const lastMatchElo = await Match.getMatchElo(playerId, 2)
 
-    const faceitLevel = playerDatas.games.csgo.skill_level_label
+    const faceitLevel = playerDatas.games.csgo.skill_level
     const size = 40
     const filesAtt = []
 

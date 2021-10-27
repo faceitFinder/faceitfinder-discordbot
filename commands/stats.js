@@ -24,8 +24,10 @@ const sendCardWithInfos = async (message, steamParam) => {
     const ladderCountry = await Ladder.getDatas(playerId, playerRegion, playerCountry)
     const ladderRegion = await Ladder.getDatas(playerId, playerRegion)
 
-    const faceitLevel = playerDatas.games.csgo.skill_level_label
+    const faceitLevel = playerDatas.games.csgo.skill_level
     const size = 40
+
+    console.log(playerDatas.games.csgo)
 
     const rankImageCanvas = Canvas.createCanvas(size, size)
     const ctx = rankImageCanvas.getContext('2d')

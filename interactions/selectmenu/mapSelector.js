@@ -18,7 +18,7 @@ module.exports = {
         const playerStats = await Player.getStats(playerId)
         const playerDatas = await Player.getDatas(playerId)
 
-        const faceitLevel = playerDatas.games.csgo.skill_level_label
+        const faceitLevel = playerDatas.games.csgo.skill_level
         const size = 40
         const filesAtt = []
 

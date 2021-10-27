@@ -51,7 +51,7 @@ module.exports = {
         const playerId = await Player.getId(values.steamId)
         const playerDatas = await Player.getDatas(playerId)
 
-        const faceitLevel = playerDatas.games.csgo.skill_level_label
+        const faceitLevel = playerDatas.games.csgo.skill_level
         const size = 40
 
         const to = parseInt((new Date(values.date * 1000).setHours(24)).toString().slice(0, -3))
