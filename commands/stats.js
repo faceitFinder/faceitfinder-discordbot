@@ -91,11 +91,12 @@ module.exports = {
       name: 'user_mention',
       description: 'Mention a user that has linked his profile to the bot.',
       required: false,
-      type: 6
+      type: 6,
+      slash: true
     }
   ],
   description: "Displays general stats of the user(s) given, including a graph that show the elo evolution.",
-  slashDescription: "Displays your general stats, including a graph that show your elo evolution.",
+  slashDescription: "Displays general stats of the @ user, including a graph that show the elo evolution.",
   usage: 'one of the options',
   type: 'stats',
   async execute(message, args) {

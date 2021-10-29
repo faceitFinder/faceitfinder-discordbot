@@ -120,11 +120,12 @@ module.exports = {
       name: 'user_mention',
       description: 'Mention a user that has linked his profile to the bot.',
       required: false,
-      type: 6
+      type: 6,
+      slash: true
     }
   ],
-  description: "Get the stats of last game played by the given user (s).",
-  slashDescription: "Get the stats of the last game you played.",
+  description: "Get the stats of last game played by you or the given user(s).",
+  slashDescription: "Get the stats of the last game played by you or the @ user.",
   usage: 'one of the options',
   type: 'stats',
   async execute(message, args) {
