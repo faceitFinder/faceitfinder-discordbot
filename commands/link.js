@@ -38,7 +38,8 @@ module.exports = {
       name: 'user_steam_parameter',
       description: 'Steam id / custom steam id / url of a steam profile / csgo status users part',
       required: true,
-      type: 3
+      type: 3,
+      slash: true
     }
   ],
   description: `Link steam id to the discord user, to get your stats directly (no parameters needed).`,

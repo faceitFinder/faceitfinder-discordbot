@@ -27,8 +27,6 @@ const sendCardWithInfos = async (message, steamParam) => {
     const faceitLevel = playerDatas.games.csgo.skill_level
     const size = 40
 
-    console.log(playerDatas.games.csgo)
-
     const rankImageCanvas = Canvas.createCanvas(size, size)
     const ctx = rankImageCanvas.getContext('2d')
     ctx.drawImage(await Graph.getRankImage(faceitLevel, size), 0, 0)
