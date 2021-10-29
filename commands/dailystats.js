@@ -66,8 +66,8 @@ module.exports = {
       slash: true
     }
   ],
-  description: "Displays the stats of the current day of the user(s) given, including a graph that show the elo evolution.",
-  slashDescription: "Displays your stats of the current day, including a graph that show your elo evolution.",
+  description: "Displays your stats of the current day or the stats of the user(s) given. With elo graph of the day.",
+  slashDescription: "Displays your stats of the current day or the stats of the @ user. With elo graph of the day.",
   usage: '',
   type: 'stats',
   async execute(message, args) {

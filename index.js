@@ -110,9 +110,14 @@ client.on('interactionCreate', async (interaction) => {
       })
       interaction.options['_hoistedOptions'].filter(o => o.type === 'USER').forEach(o => message.mentions.users.set(o.user.id, o.user))
 
-      const response = await client.commands.get(interaction.commandName).execute(message, args).catch(err => console.log(err))
-      if (Array.isArray(response)) interaction.reply(response[0]).catch(err => console.log(err))
-      else interaction.reply(response).catch(err => console.log(err))
+      try {
+        const response = await client.commands.get(interaction.commandName).execute(message, args)
+        if (Array.isArray(response)) interaction.reply(response[0]).catch(err => console.log(err))
+        else interaction.reply(response).catch(err => console.log(err))
+      } catch (err) {
+        console.log(err)
+        interaction.reply(errorCard(err)).catch(err => console.log(err))
+      }
     }
   }
 })

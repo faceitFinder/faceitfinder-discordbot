@@ -76,11 +76,11 @@ module.exports = {
       name: 'user_mention',
       description: 'Mention a user that has linked his profile to the bot.',
       required: false,
-      type: 6
+      type: 6,
+      slash: true
     }
   ],
-  description: "Displays your stats of the choosen map, or the stats of the user tagged. (only 1 user by command)",
-  slashDescription: "Displays your stats of the choosen map.",
+  description: "Displays your stats of the choosen map, or the stats of the @ user.",
   usage: 'one of the options',
   type: 'stats',
   async execute(message, args) {
