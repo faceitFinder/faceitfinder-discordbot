@@ -44,7 +44,8 @@ module.exports = {
       name: 'command',
       description: 'One of the command name.',
       required: false,
-      type: 3
+      type: 3,
+      slash: true
     }
   ],
   description: 'Display the command list.',

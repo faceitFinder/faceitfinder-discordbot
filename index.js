@@ -32,7 +32,11 @@ client.on('ready', () => {
     slashCommands.push({
       name: command.name,
       description: command?.slashDescription || command.description,
-      options: ['system', 'utility'].includes(command.type) ? command.options : []
+      options: Array.from(
+        command.options.filter(c => c.slash !== undefined && c.slash === true),
+        c => {
+          return { name: c.name, description: c.description, required: c.required, type: c.type }
+        })
     })
   })
 
@@ -106,11 +110,9 @@ client.on('interactionCreate', async (interaction) => {
       })
       interaction.options['_hoistedOptions'].filter(o => o.type === 'USER').forEach(o => message.mentions.users.set(o.user.id, o.user))
 
-      try {
-        const response = await client.commands.get(interaction.commandName).execute(message, args)
-        if (Array.isArray(response)) interaction.reply(response[0])
-        else interaction.reply(response)
-      } catch (err) { interaction.reply(errorCard(err.toString())) }
+      const response = await client.commands.get(interaction.commandName).execute(message, args).catch(err => console.log(err))
+      if (Array.isArray(response)) interaction.reply(response[0]).catch(err => console.log(err))
+      else interaction.reply(response).catch(err => console.log(err))
     }
   }
 })
