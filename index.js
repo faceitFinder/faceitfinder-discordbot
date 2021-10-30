@@ -92,7 +92,10 @@ client.on('messageCreate', async message => {
 
 client.on('interactionCreate', async (interaction) => {
   if (interaction.isSelectMenu()) {
-    interaction.update(await client.selectMenus.get(interaction.customId)?.execute(interaction))
+    interaction.deferUpdate()
+    await client.selectMenus.get(interaction.customId)?.execute(interaction)
+      .then(resp => interaction.editReply(resp).catch((err) => console.log(err)))
+
   } if (client.commands.has(interaction.commandName)) {
     if (antispam.isIgnored(interaction.user.id, interaction.createdAt, interaction.channel)) return
     else {
@@ -112,11 +115,11 @@ client.on('interactionCreate', async (interaction) => {
 
       try {
         const response = await client.commands.get(interaction.commandName).execute(message, args)
-        if (Array.isArray(response)) interaction.reply(response[0]).catch(err => console.log(err))
-        else interaction.reply(response).catch(err => console.log(err))
+        if (Array.isArray(response)) interaction.reply(response[0])
+        else interaction.reply(response)
       } catch (err) {
         console.log(err)
-        interaction.reply(errorCard(err)).catch(err => console.log(err))
+        interaction.reply(errorCard(err)).catch((err) => console.log(err))
       }
     }
   }
