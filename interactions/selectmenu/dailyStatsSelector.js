@@ -45,62 +45,57 @@ module.exports = {
   name: 'dailyStatsSelector',
   async execute(interaction) {
     const values = JSON.parse(interaction.values)
-    if (values.userId === interaction.user.id)
-      try {
-        const steamDatas = await Steam.getDatas(values.steamId)
-        const playerId = await Player.getId(values.steamId)
-        const playerDatas = await Player.getDatas(playerId)
+    if (values.userId === interaction.user.id) {
+      const steamDatas = await Steam.getDatas(values.steamId)
+      const playerId = await Player.getId(values.steamId)
+      const playerDatas = await Player.getDatas(playerId)
 
-        const faceitLevel = playerDatas.games.csgo.skill_level
-        const size = 40
+      const faceitLevel = playerDatas.games.csgo.skill_level
+      const size = 40
 
-        const to = parseInt((new Date(values.date * 1000).setHours(24)).toString().slice(0, -3))
+      const to = parseInt((new Date(values.date * 1000).setHours(24)).toString().slice(0, -3))
 
-        const playerHistory = await Player.getHistory(playerId, values.maxMatch, values.date, to)
-        const playerStats = await generatePlayerStats(playerHistory, playerId)
+      const playerHistory = await Player.getHistory(playerId, values.maxMatch, values.date, to)
+      const playerStats = await generatePlayerStats(playerHistory, playerId)
 
-        const canvaSize = playerStats.games.at(0) + 1
+      const canvaSize = playerStats.games.at(0) + 1
 
-        const elo = await Graph.getElo(playerId, values.maxMatch, to * 1000, canvaSize)
-        const graphCanvas = await Graph.generateCanvas(playerId, values.maxMatch, to * 1000, canvaSize)
-        const eloDiff = elo.shift() - elo.at(-1)
+      const elo = await Graph.getElo(playerId, values.maxMatch, to * 1000, canvaSize)
+      const graphCanvas = await Graph.generateCanvas(playerId, values.maxMatch, to * 1000, canvaSize)
+      const eloDiff = elo.shift() - elo.at(-1)
 
-        const rankImageCanvas = Canvas.createCanvas(size, size)
-        const ctx = rankImageCanvas.getContext('2d')
-        ctx.drawImage(await Graph.getRankImage(faceitLevel, size), 0, 0)
+      const rankImageCanvas = Canvas.createCanvas(size, size)
+      const ctx = rankImageCanvas.getContext('2d')
+      ctx.drawImage(await Graph.getRankImage(faceitLevel, size), 0, 0)
 
-        const card = new Discord.MessageEmbed()
-          .setAuthor(playerDatas.nickname, playerDatas.avatar, `https://www.faceit.com/fr/players/${playerDatas.nickname}`)
-          .setTitle('Steam')
-          .setURL(steamDatas.profileurl)
-          .setThumbnail(`attachment://${faceitLevel}level.png`)
-          .addFields({ name: 'From', value: new Date(values.date * 1000).toDateString(), inline: false },
-            { name: 'Games', value: `${playerStats.games.at(0)} (${getAverage(playerStats.wins, playerStats.games, 4) * 100}% Win)`, inline: true },
-            { name: 'Elo', value: isNaN(eloDiff) ? '0' : eloDiff > 0 ? `+${eloDiff}` : eloDiff.toString(), inline: true },
-            { name: '\u200B', value: '\u200B', inline: true },
-            { name: 'Average K/D', value: getAverage(playerStats['Average K/D'], playerStats.games), inline: true },
-            { name: 'Average HS', value: `${getAverage(playerStats['Average HS'], playerStats.games)}%`, inline: true },
-            { name: 'Average MVPs', value: getAverage(playerStats['Average MVPs'], playerStats.games), inline: true },
-            { name: 'Average Kills', value: getAverage(playerStats['Average Kills'], playerStats.games), inline: true },
-            { name: 'Average Deaths', value: getAverage(playerStats['Average Deaths'], playerStats.games), inline: true },
-            { name: 'Average Assists', value: getAverage(playerStats['Average Assists'], playerStats.games), inline: true })
-          .setImage(`attachment://${values.steamId}graph.png`)
-          .setColor(color.levels[faceitLevel].color)
-          .setFooter(`Steam: ${steamDatas.personaname}`)
+      const card = new Discord.MessageEmbed()
+        .setAuthor(playerDatas.nickname, playerDatas.avatar, `https://www.faceit.com/fr/players/${playerDatas.nickname}`)
+        .setTitle('Steam')
+        .setURL(steamDatas.profileurl)
+        .setThumbnail(`attachment://${faceitLevel}level.png`)
+        .addFields({ name: 'From', value: new Date(values.date * 1000).toDateString(), inline: false },
+          { name: 'Games', value: `${playerStats.games.at(0)} (${getAverage(playerStats.wins, playerStats.games, 4) * 100}% Win)`, inline: true },
+          { name: 'Elo', value: isNaN(eloDiff) ? '0' : eloDiff > 0 ? `+${eloDiff}` : eloDiff.toString(), inline: true },
+          { name: '\u200B', value: '\u200B', inline: true },
+          { name: 'Average K/D', value: getAverage(playerStats['Average K/D'], playerStats.games), inline: true },
+          { name: 'Average HS', value: `${getAverage(playerStats['Average HS'], playerStats.games)}%`, inline: true },
+          { name: 'Average MVPs', value: getAverage(playerStats['Average MVPs'], playerStats.games), inline: true },
+          { name: 'Average Kills', value: getAverage(playerStats['Average Kills'], playerStats.games), inline: true },
+          { name: 'Average Deaths', value: getAverage(playerStats['Average Deaths'], playerStats.games), inline: true },
+          { name: 'Average Assists', value: getAverage(playerStats['Average Assists'], playerStats.games), inline: true })
+        .setImage(`attachment://${values.steamId}graph.png`)
+        .setColor(color.levels[faceitLevel].color)
+        .setFooter(`Steam: ${steamDatas.personaname}`)
 
-        return {
-          embeds: [card],
-          files: [
-            new Discord.MessageAttachment(graphCanvas.toBuffer(), `${values.steamId}graph.png`),
-            new Discord.MessageAttachment(rankImageCanvas.toBuffer(), `${faceitLevel}level.png`)
-          ],
-          components: [],
-          content: null,
-        }
-      } catch (error) {
-        console.log(error)
-        interaction.editReply(errorCard(error.toString()))
+      return {
+        embeds: [card],
+        files: [
+          new Discord.MessageAttachment(graphCanvas.toBuffer(), `${values.steamId}graph.png`),
+          new Discord.MessageAttachment(rankImageCanvas.toBuffer(), `${faceitLevel}level.png`)
+        ],
+        components: [],
+        content: null,
       }
-    else return false
+    } else return false
   }
 }
