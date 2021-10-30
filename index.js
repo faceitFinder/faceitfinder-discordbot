@@ -113,14 +113,13 @@ client.on('interactionCreate', async (interaction) => {
       })
       interaction.options['_hoistedOptions'].filter(o => o.type === 'USER').forEach(o => message.mentions.users.set(o.user.id, o.user))
 
-      try {
-        const response = await client.commands.get(interaction.commandName).execute(message, args)
-        if (Array.isArray(response)) interaction.reply(response[0])
-        else interaction.reply(response)
-      } catch (err) {
-        console.log(err)
-        interaction.reply(errorCard(err)).catch((err) => console.log(err))
-      }
+      interaction.deferReply()
+
+      await client.commands.get(interaction.commandName).execute(message, args)
+        .then(resp => {
+          if (Array.isArray(resp)) interaction.editReply(resp[0]).catch((err) => console.log(err))
+          else interaction.editReply(resp).catch((err) => console.log(err))
+        }).catch((err) => console.log(err))
     }
   }
 })
