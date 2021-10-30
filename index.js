@@ -92,10 +92,10 @@ client.on('messageCreate', async message => {
 
 client.on('interactionCreate', async (interaction) => {
   if (interaction.isSelectMenu()) {
-    interaction.deferUpdate()
-    await client.selectMenus.get(interaction.customId)?.execute(interaction)
-      .then(resp => interaction.editReply(resp).catch((err) => console.log(err)))
-
+    interaction.deferUpdate().then(async () => {
+      await client.selectMenus.get(interaction.customId)?.execute(interaction)
+        .then(resp => interaction.editReply(resp).catch((err) => console.log(err)))
+    })
   } if (client.commands.has(interaction.commandName)) {
     if (antispam.isIgnored(interaction.user.id, interaction.createdAt, interaction.channel)) return
     else {
@@ -113,13 +113,13 @@ client.on('interactionCreate', async (interaction) => {
       })
       interaction.options['_hoistedOptions'].filter(o => o.type === 'USER').forEach(o => message.mentions.users.set(o.user.id, o.user))
 
-      interaction.deferReply()
-
-      await client.commands.get(interaction.commandName).execute(message, args)
-        .then(resp => {
-          if (Array.isArray(resp)) interaction.editReply(resp[0]).catch((err) => console.log(err))
-          else interaction.editReply(resp).catch((err) => console.log(err))
-        }).catch((err) => console.log(err))
+      interaction.deferReply().then(async () => {
+        await client.commands.get(interaction.commandName)?.execute(message, args)
+          .then(resp => {
+            if (Array.isArray(resp)) interaction.editReply(resp[0]).catch((err) => console.log(err))
+            else interaction.editReply(resp).catch((err) => console.log(err))
+          }).catch((err) => console.log(err))
+      })
     }
   }
 })

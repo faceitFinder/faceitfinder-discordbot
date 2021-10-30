@@ -33,6 +33,6 @@ module.exports = {
   usage: '',
   type: 'utility',
   async execute(message, args) {
-    return sendCardWithInfos(message)
+    return await sendCardWithInfos(message)
   }
 }
