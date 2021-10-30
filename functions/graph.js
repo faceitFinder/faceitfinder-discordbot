@@ -100,19 +100,19 @@ const getElo = async (playerId, limit, to, maxMatch) => {
   const playerElo = playerDatas.games.csgo.faceit_elo
   const currentElo = { elo: playerElo, date: new Date() }
 
-  if (data.length > 0 && data[0].elo === undefined)
-    data[0] = currentElo
-  else if (data[0].elo != playerElo)
-    data.unshift(currentElo)
-  else if (data.length === 0) throw 'Couldn\'t get today matches'
+  if (data.length > 0) {
+    if (data[0].elo === undefined)
+      data[0] = currentElo
+    else if (data[0].elo != playerElo)
+      data.unshift(currentElo)
+  } else if (data.length === 0) throw 'Couldn\'t get today matches'
 
   const elo = Array.from(data.filter(e => e.date < to), e => e.elo)
   elo.reverse().forEach((e, i) => {
     if (e === undefined && elo[i - 1] !== undefined) elo[i] = elo[i - 1]
   })
-  elo.reverse()
 
-  return elo.slice(0, maxMatch)
+  return elo.filter(e => e !== undefined).reverse().slice(0, maxMatch)
 }
 
 module.exports = {
