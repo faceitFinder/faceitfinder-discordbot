@@ -3,8 +3,14 @@ const path = require('path')
 const Canvas = require('canvas')
 const Match = require('./match')
 const Player = require('./player')
-const errorCard = require('../templates/errorCard')
 
+/**
+ * @param {String} playerId 
+ * @param {Number} limit 
+ * @param {Date} to 
+ * @param {Number} maxMatch 
+ * @returns {Canvas} Image with a grpahic of the elo
+ */
 const generateCanvas = async (playerId, limit = 20, to = null, maxMatch = 20) => {
   let elo
   try { elo = await getElo(playerId, limit, to, maxMatch) }
