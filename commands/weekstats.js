@@ -4,6 +4,14 @@ const Player = require('../functions/player')
 const errorCard = require('../templates/errorCard')
 const { getCardsConditions } = require('../functions/commands')
 
+const week = [6, 0, 1, 2, 3, 4, 5]
+
+const getMonday = (x) => {
+  const a = new Date(x)
+  a.setHours(0, 0, 0, 0)
+  return new Date(a.setDate(a.getDate() - week[a.getDay()]))
+}
+
 const sendCardWithInfos = async (message, steamParam) => {
   try {
     const steamId = await Steam.getId(steamParam)
@@ -17,18 +25,21 @@ const sendCardWithInfos = async (message, steamParam) => {
     const playerHistory = await Player.getHistory(playerId, maxMatch)
 
     for (const e of playerHistory.items) {
-      const matchDate = new Date(e.started_at * 1000).setHours(0, 0, 0, 0)
-      if (!dates.filter(e => e === matchDate).length > 0) dates.push(matchDate)
+      const monday = getMonday(e.started_at * 1000).getTime()
+      if (!dates.filter(e => e === monday).length > 0) dates.push(monday)
     }
 
-    dates.sort().reverse().every((d, k) => {
+    dates.sort().reverse().every((monday, k) => {
       if (k <= 24) {
+        const mondayDate = new Date(monday)
+        const to = new Date(mondayDate.setDate(mondayDate.getDate() + 7))
+
         options.push({
-          label: new Date(d).toDateString(),
+          label: [new Date(monday).toDateString(), '-', new Date(to.setHours(-24)).toDateString()].join(' '),
           value: JSON.stringify({
             s: steamId,
-            f: d,
-            t: new Date(d).setHours(24),
+            f: monday,
+            t: to.setHours(24),
             u: message.author.id,
             m: maxMatch
           })
@@ -56,8 +67,8 @@ const sendCardWithInfos = async (message, steamParam) => {
 }
 
 module.exports = {
-  name: 'dailystats',
-  aliasses: ['dailystats', 'ds'],
+  name: 'weekstats',
+  aliasses: ['weekstats', 'ws'],
   options: [
     {
       name: 'user_mention',
@@ -67,8 +78,8 @@ module.exports = {
       slash: true
     }
   ],
-  description: "Displays your stats of the choosen day or the stats of the user(s) given. With elo graph of the day.",
-  slashDescription: "Displays your stats of the choosen day or the stats of the @ user. With elo graph of the day.",
+  description: "Displays your stats of the choosen week or the stats of the user(s) given. With elo graph of the week.",
+  slashDescription: "Displays your stats of the choosen week or the stats of the @ user. With elo graph of the week.",
   usage: '',
   type: 'stats',
   async execute(message, args) {
