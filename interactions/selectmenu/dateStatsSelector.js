@@ -51,7 +51,7 @@ module.exports = {
 
       const elo = await Graph.getElo(canvaSize, playerHistory.filter(e => e.date < t), playerDatas.games.csgo.faceit_elo, t === new Date().setHours(24, 0, 0, 0))
       const graphCanvas = await Graph.generateCanvas(elo)
-      const eloDiff = elo.shift() - elo.at(-1)
+      const eloDiff = elo.at(-1) - elo.shift()
 
       const rankImageCanvas = Canvas.createCanvas(size, size)
       const ctx = rankImageCanvas.getContext('2d')
