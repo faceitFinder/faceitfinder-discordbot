@@ -1,21 +1,13 @@
 const { color } = require('../config.json')
 const path = require('path')
 const Canvas = require('canvas')
-const Match = require('./match')
-const Player = require('./player')
 
-/**
- * @param {String} playerId 
- * @param {Number} limit 
- * @param {Date} to 
- * @param {Number} maxMatch 
- * @returns {Canvas} Image with a grpahic of the elo
- */
-const generateCanvas = async (playerId, limit = 20, to = null, maxMatch = 20) => {
-  let elo
-  try { elo = await getElo(playerId, limit, to, maxMatch) }
-  catch (error) { throw error }
+const generateCanvas = async (elo = null, matchHistory, playerElo, maxMatch = 20) => {
+  if (elo === null)
+    try { elo = await getElo(maxMatch, matchHistory, playerElo) }
+    catch (error) { throw error }
   if (elo.length === 0) throw 'No match found on this date'
+
   elo.reverse()
 
   const padding = 100
@@ -99,21 +91,17 @@ const getColors = (prev, current, ctx, coordinatesStart, coordinatesEnd) => {
   return gradient
 }
 
-const getElo = async (playerId, limit, to, maxMatch) => {
-  if (to === null) to = new Date().setHours(24)
-  const data = await Match.getMatchElo(playerId, limit)
-  const playerDatas = await Player.getDatas(playerId)
-  const playerElo = playerDatas.games.csgo.faceit_elo
-  const currentElo = { elo: playerElo, date: new Date() }
+const getElo = async (maxMatch, matchHistory, playerElo, checkElo = 1) => {
+  const currentElo = { elo: playerElo }
 
-  if (data.length > 0) {
-    if (data[0].elo === undefined)
-      data[0] = currentElo
-    else if (data[0].elo != playerElo)
-      data.unshift(currentElo)
-  } else if (data.length === 0) throw 'Couldn\'t get today matches'
+  if (matchHistory.length > 0 && checkElo) {
+    if (matchHistory[0].elo === undefined)
+      matchHistory[0] = currentElo
+    else if (matchHistory[0].elo != playerElo)
+      matchHistory.unshift(currentElo)
+  } else if (matchHistory.length === 0) throw 'Couldn\'t get today matches'
 
-  const elo = Array.from(data.filter(e => e.date < to), e => e.elo)
+  const elo = Array.from(matchHistory, e => e.elo)
   elo.reverse().forEach((e, i) => {
     if (e === undefined && elo[i - 1] !== undefined) elo[i] = elo[i - 1]
   })
