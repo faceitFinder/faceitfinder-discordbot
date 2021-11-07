@@ -5,6 +5,7 @@ const RegexFun = require('../functions/regex')
 const Steam = require('../functions/steam')
 const Player = require('../functions/player')
 const Graph = require('../functions/graph')
+const Match = require('../functions/match')
 const Ladder = require('../functions/ladder')
 const errorCard = require('../templates/errorCard')
 const { getCardsConditions } = require('../functions/commands')
@@ -16,7 +17,8 @@ const sendCardWithInfos = async (message, steamParam) => {
     const playerId = await Player.getId(steamId)
     const playerDatas = await Player.getDatas(playerId)
     const playerStats = await Player.getStats(playerId)
-    const graphCanvas = await Graph.generateCanvas(playerId)
+    const playerHistory = await Match.getMatchElo(playerId, 20)
+    const graphCanvas = await Graph.generateCanvas(null, playerHistory, playerDatas.games.csgo.faceit_elo)
 
     const playerCountry = playerDatas.country
     const playerRegion = playerDatas.games.csgo.region

@@ -5,9 +5,8 @@ const Player = require('../../functions/player')
 const Steam = require('../../functions/steam')
 const Graph = require('../../functions/graph')
 const Match = require('../../functions/match')
-const errorCard = require('../../templates/errorCard')
 
-const generatePlayerStats = async (playerHistory, playerId) => {
+const generatePlayerStats = async (playerHistory) => {
   const playerStats = {
     wins: [0],
     games: [0],
@@ -19,24 +18,16 @@ const generatePlayerStats = async (playerHistory, playerId) => {
     'Average Assists': [0],
   }
 
-  for (const e of playerHistory.items)
-    await Match.getMatchStats(e.match_id).then(ms =>
-      ms.rounds.forEach(r => r.teams.forEach(t => {
-        const ps = t.players.filter(p => p.player_id === playerId)
-
-        if (ps.length > 0) {
-          playerStats.games[0] += 1
-          playerStats['Average HS'][0] += parseFloat(ps.at(0).player_stats['Headshots %'])
-          playerStats['Average K/D'][0] += parseFloat(ps.at(0).player_stats['K/D Ratio'])
-          playerStats['Average MVPs'][0] += parseFloat(ps.at(0).player_stats.MVPs)
-          playerStats['Average Kills'][0] += parseFloat(ps.at(0).player_stats.Kills)
-          playerStats['Average Deaths'][0] += parseFloat(ps.at(0).player_stats.Deaths)
-          playerStats['Average Assists'][0] += parseFloat(ps.at(0).player_stats.Assists)
-          if (ps.at(0).player_stats.Result == 1) playerStats.wins[0] += 1
-        }
-      })))
-
-  return playerStats
+  for (const e of playerHistory) {
+    playerStats.games[0] += 1
+    playerStats['Average HS'][0] += parseFloat(e.c4)
+    playerStats['Average K/D'][0] += parseFloat(e.c2)
+    playerStats['Average MVPs'][0] += parseFloat(e.i9)
+    playerStats['Average Kills'][0] += parseFloat(e.i6)
+    playerStats['Average Deaths'][0] += parseFloat(e.i8)
+    playerStats['Average Assists'][0] += parseFloat(e.i7)
+    playerStats.wins[0] += Math.max(...e.i18.split('/').map(Number)) === parseInt(e.c5)
+  } return playerStats
 }
 
 const getAverage = (q, d, fixe = 2, percent = 1) => { return ((q / d) * percent).toFixed(fixe) }
@@ -53,13 +44,13 @@ module.exports = {
       const faceitLevel = playerDatas.games.csgo.skill_level
       const size = 40
 
-      const playerHistory = await Player.getHistory(playerId, m, f / 1000, t / 1000)
-      const playerStats = await generatePlayerStats(playerHistory, playerId)
+      const playerHistory = await Match.getMatchElo(playerId, m)
+      const playerStats = await generatePlayerStats(playerHistory.filter(e => e.date >= f && e.date < t))
 
       const canvaSize = playerStats.games.at(0) + 1
 
-      const elo = await Graph.getElo(playerId, m, t, canvaSize)
-      const graphCanvas = await Graph.generateCanvas(playerId, m, t, canvaSize)
+      const elo = await Graph.getElo(canvaSize, playerHistory.filter(e => e.date < t), playerDatas.games.csgo.faceit_elo, t === new Date().setHours(24, 0, 0, 0))
+      const graphCanvas = await Graph.generateCanvas(elo)
       const eloDiff = elo.shift() - elo.at(-1)
 
       const rankImageCanvas = Canvas.createCanvas(size, size)

@@ -25,7 +25,7 @@ const sendCardWithInfos = async (message, steamParam) => {
     const playerHistory = await Player.getHistory(playerId, maxMatch)
 
     for (const e of playerHistory.items) {
-      const monday = getMonday(e.started_at * 1000).getTime()
+      const monday = getMonday(e.finished_at * 1000).getTime()
       if (!dates.filter(e => e === monday).length > 0) dates.push(monday)
     }
 

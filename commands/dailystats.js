@@ -17,7 +17,7 @@ const sendCardWithInfos = async (message, steamParam) => {
     const playerHistory = await Player.getHistory(playerId, maxMatch)
 
     for (const e of playerHistory.items) {
-      const matchDate = new Date(e.started_at * 1000).setHours(0, 0, 0, 0)
+      const matchDate = new Date(e.finished_at * 1000).setHours(0, 0, 0, 0)
       if (!dates.filter(e => e === matchDate).length > 0) dates.push(matchDate)
     }
 
