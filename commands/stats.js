@@ -18,7 +18,8 @@ const sendCardWithInfos = async (message, steamParam) => {
     const playerDatas = await Player.getDatas(playerId)
     const playerStats = await Player.getStats(playerId)
     const playerHistory = await Match.getMatchElo(playerId, 20)
-    const graphCanvas = await Graph.generateCanvas(null, playerHistory, playerDatas.games.csgo.faceit_elo)
+    const faceitElo = playerDatas.games.csgo.faceit_elo
+    const graphCanvas = await Graph.generateCanvas(null, playerHistory, faceitElo)
 
     const playerCountry = playerDatas.country
     const playerRegion = playerDatas.games.csgo.region
@@ -29,9 +30,7 @@ const sendCardWithInfos = async (message, steamParam) => {
     const faceitLevel = playerDatas.games.csgo.skill_level
     const size = 40
 
-    const rankImageCanvas = Canvas.createCanvas(size, size)
-    const ctx = rankImageCanvas.getContext('2d')
-    ctx.drawImage(await Graph.getRankImage(faceitLevel, size), 0, 0)
+    const rankImageCanvas = await Graph.getRankImage(faceitLevel, faceitElo, size)
 
     const card = new Discord.MessageEmbed()
       .setAuthor(playerDatas.nickname, playerDatas.avatar, `https://www.faceit.com/fr/players/${playerDatas.nickname}`)
@@ -41,7 +40,7 @@ const sendCardWithInfos = async (message, steamParam) => {
       .addFields({ name: 'Games', value: `${playerStats.lifetime.Matches} (${playerStats.lifetime['Win Rate %']}% Win)`, inline: true },
         { name: 'K/D', value: playerStats.lifetime['Average K/D Ratio'], inline: true },
         { name: 'HS', value: `${playerStats.lifetime['Average Headshots %']}%`, inline: true },
-        { name: 'Elo', value: playerDatas.games.csgo.faceit_elo.toString(), inline: true },
+        { name: 'Elo', value: faceitElo.toString(), inline: true },
         { name: `:flag_${playerCountry}:`, value: ladderCountry.position.toString(), inline: true },
         { name: `:flag_${playerRegion.toLowerCase()}:`, value: ladderRegion.position.toString(), inline: true })
       .setImage(`attachment://${steamId}graph.png`)

@@ -24,15 +24,14 @@ const sendCardWithInfos = async (message = null, steamParam) => {
 
     const lastMatchElo = await Match.getMatchElo(playerId, 2)
 
+    const faceitElo = playerDatas.games.csgo.faceit_elo
     const faceitLevel = playerDatas.games.csgo.skill_level
     const size = 40
     const filesAtt = []
 
-    const rankImageCanvas = Canvas.createCanvas(size, size)
-    const ctx = rankImageCanvas.getContext('2d')
-    ctx.drawImage(await Graph.getRankImage(faceitLevel, size), 0, 0)
+    const rankImageCanvas = await Graph.getRankImage(faceitLevel, faceitElo, size)
 
-    let eloDiff = playerDatas.games.csgo.faceit_elo - lastMatchElo[1]?.elo || 0
+    let eloDiff = faceitElo - lastMatchElo[1]?.elo || 0
     eloDiff = isNaN(eloDiff) ? '0' : eloDiff > 0 ? `+${eloDiff}` : eloDiff.toString()
     const cards = []
 

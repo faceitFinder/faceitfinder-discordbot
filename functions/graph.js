@@ -67,12 +67,48 @@ const generateCanvas = async (elo = null, matchHistory, playerElo, maxMatch = 20
   return canvas
 }
 
-const getRankImage = async (faceitLevel, size) => {
-  const image = await Canvas.loadImage(
-    path.resolve(__dirname, `../images/faceit/faceit${faceitLevel}.svg`))
+const getRankImage = async (faceitLevel, faceitElo, size) => {
+  const space = 6,
+    maxWidth = size - space,
+    height = 4,
+    x = space * .6,
+    y = size + space * 1.2,
+    canvas = Canvas.createCanvas(size, y + height + 1),
+    image = await Canvas.loadImage(path.resolve(__dirname, `../images/faceit/faceit${faceitLevel}.svg`))
+
   image.height = image.width = size
 
-  return image
+  let ctx = canvas.getContext('2d')
+
+  ctx.drawImage(image, 0, 0)
+  ctx.lineWidth = space
+  ctx.globalCompositeOperation = 'source-over'
+  ctx.fillStyle = ctx.strokeStyle = '#1f1f22'
+  ctx = roundRect(ctx, x, y, maxWidth, height, space)
+
+  const range = color.levels[faceitLevel],
+    width = faceitLevel === 10 ? maxWidth : (maxWidth * (faceitElo - range.min) / (range.max - range.min))
+
+  ctx.globalCompositeOperation = 'source-over'
+  ctx.fillStyle = ctx.strokeStyle = color.levels[faceitLevel].color
+  ctx = roundRect(ctx, x, y, width, height, space)
+
+  return canvas
+}
+
+const roundRect = (ctx, x, y, w, h, r) => {
+  if (w < 2 * r) r = w / 2
+  if (h < 2 * r) r = h / 2
+  ctx.beginPath()
+  ctx.moveTo(x + r, y)
+  ctx.arcTo(x + w, y, x + w, y + h, r)
+  ctx.arcTo(x + w, y + h, x, y + h, r)
+  ctx.arcTo(x, y + h, x, y, r)
+  ctx.arcTo(x, y, x + w, y, r)
+  ctx.closePath()
+  ctx.fill()
+
+  return ctx
 }
 
 const getColors = (prev, current, ctx, coordinatesStart, coordinatesEnd) => {

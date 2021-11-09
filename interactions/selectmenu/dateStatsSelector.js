@@ -42,6 +42,7 @@ module.exports = {
       const playerDatas = await Player.getDatas(playerId)
 
       const faceitLevel = playerDatas.games.csgo.skill_level
+      const faceitElo = playerDatas.games.csgo.faceit_elo
       const size = 40
 
       const playerHistory = await Match.getMatchElo(playerId, m)
@@ -49,13 +50,11 @@ module.exports = {
 
       const canvaSize = playerStats.games.at(0) + 1
 
-      const elo = await Graph.getElo(canvaSize, playerHistory.filter(e => e.date < t), playerDatas.games.csgo.faceit_elo, t === new Date().setHours(24, 0, 0, 0))
+      const elo = await Graph.getElo(canvaSize, playerHistory.filter(e => e.date < t), faceitElo, t === new Date().setHours(24, 0, 0, 0))
       const graphCanvas = await Graph.generateCanvas(elo)
       const eloDiff = elo.at(-1) - elo.shift()
 
-      const rankImageCanvas = Canvas.createCanvas(size, size)
-      const ctx = rankImageCanvas.getContext('2d')
-      ctx.drawImage(await Graph.getRankImage(faceitLevel, size), 0, 0)
+      const rankImageCanvas = await Graph.getRankImage(faceitLevel, faceitElo, size)
 
       const toRealTimeStamp = new Date(t).setHours(-24)
 
