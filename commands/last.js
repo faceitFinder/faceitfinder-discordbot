@@ -12,72 +12,60 @@ const { getCardsConditions } = require('../functions/commands')
 
 const sendCardWithInfos = async (message = null, steamParam) => {
   try {
-    const steamId = await Steam.getId(steamParam)
-    const steamDatas = await Steam.getDatas(steamId)
-    const playerId = await Player.getId(steamId)
-    const playerDatas = await Player.getDatas(playerId)
-    const playerHistory = await Player.getHistory(playerId)
+    const range = 6,
+      steamId = await Steam.getId(steamParam),
+      steamDatas = await Steam.getDatas(steamId),
+      playerId = await Player.getId(steamId),
+      playerDatas = await Player.getDatas(playerId),
+      playerHistory = await Match.getMatchElo(playerId, range)
 
-    let lastMatchStats
-    if (playerHistory.items.length > 0) lastMatchStats = await Match.getMatchStats(playerHistory.items[0].match_id)
-    else return errorCard(`Couldn\'t get the last match of ${steamDatas.personaname}`)
+    if (!playerHistory.length > 0) return errorCard(`Couldn\'t get the last match of ${steamDatas.personaname}`)
 
-    const lastMatchElo = await Match.getMatchElo(playerId, 2)
+    const faceitElo = playerDatas.games.csgo.faceit_elo,
+      faceitLevel = playerDatas.games.csgo.skill_level,
+      size = 40,
+      filesAtt = [],
+      cards = [],
+      rankImageCanvas = await Graph.getRankImage(faceitLevel, faceitElo, size),
+      lastMatchsElo = await Graph.getElo(range, playerHistory, faceitElo)
 
-    const faceitElo = playerDatas.games.csgo.faceit_elo
-    const faceitLevel = playerDatas.games.csgo.skill_level
-    const size = 40
-    const filesAtt = []
+    playerHistory.pop()
+    filesAtt.push(new Discord.MessageAttachment(rankImageCanvas.toBuffer(), `${faceitLevel}.png`))
 
-    const rankImageCanvas = await Graph.getRankImage(faceitLevel, faceitElo, size)
+    playerHistory.forEach((m, i) => {
+      const card = new Discord.MessageEmbed(),
+        mapThumbnails = `./images/maps/${m.i1}.jpg`,
+        result = Math.max(...m.i18.split('/').map(Number)) === parseInt(m.c5),
+        eloDiff = lastMatchsElo[i] - lastMatchsElo[i + 1]
 
-    let eloDiff = faceitElo - lastMatchElo[1]?.elo || 0
-    eloDiff = isNaN(eloDiff) ? '0' : eloDiff > 0 ? `+${eloDiff}` : eloDiff.toString()
-    const cards = []
+      if (parseInt(m.matchRound) > 1) card.addFields({ name: 'Rounds', value: m.matchRound })
 
-    let mapThumbnail
-    lastMatchStats.rounds.forEach(r => {
-      const card = new Discord.MessageEmbed()
-      let playerStats
-      for (const t of r.teams) {
-        const stats = t.players.filter(p => p.player_id === playerId)
-        if (stats.length > 0) playerStats = stats[0].player_stats
-      }
+      card.setAuthor(playerDatas.nickname, playerDatas.avatar, `https://www.faceit.com/fr/players/${playerDatas.nickname}`)
+        .setDescription(`[Steam](${steamDatas.profileurl}), [Game Lobby](https://www.faceit.com/fr/csgo/room/${m.matchId}/scoreboard)`)
+        .addFields({ name: 'Score', value: m.i18, inline: true },
+          { name: 'Map', value: m.i1, inline: true },
+          { name: 'Status', value: result ? emojis.won.balise : emojis.lost.balise, inline: true },
+          { name: 'K/D', value: m.c2, inline: true },
+          { name: 'HS', value: `${m.c4}%`, inline: true },
+          { name: 'MVPs', value: m.i9, inline: true },
+          { name: 'Kills', value: m.i6, inline: true },
+          { name: 'Deaths', value: m.i8, inline: true },
+          { name: 'Assists', value: m.i7, inline: true },
+          { name: 'Elo', value: isNaN(eloDiff) ? '0' : eloDiff.toString(), inline: true },
+          { name: 'Date', value: new Date(m.date).toDateString(), inline: true })
+        .setThumbnail(`attachment://${faceitLevel}.png`)
+        .setImage(`attachment://${m.i1}.jpg`)
+        .setColor(result ? color.won : color.lost)
+        .setFooter(`Steam: ${steamDatas.personaname}`)
 
-      if (playerStats === undefined) cards.push(errorCard(`Couldn\'t get the stats of ${steamDatas.personaname} from his last match`).embeds[0])
-      if (lastMatchStats.rounds.length > 1) card.addFields({ name: 'round', value: `${r.match_round}/${lastMatchStats.rounds.length}` })
-      mapThumbnail = `./images/maps/${r.round_stats.Map}.jpg`
+      const attachment = new Discord.MessageAttachment(mapThumbnails, `${m.i1}.jpg`)
+      if (fs.existsSync(mapThumbnails) && !filesAtt.includes(attachment)) filesAtt.push(attachment)
 
-      if (playerStats !== undefined && playerDatas !== undefined) {
-        filesAtt.push(new Discord.MessageAttachment(rankImageCanvas.toBuffer(), `${faceitLevel}.png`))
-
-        card.setAuthor(playerDatas.nickname, playerDatas.avatar, `https://www.faceit.com/fr/players/${playerDatas.nickname}`)
-          .setDescription(`[Steam](${steamDatas.profileurl}), [Game Lobby](https://www.faceit.com/fr/csgo/room/${playerHistory.items[0].match_id}/scoreboard)`)
-          .addFields({ name: 'Score', value: r.round_stats.Score.toString(), inline: true },
-            { name: 'Map', value: r.round_stats.Map, inline: true },
-            { name: 'Status', value: parseInt(playerStats.Result) ? emojis.won.balise : emojis.lost.balise, inline: true },
-            { name: 'K/D', value: playerStats['K/D Ratio'], inline: true },
-            { name: 'HS', value: `${playerStats['Headshots %']}%`, inline: true },
-            { name: 'MVPs', value: playerStats.MVPs, inline: true },
-            { name: 'Kills', value: playerStats.Kills, inline: true },
-            { name: 'Deaths', value: playerStats.Deaths, inline: true },
-            { name: 'Assists', value: playerStats.Assists, inline: true },
-            { name: 'Elo', value: eloDiff.toString(), inline: true },
-            { name: 'Date', value: new Date(lastMatchElo[0].date).toDateString(), inline: true })
-          .setThumbnail(`attachment://${faceitLevel}.png`)
-          .setImage(`attachment://${r.round_stats.Map}.jpg`)
-          .setColor(parseInt(playerStats.Result) ? color.won : color.lost)
-          .setFooter(`Steam: ${steamDatas.personaname}`)
-
-        if (fs.existsSync(mapThumbnail))
-          filesAtt.push(new Discord.MessageAttachment(mapThumbnail, `${r.round_stats.Map}.jpg`))
-
-        cards.push(card)
-      }
+      cards.push(card)
     })
 
     return {
-      embeds: cards,
+      embeds: cards[0],
       files: filesAtt
     }
 
