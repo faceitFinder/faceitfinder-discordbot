@@ -1,5 +1,3 @@
-const errorCard = require('../templates/errorCard')
-
 module.exports = class AntiSpam {
   constructor(
     msgInARow = 3,
