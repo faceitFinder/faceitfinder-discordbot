@@ -45,16 +45,18 @@ module.exports = {
         .setFooter(`Steam: ${steamDatas.personaname}`)
 
       if (fs.existsSync(mapThumbnail)) {
-        filesAtt.push(new Discord.MessageAttachment(mapThumbnail, `${values.map}.jpg`),)
+        filesAtt.push(new Discord.MessageAttachment(mapThumbnail, `${values.map}.jpg`))
         card.setImage(`attachment://${values.map}.jpg`)
       }
 
-      return {
-        embeds: [card],
-        files: filesAtt,
-        components: [],
-        content: null,
-      }
+      await interaction.fetchReply().then(e => {
+        e.removeAttachments()
+        e.edit({
+          embeds: [card],
+          files: filesAtt,
+          content: null
+        })
+      })
     } else return false
   }
 }
