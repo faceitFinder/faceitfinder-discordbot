@@ -28,12 +28,20 @@ const getCardsConditions = async (message, args, fn, maxUser = 10) => {
     .slice(0, maxUser)
     .map(e => { return { param: e, discord: false } })
 
-  const params = args.map(e => {
-    const regex = /<@!?([0-9]*)>/gi, res = regex.exec(e)
-    return { param: res?.at(1) || e.split('/').filter(e => e).pop(), discord: res !== null }
+  let params = []
+  args.forEach(e => {
+    const res = RegexFun.findUserMentions(e)
+    params = params.concat(
+      res.length > 0 ?
+        res.map(r => {
+          return {
+            param: r,
+            discord: true
+          }
+        })
+        : { param: e.split('/').filter(e => e).pop(), discord: false }
+    )
   })
-
-  console.log(args)
 
   if (steamIds.length > 0) return getCards(message, steamIds, fn)
   else if (params.slice(0, maxUser).length > 0) return getCards(message, params, fn)

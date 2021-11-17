@@ -108,13 +108,9 @@ client.on('interactionCreate', async (interaction) => {
       }
       const args = []
       interaction.options['_hoistedOptions'].filter(o => o.type === 'STRING').forEach(o => {
-        o.value.trim().split(' ').forEach(e => { if (e !== '') args.push(e) })
+        o.value.split(' ').forEach(e => { if (e !== '') args.push(e) })
         message.content += o.value
       })
-
-      interaction.options['_hoistedOptions'].filter(o => o.type === 'USER')
-        .forEach(o => message.mentions.users.set(o.user.id, o.user))
-
       interaction.deferReply().then(async () => {
         await client.commands.get(interaction.commandName)?.execute(message, args)
           .then(resp => {
