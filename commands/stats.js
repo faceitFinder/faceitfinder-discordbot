@@ -40,7 +40,7 @@ const sendCardWithInfos = async (message, steamParam) => {
         { name: 'K/D', value: playerStats.lifetime['Average K/D Ratio'], inline: true },
         { name: 'HS', value: `${playerStats.lifetime['Average Headshots %']}%`, inline: true },
         { name: 'Elo', value: faceitElo.toString(), inline: true },
-        { name: `:flag_${playerCountry}:`, value: ladderCountry.position.toString(), inline: true },
+        { name: `:flag_${playerCountry.toLowerCase()}:`, value: ladderCountry.position.toString(), inline: true },
         { name: `:flag_${playerRegion.toLowerCase()}:`, value: ladderRegion.position.toString(), inline: true })
       .setImage(`attachment://${steamId}graph.png`)
       .setColor(color.levels[faceitLevel].color)
