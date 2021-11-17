@@ -43,7 +43,6 @@ const sendCardWithInfos = async (message, steamParam) => {
             m: maxMatch
           })
         })
-        console.log(options)
 
         return true
       } else return false
