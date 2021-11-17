@@ -1,6 +1,5 @@
 const { color, emojis } = require('../config.json')
 const Discord = require('discord.js')
-const Canvas = require('canvas')
 const fs = require('fs')
 const Match = require('../functions/match')
 const Steam = require('../functions/steam')
