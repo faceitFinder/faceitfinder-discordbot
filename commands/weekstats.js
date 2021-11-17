@@ -71,18 +71,29 @@ module.exports = {
   aliasses: ['weekstats', 'ws'],
   options: [
     {
-      name: 'user_mention',
-      description: 'Mention a user that has linked his profile to the bot.',
+      name: 'steam_parameters',
+      description: 'steamIDs / steam custom IDs / url of one or more steam profiles / CSGO status.',
+      required: true,
+      type: 3,
+    },
+    {
+      name: 'user_mentions',
+      description: '@users that has linked their profiles to the bot.',
       required: false,
       type: 6,
+    },
+    {
+      name: 'parameters',
+      slashDescription: 'steamIDs / steam custom IDs / url of one or more steam profiles / @users / CSGO status.',
+      required: false,
+      type: 3,
       slash: true
     }
   ],
-  description: "Displays your stats of the choosen week or the stats of the user(s) given. With elo graph of the week.",
-  slashDescription: "Displays your stats of the choosen week or the stats of the @ user. With elo graph of the week.",
-  usage: '',
+  description: "Displays the stats of the choosen week. With elo graph of the week.",
+  usage: 'multiple steam params and @user or CSGO status, max 10 users',
   type: 'stats',
   async execute(message, args) {
-    return await getCardsConditions(message.mentions.users, [], [], message, sendCardWithInfos)
+    return await getCardsConditions(message, args, sendCardWithInfos)
   }
 }

@@ -29,14 +29,14 @@ client.on('ready', () => {
     command.aliasses.forEach(e => {
       client.commands.set(e, command)
     })
+    const options = command.options.filter(c => c.slash !== undefined && c.slash === true).map(c => {
+      return { name: c.name, description: c.description || c.slashDescription, required: c.required, type: c.type }
+    })
+
     slashCommands.push({
       name: command.name,
       description: command?.slashDescription || command.description,
-      options: Array.from(
-        command.options.filter(c => c.slash !== undefined && c.slash === true),
-        c => {
-          return { name: c.name, description: c.description, required: c.required, type: c.type }
-        })
+      options: options
     })
   })
 
@@ -108,16 +108,21 @@ client.on('interactionCreate', async (interaction) => {
       }
       const args = []
       interaction.options['_hoistedOptions'].filter(o => o.type === 'STRING').forEach(o => {
-        args.push(o.value)
+        o.value.trim().split(' ').forEach(e => { if (e !== '') args.push(e) })
         message.content += o.value
       })
-      interaction.options['_hoistedOptions'].filter(o => o.type === 'USER').forEach(o => message.mentions.users.set(o.user.id, o.user))
+
+      interaction.options['_hoistedOptions'].filter(o => o.type === 'USER')
+        .forEach(o => message.mentions.users.set(o.user.id, o.user))
 
       interaction.deferReply().then(async () => {
         await client.commands.get(interaction.commandName)?.execute(message, args)
           .then(resp => {
-            if (Array.isArray(resp)) interaction.editReply(resp[0]).catch((err) => console.log(err))
-            else interaction.editReply(resp).catch((err) => console.log(err))
+            if (Array.isArray(resp)) {
+              resp.forEach(r => {
+                interaction.followUp(r).catch((err) => console.log(err))
+              })
+            } else interaction.editReply(resp).catch((err) => console.log(err))
           }).catch((err) => console.log(err))
       })
     }

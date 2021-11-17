@@ -35,28 +35,30 @@ module.exports = {
   aliasses: ['link'],
   options: [
     {
-      name: 'user_steam_parameter',
-      description: 'Steam id / custom steam id / url of a steam profile / csgo status users part',
+      name: 'steam_parameter',
+      description: 'steamID / steam custom ID / url of one steam profile / CSGO status.',
       required: true,
+      type: 3,
+    },
+    {
+      name: 'user_mention',
+      description: '@user that has linked his profile to the bot.',
+      required: false,
+      type: 6,
+    },
+    {
+      name: 'parameter',
+      slashDescription: 'steamID / steam custom ID / url of one steam profile / @user / CSGO status.',
+      required: false,
       type: 3,
       slash: true
     }
   ],
   description: `Link steam id to the discord user, to get your stats directly (no parameters needed).`,
-  usage: 'one of the options',
+  usage: 'steam parameter or @user, max 1 user',
   type: 'utility',
   async execute(message, args) {
-    const steamId = RegexFun.findSteamUIds(message.content)
-    try {
-      [args[0].split('/').filter(e => e).pop()]
-
-      return await getCardsConditions([],
-        steamId.length > 0 ? [steamId[0]] : [],
-        [args[0].split('/').filter(e => e).pop()],
-        message,
-        sendCardWithInfos)
-    } catch (e) {
-      return errorCard(`A parameter is missing, do \`.ffhelp link\` to see how the command works.`)
-    }
+    if (args?.length > 0) return await getCardsConditions(message, args, sendCardWithInfos, 1)
+    else return errorCard(`A parameter is missing, do \`.ffhelp link\` to see how the command works.`)
   }
 }
