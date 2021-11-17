@@ -25,7 +25,7 @@ const getCommandsHelp = (commandName, card) => {
 
   let optionsDesc = ''
 
-  command.options.forEach(o => { optionsDesc += `\`${o.name}\`: ${o.description}\n` })
+  command.options.forEach(o => { if (o.description) optionsDesc += `\`${o.name}\`: ${o.description}\n` })
 
   card.setDescription(`Informations about the ${command.name} command`)
     .addFields({ name: 'Aliases', value: command.aliasses.join(', ') },
