@@ -17,10 +17,10 @@ const sendCardWithInfos = async (message, steamParam) => {
     playerStats.segments.forEach(e => options.push({
       label: `${e.label} ${e.mode}`,
       value: JSON.stringify({
-        map: e.label,
-        mode: e.mode,
-        steamId: steamId,
-        userId: message.author.id
+        m: e.label,
+        v: e.mode,
+        s: steamId,
+        u: message.author.id
       })
     }))
 
