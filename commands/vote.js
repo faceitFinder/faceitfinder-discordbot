@@ -8,8 +8,8 @@ module.exports = {
   description: "Get the link to vote for the bot on top.gg",
   usage: '',
   type: 'system',
-  async execute(message, args) {
-    return await {
+  execute(message, args) {
+    return {
       embeds: [
         new Discord.MessageEmbed()
           .setColor(color.primary)

@@ -1,5 +1,4 @@
 const Discord = require('discord.js')
-const RegexFun = require('../functions/regex')
 const Player = require('../functions/player')
 const Steam = require('../functions/steam')
 const errorCard = require('../templates/errorCard')

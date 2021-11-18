@@ -1,6 +1,5 @@
 const { color } = require('../config.json')
 const Discord = require('discord.js')
-const RegexFun = require('../functions/regex')
 const Steam = require('../functions/steam')
 const Player = require('../functions/player')
 const Graph = require('../functions/graph')

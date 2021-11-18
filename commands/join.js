@@ -8,8 +8,8 @@ module.exports = {
   description: "Get the link to join the community server of the bot .",
   usage: '',
   type: 'system',
-  async execute(message, args) {
-    return await {
+  execute(message, args) {
+    return {
       embeds: [
         new Discord.MessageEmbed()
           .setColor(color.primary)

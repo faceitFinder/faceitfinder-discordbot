@@ -24,9 +24,16 @@ const getCards = async (message, array, fn) => {
 }
 
 const getCardsConditions = async (message, args, fn, maxUser = 10) => {
+  if (args.length === 0)
+    return await User.get(message.author.id) ?
+      getCards(message, [{ param: message.author.id, discord: true }], fn) :
+      errorCard(`You need to link your account to do that without a parameter, do \`${prefix}help link\` to see how.`)
+
   const steamIds = RegexFun.findSteamUIds(message.content)
     .slice(0, maxUser)
     .map(e => { return { param: e, discord: false } })
+
+  if (steamIds.length > 0) return getCards(message, steamIds, fn)
 
   let params = []
   args.forEach(e => {
@@ -43,10 +50,7 @@ const getCardsConditions = async (message, args, fn, maxUser = 10) => {
     )
   })
 
-  if (steamIds.length > 0) return getCards(message, steamIds, fn)
-  else if (params.slice(0, maxUser).length > 0) return getCards(message, params, fn)
-  else if (await User.get(message.author.id)) return getCards(message, [{ param: message.author.id, discord: true }], fn)
-  else return errorCard(`You need to link your account to do that without a parameter, do \`${prefix}help link\` to see how.`)
+  return getCards(message, params, fn)
 }
 
 module.exports = {
