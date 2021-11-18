@@ -51,14 +51,14 @@ module.exports = {
   description: 'Display the command list.',
   usage: 'command name',
   type: 'system',
-  async execute(message, args) {
+  execute(message, args) {
     const helpCard = new Discord.MessageEmbed()
       .setColor(color.primary)
       .setTitle('Commands')
       .setDescription(`\`${prefix}help {command}\` for more info on a specific command`)
       .setFooter(`${name} Help`)
 
-    if (args.length === 0) return await getCommands(helpCard)
-    else return await getCommandsHelp(args[0], helpCard)
+    if (args.length === 0) return getCommands(helpCard)
+    else return getCommandsHelp(args[0], helpCard)
   }
 }

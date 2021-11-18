@@ -8,8 +8,8 @@ module.exports = {
   description: "Get the link to invite the bot on your server.",
   usage: '',
   type: 'system',
-  async execute(message, args) {
-    return await {
+  execute(message, args) {
+    return {
       embeds: [
         new Discord.MessageEmbed()
           .setColor(color.primary)
