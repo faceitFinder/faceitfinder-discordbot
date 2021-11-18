@@ -5,7 +5,6 @@ const Match = require('../functions/match')
 const Steam = require('../functions/steam')
 const Player = require('../functions/player')
 const Graph = require('../functions/graph')
-const RegexFun = require('../functions/regex')
 const errorCard = require('../templates/errorCard')
 const { getCardsConditions } = require('../functions/commands')
 
