@@ -16,14 +16,15 @@ services:
       - .env
     networks:
       - app
-      
+
   mongodb:
     image: mongo:latest
     hostname: mongodb
     ports:
       - '27017:27017'
-    command:
-      [--auth]
+    command: [ --auth ]
+    volumes:
+      - ~/mongo-volume:/data/db
     env_file:
       - .env
     networks:
