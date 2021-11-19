@@ -8,7 +8,7 @@ module.exports = {
   description: "Get the link to join the community server of the bot .",
   usage: '',
   type: 'system',
-  execute(message, args) {
+  async execute(message, args) {
     return {
       embeds: [
         new Discord.MessageEmbed()
