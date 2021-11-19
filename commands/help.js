@@ -51,7 +51,7 @@ module.exports = {
   description: 'Display the command list.',
   usage: 'command name',
   type: 'system',
-  execute(message, args) {
+  async execute(message, args) {
     const helpCard = new Discord.MessageEmbed()
       .setColor(color.primary)
       .setTitle('Commands')

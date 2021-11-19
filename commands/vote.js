@@ -8,7 +8,7 @@ module.exports = {
   description: "Get the link to vote for the bot on top.gg",
   usage: '',
   type: 'system',
-  execute(message, args) {
+  async execute(message, args) {
     return {
       embeds: [
         new Discord.MessageEmbed()
