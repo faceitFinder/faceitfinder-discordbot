@@ -25,7 +25,7 @@ const getCommandsHelp = (commandName, card) => {
 
   let optionsDesc = ''
 
-  command.options.forEach(o => { optionsDesc += `\`${o.name}\`: ${o.description}\n` })
+  command.options.forEach(o => { if (o.description) optionsDesc += `\`${o.name}\`: ${o.description}\n` })
 
   card.setDescription(`Informations about the ${command.name} command`)
     .addFields({ name: 'Aliases', value: command.aliasses.join(', ') },
@@ -58,7 +58,7 @@ module.exports = {
       .setDescription(`\`${prefix}help {command}\` for more info on a specific command`)
       .setFooter(`${name} Help`)
 
-    if (args.length === 0) return await getCommands(helpCard)
-    else return await getCommandsHelp(args[0], helpCard)
+    if (args.length === 0) return getCommands(helpCard)
+    else return getCommandsHelp(args[0], helpCard)
   }
 }

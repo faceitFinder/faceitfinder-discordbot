@@ -6,12 +6,24 @@ const findSteamUIds = (str) => {
   const res = []
 
   while ((m = regex.exec(str)) !== null) {
-    if (m.index === regex.lastIndex)
-      regex.lastIndex++
+    if (m.index === regex.lastIndex) regex.lastIndex++
 
     const binaryId = `${decToBin(m[1], 8)}${staticBin}${decToBin(m[3], 32)}${m[2]}`
     res.push(binToDec(binaryId).toString())
   }
+  return res
+}
+
+const findUserMentions = (str) => {
+  const regex = /<@!?([0-9]*)>/gi
+  const res = []
+
+  while ((m = regex.exec(str)) !== null) {
+    if (m.index === regex.lastIndex) regex.lastIndex++
+
+    res.push(m[1])
+  }
+
   return res
 }
 
@@ -28,9 +40,9 @@ const binToDec = (num) => {
 
 const decToBin = (num, len) => {
   if (!num) return num
-  
+
   const bin = []
-  
+
   while (num > 0) {
     let rem = num % 2
     bin.push(rem)
@@ -45,4 +57,5 @@ const decToBin = (num, len) => {
 
 module.exports = {
   findSteamUIds,
+  findUserMentions,
 }

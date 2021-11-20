@@ -127,7 +127,7 @@ const getColors = (prev, current, ctx, coordinatesStart, coordinatesEnd) => {
   return gradient
 }
 
-const getElo = async (maxMatch, matchHistory, playerElo, checkElo = 1) => {
+const getElo = async (maxMatch, matchHistory, playerElo, checkElo = true) => {
   const currentElo = { elo: playerElo }
 
   if (matchHistory.length > 0 && checkElo) {

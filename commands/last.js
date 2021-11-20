@@ -1,12 +1,10 @@
 const { color, emojis } = require('../config.json')
 const Discord = require('discord.js')
-const Canvas = require('canvas')
 const fs = require('fs')
 const Match = require('../functions/match')
 const Steam = require('../functions/steam')
 const Player = require('../functions/player')
 const Graph = require('../functions/graph')
-const RegexFun = require('../functions/regex')
 const errorCard = require('../templates/errorCard')
 const { getCardsConditions } = require('../functions/commands')
 
@@ -92,46 +90,29 @@ module.exports = {
   aliasses: ['last', 'l', 'lst'],
   options: [
     {
-      name: 'user_steam_id',
-      description: 'Steam id of a user.',
-      required: false,
-      type: 3
+      name: 'steam_parameters',
+      description: 'steamIDs / steam custom IDs / url of one or more steam profiles / CSGO status.',
+      required: true,
+      type: 3,
     },
     {
-      name: 'user_custom_steam_id',
-      description: 'Custom steam id of a user.',
-      required: false,
-      type: 3
-    },
-    {
-      name: 'steam_profile_link',
-      description: 'Url of a steam profile.',
-      required: false,
-      type: 3
-    },
-    {
-      name: 'csgo_status',
-      description: 'The result of the "status" command in CS:GO that contains the user part.',
-      required: false,
-      type: 3
-    },
-    {
-      name: 'user_mention',
-      description: 'Mention a user that has linked his profile to the bot.',
+      name: 'user_mentions',
+      description: '@users that has linked their profiles to the bot.',
       required: false,
       type: 6,
+    },
+    {
+      name: 'parameters',
+      slashDescription: 'steamIDs / steam custom IDs / url of one or more steam profiles / @users / CSGO status.',
+      required: false,
+      type: 3,
       slash: true
     }
   ],
-  description: "Get the stats of last game played by you or the given user(s).",
-  slashDescription: "Get the stats of the last game played by you or the @ user.",
-  usage: 'one of the options',
+  description: "Get the stats of last game.",
+  usage: 'multiple steam params and @user or CSGO status, max 10 users',
   type: 'stats',
   async execute(message, args) {
-    const steamIds = RegexFun.findSteamUIds(message.content)
-    const params = []
-    await args.forEach(async e => { params.push(e.split('/').filter(e => e).pop()) })
-
-    return await getCardsConditions(message.mentions.users, steamIds, params, message, sendCardWithInfos)
+    return await getCardsConditions(message, args, sendCardWithInfos)
   }
 }

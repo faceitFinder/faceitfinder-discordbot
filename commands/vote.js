@@ -9,7 +9,7 @@ module.exports = {
   usage: '',
   type: 'system',
   async execute(message, args) {
-    return await {
+    return {
       embeds: [
         new Discord.MessageEmbed()
           .setColor(color.primary)
