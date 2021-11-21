@@ -28,15 +28,13 @@ const sendCardWithInfos = async (message, steamParam, matchId = null) => {
 
     const lastMatchs = await Match.getMatchElo(playerId, 6)
     const { lastMatch, lastMatchIndex } = lastMatchs.map((e, k) => {
-      if (e.matchId === matchId) return { e, k }
-    }).at(0)
-    const lastMatchsElo = Graph.getElo(6, lastMatchs, faceitElo)
+      if (e.matchId === matchId) return { lastMatch: e, lastMatchIndex: k }
+    }).filter(e => e !== undefined).at(0)
 
+    const lastMatchsElo = Graph.getElo(6, lastMatchs, faceitElo)
     const rankImageCanvas = await Graph.getRankImage(faceitLevel, faceitElo, size)
 
-    console.log(lastMatch)
-
-    let eloDiff = faceitElo - lastMatch?.elo || 0
+    let eloDiff = lastMatchsElo.at(lastMatchIndex) - lastMatchsElo.at(lastMatchIndex + 1) || 0
     eloDiff = isNaN(eloDiff) ? '0' : eloDiff > 0 ? `+${eloDiff}` : eloDiff.toString()
     const cards = []
 
