@@ -14,27 +14,18 @@ const sendCardWithInfos = async (message, steamParam) => {
 
     const options = []
 
-<<<<<<< HEAD
     playerStats.segments.forEach(e => {
       const label = `${e.label} ${e.mode}`
       const option = {
-=======
-    playerStats.segments.forEach(e => options.push({
-      label: `${e.label} ${e.mode}`,
-      value: JSON.stringify({
->>>>>>> d15321ff95a6c7ce94e8b28487fdb306acf76487
         m: e.label,
         v: e.mode,
         s: steamId,
         u: message.author.id
-<<<<<<< HEAD
       }
 
       if (!options.filter(e => e.label === label).length > 0) options.push({
         label: label,
         value: JSON.stringify(option)
-=======
->>>>>>> d15321ff95a6c7ce94e8b28487fdb306acf76487
       })
     })
 
