@@ -50,7 +50,7 @@ const getCardsConditions = async (message, args, fn, maxUser = 10) => {
     )
   })
 
-  return getCards(message, params, fn)
+  return getCards(message, params.slice(0, maxUser), fn)
 }
 
 module.exports = {
