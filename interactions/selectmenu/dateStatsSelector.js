@@ -5,7 +5,7 @@ const Steam = require('../../functions/steam')
 const Graph = require('../../functions/graph')
 const Match = require('../../functions/match')
 
-const generatePlayerStats = async (playerHistory) => {
+const generatePlayerStats = playerHistory => {
   const playerStats = {
     wins: 0,
     games: 0,
@@ -46,14 +46,14 @@ module.exports = {
     const size = 40
 
     const playerHistory = await Match.getMatchElo(playerId, m)
-    const playerStats = await generatePlayerStats(playerHistory.filter(e => e.date >= f && e.date < t))
+    const playerStats = generatePlayerStats(playerHistory.filter(e => e.date >= f && e.date < t))
 
     const canvaSize = playerStats.games + 1
     const today = new Date().setHours(24, 0, 0, 0)
 
-    const elo = await Graph.getElo(canvaSize, playerHistory.filter(e => e.date < t), faceitElo,
+    const elo = Graph.getElo(canvaSize, playerHistory.filter(e => e.date < t), faceitElo,
       today >= f && today <= t)
-    const graphCanvas = await Graph.generateCanvas(elo)
+    const graphCanvas = Graph.generateCanvas(elo)
     const eloDiff = elo.at(-1) - elo.shift()
 
     const rankImageCanvas = await Graph.getRankImage(faceitLevel, faceitElo, size)

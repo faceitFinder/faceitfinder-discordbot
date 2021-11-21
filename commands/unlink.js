@@ -7,7 +7,7 @@ const sendCardWithInfos = async (message) => {
   try {
     const discordId = message.author.id
     if (await User.exists(discordId)) {
-      await User.remove(discordId)
+      User.remove(discordId)
 
       return {
         embeds: [
@@ -33,6 +33,6 @@ module.exports = {
   usage: '',
   type: 'utility',
   async execute(message, args) {
-    return await sendCardWithInfos(message)
+    return sendCardWithInfos(message)
   }
 }

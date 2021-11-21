@@ -94,6 +94,6 @@ module.exports = {
   usage: 'multiple steam params and @user or CSGO status, max 10 users',
   type: 'stats',
   async execute(message, args) {
-    return await getCardsConditions(message, args, sendCardWithInfos)
+    return getCardsConditions(message, args, sendCardWithInfos)
   }
 }

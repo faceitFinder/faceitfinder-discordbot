@@ -29,7 +29,7 @@ module.exports = {
           message.content += o.value
         })
         interaction.deferReply().then(async () => {
-          await interaction.client.commands.get(interaction.commandName)?.execute(message, args)
+          interaction.client.commands.get(interaction.commandName)?.execute(message, args)
             .then(resp => {
               if (Array.isArray(resp)) {
                 resp.forEach(r => {

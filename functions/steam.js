@@ -2,7 +2,7 @@ const fetch = require('node-fetch')
 
 require('dotenv').config()
 
-const getId = async (arg) => await fetch(`http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?key=${process.env.STEAM_TOKEN}&vanityurl=${arg}`)
+const getId = (arg) => fetch(`http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?key=${process.env.STEAM_TOKEN}&vanityurl=${arg}`)
   .then(res => {
     if (res.status == 200) return res.json()
     else throw 'An error has occured'
@@ -12,7 +12,7 @@ const getId = async (arg) => await fetch(`http://api.steampowered.com/ISteamUser
     else return arg
   })
 
-const getDatas = async (steamId) => await fetch(`http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=${process.env.STEAM_TOKEN}&steamids=${steamId}`)
+const getDatas = (steamId) => fetch(`http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=${process.env.STEAM_TOKEN}&steamids=${steamId}`)
   .then(res => {
     if (res.status == 200) return res.json()
     else throw 'An error has occured'
