@@ -7,9 +7,12 @@ module.exports = {
       interaction.deferUpdate().then(() => {
         interaction.client.selectMenus.get(interaction.customId)?.execute(interaction)
           .then(resp => {
+            if (!resp) return
             interaction.fetchReply()
-              .then(e => e.removeAttachments())
-              .then(e => e.edit(resp))
+              .then(e => {
+                e.removeAttachments()
+                e.edit(resp)
+              })
               .catch((err) => console.log(err))
           })
       })

@@ -137,7 +137,7 @@ const getElo = (maxMatch, matchHistory, playerElo, checkElo = true) => {
       matchHistory.unshift(currentElo)
   } else if (matchHistory.length === 0) throw 'Couldn\'t get today matches'
 
-  const elo = Array.from(matchHistory, e => e.elo)
+  const elo = matchHistory.map(e => e.elo)
   elo.reverse().forEach((e, i) => {
     if (e === undefined && elo[i - 1] !== undefined) elo[i] = elo[i - 1]
   })

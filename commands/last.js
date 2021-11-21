@@ -8,28 +8,35 @@ const Graph = require('../functions/graph')
 const errorCard = require('../templates/errorCard')
 const { getCardsConditions } = require('../functions/commands')
 
-const sendCardWithInfos = async (message = null, steamParam) => {
+const sendCardWithInfos = async (message, steamParam, matchId = null) => {
   try {
     const steamId = await Steam.getId(steamParam)
     const steamDatas = await Steam.getDatas(steamId)
     const playerId = await Player.getId(steamId)
     const playerDatas = await Player.getDatas(playerId)
-    const playerHistory = await Player.getHistory(playerId)
+    const playerHistory = await Player.getHistory(playerId, 5)
 
     let lastMatchStats
-    if (playerHistory.items.length > 0) lastMatchStats = await Match.getMatchStats(playerHistory.items[0].match_id)
+    matchId = matchId || playerHistory.items[0].match_id
+    if (playerHistory.items.length > 0) lastMatchStats = await Match.getMatchStats(matchId)
     else return errorCard(`Couldn\'t get the last match of ${steamDatas.personaname}`)
-
-    const lastMatchElo = await Match.getMatchElo(playerId, 2)
 
     const faceitElo = playerDatas.games.csgo.faceit_elo
     const faceitLevel = playerDatas.games.csgo.skill_level
     const size = 40
     const filesAtt = []
 
+    const lastMatchs = await Match.getMatchElo(playerId, 6)
+    const { lastMatch, lastMatchIndex } = lastMatchs.map((e, k) => {
+      if (e.matchId === matchId) return { e, k }
+    }).at(0)
+    const lastMatchsElo = Graph.getElo(6, lastMatchs, faceitElo)
+
     const rankImageCanvas = await Graph.getRankImage(faceitLevel, faceitElo, size)
 
-    let eloDiff = faceitElo - lastMatchElo[1]?.elo || 0
+    console.log(lastMatch)
+
+    let eloDiff = faceitElo - lastMatch?.elo || 0
     eloDiff = isNaN(eloDiff) ? '0' : eloDiff > 0 ? `+${eloDiff}` : eloDiff.toString()
     const cards = []
 
@@ -50,7 +57,7 @@ const sendCardWithInfos = async (message = null, steamParam) => {
         filesAtt.push(new Discord.MessageAttachment(rankImageCanvas.toBuffer(), `${faceitLevel}.png`))
 
         card.setAuthor(playerDatas.nickname, playerDatas.avatar, `https://www.faceit.com/fr/players/${playerDatas.nickname}`)
-          .setDescription(`[Steam](${steamDatas.profileurl}), [Game Lobby](https://www.faceit.com/fr/csgo/room/${playerHistory.items[0].match_id}/scoreboard)`)
+          .setDescription(`[Steam](${steamDatas.profileurl}), [Game Lobby](https://www.faceit.com/fr/csgo/room/${lastMatch.matchId}/scoreboard)`)
           .addFields({ name: 'Score', value: r.round_stats.Score.toString(), inline: true },
             { name: 'Map', value: r.round_stats.Map, inline: true },
             { name: 'Status', value: parseInt(playerStats.Result) ? emojis.won.balise : emojis.lost.balise, inline: true },
@@ -61,7 +68,7 @@ const sendCardWithInfos = async (message = null, steamParam) => {
             { name: 'Deaths', value: playerStats.Deaths, inline: true },
             { name: 'Assists', value: playerStats.Assists, inline: true },
             { name: 'Elo', value: eloDiff.toString(), inline: true },
-            { name: 'Date', value: new Date(lastMatchElo[0].date).toDateString(), inline: true })
+            { name: 'Date', value: new Date(lastMatch.date).toDateString(), inline: true })
           .setThumbnail(`attachment://${faceitLevel}.png`)
           .setImage(`attachment://${r.round_stats.Map}.jpg`)
           .setColor(parseInt(playerStats.Result) ? color.won : color.lost)
@@ -76,7 +83,23 @@ const sendCardWithInfos = async (message = null, steamParam) => {
 
     return {
       embeds: cards,
-      files: filesAtt
+      files: filesAtt,
+      components: [new Discord.MessageActionRow()
+        .addComponents(
+          new Discord.MessageSelectMenu()
+            .setCustomId('lastSelector')
+            .setPlaceholder('No match selected')
+            .addOptions(playerHistory.items.map(e => {
+              return {
+                label: new Date(e.finished_at * 1000).toDateString(),
+                value: JSON.stringify({
+                  u: message.author.id,
+                  m: e.match_id,
+                  s: steamId
+                })
+              }
+            })),
+        )]
     }
 
   } catch (error) {
@@ -114,5 +137,7 @@ module.exports = {
   type: 'stats',
   async execute(message, args) {
     return getCardsConditions(message, args, sendCardWithInfos)
-  }
+  },
 }
+
+module.exports.sendCardWithInfos = sendCardWithInfos
