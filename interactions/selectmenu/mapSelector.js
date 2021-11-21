@@ -10,7 +10,11 @@ module.exports = {
   async execute(interaction) {
     const values = JSON.parse(interaction.values)
     if (values.u !== interaction.user.id) return false
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> d15321ff95a6c7ce94e8b28487fdb306acf76487
     const steamDatas = await Steam.getDatas(values.s)
     const playerId = await Player.getId(values.s)
     const playerStats = await Player.getStats(playerId)
