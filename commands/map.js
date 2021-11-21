@@ -14,15 +14,20 @@ const sendCardWithInfos = async (message, steamParam) => {
 
     const options = []
 
-    playerStats.segments.forEach(e => options.push({
-      label: `${e.label} ${e.mode}`,
-      value: JSON.stringify({
+    playerStats.segments.forEach(e => {
+      const label = `${e.label} ${e.mode}`
+      const option = {
         m: e.label,
         v: e.mode,
         s: steamId,
         u: message.author.id
+      }
+
+      if (!options.filter(e => e.label === label).length > 0) options.push({
+        label: label,
+        value: JSON.stringify(option)
       })
-    }))
+    })
 
     const row = new Discord.MessageActionRow()
       .addComponents(
