@@ -10,7 +10,6 @@ module.exports = {
   async execute(interaction) {
     const values = JSON.parse(interaction.values)
     if (values.u !== interaction.user.id) return false
-    
     const steamDatas = await Steam.getDatas(values.s)
     const playerId = await Player.getId(values.s)
     const playerStats = await Player.getStats(playerId)
@@ -24,37 +23,32 @@ module.exports = {
     filesAtt.push(new Discord.MessageAttachment(rankImageCanvas.toBuffer(), 'level.png'))
 
     const mapThumbnail = `./images/maps/${values.m}.jpg`
-    const mapStats = playerStats.segments.filter(e => e.label === values.m && e.mode == values.v)[0]
 
-    const card = new Discord.MessageEmbed()
-      .setAuthor(playerDatas.nickname, playerDatas.avatar, `https://www.faceit.com/fr/players/${playerDatas.nickname}`)
-      .setTitle('Steam')
-      .setURL(steamDatas.profileurl)
-      .setThumbnail('attachment://level.png')
-      .addFields({ name: 'Games', value: `${mapStats.stats.Matches} (${mapStats.stats['Win Rate %']}% Win)`, inline: true },
-        { name: 'Map', value: values.m, inline: true },
-        { name: 'Mode', value: values.v, inline: true },
-        { name: 'Average K/D', value: mapStats.stats['Average K/D Ratio'], inline: true },
-        { name: 'Average HS', value: `${mapStats.stats['Average Headshots %']}%`, inline: true },
-        { name: 'Average MVPs', value: mapStats.stats['Average MVPs'], inline: true },
-        { name: 'Average Kills', value: mapStats.stats['Average Kills'], inline: true },
-        { name: 'Average Deaths', value: mapStats.stats['Average Deaths'], inline: true },
-        { name: 'Average Assists', value: mapStats.stats['Average Assists'], inline: true })
-      .setColor(color.levels[faceitLevel].color)
-      .setFooter(`Steam: ${steamDatas.personaname}`)
+    const cards = playerStats.segments.filter(e => e.label === values.m && e.mode == values.v).map(m => {
+      if (fs.existsSync(mapThumbnail)) filesAtt.push(new Discord.MessageAttachment(mapThumbnail, `${values.m}.jpg`))
 
-    if (fs.existsSync(mapThumbnail)) {
-      filesAtt.push(new Discord.MessageAttachment(mapThumbnail, `${values.m}.jpg`))
-      card.setImage(`attachment://${values.m}.jpg`)
-    }
-
-    await interaction.fetchReply().then(e => {
-      e.removeAttachments()
-      e.edit({
-        embeds: [card],
-        files: filesAtt,
-        content: null
-      })
+      return new Discord.MessageEmbed()
+        .setAuthor(playerDatas.nickname, playerDatas.avatar, `https://www.faceit.com/fr/players/${playerDatas.nickname}`)
+        .setDescription(`[Steam](${steamDatas.profileurl})`)
+        .setThumbnail('attachment://level.png')
+        .addFields({ name: 'Games', value: `${m.stats.Matches} (${m.stats['Win Rate %']}% Win)`, inline: true },
+          { name: 'Map', value: values.m, inline: true },
+          { name: 'Mode', value: values.v, inline: true },
+          { name: 'Average K/D', value: m.stats['Average K/D Ratio'], inline: true },
+          { name: 'Average HS', value: `${m.stats['Average Headshots %']}%`, inline: true },
+          { name: 'Average MVPs', value: m.stats['Average MVPs'], inline: true },
+          { name: 'Average Kills', value: m.stats['Average Kills'], inline: true },
+          { name: 'Average Deaths', value: m.stats['Average Deaths'], inline: true },
+          { name: 'Average Assists', value: m.stats['Average Assists'], inline: true })
+        .setColor(color.levels[faceitLevel].color)
+        .setFooter(`Steam: ${steamDatas.personaname}`)
+        .setImage(`attachment://${values.m}.jpg`)
     })
+
+    return {
+      embeds: cards,
+      files: filesAtt,
+      content: null
+    }
   }
 }

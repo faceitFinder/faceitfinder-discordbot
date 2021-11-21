@@ -91,7 +91,6 @@ module.exports = {
         new Discord.MessageAttachment(graphCanvas.toBuffer(), `${s}graph.png`),
         new Discord.MessageAttachment(rankImageCanvas.toBuffer(), `${faceitLevel}level.png`)
       ],
-      components: [],
       content: null,
     }
   }
