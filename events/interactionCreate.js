@@ -4,9 +4,14 @@ module.exports = {
   name: 'interactionCreate',
   async execute(interaction) {
     if (interaction.isSelectMenu()) {
-      interaction.deferUpdate().then(async () => {
-        await interaction.client.selectMenus.get(interaction.customId)?.execute(interaction)
-          .then(resp => interaction.editReply(resp).catch((err) => console.log(err)))
+      interaction.deferUpdate().then(() => {
+        interaction.client.selectMenus.get(interaction.customId)?.execute(interaction)
+          .then(resp => {
+            interaction.fetchReply()
+              .then(e => e.removeAttachments())
+              .then(e => e.edit(resp))
+              .catch((err) => console.log(err))
+          })
       })
     } if (interaction.client.commands.has(interaction.commandName)) {
       if (interaction.client.antispam.isIgnored(interaction.user.id, interaction.createdAt, interaction.channel)) return
