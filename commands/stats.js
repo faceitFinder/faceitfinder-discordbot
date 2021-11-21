@@ -17,7 +17,7 @@ const sendCardWithInfos = async (message, steamParam) => {
     const playerStats = await Player.getStats(playerId)
     const playerHistory = await Match.getMatchElo(playerId, 20)
     const faceitElo = playerDatas.games.csgo.faceit_elo
-    const graphCanvas = await Graph.generateCanvas(null, playerHistory, faceitElo)
+    const graphCanvas = Graph.generateCanvas(null, playerHistory, faceitElo)
 
     const playerCountry = playerDatas.country
     const playerRegion = playerDatas.games.csgo.region
@@ -86,6 +86,6 @@ module.exports = {
   usage: 'multiple steam params and @user or CSGO status, max 10 users',
   type: 'stats',
   async execute(message, args) {
-    return await getCardsConditions(message, args, sendCardWithInfos)
+    return getCardsConditions(message, args, sendCardWithInfos)
   }
 }

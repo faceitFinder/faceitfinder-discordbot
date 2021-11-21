@@ -13,14 +13,16 @@ module.exports = {
 
       if (!message.client.commands.has(command))
         message.channel.send(errorCard('Command not found')).catch((err) => console.log(err))
-      else try {
-        const msg = await message.client.commands.get(command).execute(message, args)
-        if (msg.length !== undefined) msg.forEach(m => message.channel.send(m).catch((err) => console.log(err)))
-        else message.channel.send(msg).catch((err) => console.log(err))
-      } catch (error) {
-        console.log(error)
-        message.channel.send(errorCard('An error has occured')).catch((err) => console.log(err))
-      }
+      else
+        message.client.commands.get(command).execute(message, args)
+          .then(resp => {
+            if (Array.isArray(resp)) resp.forEach(m => message.channel.send(m).catch((err) => console.log(err)))
+            else message.channel.send(resp).catch((err) => console.log(err))
+          })
+          .catch(err => {
+            console.log(err)
+            message.channel.send(errorCard('An error has occured')).catch((err) => console.log(err))
+          })
     }
   }
 }

@@ -13,7 +13,7 @@ const sendCardWithInfos = async (message, steamParam) => {
     const playerDatas = await Player.getDatas(playerId)
     const discordId = message.author.id
 
-    await User.exists(discordId) ? await User.update(discordId, steamId) : User.create(discordId, steamId)
+    await User.exists(discordId) ? User.update(discordId, steamId) : User.create(discordId, steamId)
 
     return {
       embeds: [
@@ -57,7 +57,7 @@ module.exports = {
   usage: 'steam parameter or @user, max 1 user',
   type: 'utility',
   async execute(message, args) {
-    if (args?.length > 0) return await getCardsConditions(message, args, sendCardWithInfos, 1)
+    if (args?.length > 0) return getCardsConditions(message, args, sendCardWithInfos, 1)
     else return errorCard(`A parameter is missing, do \`.ffhelp link\` to see how the command works.`)
   }
 }

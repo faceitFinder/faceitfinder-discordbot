@@ -4,12 +4,12 @@ const errorCard = require('../templates/errorCard')
 const RegexFun = require('../functions/regex')
 
 const getCards = async (message, array, fn) => {
-  return await Promise.all(array.map(async obj => {
+  return Promise.all(array.map(async obj => {
     if (obj.discord) {
       const user = await User.exists(obj.param)
-      if (user) return await fn(message, user.steamId)
+      if (user) return fn(message, user.steamId)
       else return errorCard('This user hasn\'t linked his profile')
-    } else return await fn(message, obj.param)
+    } else return fn(message, obj.param)
   })).then(msgs => msgs.map(msg => {
     const data = {
       embeds: msg.embeds || [],
@@ -50,7 +50,7 @@ const getCardsConditions = async (message, args, fn, maxUser = 10) => {
     )
   })
 
-  return getCards(message, params, fn)
+  return getCards(message, params.slice(0, maxUser), fn)
 }
 
 module.exports = {

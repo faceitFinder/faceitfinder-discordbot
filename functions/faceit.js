@@ -6,7 +6,7 @@ const headerFaceit = {
   Authorization: `Bearer ${process.env.FACEIT_TOKEN}`
 }
 
-const fetchData = async (url, error) => await fetch(url, {
+const fetchData = async (url, error) => fetch(url, {
   method: 'GET',
   headers: headerFaceit
 })

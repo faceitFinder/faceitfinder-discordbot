@@ -2,9 +2,9 @@ const { color } = require('../config.json')
 const path = require('path')
 const Canvas = require('canvas')
 
-const generateCanvas = async (elo = null, matchHistory, playerElo, maxMatch = 20) => {
+const generateCanvas = (elo = null, matchHistory, playerElo, maxMatch = 20) => {
   if (elo === null)
-    try { elo = await getElo(maxMatch, matchHistory, playerElo) }
+    try { elo = getElo(maxMatch, matchHistory, playerElo) }
     catch (error) { throw error }
   if (elo.length === 0) throw 'No match found on this date'
 
@@ -127,7 +127,7 @@ const getColors = (prev, current, ctx, coordinatesStart, coordinatesEnd) => {
   return gradient
 }
 
-const getElo = async (maxMatch, matchHistory, playerElo, checkElo = true) => {
+const getElo = (maxMatch, matchHistory, playerElo, checkElo = true) => {
   const currentElo = { elo: playerElo }
 
   if (matchHistory.length > 0 && checkElo) {

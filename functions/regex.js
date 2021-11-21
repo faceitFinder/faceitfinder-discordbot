@@ -15,7 +15,7 @@ const findSteamUIds = (str) => {
 }
 
 const findUserMentions = (str) => {
-  const regex = /<@!?([0-9]*)>/gi
+  const regex = /<@!?(\d{17,19})>/gi
   const res = []
 
   while ((m = regex.exec(str)) !== null) {
