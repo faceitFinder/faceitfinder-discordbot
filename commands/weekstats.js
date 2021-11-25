@@ -48,7 +48,7 @@ const sendCardWithInfos = async (message, steamParam) => {
       } else return false
     })
 
-    if (options.length === 0) return errorCard(`Couldn\'t get today matches of ${playerDatas.nickname}`)
+    if (options.length === 0) return errorCard(`Couldn\'t get matchs of ${playerDatas.nickname}`)
     const row = new Discord.MessageActionRow()
       .addComponents(
         new Discord.MessageSelectMenu()
