@@ -6,7 +6,7 @@ const getMatchElo = (playerId, limit = 20) => fetch(`https://api.faceit.com/stat
 })
   .then(res => {
     if (res.status == 200) return res.json()
-    else throw 'Couldn\'t get last matches'
+    else throw 'Couldn\'t get last matchs'
   })
   .then(data => data)
 
