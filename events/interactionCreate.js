@@ -1,22 +1,30 @@
 const Discord = require('discord.js')
 
+const editInteraction = (interaction, resp) => {
+  if (!resp) return
+  interaction.fetchReply()
+    .then(e => {
+      e.removeAttachments()
+      e.edit(resp)
+    })
+    .catch((err) => console.log(err))
+}
+
 module.exports = {
   name: 'interactionCreate',
   async execute(interaction) {
     if (interaction.isSelectMenu()) {
       interaction.deferUpdate().then(() => {
-        interaction.client.selectMenus.get(interaction.customId)?.execute(interaction)
-          .then(resp => {
-            if (!resp) return
-            interaction.fetchReply()
-              .then(e => {
-                e.removeAttachments()
-                e.edit(resp)
-              })
-              .catch((err) => console.log(err))
-          })
+        interaction.client.selectmenus.get(interaction.customId)?.execute(interaction)
+          .then(e => editInteraction(interaction, e))
       })
-    } if (interaction.client.commands.has(interaction.commandName)) {
+    } else if (interaction.isButton()) {
+      interaction.deferUpdate().then(() => {
+        const { id, s } = JSON.parse(interaction.customId)
+        interaction.client.buttons.get(id)?.execute(interaction, s, id)
+          .then(e => editInteraction(interaction, e))
+      })
+    } else if (interaction.client.commands.has(interaction.commandName)) {
       if (interaction.client.antispam.isIgnored(interaction.user.id, interaction.createdAt, interaction.channel)) return
       else {
         const message = {

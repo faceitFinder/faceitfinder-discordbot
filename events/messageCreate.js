@@ -12,16 +12,16 @@ module.exports = {
       const command = args.shift().toLowerCase()
 
       if (!message.client.commands.has(command))
-        message.channel.send(errorCard('Command not found')).catch((err) => console.log(err))
+        message.reply(errorCard('Command not found')).catch((err) => console.log(err))
       else
         message.client.commands.get(command).execute(message, args)
           .then(resp => {
-            if (Array.isArray(resp)) resp.forEach(m => message.channel.send(m).catch((err) => console.log(err)))
-            else message.channel.send(resp).catch((err) => console.log(err))
+            if (Array.isArray(resp)) resp.forEach(m => message.reply(m).catch((err) => console.log(err)))
+            else message.reply(resp).catch((err) => console.log(err))
           })
           .catch(err => {
             console.log(err)
-            message.channel.send(errorCard('An error has occured')).catch((err) => console.log(err))
+            message.reply(errorCard('An error has occured')).catch((err) => console.log(err))
           })
     }
   }

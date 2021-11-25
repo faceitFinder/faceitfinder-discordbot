@@ -8,7 +8,7 @@ const Ladder = require('../functions/ladder')
 const errorCard = require('../templates/errorCard')
 const { getCardsConditions } = require('../functions/commands')
 
-const sendCardWithInfos = async (message, steamParam) => {
+const sendCardWithInfos = async (message, steamParam, customId = 'elo') => {
   try {
     const steamId = await Steam.getId(steamParam)
     const steamDatas = await Steam.getDatas(steamId)
@@ -17,7 +17,9 @@ const sendCardWithInfos = async (message, steamParam) => {
     const playerStats = await Player.getStats(playerId)
     const playerHistory = await Match.getMatchElo(playerId, 20)
     const faceitElo = playerDatas.games.csgo.faceit_elo
-    const graphCanvas = Graph.generateCanvas(null, playerHistory, faceitElo)
+
+    const graphCanvas = Graph.generateCanvas(customId === 'elo' ?
+      Graph.getElo(20, playerHistory, faceitElo) : Graph.getKD(playerHistory, 20), null, null, 20, 10)
 
     const playerCountry = playerDatas.country
     const playerRegion = playerDatas.games.csgo.region
@@ -41,15 +43,28 @@ const sendCardWithInfos = async (message, steamParam) => {
         { name: 'Elo', value: faceitElo.toString(), inline: true },
         { name: `:flag_${playerCountry.toLowerCase()}:`, value: ladderCountry.position.toString(), inline: true },
         { name: `:flag_${playerRegion.toLowerCase()}:`, value: ladderRegion.position.toString(), inline: true })
-      .setImage(`attachment://${steamId}graph.png`)
+      .setImage(`attachment://graph.png`)
       .setColor(color.levels[faceitLevel].color)
       .setFooter(`Steam: ${steamDatas.personaname}`)
 
     return {
       embeds: [card],
       files: [
-        new Discord.MessageAttachment(graphCanvas.toBuffer(), `${steamId}graph.png`),
+        new Discord.MessageAttachment(graphCanvas.toBuffer(), `graph.png`),
         new Discord.MessageAttachment(rankImageCanvas.toBuffer(), `${faceitLevel}level.png`)
+      ],
+      components: [
+        new Discord.MessageActionRow()
+          .addComponents(
+            new Discord.MessageButton()
+              .setCustomId(JSON.stringify({
+                id: 'updateStatsGraph',
+                s: steamId
+              }))
+              .setLabel('K/D')
+              .setEmoji('📈')
+              .setStyle('SECONDARY'),
+          )
       ]
     }
   } catch (error) {
@@ -89,3 +104,5 @@ module.exports = {
     return getCardsConditions(message, args, sendCardWithInfos)
   }
 }
+
+module.exports.sendCardWithInfos = sendCardWithInfos

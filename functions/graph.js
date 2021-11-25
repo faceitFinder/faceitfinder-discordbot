@@ -2,17 +2,17 @@ const { color } = require('../config.json')
 const path = require('path')
 const Canvas = require('canvas')
 
-const generateCanvas = (elo = null, matchHistory, playerElo, maxMatch = 20) => {
-  if (elo === null)
-    try { elo = getElo(maxMatch, matchHistory, playerElo) }
+const generateCanvas = (array = null, matchHistory, playerElo, maxMatch = 20, gap = 10) => {
+  if (array === null)
+    try { array = getElo(maxMatch, matchHistory, playerElo) }
     catch (error) { throw error }
-  if (elo.length === 0) throw 'No match found on this date'
+  if (array.length === 0) throw 'No match found on this date'
 
-  elo.reverse()
+  array.reverse()
 
   const padding = 100
-  const width = padding * (elo.length + 1)
-  const height = Math.max(...elo) - Math.min(...elo) + padding * 2
+  const width = padding * (array.length + 1)
+  const height = Math.max(...array) - Math.min(...array) + padding * 2
 
   const canvas = Canvas.createCanvas(width, height)
   const ctx = canvas.getContext('2d')
@@ -33,7 +33,7 @@ const generateCanvas = (elo = null, matchHistory, playerElo, maxMatch = 20) => {
   /**
    * Grid
    */
-  for (let i = 0; i < elo.length + 1; i++) {
+  for (let i = 0; i < array.length + 1; i++) {
     ctx.beginPath()
     ctx.moveTo(padding * i, 0)
     ctx.lineTo(padding * i, height)
@@ -45,10 +45,10 @@ const generateCanvas = (elo = null, matchHistory, playerElo, maxMatch = 20) => {
   /**
    * Elo bar
    */
-  elo.forEach((current, i) => {
-    const prev = elo[i - 1] === undefined ? current : elo[i - 1]
-    const coordinatesStart = { x: padding * i, y: Math.max(...elo) - elo[i - 1] + padding }
-    const coordinatesEnd = { x: padding * (i + 1), y: Math.max(...elo) - current + padding }
+  array.forEach((current, i) => {
+    const prev = array[i - 1] === undefined ? current : array[i - 1]
+    const coordinatesStart = { x: padding * i, y: Math.max(...array) - array[i - 1] + padding }
+    const coordinatesEnd = { x: padding * (i + 1), y: Math.max(...array) - current + padding }
     const [level, values] = Object.entries(color.levels).filter(fc => current >= fc[1].min && current <= fc[1].max)[0]
 
     ctx.font = '30px sans-serif'
@@ -58,7 +58,7 @@ const generateCanvas = (elo = null, matchHistory, playerElo, maxMatch = 20) => {
 
     ctx.beginPath()
     ctx.moveTo(coordinatesStart.x, coordinatesStart.y)
-    ctx.lineTo(coordinatesEnd.x, coordinatesEnd.y)
+    ctx.lineTo(coordinatesEnd.x, coordinatesEnd.y )
     ctx.stroke()
 
     ctx.fillText(current, padding * i + padding / 1.5, height)
@@ -135,7 +135,7 @@ const getElo = (maxMatch, matchHistory, playerElo, checkElo = true) => {
       matchHistory[0] = currentElo
     else if (matchHistory[0].elo != playerElo)
       matchHistory.unshift(currentElo)
-  } else if (matchHistory.length === 0) throw 'Couldn\'t get today matches'
+  } else if (matchHistory.length === 0) throw 'Couldn\'t get matchs'
 
   const elo = matchHistory.map(e => e.elo)
   elo.reverse().forEach((e, i) => {
@@ -145,8 +145,14 @@ const getElo = (maxMatch, matchHistory, playerElo, checkElo = true) => {
   return elo.filter(e => e !== undefined).reverse().slice(0, maxMatch)
 }
 
+const getKD = (matchHistory, maxMatch = 20) => {
+  if (matchHistory.length === 0) throw 'Couldn\'t get matchs'
+  return matchHistory.map(e => e.c2).reverse().slice(0, maxMatch)
+}
+
 module.exports = {
   generateCanvas,
   getRankImage,
   getElo,
+  getKD
 }
