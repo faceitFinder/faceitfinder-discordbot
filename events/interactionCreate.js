@@ -1,4 +1,4 @@
-const Discord = require('discord.js')
+const { buildMessageFromInteraction } = require('../functions/commands')
 
 const editInteraction = (interaction, resp) => {
   if (!resp) return
@@ -20,25 +20,14 @@ module.exports = {
       })
     } else if (interaction.isButton()) {
       interaction.deferUpdate().then(() => {
-        const { id, s } = JSON.parse(interaction.customId)
-        interaction.client.buttons.get(id)?.execute(interaction, s, id)
+        const json = JSON.parse(interaction.customId)
+        interaction.client.buttons.get(json.id)?.execute(interaction, json)
           .then(e => editInteraction(interaction, e))
       })
     } else if (interaction.client.commands.has(interaction.commandName)) {
       if (interaction.client.antispam.isIgnored(interaction.user.id, interaction.createdAt, interaction.channel)) return
       else {
-        const message = {
-          author: interaction.user,
-          mentions: {
-            users: new Discord.Collection()
-          },
-          content: ''
-        }
-        const args = []
-        interaction.options['_hoistedOptions'].filter(o => o.type === 'STRING').forEach(o => {
-          o.value.split(' ').forEach(e => { if (e !== '') args.push(e) })
-          message.content += o.value
-        })
+        const { message, args } = buildMessageFromInteraction(interaction)
         interaction.deferReply().then(async () => {
           interaction.client.commands.get(interaction.commandName)?.execute(message, args)
             .then(resp => {

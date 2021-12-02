@@ -2,7 +2,7 @@ const { color } = require('../config.json')
 const path = require('path')
 const Canvas = require('canvas')
 
-const generateCanvas = (array = null, matchHistory, playerElo, maxMatch = 20, gap = 10) => {
+const generateCanvas = (array = null, matchHistory, playerElo, maxMatch = 20, gap = 1, fixed = 0) => {
   if (array === null)
     try { array = getElo(maxMatch, matchHistory, playerElo) }
     catch (error) { throw error }
@@ -16,7 +16,6 @@ const generateCanvas = (array = null, matchHistory, playerElo, maxMatch = 20, ga
 
   const canvas = Canvas.createCanvas(width, height)
   const ctx = canvas.getContext('2d')
-
   /**
    * Background
    */
@@ -47,8 +46,8 @@ const generateCanvas = (array = null, matchHistory, playerElo, maxMatch = 20, ga
    */
   array.forEach((current, i) => {
     const prev = array[i - 1] === undefined ? current : array[i - 1]
-    const coordinatesStart = { x: padding * i, y: Math.max(...array) - array[i - 1] + padding }
-    const coordinatesEnd = { x: padding * (i + 1), y: Math.max(...array) - current + padding }
+    const coordinatesStart = { x: padding * i, y: (Math.max(...array) - array[i - 1] + padding) }
+    const coordinatesEnd = { x: padding * (i + 1), y: (Math.max(...array) - current + padding) }
     const [level, values] = Object.entries(color.levels).filter(fc => current >= fc[1].min && current <= fc[1].max)[0]
 
     ctx.font = '30px sans-serif'
@@ -58,10 +57,10 @@ const generateCanvas = (array = null, matchHistory, playerElo, maxMatch = 20, ga
 
     ctx.beginPath()
     ctx.moveTo(coordinatesStart.x, coordinatesStart.y)
-    ctx.lineTo(coordinatesEnd.x, coordinatesEnd.y )
+    ctx.lineTo(coordinatesEnd.x, coordinatesEnd.y)
     ctx.stroke()
 
-    ctx.fillText(current, padding * i + padding / 1.5, height)
+    ctx.fillText(parseFloat(current / gap).toFixed(fixed), padding * i + padding / 1.5, height)
   })
 
   return canvas
@@ -145,9 +144,9 @@ const getElo = (maxMatch, matchHistory, playerElo, checkElo = true) => {
   return elo.filter(e => e !== undefined).reverse().slice(0, maxMatch)
 }
 
-const getKD = (matchHistory, maxMatch = 20) => {
+const getKD = (matchHistory, maxMatch = 20, gap = 1) => {
   if (matchHistory.length === 0) throw 'Couldn\'t get matchs'
-  return matchHistory.map(e => e.c2).reverse().slice(0, maxMatch)
+  return matchHistory.map(e => parseFloat(e.c2).toFixed(2) * gap).reverse().slice(0, maxMatch)
 }
 
 module.exports = {

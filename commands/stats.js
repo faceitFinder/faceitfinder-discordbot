@@ -6,9 +6,29 @@ const Graph = require('../functions/graph')
 const Match = require('../functions/match')
 const Ladder = require('../functions/ladder')
 const errorCard = require('../templates/errorCard')
+const CustomType = require('../templates/customType')
 const { getCardsConditions } = require('../functions/commands')
 
-const sendCardWithInfos = async (message, steamParam, customId = 'elo') => {
+const getGraph = (type, playerHistory, faceitElo, gap = 100) => {
+  if (type === CustomType.ELO) return Graph.getElo(20, playerHistory, faceitElo)
+  else if (type === CustomType.KD) return Graph.getKD(playerHistory, 20, gap)
+}
+
+const generateButtons = (steamId, author, type, emoji, disabled) => {
+  return new Discord.MessageButton()
+    .setCustomId(JSON.stringify({
+      id: 'updateStatsGraph',
+      s: steamId,
+      u: author,
+      t: type
+    }))
+    .setLabel(type)
+    .setEmoji(emoji)
+    .setStyle('SECONDARY')
+    .setDisabled(disabled)
+}
+
+const sendCardWithInfos = async (message, steamParam, type = CustomType.ELO) => {
   try {
     const steamId = await Steam.getId(steamParam)
     const steamDatas = await Steam.getDatas(steamId)
@@ -18,8 +38,8 @@ const sendCardWithInfos = async (message, steamParam, customId = 'elo') => {
     const playerHistory = await Match.getMatchElo(playerId, 20)
     const faceitElo = playerDatas.games.csgo.faceit_elo
 
-    const graphCanvas = Graph.generateCanvas(customId === 'elo' ?
-      Graph.getElo(20, playerHistory, faceitElo) : Graph.getKD(playerHistory, 20), null, null, 20, 10)
+    const graphCanvas = Graph.generateCanvas(getGraph(type, playerHistory, faceitElo),
+      null, null, 20, type === CustomType.KD ? 100 : 1, type === CustomType.KD ? 2 : 0)
 
     const playerCountry = playerDatas.country
     const playerRegion = playerDatas.games.csgo.region
@@ -55,21 +75,15 @@ const sendCardWithInfos = async (message, steamParam, customId = 'elo') => {
       ],
       components: [
         new Discord.MessageActionRow()
-          .addComponents(
-            new Discord.MessageButton()
-              .setCustomId(JSON.stringify({
-                id: 'updateStatsGraph',
-                s: steamId
-              }))
-              .setLabel('K/D')
-              .setEmoji('📈')
-              .setStyle('SECONDARY'),
-          )
+          .addComponents([
+            generateButtons(steamId, message.author.id, CustomType.KD, '📈', type === CustomType.KD),
+            generateButtons(steamId, message.author.id, CustomType.ELO, '📉', type === CustomType.ELO)
+          ])
       ]
     }
   } catch (error) {
     console.log(error)
-    return errorCard(error)
+    return errorCard(error.toString())
   }
 }
 
