@@ -15,7 +15,7 @@ Want to contribute? Great!
 
 ### Installation
 
-FaceitFinder require `docker-compose` v3 or latest. 
+FaceitFinder require `docker-compose` v3. 
 
 **Clone the repository:**
 
@@ -24,12 +24,18 @@ git clone git@github.com:JustDams/faceitFinder.git
 cd faceitFinder
 ```
 
-Rename the `.env.example` to `.env` and complete it with yours informations.
+Rename the `.env.example` to `.env` and complete/update it with yours informations.
 
-**Build the dockers:**
+**Run docker on a dev environment:**
 
 ```sh
-docker-compose up -d
+docker-compose -f docker-compose.dev.yml up
+```
+
+**Run docker on a prod environment:**
+
+```sh
+docker-compose -f docker-compose.prod.yml up
 ```
 
 ## License
