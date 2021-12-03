@@ -10,8 +10,8 @@ const CustomType = require('../templates/customType')
 const { getCardsConditions } = require('../functions/commands')
 
 const getGraph = (type, playerHistory, faceitElo) => {
-  if (type === CustomType.ELO) return Graph.getElo(20, playerHistory, faceitElo)
-  else if (type === CustomType.KD) return Graph.getKD(playerHistory, 20, type.g)
+  if (type === CustomType.TYPES.ELO) return Graph.getElo(20, playerHistory, faceitElo)
+  else if (type === CustomType.TYPES.KD) return Graph.getKD(playerHistory, 20, type.g)
 }
 
 const generateButtons = (steamId, author, type, disabled) => {
@@ -28,7 +28,7 @@ const generateButtons = (steamId, author, type, disabled) => {
     .setDisabled(disabled)
 }
 
-const sendCardWithInfos = async (message, steamParam, type = CustomType.ELO) => {
+const sendCardWithInfos = async (message, steamParam, type = CustomType.TYPES.ELO) => {
   try {
     const steamId = await Steam.getId(steamParam)
     const steamDatas = await Steam.getDatas(steamId)
@@ -76,8 +76,8 @@ const sendCardWithInfos = async (message, steamParam, type = CustomType.ELO) => 
       components: [
         new Discord.MessageActionRow()
           .addComponents([
-            generateButtons(steamId, message.author.id, CustomType.KD, type === CustomType.KD),
-            generateButtons(steamId, message.author.id, CustomType.ELO, type === CustomType.ELO)
+            generateButtons(steamId, message.author.id, CustomType.TYPES.KD, type === CustomType.TYPES.KD),
+            generateButtons(steamId, message.author.id, CustomType.TYPES.ELO, type === CustomType.TYPES.ELO)
           ])
       ]
     }

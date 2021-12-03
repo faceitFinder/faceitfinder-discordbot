@@ -3,7 +3,7 @@ const path = require('path')
 const Canvas = require('canvas')
 const CustomType = require('../templates/customType.js')
 
-const generateCanvas = (array = null, matchHistory, playerElo, maxMatch = 20, type = CustomType.ELO) => {
+const generateCanvas = (array = null, matchHistory, playerElo, maxMatch = 20, type = CustomType.TYPES.ELO) => {
   if (array === null)
     try { array = getElo(maxMatch, matchHistory, playerElo) }
     catch (error) { throw error }
@@ -17,6 +17,7 @@ const generateCanvas = (array = null, matchHistory, playerElo, maxMatch = 20, ty
 
   const canvas = Canvas.createCanvas(width, height)
   const ctx = canvas.getContext('2d')
+  
   /**
    * Background
    */
@@ -147,7 +148,7 @@ const getElo = (maxMatch, matchHistory, playerElo, checkElo = true) => {
 
 const getKD = (matchHistory, maxMatch = 20) => {
   if (matchHistory.length === 0) throw 'Couldn\'t get matchs'
-  return matchHistory.map(e => parseFloat(e.c2).toFixed(CustomType.KD.f) * CustomType.KD.g).slice(0, maxMatch)
+  return matchHistory.map(e => parseFloat(e.c2).toFixed(CustomType.TYPES.KD.f) * CustomType.TYPES.KD.g).slice(0, maxMatch)
 }
 
 module.exports = {

@@ -7,7 +7,7 @@ module.exports = {
   async execute(interaction, json) {
     const { id, s, u, t } = json
     if (interaction.user.id !== u) return false
-    const type = Object.entries(CustomType).filter(e => e[1].n === t)[0][1]
+    const type = CustomType.getType(t)
     const { message, args } = buildMessageFromInteraction(interaction)
     return await Stats.sendCardWithInfos(message, s, type)
   }
