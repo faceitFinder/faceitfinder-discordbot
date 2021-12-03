@@ -9,21 +9,21 @@ const errorCard = require('../templates/errorCard')
 const CustomType = require('../templates/customType')
 const { getCardsConditions } = require('../functions/commands')
 
-const getGraph = (type, playerHistory, faceitElo, gap = 100) => {
+const getGraph = (type, playerHistory, faceitElo) => {
   if (type === CustomType.ELO) return Graph.getElo(20, playerHistory, faceitElo)
-  else if (type === CustomType.KD) return Graph.getKD(playerHistory, 20, gap)
+  else if (type === CustomType.KD) return Graph.getKD(playerHistory, 20, type.g)
 }
 
-const generateButtons = (steamId, author, type, emoji, disabled) => {
+const generateButtons = (steamId, author, type, disabled) => {
   return new Discord.MessageButton()
     .setCustomId(JSON.stringify({
       id: 'updateStatsGraph',
       s: steamId,
       u: author,
-      t: type
+      t: type.n
     }))
-    .setLabel(type)
-    .setEmoji(emoji)
+    .setLabel(type.n)
+    .setEmoji(type.e)
     .setStyle('SECONDARY')
     .setDisabled(disabled)
 }
@@ -39,7 +39,7 @@ const sendCardWithInfos = async (message, steamParam, type = CustomType.ELO) => 
     const faceitElo = playerDatas.games.csgo.faceit_elo
 
     const graphCanvas = Graph.generateCanvas(getGraph(type, playerHistory, faceitElo),
-      null, null, 20, type === CustomType.KD ? 100 : 1, type === CustomType.KD ? 2 : 0)
+      null, null, 20, type)
 
     const playerCountry = playerDatas.country
     const playerRegion = playerDatas.games.csgo.region
@@ -76,8 +76,8 @@ const sendCardWithInfos = async (message, steamParam, type = CustomType.ELO) => 
       components: [
         new Discord.MessageActionRow()
           .addComponents([
-            generateButtons(steamId, message.author.id, CustomType.KD, '📈', type === CustomType.KD),
-            generateButtons(steamId, message.author.id, CustomType.ELO, '📉', type === CustomType.ELO)
+            generateButtons(steamId, message.author.id, CustomType.KD, type === CustomType.KD),
+            generateButtons(steamId, message.author.id, CustomType.ELO, type === CustomType.ELO)
           ])
       ]
     }
