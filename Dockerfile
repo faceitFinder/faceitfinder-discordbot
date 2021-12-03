@@ -6,7 +6,12 @@ RUN mkdir -p $APP
 WORKDIR $APP
 
 COPY package.json $APP
-RUN npm install
+ARG NODE_ENV
+RUN if [ ${NODE_ENV} = 'dev' ] \
+  then npm install; \
+  else if [ ${NODE_ENV} = 'prod' \
+  then npm install --only=production; \
+  fi
 
 COPY . $APP
 
