@@ -1,6 +1,8 @@
 const { Api } = require('@top-gg/sdk')
 const { prefix } = require('../config.json')
 
+require('dotenv').config()
+
 const guildCount = (client) => {
   const Guilds = client.guilds.cache.map(guild => guild.id)
   client.user.setActivity(`${prefix}help | ${Guilds.length} servers`, { type: 'PLAYING' })
