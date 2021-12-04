@@ -18,7 +18,7 @@ if (process.env.TOPGG_TOKEN) {
   const api = new Api(process.env.TOPGG_TOKEN)
   api.postStats({
     serverCount: client.guilds.cache.map(guild => guild.id).length
-  })
+  }).catch(e => console.log(e))
 }
 
 // Start the bot
