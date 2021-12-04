@@ -1,5 +1,5 @@
 const Discord = require('discord.js')
-const Api = require('@top-gg/sdk')
+const { Api } = require('@top-gg/sdk')
 const fs = require('fs')
 const AntiSpam = require('./templates/antispam')
 const client = new Discord.Client({ intents: [Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.GUILD_MESSAGES] })
