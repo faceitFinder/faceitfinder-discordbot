@@ -15,7 +15,7 @@ fs.readdirSync('./events').filter(file => file.endsWith('.js')).forEach(async (f
 })
 
 // Send datas to top.gg
-if (process.env.TOPGG_TOKEN) AutoPoster(process.env.TOPGG_TOKEN, client).on('posted', () => { guildCount(client) })
+if (process.env.TOPGG_TOKEN) AutoPoster(process.env.TOPGG_TOKEN.toString(), client).on('posted', () => { guildCount(client) })
 
 // Start the bot
 client.login(process.env.TOKEN)
