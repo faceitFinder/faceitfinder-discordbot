@@ -1,6 +1,5 @@
 const Discord = require('discord.js')
-const { AutoPoster } = require('topgg-autoposter')
-const { guildCount } = require('./functions/client')
+const Api = require('@top-gg/sdk')
 const fs = require('fs')
 const AntiSpam = require('./templates/antispam')
 const client = new Discord.Client({ intents: [Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.GUILD_MESSAGES] })
@@ -15,7 +14,12 @@ fs.readdirSync('./events').filter(file => file.endsWith('.js')).forEach(async (f
 })
 
 // Send datas to top.gg
-if (process.env.TOPGG_TOKEN) AutoPoster(process.env.TOPGG_TOKEN.toString(), client).on('posted', () => { guildCount(client) })
+if (process.env.TOPGG_TOKEN) {
+  const api = new Api(process.env.TOPGG_TOKEN)
+  api.postStats({
+    serverCount: client.guilds.cache.map(guild => guild.id).length
+  })
+}
 
 // Start the bot
 client.login(process.env.TOKEN)
