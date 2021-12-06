@@ -1,11 +1,12 @@
 const { buildMessageFromInteraction } = require('../functions/commands')
+const noMention = require('../templates/noMention')
 
 const editInteraction = (interaction, resp) => {
   if (!resp) return
   interaction.fetchReply()
     .then(e => {
       e.removeAttachments()
-      e.edit(resp)
+      e.edit(noMention(resp))
     })
     .catch((err) => console.log(err))
 }
