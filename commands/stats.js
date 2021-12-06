@@ -11,7 +11,7 @@ const { getCardsConditions } = require('../functions/commands')
 
 const getGraph = (type, playerHistory, faceitElo) => {
   if (type === CustomType.TYPES.ELO) return Graph.getElo(20, playerHistory, faceitElo)
-  else if (type === CustomType.TYPES.KD) return Graph.getKD(playerHistory, 20, type.g)
+  else if (type === CustomType.TYPES.KD) return Graph.getKD(playerHistory, 20, type.gap)
 }
 
 const generateButtons = (steamId, author, type, disabled) => {
@@ -20,10 +20,10 @@ const generateButtons = (steamId, author, type, disabled) => {
       id: 'updateStatsGraph',
       s: steamId,
       u: author,
-      t: type.n
+      t: type.name
     }))
-    .setLabel(type.n)
-    .setEmoji(type.e)
+    .setLabel(type.name)
+    .setEmoji(type.emoji)
     .setStyle('SECONDARY')
     .setDisabled(disabled)
 }
@@ -68,6 +68,7 @@ const sendCardWithInfos = async (message, steamParam, type = CustomType.TYPES.EL
       .setFooter(`Steam: ${steamDatas.personaname}`)
 
     return {
+      content: ' ',
       embeds: [card],
       files: [
         new Discord.MessageAttachment(graphCanvas.toBuffer(), `graph.png`),

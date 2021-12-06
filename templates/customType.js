@@ -1,6 +1,8 @@
+const { color } = require('../config.json')
+
 module.exports.TYPES = {
-  ELO: { n: 'ELO', g: 1, f: 0, e: '📈' },
-  KD: { n: 'K/D', g: 100, f: 2, e: '📉' }
+  ELO: { name: 'ELO', gap: 1, fixe: 0, emoji: '📈', color: color.levels },
+  KD: { name: 'K/D', gap: 100, fixe: 2, emoji: '📉', color: color.kd }
 }
 
-module.exports.getType = (t) => Object.entries(this.TYPES).filter(e => e[1].n === t)[0][1]
+module.exports.getType = (t) => Object.entries(this.TYPES).filter(e => e[1].name === t)[0][1]

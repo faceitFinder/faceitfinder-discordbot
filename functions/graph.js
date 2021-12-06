@@ -17,7 +17,7 @@ const generateCanvas = (array = null, matchHistory, playerElo, maxMatch = 20, ty
 
   const canvas = Canvas.createCanvas(width, height)
   const ctx = canvas.getContext('2d')
-  
+
   /**
    * Background
    */
@@ -47,22 +47,24 @@ const generateCanvas = (array = null, matchHistory, playerElo, maxMatch = 20, ty
    * Elo bar
    */
   array.forEach((current, i) => {
-    const prev = array[i - 1] === undefined ? current : array[i - 1]
+    let prev = array[i - 1] === undefined ? current : array[i - 1]
     const coordinatesStart = { x: padding * i, y: (Math.max(...array) - array[i - 1] + padding) }
     const coordinatesEnd = { x: padding * (i + 1), y: (Math.max(...array) - current + padding) }
-    const [level, values] = Object.entries(color.levels).filter(fc => current >= fc[1].min && current <= fc[1].max)[0]
+    prev /= type.gap; current /= type.gap
+
+    const [value, colorObj] = colorFilter(type.color, current)
 
     ctx.font = '30px sans-serif'
     ctx.lineWidth = 5
-    ctx.fillStyle = values.color
-    ctx.strokeStyle = getColors(prev, current, ctx, coordinatesStart, coordinatesEnd)
+    ctx.fillStyle = colorObj.color
+    ctx.strokeStyle = getColors(prev, current, ctx, coordinatesStart, coordinatesEnd, type)
 
     ctx.beginPath()
     ctx.moveTo(coordinatesStart.x, coordinatesStart.y)
     ctx.lineTo(coordinatesEnd.x, coordinatesEnd.y)
     ctx.stroke()
 
-    ctx.fillText(parseFloat(current / type.g).toFixed(type.f), padding * i + padding / 1.5, height)
+    ctx.fillText(parseFloat(current).toFixed(type.fixe), padding * i + padding / 1.5, height)
   })
 
   return canvas
@@ -112,22 +114,6 @@ const roundRect = (ctx, x, y, w, h, r) => {
   return ctx
 }
 
-const getColors = (prev, current, ctx, coordinatesStart, coordinatesEnd) => {
-  const gradient = ctx.createLinearGradient(coordinatesStart.x, coordinatesStart.y, coordinatesEnd.x, coordinatesEnd.y)
-  const [prevLevel, prevValues] = Object.entries(color.levels).filter(fc => prev >= fc[1].min && prev <= fc[1].max)[0]
-
-  if (current >= prevValues.min && current <= prevValues.max) gradient.addColorStop(0, prevValues.color)
-  else if (current > prevValues.max) {
-    gradient.addColorStop(0, prevValues.color)
-    gradient.addColorStop(0.5, color.levels[parseInt(prevLevel) + 1].color)
-  } else if (current < prevValues.min) {
-    gradient.addColorStop(0.5, prevValues.color)
-    gradient.addColorStop(1, color.levels[parseInt(prevLevel) - 1].color)
-  }
-
-  return gradient
-}
-
 const getElo = (maxMatch, matchHistory, playerElo, checkElo = true) => {
   const currentElo = { elo: playerElo }
 
@@ -148,8 +134,30 @@ const getElo = (maxMatch, matchHistory, playerElo, checkElo = true) => {
 
 const getKD = (matchHistory, maxMatch = 20) => {
   if (matchHistory.length === 0) throw 'Couldn\'t get matchs'
-  return matchHistory.map(e => parseFloat(e.c2).toFixed(CustomType.TYPES.KD.f) * CustomType.TYPES.KD.g).slice(0, maxMatch)
+  return matchHistory.map(e => parseFloat(e.c2).toFixed(CustomType.TYPES.KD.fixe) * CustomType.TYPES.KD.gap).slice(0, maxMatch)
 }
+
+const getColors = (prev, current, ctx, coordinatesStart, coordinatesEnd, type) => {
+  const gradient = ctx.createLinearGradient(coordinatesStart.x, coordinatesStart.y, coordinatesEnd.x, coordinatesEnd.y)
+  const [prevValue, prevColorObj] = colorFilter(type.color, prev)
+  const [currentValue, currentColorObj] = colorFilter(type.color, current)
+
+  let i = 1
+  if (current >= prevColorObj.min && current <= prevColorObj.max)
+    gradient.addColorStop(0, prevColorObj.color)
+  else if (current > prevColorObj.max) {
+    gradient.addColorStop(0, prevColorObj.color)
+    gradient.addColorStop(0.5, currentColorObj.color)
+  } else if (current < prevColorObj.min) {
+    gradient.addColorStop(0.5, prevColorObj.color)
+    gradient.addColorStop(1, currentColorObj.color)
+  }
+
+  return gradient
+}
+
+const colorFilter = (color, val) => Object.entries(color)
+  .filter(c => val >= c[1].min && val <= c[1].max)[0]
 
 module.exports = {
   generateCanvas,
