@@ -2,6 +2,7 @@ const { prefix } = require('../config.json')
 const User = require('../database/user')
 const errorCard = require('../templates/errorCard')
 const RegexFun = require('../functions/regex')
+const Discord = require('discord.js')
 
 const getCards = async (message, array, fn) => {
   return Promise.all(array.map(async obj => {
@@ -53,6 +54,24 @@ const getCardsConditions = async (message, args, fn, maxUser = 10) => {
   return getCards(message, params.slice(0, maxUser), fn)
 }
 
+const buildMessageFromInteraction = interaction => {
+  const message = {
+    author: interaction.user,
+    mentions: {
+      users: new Discord.Collection()
+    },
+    content: ''
+  }
+  const args = []
+  interaction.options?._hoistedOptions?.filter(o => o.type === 'STRING').forEach(o => {
+    o.value.split(' ').forEach(e => { if (e !== '') args.push(e) })
+    message.content += o.value
+  })
+
+  return { message, args }
+}
+
 module.exports = {
-  getCardsConditions
+  getCardsConditions,
+  buildMessageFromInteraction
 }

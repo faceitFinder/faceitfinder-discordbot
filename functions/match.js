@@ -1,4 +1,4 @@
-const { default: fetch } = require("node-fetch")
+const { default: fetch } = require('node-fetch')
 const Faceit = require('./faceit')
 
 const getMatchElo = (playerId, limit = 20) => fetch(`https://api.faceit.com/stats/api/v1/stats/time/users/${playerId}/games/csgo?size=${limit}`, {
@@ -6,7 +6,7 @@ const getMatchElo = (playerId, limit = 20) => fetch(`https://api.faceit.com/stat
 })
   .then(res => {
     if (res.status == 200) return res.json()
-    else throw 'Couldn\'t get last matches'
+    else throw 'Couldn\'t get last matchs'
   })
   .then(data => data)
 

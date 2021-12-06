@@ -6,9 +6,11 @@ const Graph = require('../functions/graph')
 const Match = require('../functions/match')
 const Ladder = require('../functions/ladder')
 const errorCard = require('../templates/errorCard')
+const CustomType = require('../templates/customType')
+const CustomTypeFunc = require('../functions/customType')
 const { getCardsConditions } = require('../functions/commands')
 
-const sendCardWithInfos = async (message, steamParam) => {
+const sendCardWithInfos = async (message, steamParam, type = CustomType.TYPES.ELO) => {
   try {
     const steamId = await Steam.getId(steamParam)
     const steamDatas = await Steam.getDatas(steamId)
@@ -17,7 +19,9 @@ const sendCardWithInfos = async (message, steamParam) => {
     const playerStats = await Player.getStats(playerId)
     const playerHistory = await Match.getMatchElo(playerId, 20)
     const faceitElo = playerDatas.games.csgo.faceit_elo
-    const graphCanvas = Graph.generateCanvas(null, playerHistory, faceitElo)
+
+    const graphCanvas = Graph.generateCanvas(CustomTypeFunc.getGraph(type, playerHistory, faceitElo),
+      null, null, 20, type)
 
     const playerCountry = playerDatas.country
     const playerRegion = playerDatas.games.csgo.region
@@ -41,20 +45,28 @@ const sendCardWithInfos = async (message, steamParam) => {
         { name: 'Elo', value: faceitElo.toString(), inline: true },
         { name: `:flag_${playerCountry.toLowerCase()}:`, value: ladderCountry.position.toString(), inline: true },
         { name: `:flag_${playerRegion.toLowerCase()}:`, value: ladderRegion.position.toString(), inline: true })
-      .setImage(`attachment://${steamId}graph.png`)
+      .setImage(`attachment://graph.png`)
       .setColor(color.levels[faceitLevel].color)
       .setFooter(`Steam: ${steamDatas.personaname}`)
 
     return {
+      content: ' ',
       embeds: [card],
       files: [
-        new Discord.MessageAttachment(graphCanvas.toBuffer(), `${steamId}graph.png`),
+        new Discord.MessageAttachment(graphCanvas.toBuffer(), `graph.png`),
         new Discord.MessageAttachment(rankImageCanvas.toBuffer(), `${faceitLevel}level.png`)
+      ],
+      components: [
+        new Discord.MessageActionRow()
+          .addComponents([
+            CustomTypeFunc.generateButtons(steamId, message.author.id, CustomType.TYPES.KD, type === CustomType.TYPES.KD, 'updateStatsGraph'),
+            CustomTypeFunc.generateButtons(steamId, message.author.id, CustomType.TYPES.ELO, type === CustomType.TYPES.ELO, 'updateStatsGraph')
+          ])
       ]
     }
   } catch (error) {
     console.log(error)
-    return errorCard(error)
+    return errorCard(error.toString())
   }
 }
 
@@ -89,3 +101,5 @@ module.exports = {
     return getCardsConditions(message, args, sendCardWithInfos)
   }
 }
+
+module.exports.sendCardWithInfos = sendCardWithInfos

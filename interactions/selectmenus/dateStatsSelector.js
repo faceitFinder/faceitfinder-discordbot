@@ -4,6 +4,7 @@ const Player = require('../../functions/player')
 const Steam = require('../../functions/steam')
 const Graph = require('../../functions/graph')
 const Match = require('../../functions/match')
+const loadingCard = require('../../templates/loadingCard')
 
 const generatePlayerStats = playerHistory => {
   const playerStats = {
@@ -36,7 +37,10 @@ module.exports = {
   async execute(interaction) {
     const { s, f, t, u, m } = JSON.parse(interaction.values)
     if (u !== interaction.user.id) return false
-    
+    const components = interaction.message.components
+
+    loadingCard(interaction)
+
     const steamDatas = await Steam.getDatas(s)
     const playerId = await Player.getId(s)
     const playerDatas = await Player.getDatas(playerId)
@@ -87,11 +91,12 @@ module.exports = {
 
     return {
       embeds: [card],
+      content: null,
       files: [
         new Discord.MessageAttachment(graphCanvas.toBuffer(), `${s}graph.png`),
         new Discord.MessageAttachment(rankImageCanvas.toBuffer(), `${faceitLevel}level.png`)
       ],
-      content: null,
+      components: components
     }
   }
 }

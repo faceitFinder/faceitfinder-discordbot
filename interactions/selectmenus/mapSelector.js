@@ -4,12 +4,17 @@ const fs = require('fs')
 const Player = require('../../functions/player')
 const Steam = require('../../functions/steam')
 const Graph = require('../../functions/graph')
+const loadingCard = require('../../templates/loadingCard')
 
 module.exports = {
   name: 'mapSelector',
   async execute(interaction) {
     const values = JSON.parse(interaction.values)
     if (values.u !== interaction.user.id) return false
+    const components = interaction.message.components
+
+    loadingCard(interaction)
+
     const steamDatas = await Steam.getDatas(values.s)
     const playerId = await Player.getId(values.s)
     const playerStats = await Player.getStats(playerId)
@@ -48,7 +53,8 @@ module.exports = {
     return {
       embeds: cards,
       files: filesAtt,
-      content: null
+      content: null,
+      components: components
     }
   }
 }

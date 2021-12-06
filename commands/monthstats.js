@@ -48,16 +48,16 @@ const sendCardWithInfos = async (message, steamParam) => {
       } else return false
     })
 
-    if (options.length === 0) return errorCard(`Couldn\'t get today matches of ${playerDatas.nickname}`)
+    if (options.length === 0) return errorCard(`Couldn\'t get matchs of ${playerDatas.nickname}`)
     const row = new Discord.MessageActionRow()
       .addComponents(
         new Discord.MessageSelectMenu()
           .setCustomId('dateStatsSelector')
-          .setPlaceholder('No dates selected')
+          .setPlaceholder('Select a month')
           .addOptions(options))
 
     return {
-      content: `Select one of the following dates to get the stats related (${playerDatas.nickname})`,
+      content: `Select one of the following month to get the stats related (${playerDatas.nickname})`,
       components: [row]
     }
   } catch (error) {

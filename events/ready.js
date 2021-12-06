@@ -46,12 +46,15 @@ module.exports = {
     })()
 
     /**
-     * Setup selectMenus
+     * Setup interactions
      */
-    client.selectMenus = new Discord.Collection()
-    fs.readdirSync('./interactions/selectmenu').filter(file => file.endsWith('.js')).forEach(menuFileName => {
-      const menu = require(`../interactions/selectmenu/${menuFileName}`)
-      client.selectMenus.set(menu.name, menu)
+    fs.readdirSync('./interactions').forEach(folder => {
+      client[folder] = new Discord.Collection()
+
+      fs.readdirSync(`./interactions/${folder}`).filter(file => file.endsWith('.js')).forEach(interactionFileName => {
+        const i = require(`../interactions/${folder}/${interactionFileName}`)
+        client[folder].set(i.name, i)
+      })
     })
 
     guildCount(client)
