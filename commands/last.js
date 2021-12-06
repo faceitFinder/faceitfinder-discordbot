@@ -86,7 +86,7 @@ const sendCardWithInfos = async (message, steamParam, matchId = null) => {
         .addComponents(
           new Discord.MessageSelectMenu()
             .setCustomId('lastSelector')
-            .setPlaceholder('No match selected')
+            .setPlaceholder('Select another match')
             .addOptions(playerHistory.items.map(e => {
               return {
                 label: new Date(e.finished_at * 1000).toDateString(),

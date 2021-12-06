@@ -33,7 +33,7 @@ const sendCardWithInfos = async (message, steamParam) => {
       .addComponents(
         new Discord.MessageSelectMenu()
           .setCustomId('mapSelector')
-          .setPlaceholder('No maps selected')
+          .setPlaceholder('Select a map')
           .addOptions(options),
       )
 

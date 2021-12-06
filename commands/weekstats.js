@@ -53,11 +53,11 @@ const sendCardWithInfos = async (message, steamParam) => {
       .addComponents(
         new Discord.MessageSelectMenu()
           .setCustomId('dateStatsSelector')
-          .setPlaceholder('No dates selected')
+          .setPlaceholder('Select a week')
           .addOptions(options))
 
     return {
-      content: `Select one of the following dates to get the stats related (${playerDatas.nickname})`,
+      content: `Select one of the following week to get the stats related (${playerDatas.nickname})`,
       components: [row]
     }
   } catch (error) {
