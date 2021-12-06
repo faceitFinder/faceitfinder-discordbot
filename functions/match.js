@@ -1,4 +1,4 @@
-const { default: fetch } = require("node-fetch")
+const { default: fetch } = require('node-fetch')
 const Faceit = require('./faceit')
 
 const getMatchElo = (playerId, limit = 20) => fetch(`https://api.faceit.com/stats/api/v1/stats/time/users/${playerId}/games/csgo?size=${limit}`, {

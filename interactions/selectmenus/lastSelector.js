@@ -1,5 +1,5 @@
-const { sendCardWithInfos } = require("../../commands/last")
-const loadingCard = require("../../templates/loadingCard")
+const { sendCardWithInfos } = require('../../commands/last')
+const loadingCard = require('../../templates/loadingCard')
 
 module.exports = {
   name: 'lastSelector',

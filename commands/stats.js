@@ -7,26 +7,8 @@ const Match = require('../functions/match')
 const Ladder = require('../functions/ladder')
 const errorCard = require('../templates/errorCard')
 const CustomType = require('../templates/customType')
+const CustomTypeFunc = require('../functions/customType')
 const { getCardsConditions } = require('../functions/commands')
-
-const getGraph = (type, playerHistory, faceitElo) => {
-  if (type === CustomType.TYPES.ELO) return Graph.getElo(20, playerHistory, faceitElo)
-  else if (type === CustomType.TYPES.KD) return Graph.getKD(playerHistory, 20, type.gap)
-}
-
-const generateButtons = (steamId, author, type, disabled) => {
-  return new Discord.MessageButton()
-    .setCustomId(JSON.stringify({
-      id: 'updateStatsGraph',
-      s: steamId,
-      u: author,
-      t: type.name
-    }))
-    .setLabel(type.name)
-    .setEmoji(type.emoji)
-    .setStyle('SECONDARY')
-    .setDisabled(disabled)
-}
 
 const sendCardWithInfos = async (message, steamParam, type = CustomType.TYPES.ELO) => {
   try {
@@ -38,7 +20,7 @@ const sendCardWithInfos = async (message, steamParam, type = CustomType.TYPES.EL
     const playerHistory = await Match.getMatchElo(playerId, 20)
     const faceitElo = playerDatas.games.csgo.faceit_elo
 
-    const graphCanvas = Graph.generateCanvas(getGraph(type, playerHistory, faceitElo),
+    const graphCanvas = Graph.generateCanvas(CustomTypeFunc.getGraph(type, playerHistory, faceitElo),
       null, null, 20, type)
 
     const playerCountry = playerDatas.country
@@ -77,8 +59,8 @@ const sendCardWithInfos = async (message, steamParam, type = CustomType.TYPES.EL
       components: [
         new Discord.MessageActionRow()
           .addComponents([
-            generateButtons(steamId, message.author.id, CustomType.TYPES.KD, type === CustomType.TYPES.KD),
-            generateButtons(steamId, message.author.id, CustomType.TYPES.ELO, type === CustomType.TYPES.ELO)
+            CustomTypeFunc.generateButtons(steamId, message.author.id, CustomType.TYPES.KD, type === CustomType.TYPES.KD, 'updateStatsGraph'),
+            CustomTypeFunc.generateButtons(steamId, message.author.id, CustomType.TYPES.ELO, type === CustomType.TYPES.ELO, 'updateStatsGraph')
           ])
       ]
     }

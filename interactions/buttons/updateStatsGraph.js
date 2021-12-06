@@ -10,7 +10,7 @@ module.exports = {
     if (interaction.user.id !== u) return false
 
     loadingCard(interaction)
-    
+
     const type = CustomType.getType(t)
     const { message, args } = buildMessageFromInteraction(interaction)
     return await Stats.sendCardWithInfos(message, s, type)
