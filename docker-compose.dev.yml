@@ -4,16 +4,16 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      args:
-        NODE_ENV: dev
     restart: on-failure
-    container_name: faceitfinder
+    container_name: faceitfinder_dev
     command: npm run dev
     links:
       - mongodb
     volumes:
       - /usr/src/app/node_modules
       - .:/usr/src/app
+    environment:
+      - NODE_ENV=dev
     env_file:
       - .env
     networks:
@@ -33,4 +33,4 @@ services:
       - app
 
 networks:
-  app: null
+  app:
