@@ -8,6 +8,13 @@ const Graph = require('../functions/graph')
 const errorCard = require('../templates/errorCard')
 const { getCardsConditions } = require('../functions/commands')
 
+
+const getPlayerStats = (teams, playerId) => {
+  for (const team of teams) {
+    const stats = team.players.filter(p => p.player_id === playerId).filter(e => e !== undefined)
+    if (stats.length > 0) return stats[0].player_stats
+  }
+}
 const sendCardWithInfos = async (message, steamParam, matchId = null) => {
   try {
     const steamId = await Steam.getId(steamParam)
@@ -41,11 +48,7 @@ const sendCardWithInfos = async (message, steamParam, matchId = null) => {
     let mapThumbnail
     lastMatchStats.rounds.forEach(r => {
       const card = new Discord.MessageEmbed()
-      let playerStats
-      for (const t of r.teams) {
-        const stats = t.players.filter(p => p.player_id === playerId)
-        if (stats.length > 0) playerStats = stats[0].player_stats
-      }
+      let playerStats = getPlayerStats(r.teams, playerId)
 
       if (playerStats === undefined) cards.push(errorCard(`Couldn\'t get the stats of ${steamDatas.personaname} from his last match`).embeds[0])
       if (lastMatchStats.rounds.length > 1) card.addFields({ name: 'round', value: `${r.match_round}/${lastMatchStats.rounds.length}` })
@@ -79,6 +82,24 @@ const sendCardWithInfos = async (message, steamParam, matchId = null) => {
       }
     })
 
+    const options = []
+    for (const e of playerHistory.items) {
+      const matchStats = await Match.getMatchStats(e.match_id)
+      const maps = matchStats.rounds.map(r => r.round_stats.Map)
+      const playerResult = matchStats.rounds.map(r => getPlayerStats(r.teams, playerId).Result).at(0)
+
+      options.push({
+        label: new Date(e.finished_at * 1000).toDateString(),
+        description: maps.join(' '),
+        emoji: parseInt(playerResult) ? emojis.won.balise : emojis.lost.balise,
+        value: JSON.stringify({
+          u: message.author.id,
+          m: e.match_id,
+          s: steamId
+        })
+      })
+    }
+
     return {
       embeds: cards,
       files: filesAtt,
@@ -87,16 +108,7 @@ const sendCardWithInfos = async (message, steamParam, matchId = null) => {
           new Discord.MessageSelectMenu()
             .setCustomId('lastSelector')
             .setPlaceholder('Select another match')
-            .addOptions(playerHistory.items.map(e => {
-              return {
-                label: new Date(e.finished_at * 1000).toDateString(),
-                value: JSON.stringify({
-                  u: message.author.id,
-                  m: e.match_id,
-                  s: steamId
-                })
-              }
-            })),
+            .addOptions(options),
         )]
     }
 
