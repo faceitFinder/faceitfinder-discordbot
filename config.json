@@ -91,6 +91,58 @@
       "name": "lost",
       "id": "885455779044401192",
       "balise": "<:lost:885455779044401192>"
+    },
+    "maps": {
+      "de_vertigo": {
+        "name": "de_vertigo",
+        "id": "918282479532642314",
+        "balise": "<:de_vertigo:918282479532642314>"
+      },
+      "de_ancient": {
+        "name": "de_ancient",
+        "id": "918282479515877396",
+        "balise": "<:de_ancient:918282479515877396>"
+      },
+      "de_nuke": {
+        "name": "de_nuke",
+        "id": "918282479163568209",
+        "balise": "<:de_nuke:918282479163568209>"
+      },
+      "de_cache": {
+        "name": "de_cache",
+        "id": "918282479369068586",
+        "balise": "<:de_cache:918282479369068586>"
+      },
+      "de_dust2": {
+        "name": "de_dust2",
+        "id": "918282479616548934",
+        "balise": "<:de_dust2:918282479616548934>"
+      },
+      "de_cbble": {
+        "name": "de_cbble",
+        "id": "918282479406829648",
+        "balise": "<:de_cbble:918282479406829648>"
+      },
+      "de_inferno": {
+        "name": "de_inferno",
+        "id": "918282479574597693",
+        "balise": "<:de_inferno:918282479574597693>"
+      },
+      "de_mirage": {
+        "name": "de_mirage",
+        "id": "918282479733997638",
+        "balise": "<:de_mirage:918282479733997638>"
+      },
+      "de_overpass": {
+        "name": "de_overpass",
+        "id": "918282479692054548",
+        "balise": "<:de_overpass:918282479692054548>"
+      },
+      "de_train": {
+        "name": "de_train",
+        "id": "918282479335510066",
+        "balise": "<:de_train:918282479335510066>"
+      }
     }
   }
 }
