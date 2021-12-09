@@ -2,7 +2,6 @@ const Discord = require('discord.js')
 const Player = require('../functions/player')
 const Steam = require('../functions/steam')
 const errorCard = require('../templates/errorCard')
-const { emojis } = require('../config.json')
 const { getCardsConditions } = require('../functions/commands')
 
 
@@ -27,7 +26,6 @@ const sendCardWithInfos = async (message, steamParam) => {
       if (!options.filter(e => e.label === label).length > 0) options.push({
         label: label,
         description: `Games ${e.stats.Matches} (${e.stats['Win Rate %']}%)`,
-        emoji: emojis.maps[e.label],
         value: JSON.stringify(option)
       })
     })
