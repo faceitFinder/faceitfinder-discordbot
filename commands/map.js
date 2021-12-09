@@ -25,6 +25,7 @@ const sendCardWithInfos = async (message, steamParam) => {
 
       if (!options.filter(e => e.label === label).length > 0) options.push({
         label: label,
+        description: `Games ${e.stats.Matches} (${e.stats['Win Rate %']}%)`,
         value: JSON.stringify(option)
       })
     })
