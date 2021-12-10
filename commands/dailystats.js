@@ -3,6 +3,13 @@ const Steam = require('../functions/steam')
 const Player = require('../functions/player')
 const errorCard = require('../templates/errorCard')
 const { getCardsConditions } = require('../functions/commands')
+const DateStats = require('../functions/dateStats')
+
+const getDay = date => {
+  date = new Date(date)
+  date.setHours(0, 0, 0, 0)
+  return date.getTime()
+}
 
 const sendCardWithInfos = async (message, steamParam) => {
   try {
@@ -11,39 +18,34 @@ const sendCardWithInfos = async (message, steamParam) => {
     const playerDatas = await Player.getDatas(playerId)
 
     const options = []
-    const dates = []
     const maxMatch = 85
+    const dates = await DateStats.getDates(playerId, maxMatch, getDay)
 
-    const playerHistory = await Player.getHistory(playerId, maxMatch)
+    dates.forEach(date => {
+      const from = new Date(date.date)
+      const to = new Date(date.date).setHours(24)
 
-    for (const e of playerHistory.items) {
-      const matchDate = new Date(e.finished_at * 1000).setHours(0, 0, 0, 0)
-      if (!dates.filter(e => e === matchDate).length > 0) dates.push(matchDate)
-    }
-
-    dates.sort().reverse().every((d, k) => {
-      if (k <= 24) {
-        options.push({
-          label: new Date(d).toDateString(),
-          value: JSON.stringify({
-            s: steamId,
-            f: d,
-            t: new Date(d).setHours(24),
-            u: message.author.id,
-            m: maxMatch
-          })
+      options.push({
+        label: from.toDateString(),
+        description: `${date.number} match played`,
+        value: JSON.stringify({
+          s: steamId,
+          f: from.getTime(),
+          t: to,
+          u: message.author.id,
+          m: maxMatch
         })
-        return true
-      } else return false
+      })
     })
 
     if (options.length === 0) return errorCard(`Couldn\'t get matchs of ${playerDatas.nickname}`)
+    if (options.length > 1) options.pop()
     const row = new Discord.MessageActionRow()
       .addComponents(
         new Discord.MessageSelectMenu()
           .setCustomId('dateStatsSelector')
           .setPlaceholder('Select a day')
-          .addOptions(options))
+          .addOptions(options.slice(0, 24)))
 
     return {
       content: `Select one of the following day to get the stats related (${playerDatas.nickname})`,
