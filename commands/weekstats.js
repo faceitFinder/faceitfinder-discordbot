@@ -2,14 +2,16 @@ const Discord = require('discord.js')
 const Steam = require('../functions/steam')
 const Player = require('../functions/player')
 const errorCard = require('../templates/errorCard')
+const DateStats = require('../functions/dateStats')
 const { getCardsConditions } = require('../functions/commands')
 
-const week = [6, 0, 1, 2, 3, 4, 5]
 
-const getMonday = (x) => {
-  const a = new Date(x)
-  a.setHours(0, 0, 0, 0)
-  return new Date(a.setDate(a.getDate() - week[a.getDay()]))
+const getMonday = date => {
+  const week = [6, 0, 1, 2, 3, 4, 5]
+
+  date = new Date(date)
+  date.setHours(0, 0, 0, 0)
+  return new Date(date.setDate(date.getDate() - week[date.getDay()])).getTime()
 }
 
 const sendCardWithInfos = async (message, steamParam) => {
@@ -19,42 +21,34 @@ const sendCardWithInfos = async (message, steamParam) => {
     const playerDatas = await Player.getDatas(playerId)
 
     const options = []
-    const dates = []
     const maxMatch = 85
+    const dates = await DateStats.getDates(playerId, maxMatch, getMonday)
 
-    const playerHistory = await Player.getHistory(playerId, maxMatch)
+    dates.forEach(date => {
+      const from = new Date(date.date)
+      const to = new Date(from.setDate(from.getDate() + 7))
 
-    for (const e of playerHistory.items) {
-      const monday = getMonday(e.finished_at * 1000).getTime()
-      if (!dates.filter(e => e === monday).length > 0) dates.push(monday)
-    }
-
-    dates.sort().reverse().every((monday, k) => {
-      if (k <= 24) {
-        const mondayDate = new Date(monday)
-        const to = new Date(mondayDate.setDate(mondayDate.getDate() + 7))
-
-        options.push({
-          label: [new Date(monday).toDateString(), '-', new Date(to.setHours(-24)).toDateString()].join(' '),
-          value: JSON.stringify({
-            s: steamId,
-            f: monday,
-            t: to.setHours(24),
-            u: message.author.id,
-            m: maxMatch
-          })
+      options.push({
+        label: [new Date(date.date).toDateString(), '-', new Date(new Date(to).setHours(-24)).toDateString()].join(' '),
+        description: `${date.number} match played`,
+        value: JSON.stringify({
+          s: steamId,
+          f: date.date,
+          t: to.getTime(),
+          u: message.author.id,
+          m: maxMatch
         })
-        return true
-      } else return false
+      })
     })
 
     if (options.length === 0) return errorCard(`Couldn\'t get matchs of ${playerDatas.nickname}`)
+    if (options.length > 1) options.pop()
     const row = new Discord.MessageActionRow()
       .addComponents(
         new Discord.MessageSelectMenu()
           .setCustomId('dateStatsSelector')
           .setPlaceholder('Select a week')
-          .addOptions(options))
+          .addOptions(options.splice(0, 24)))
 
     return {
       content: `Select one of the following week to get the stats related (${playerDatas.nickname})`,
