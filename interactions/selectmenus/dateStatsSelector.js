@@ -1,4 +1,4 @@
-const { color } = require('../../config.json')
+const { color, emojis } = require('../../config.json')
 const Discord = require('discord.js')
 const Player = require('../../functions/player')
 const Steam = require('../../functions/steam')
@@ -37,7 +37,13 @@ module.exports = {
   async execute(interaction) {
     const { s, f, t, u, m } = JSON.parse(interaction.values)
     if (u !== interaction.user.id) return false
-    const components = interaction.message.components
+    const actionRow = interaction.message.components
+    actionRow.at(0).components
+      .filter(e => e instanceof Discord.MessageSelectMenu)
+      .map(msm => msm.options.map(o => {
+        if (o.value === interaction.values.at(0)) o.emoji = emojis.select.balise
+        else o.emoji = null
+      }))
 
     loadingCard(interaction)
 
@@ -96,7 +102,7 @@ module.exports = {
         new Discord.MessageAttachment(graphCanvas.toBuffer(), `${s}graph.png`),
         new Discord.MessageAttachment(rankImageCanvas.toBuffer(), `${faceitLevel}level.png`)
       ],
-      components: components
+      components: actionRow
     }
   }
 }
