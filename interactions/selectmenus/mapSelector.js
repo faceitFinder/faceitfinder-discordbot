@@ -1,4 +1,4 @@
-const { color } = require('../../config.json')
+const { emojis, color } = require('../../config.json')
 const Discord = require('discord.js')
 const fs = require('fs')
 const Player = require('../../functions/player')
@@ -11,7 +11,23 @@ module.exports = {
   async execute(interaction) {
     const values = JSON.parse(interaction.values)
     if (values.u !== interaction.user.id) return false
-    const components = interaction.message.components
+
+    const options = interaction.message.components.at(0).components
+      .filter(e => e instanceof Discord.MessageSelectMenu)
+      .map(msm => {
+        return msm.options.map(o => {
+          const active = JSON.stringify(JSON.parse(o.value)) === JSON.stringify(values)
+          o.emoji = active ? emojis.select.balise : null
+          o.default = active
+          return o
+        })
+      }).at(0)
+
+    const components = new Discord.MessageActionRow()
+      .addComponents(
+        new Discord.MessageSelectMenu()
+          .setCustomId('mapSelector')
+          .addOptions(options))
 
     loadingCard(interaction)
 
@@ -54,7 +70,7 @@ module.exports = {
       embeds: cards,
       files: filesAtt,
       content: null,
-      components: components
+      components: [components]
     }
   }
 }

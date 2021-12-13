@@ -36,11 +36,9 @@ const getAverage = (q, d, fixe = 2, percent = 1) => { return ((q / d) * percent)
 
 const sendCardWithInfos = async (interaction, values, type = CustomType.TYPES.ELO) => {
   if (values.u !== interaction.user.id) return false
-  let placeholder = ''
   const options = interaction.message.components.at(0).components
     .filter(e => e instanceof Discord.MessageSelectMenu)
     .map(msm => {
-      placeholder = msm.placeholder
       return msm.options.map(o => {
         if (values.id !== 'uDSG') {
           const active = JSON.stringify(JSON.parse(o.value)) === JSON.stringify(values)
@@ -54,7 +52,6 @@ const sendCardWithInfos = async (interaction, values, type = CustomType.TYPES.EL
     .addComponents(
       new Discord.MessageSelectMenu()
         .setCustomId('dateStatsSelector')
-        .setPlaceholder(placeholder)
         .addOptions(options))
 
   loadingCard(interaction)
