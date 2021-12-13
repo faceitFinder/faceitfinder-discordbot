@@ -4,6 +4,7 @@ const Player = require('../functions/player')
 const errorCard = require('../templates/errorCard')
 const DateStats = require('../functions/dateStats')
 const { getCardsConditions } = require('../functions/commands')
+const { maxMatchsDateStats } = require('../config.json')
 
 const getFirstDay = (x) => {
   const a = new Date(x)
@@ -20,8 +21,7 @@ const sendCardWithInfos = async (message, steamParam) => {
     const playerDatas = await Player.getDatas(playerId)
 
     const options = []
-    const maxMatch = 300
-    const dates = await DateStats.getDates(playerId, maxMatch, getFirstDay)
+    const dates = await DateStats.getDates(playerId, maxMatchsDateStats, getFirstDay)
 
     dates.forEach(date => {
       const from = new Date(date.date)
@@ -32,16 +32,15 @@ const sendCardWithInfos = async (message, steamParam) => {
         description: `${date.number} match played`,
         value: JSON.stringify({
           s: steamId,
-          f: from.getTime(),
-          t: to,
-          u: message.author.id,
-          m: maxMatch
+          f: from.getTime() / 1000,
+          t: to / 1000,
+          u: message.author.id
         })
       })
     })
 
     if (options.length === 0) return errorCard(`Couldn\'t get matchs of ${playerDatas.nickname}`)
-    if (playerStats.lifetime.Matches > maxMatch) options.pop()
+    if (playerStats.lifetime.Matches > maxMatchsDateStats) options.pop()
     const row = new Discord.MessageActionRow()
       .addComponents(
         new Discord.MessageSelectMenu()
