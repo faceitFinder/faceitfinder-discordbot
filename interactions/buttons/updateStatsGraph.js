@@ -6,13 +6,12 @@ const loadingCard = require('../../templates/loadingCard')
 module.exports = {
   name: 'updateStatsGraph',
   async execute(interaction, json) {
-    const { id, s, u, t } = json
-    if (interaction.user.id !== u) return false
-
+    if (interaction.user.id !== json.u) return false
+    
     loadingCard(interaction)
 
-    const type = CustomType.getType(t)
     const { message, args } = buildMessageFromInteraction(interaction)
-    return await Stats.sendCardWithInfos(message, s, type)
+
+    return await Stats.sendCardWithInfos(message, json.s, CustomType.getType(interaction.component.label))
   }
 }

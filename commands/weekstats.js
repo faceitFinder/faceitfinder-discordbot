@@ -4,7 +4,7 @@ const Player = require('../functions/player')
 const errorCard = require('../templates/errorCard')
 const DateStats = require('../functions/dateStats')
 const { getCardsConditions } = require('../functions/commands')
-
+const { maxMatchsDateStats } = require('../config.json')
 
 const getMonday = date => {
   const week = [6, 0, 1, 2, 3, 4, 5]
@@ -18,11 +18,11 @@ const sendCardWithInfos = async (message, steamParam) => {
   try {
     const steamId = await Steam.getId(steamParam)
     const playerId = await Player.getId(steamId)
+    const playerStats = await Player.getStats(playerId)
     const playerDatas = await Player.getDatas(playerId)
 
     const options = []
-    const maxMatch = 85
-    const dates = await DateStats.getDates(playerId, maxMatch, getMonday)
+    const dates = await DateStats.getDates(playerId, maxMatchsDateStats, getMonday)
 
     dates.forEach(date => {
       const from = new Date(date.date)
@@ -33,16 +33,15 @@ const sendCardWithInfos = async (message, steamParam) => {
         description: `${date.number} match played`,
         value: JSON.stringify({
           s: steamId,
-          f: date.date,
-          t: to.getTime(),
-          u: message.author.id,
-          m: maxMatch
+          f: date.date / 1000,
+          t: to.getTime() / 1000,
+          u: message.author.id
         })
       })
     })
 
-    if (options.length === 0) return errorCard(`Couldn\'t get matchs of ${playerDatas.nickname}`)
-    if (options.length > 1) options.pop()
+    if (options.length === 0) return errorCard(`Couldn\'t get matchs of ${playerStats.nickname}`)
+    if (playerStats.lifetime.Matches > maxMatchsDateStats) options.pop()
     const row = new Discord.MessageActionRow()
       .addComponents(
         new Discord.MessageSelectMenu()

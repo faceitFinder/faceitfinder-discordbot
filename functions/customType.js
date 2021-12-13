@@ -2,18 +2,14 @@ const Discord = require('discord.js')
 const CustomType = require('../templates/customType')
 const Graph = require('./graph')
 
-const getGraph = (type, playerHistory, faceitElo) => {
-  if (type === CustomType.TYPES.ELO) return Graph.getElo(20, playerHistory, faceitElo)
-  else if (type === CustomType.TYPES.KD) return Graph.getKD(playerHistory, 20, type.gap)
+const getGraph = (type, playerHistory, faceitElo, check = true, canvaSize = 20) => {
+  if (type === CustomType.TYPES.ELO) return Graph.getElo(canvaSize, playerHistory, faceitElo, check)
+  else if (type === CustomType.TYPES.KD) return Graph.getKD(playerHistory, canvaSize, type.gap)
 }
-const generateButtons = (steamId, author, type, disabled, customId) => {
+
+const generateButtons = (values, type, disabled) => {
   return new Discord.MessageButton()
-    .setCustomId(JSON.stringify({
-      id: customId,
-      s: steamId,
-      u: author,
-      t: type.name
-    }))
+    .setCustomId(JSON.stringify(values))
     .setLabel(type.name)
     .setEmoji(type.emoji)
     .setStyle('SECONDARY')
