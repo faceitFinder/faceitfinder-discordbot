@@ -19,6 +19,11 @@ const sendCardWithInfos = async (message, steamParam, type = CustomType.TYPES.EL
     const playerStats = await Player.getStats(playerId)
     const playerHistory = await Match.getMatchElo(playerId, 20)
     const faceitElo = playerDatas.games.csgo.faceit_elo
+    const buttonValues = {
+      id: 'updateStatsGraph',
+      s: steamId,
+      u: message.author.id
+    }
 
     const graphCanvas = Graph.generateCanvas(CustomTypeFunc.getGraph(type, playerHistory, faceitElo),
       null, null, 20, type)
@@ -60,17 +65,13 @@ const sendCardWithInfos = async (message, steamParam, type = CustomType.TYPES.EL
         new Discord.MessageActionRow()
           .addComponents([
             CustomTypeFunc.generateButtons(
-              steamId,
-              message.author.id,
+              { ...buttonValues, n: 1 },
               CustomType.TYPES.KD,
-              type === CustomType.TYPES.KD,
-              'updateStatsGraph'),
+              type === CustomType.TYPES.KD),
             CustomTypeFunc.generateButtons(
-              steamId,
-              message.author.id,
+              { ...buttonValues, n: 2 },
               CustomType.TYPES.ELO,
-              type === CustomType.TYPES.ELO,
-              'updateStatsGraph')
+              type === CustomType.TYPES.ELO)
           ])
       ]
     }
