@@ -90,5 +90,3 @@ module.exports = {
     return getCardsConditions(message, args, sendCardWithInfos)
   }
 }
-
-module.exports.sendCardWithInfos = sendCardWithInfos
