@@ -16,6 +16,7 @@ const sendCardWithInfos = async (message, steamParam) => {
   try {
     const steamId = await Steam.getId(steamParam)
     const playerId = await Player.getId(steamId)
+    const playerStats = await Player.getStats(playerId)
     const playerDatas = await Player.getDatas(playerId)
 
     const options = []
@@ -40,7 +41,7 @@ const sendCardWithInfos = async (message, steamParam) => {
     })
 
     if (options.length === 0) return errorCard(`Couldn\'t get matchs of ${playerDatas.nickname}`)
-    if (options.length > 1) options.pop()
+    if (playerStats.lifetime.Matches > maxMatch) options.pop()
     const row = new Discord.MessageActionRow()
       .addComponents(
         new Discord.MessageSelectMenu()
@@ -89,3 +90,5 @@ module.exports = {
     return getCardsConditions(message, args, sendCardWithInfos)
   }
 }
+
+module.exports.sendCardWithInfos = sendCardWithInfos
