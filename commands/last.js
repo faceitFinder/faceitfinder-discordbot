@@ -92,6 +92,7 @@ const sendCardWithInfos = async (message, steamParam, matchId = null) => {
         label: new Date(e.finished_at * 1000).toDateString(),
         description: maps.join(' '),
         emoji: parseInt(playerResult) ? emojis.won.balise : emojis.lost.balise,
+        default: e.match_id === matchId,
         value: JSON.stringify({
           u: message.author.id,
           m: e.match_id,
