@@ -59,8 +59,18 @@ const sendCardWithInfos = async (message, steamParam, type = CustomType.TYPES.EL
       components: [
         new Discord.MessageActionRow()
           .addComponents([
-            CustomTypeFunc.generateButtons(steamId, message.author.id, CustomType.TYPES.KD, type === CustomType.TYPES.KD, 'updateStatsGraph'),
-            CustomTypeFunc.generateButtons(steamId, message.author.id, CustomType.TYPES.ELO, type === CustomType.TYPES.ELO, 'updateStatsGraph')
+            CustomTypeFunc.generateButtons(
+              steamId,
+              message.author.id,
+              CustomType.TYPES.KD,
+              type === CustomType.TYPES.KD,
+              'updateStatsGraph'),
+            CustomTypeFunc.generateButtons(
+              steamId,
+              message.author.id,
+              CustomType.TYPES.ELO,
+              type === CustomType.TYPES.ELO,
+              'updateStatsGraph')
           ])
       ]
     }
