@@ -53,11 +53,11 @@ module.exports = {
       slash: true
     }
   ],
-  description: `Link steam id to the discord user, to get your stats directly (no parameters needed).`,
+  description: 'Link a steam profile to the discord user, to get your stats directly (no parameters needed).',
   usage: 'steam parameter or @user, max 1 user',
   type: 'utility',
   async execute(message, args) {
     if (args?.length > 0) return getCardsConditions(message, args, sendCardWithInfos, 1)
-    else return errorCard(`A parameter is missing, do \`.ffhelp link\` to see how the command works.`)
+    else return errorCard('A parameter is missing, do `.ffhelp link` to see how the command works.')
   }
 }

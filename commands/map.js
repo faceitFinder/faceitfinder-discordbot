@@ -73,7 +73,7 @@ module.exports = {
       slash: true
     }
   ],
-  description: "Displays the stats of the choosen map.",
+  description: 'Displays the stats of the choosen map.',
   usage: 'multiple steam params and @user or CSGO status, max 10 users',
   type: 'stats',
   async execute(message, args) {

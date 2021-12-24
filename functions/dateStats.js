@@ -1,4 +1,4 @@
-const Match = require("./match")
+const Match = require('./match')
 
 const getDates = async (playerId, maxMatch, getDay) => {
   const dates = new Map()

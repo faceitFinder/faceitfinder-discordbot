@@ -39,7 +39,7 @@ const sendCardWithInfos = async (message, steamParam) => {
       })
     })
 
-    if (options.length === 0) return errorCard(`Couldn\'t get matchs of ${playerDatas.nickname}`)
+    if (options.length === 0) return errorCard(`Couldn't get matchs of ${playerDatas.nickname}`)
     if (playerStats.lifetime.Matches > maxMatchsDateStats) options.pop()
     const row = new Discord.MessageActionRow()
       .addComponents(
@@ -82,7 +82,7 @@ module.exports = {
       slash: true
     }
   ],
-  description: "Displays the stats of the choosen month. With elo graph of the month.",
+  description: 'Displays the stats of the choosen month. With elo graph of the month.',
   usage: 'multiple steam params and @user or CSGO status, max 10 users',
   type: 'stats',
   async execute(message, args) {

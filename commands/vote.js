@@ -5,7 +5,7 @@ module.exports = {
   name: 'vote',
   aliasses: ['vote'],
   options: [],
-  description: "Get the link to vote for the bot on top.gg",
+  description: 'Get the link to vote for the bot on top.gg',
   usage: '',
   type: 'system',
   async execute(message, args) {

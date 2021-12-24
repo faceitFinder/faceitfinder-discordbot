@@ -83,7 +83,7 @@ module.exports = {
       slash: true
     }
   ],
-  description: "Displays the stats of the choosen week. With elo graph of the week.",
+  description: 'Displays the stats of the choosen week. With elo graph of the week.',
   usage: 'multiple steam params and @user or CSGO status, max 10 users',
   type: 'stats',
   async execute(message, args) {

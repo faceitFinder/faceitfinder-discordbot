@@ -50,7 +50,7 @@ const sendCardWithInfos = async (message, steamParam, type = CustomType.TYPES.EL
         { name: 'Elo', value: faceitElo.toString(), inline: true },
         { name: `:flag_${playerCountry.toLowerCase()}:`, value: ladderCountry.position.toString(), inline: true },
         { name: `:flag_${playerRegion.toLowerCase()}:`, value: ladderRegion.position.toString(), inline: true })
-      .setImage(`attachment://graph.png`)
+      .setImage('attachment://graph.png')
       .setColor(color.levels[faceitLevel].color)
       .setFooter(`Steam: ${steamDatas.personaname}`)
 
@@ -58,7 +58,7 @@ const sendCardWithInfos = async (message, steamParam, type = CustomType.TYPES.EL
       content: ' ',
       embeds: [card],
       files: [
-        new Discord.MessageAttachment(graphCanvas.toBuffer(), `graph.png`),
+        new Discord.MessageAttachment(graphCanvas.toBuffer(), 'graph.png'),
         new Discord.MessageAttachment(rankImageCanvas.toBuffer(), `${faceitLevel}level.png`)
       ],
       components: [
@@ -105,7 +105,7 @@ module.exports = {
       slash: true
     }
   ],
-  description: "Displays general stats. With elo graph of the 20 last games.",
+  description: 'Displays general stats. With elo graph of the 20 last games.',
   usage: 'multiple steam params and @user or CSGO status, max 10 users',
   type: 'stats',
   async execute(message, args) {

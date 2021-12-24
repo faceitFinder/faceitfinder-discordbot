@@ -143,7 +143,7 @@ module.exports = {
       slash: true
     }
   ],
-  description: "Get the stats of last game.",
+  description: 'Get the stats of last game.',
   usage: 'multiple steam params and @user or CSGO status, max 10 users',
   type: 'stats',
   async execute(message, args) {

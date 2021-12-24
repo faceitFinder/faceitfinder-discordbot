@@ -13,7 +13,7 @@ const sendCardWithInfos = async (message) => {
         embeds: [
           new Discord.MessageEmbed()
             .setColor(color.primary)
-            .setDescription(`Your account has been unlinked.`)
+            .setDescription('Your account has been unlinked.')
         ]
       }
     }
@@ -29,7 +29,7 @@ module.exports = {
   name: 'unlink',
   aliasses: ['unlink'],
   options: [],
-  description: `Unlink your steam id to the discord bot.`,
+  description: 'Unlink your steam id to the discord bot.',
   usage: '',
   type: 'utility',
   async execute(message, args) {
