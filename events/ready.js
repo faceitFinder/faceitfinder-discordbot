@@ -7,7 +7,7 @@ const { Routes } = require('discord-api-types/v9')
 
 module.exports = {
   name: 'ready',
-  execute(client) {
+  async execute(client) {
     console.log('🚀 Bot started!')
     mongo().then(() => { console.log('🧱 Connected to mongo') }).catch((e) => {
       console.error(e)
@@ -35,15 +35,13 @@ module.exports = {
     /**
      * Setup / commands
      */
-    const rest = new REST({ version: '9' }).setToken(process.env.TOKEN);
+    const rest = new REST({ version: '9' }).setToken(process.env.TOKEN)
 
-    (async () => {
-      try {
-        console.log('🚧 Started refreshing application (/) commands.')
-        await rest.put(Routes.applicationCommands(client.user.id), { body: client.slashCommands })
-        console.log('🎉 Successfully reloaded application (/) commands.')
-      } catch (error) { console.error(error) }
-    })()
+    try {
+      console.log('🚧 Started refreshing application (/) commands.')
+      await rest.put(Routes.applicationCommands(client.user.id), { body: client.slashCommands })
+      console.log('🎉 Successfully reloaded application (/) commands.')
+    } catch (error) { console.error(error) }
 
     /**
      * Setup interactions
