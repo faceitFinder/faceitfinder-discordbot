@@ -15,47 +15,42 @@ const getMonday = date => {
 }
 
 const sendCardWithInfos = async (message, steamParam) => {
-  try {
-    const steamId = await Steam.getId(steamParam)
-    const playerId = await Player.getId(steamId)
-    const playerStats = await Player.getStats(playerId)
-    const playerDatas = await Player.getDatas(playerId)
+  const steamId = await Steam.getId(steamParam)
+  const playerId = await Player.getId(steamId)
+  const playerStats = await Player.getStats(playerId)
+  const playerDatas = await Player.getDatas(playerId)
 
-    const options = []
-    const dates = await DateStats.getDates(playerId, maxMatchsDateStats, getMonday)
+  const options = []
+  const dates = await DateStats.getDates(playerId, maxMatchsDateStats, getMonday)
 
-    dates.forEach(date => {
-      const from = new Date(date.date)
-      const to = new Date(from.setDate(from.getDate() + 7))
+  dates.forEach(date => {
+    const from = new Date(date.date)
+    const to = new Date(from.setDate(from.getDate() + 7))
 
-      options.push({
-        label: [new Date(date.date).toDateString(), '-', new Date(new Date(to).setHours(-24)).toDateString()].join(' '),
-        description: `${date.number} match played`,
-        value: JSON.stringify({
-          s: steamId,
-          f: date.date / 1000,
-          t: to.getTime() / 1000,
-          u: message.author.id
-        })
+    options.push({
+      label: [new Date(date.date).toDateString(), '-', new Date(new Date(to).setHours(-24)).toDateString()].join(' '),
+      description: `${date.number} match played`,
+      value: JSON.stringify({
+        s: steamId,
+        f: date.date / 1000,
+        t: to.getTime() / 1000,
+        u: message.author.id
       })
     })
+  })
 
-    if (options.length === 0) return errorCard(`Couldn\'t get matchs of ${playerStats.nickname}`)
-    if (playerStats.lifetime.Matches > maxMatchsDateStats) options.pop()
-    const row = new Discord.MessageActionRow()
-      .addComponents(
-        new Discord.MessageSelectMenu()
-          .setCustomId('dateStatsSelector')
-          .setPlaceholder('Select a week')
-          .addOptions(options.splice(0, 24)))
+  if (options.length === 0) return errorCard(`Couldn\'t get matchs of ${playerStats.nickname}`)
+  if (playerStats.lifetime.Matches > maxMatchsDateStats) options.pop()
+  const row = new Discord.MessageActionRow()
+    .addComponents(
+      new Discord.MessageSelectMenu()
+        .setCustomId('dateStatsSelector')
+        .setPlaceholder('Select a week')
+        .addOptions(options.splice(0, 24)))
 
-    return {
-      content: `Select one of the following week to get the stats related (${playerDatas.nickname})`,
-      components: [row]
-    }
-  } catch (error) {
-    console.log(error)
-    return errorCard(error)
+  return {
+    content: `Select one of the following week to get the stats related (${playerDatas.nickname})`,
+    components: [row]
   }
 }
 
@@ -83,7 +78,7 @@ module.exports = {
       slash: true
     }
   ],
-  description: "Displays the stats of the choosen week. With elo graph of the week.",
+  description: 'Displays the stats of the choosen week. With elo graph of the week.',
   usage: 'multiple steam params and @user or CSGO status, max 10 users',
   type: 'stats',
   async execute(message, args) {

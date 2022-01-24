@@ -4,9 +4,7 @@ const Canvas = require('canvas')
 const CustomType = require('../templates/customType.js')
 
 const generateCanvas = (array = null, matchHistory, playerElo, maxMatch = 20, type = CustomType.TYPES.ELO) => {
-  if (array === null)
-    try { array = getElo(maxMatch, matchHistory, playerElo) }
-    catch (error) { throw error }
+  if (array === null) array = getElo(maxMatch, matchHistory, playerElo)
   if (array.length === 0) throw 'No match found on this date'
 
   array.reverse()
@@ -21,7 +19,7 @@ const generateCanvas = (array = null, matchHistory, playerElo, maxMatch = 20, ty
   /**
    * Background
    */
-  ctx.clearRect(0, 0, width, height);
+  ctx.clearRect(0, 0, width, height)
   ctx.fillStyle = '#2f3136'
   ctx.fillRect(0, 0, width, height)
 
@@ -47,7 +45,7 @@ const generateCanvas = (array = null, matchHistory, playerElo, maxMatch = 20, ty
    * Elo bar
    */
   array.forEach((current, i) => {
-    let prev = array[i - 1] === undefined ? current : array[i - 1]
+    let prev = array[i - 1] || current
     const coordinatesStart = { x: padding * i, y: (Math.max(...array) - array[i - 1] + padding) }
     const coordinatesEnd = { x: padding * (i + 1), y: (Math.max(...array) - current + padding) }
     prev /= type.gap; current /= type.gap

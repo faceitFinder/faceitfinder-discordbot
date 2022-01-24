@@ -3,14 +3,15 @@ const User = require('../database/user')
 const errorCard = require('../templates/errorCard')
 const RegexFun = require('../functions/regex')
 const Discord = require('discord.js')
+const noMention = require('../templates/noMention')
 
 const getCards = async (message, array, fn) => {
   return Promise.all(array.map(async obj => {
     if (obj.discord) {
       const user = await User.exists(obj.param)
-      if (user) return fn(message, user.steamId)
+      if (user) return fn(message, user.steamId).catch(err => noMention(errorCard(err)))
       else return errorCard('This user hasn\'t linked his profile')
-    } else return fn(message, obj.param)
+    } else return fn(message, obj.param).catch(err => noMention(errorCard(err)))
   })).then(msgs => msgs.map(msg => {
     const data = {
       embeds: msg.embeds || [],

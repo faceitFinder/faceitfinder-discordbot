@@ -5,7 +5,7 @@ module.exports = {
   name: 'invite',
   aliasses: ['invite', 'inv'],
   options: [],
-  description: "Get the link to invite the bot on your server.",
+  description: 'Get the link to invite the bot on your server.',
   usage: '',
   type: 'system',
   async execute(message, args) {

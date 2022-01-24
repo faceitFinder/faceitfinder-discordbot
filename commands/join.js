@@ -5,7 +5,7 @@ module.exports = {
   name: 'join',
   aliasses: ['join'],
   options: [],
-  description: "Get the link to join the community server of the bot .",
+  description: 'Get the link to join the community server of the bot .',
   usage: '',
   type: 'system',
   async execute(message, args) {
