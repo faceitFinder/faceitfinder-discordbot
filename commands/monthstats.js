@@ -14,47 +14,42 @@ const getFirstDay = (x) => {
 }
 
 const sendCardWithInfos = async (message, steamParam) => {
-  try {
-    const steamId = await Steam.getId(steamParam)
-    const playerId = await Player.getId(steamId)
-    const playerStats = await Player.getStats(playerId)
-    const playerDatas = await Player.getDatas(playerId)
+  const steamId = await Steam.getId(steamParam)
+  const playerId = await Player.getId(steamId)
+  const playerStats = await Player.getStats(playerId)
+  const playerDatas = await Player.getDatas(playerId)
 
-    const options = []
-    const dates = await DateStats.getDates(playerId, maxMatchsDateStats, getFirstDay)
+  const options = []
+  const dates = await DateStats.getDates(playerId, maxMatchsDateStats, getFirstDay)
 
-    dates.forEach(date => {
-      const from = new Date(date.date)
-      const to = new Date(date.date).setMonth(new Date(date.date).getMonth() + 1)
+  dates.forEach(date => {
+    const from = new Date(date.date)
+    const to = new Date(date.date).setMonth(new Date(date.date).getMonth() + 1)
 
-      options.push({
-        label: `${from.toLocaleDateString('en-EN', { month: 'short', year: 'numeric' })}`,
-        description: `${date.number} match played`,
-        value: JSON.stringify({
-          s: steamId,
-          f: from.getTime() / 1000,
-          t: to / 1000,
-          u: message.author.id
-        })
+    options.push({
+      label: `${from.toLocaleDateString('en-EN', { month: 'short', year: 'numeric' })}`,
+      description: `${date.number} match played`,
+      value: JSON.stringify({
+        s: steamId,
+        f: from.getTime() / 1000,
+        t: to / 1000,
+        u: message.author.id
       })
     })
+  })
 
-    if (options.length === 0) return errorCard(`Couldn't get matchs of ${playerDatas.nickname}`)
-    if (playerStats.lifetime.Matches > maxMatchsDateStats) options.pop()
-    const row = new Discord.MessageActionRow()
-      .addComponents(
-        new Discord.MessageSelectMenu()
-          .setCustomId('dateStatsSelector')
-          .setPlaceholder('Select a month')
-          .addOptions(options.slice(0, 24)))
+  if (options.length === 0) return errorCard(`Couldn't get matchs of ${playerDatas.nickname}`)
+  if (playerStats.lifetime.Matches > maxMatchsDateStats) options.pop()
+  const row = new Discord.MessageActionRow()
+    .addComponents(
+      new Discord.MessageSelectMenu()
+        .setCustomId('dateStatsSelector')
+        .setPlaceholder('Select a month')
+        .addOptions(options.slice(0, 24)))
 
-    return {
-      content: `Select one of the following month to get the stats related (${playerDatas.nickname})`,
-      components: [row]
-    }
-  } catch (error) {
-    console.log(error)
-    return errorCard(error)
+  return {
+    content: `Select one of the following month to get the stats related (${playerDatas.nickname})`,
+    components: [row]
   }
 }
 

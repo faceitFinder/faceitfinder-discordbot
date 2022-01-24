@@ -7,25 +7,19 @@ const errorCard = require('../templates/errorCard')
 const { getCardsConditions } = require('../functions/commands')
 
 const sendCardWithInfos = async (message, steamParam) => {
-  try {
-    const steamId = await Steam.getId(steamParam)
-    const playerId = await Player.getId(steamId)
-    const playerDatas = await Player.getDatas(playerId)
-    const discordId = message.author.id
+  const steamId = await Steam.getId(steamParam)
+  const playerId = await Player.getId(steamId)
+  const playerDatas = await Player.getDatas(playerId)
+  const discordId = message.author.id
 
-    await User.exists(discordId) ? User.update(discordId, steamId) : User.create(discordId, steamId)
+  await User.exists(discordId) ? User.update(discordId, steamId) : User.create(discordId, steamId)
 
-    return {
-      embeds: [
-        new Discord.MessageEmbed()
-          .setColor(color.primary)
-          .setDescription(`Your account has been linked to ${playerDatas.nickname}`)
-      ]
-    }
-
-  } catch (error) {
-    console.log(error)
-    return errorCard(error)
+  return {
+    embeds: [
+      new Discord.MessageEmbed()
+        .setColor(color.primary)
+        .setDescription(`Your account has been linked to ${playerDatas.nickname}`)
+    ]
   }
 }
 
