@@ -16,8 +16,9 @@ module.exports = {
   async execute(interaction) {
     if (interaction.isSelectMenu()) {
       interaction.deferUpdate().then(() => {
-        interaction.client.selectmenus.get(interaction.customId)?.execute(interaction)
+        interaction.client.selectmenus?.get(interaction.customId)?.execute(interaction)
           .then(e => editInteraction(interaction, e))
+          .catch(err => editInteraction(interaction, errorCard(err)))
       })
     } else if (interaction.isButton()) {
       interaction.deferUpdate().then(() => {

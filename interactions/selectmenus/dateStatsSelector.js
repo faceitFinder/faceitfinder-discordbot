@@ -86,7 +86,7 @@ const sendCardWithInfos = async (interaction, values, type = CustomType.TYPES.EL
   const toRealTimeStamp = new Date(to).setHours(-24)
 
   const card = new Discord.MessageEmbed()
-    .setAuthor(playerDatas.nickname, playerDatas.avatar, `https://www.faceit.com/fr/players/${playerDatas.nickname}`)
+    .setAuthor({ name: playerDatas.nickname, iconURL: playerDatas.avatar, url: `https://www.faceit.com/fr/players/${playerDatas.nickname}` })
     .setTitle('Steam')
     .setURL(steamDatas.profileurl)
     .setThumbnail(`attachment://${faceitLevel}level.png`)
@@ -108,7 +108,7 @@ const sendCardWithInfos = async (interaction, values, type = CustomType.TYPES.EL
       { name: 'Average Assists', value: getAverage(playerStats['Average Assists'], playerStats.games), inline: true })
     .setImage(`attachment://${values.s}graph.png`)
     .setColor(color.levels[faceitLevel].color)
-    .setFooter(`Steam: ${steamDatas.personaname}`)
+    .setFooter({ text: `Steam: ${steamDatas.personaname}` })
 
   return {
     embeds: [card],

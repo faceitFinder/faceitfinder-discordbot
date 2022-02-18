@@ -49,7 +49,7 @@ module.exports = {
       if (fs.existsSync(mapThumbnail)) filesAtt.push(new Discord.MessageAttachment(mapThumbnail, `${values.m}.jpg`))
 
       return new Discord.MessageEmbed()
-        .setAuthor(playerDatas.nickname, playerDatas.avatar, `https://www.faceit.com/fr/players/${playerDatas.nickname}`)
+        .setAuthor({ name: playerDatas.nickname, iconURL: playerDatas.avatar, url: `https://www.faceit.com/fr/players/${playerDatas.nickname}` })
         .setDescription(`[Steam](${steamDatas.profileurl})`)
         .setThumbnail('attachment://level.png')
         .addFields({ name: 'Games', value: `${m.stats.Matches} (${m.stats['Win Rate %']}% Win)`, inline: true },
@@ -62,7 +62,7 @@ module.exports = {
           { name: 'Average Deaths', value: m.stats['Average Deaths'], inline: true },
           { name: 'Average Assists', value: m.stats['Average Assists'], inline: true })
         .setColor(color.levels[faceitLevel].color)
-        .setFooter(`Steam: ${steamDatas.personaname}`)
+        .setFooter({ text: `Steam: ${steamDatas.personaname}` })
         .setImage(`attachment://${values.m}.jpg`)
     })
 

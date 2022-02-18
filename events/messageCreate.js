@@ -20,7 +20,10 @@ module.exports = {
             if (Array.isArray(resp)) resp.forEach(m => message.reply(noMention(m)).catch((err) => console.log(err)))
             else message.reply(noMention(resp)).catch((err) => console.log(err))
           })
-          .catch(err => message.reply(noMention(errorCard('An error has occured'))).catch((err) => console.log(err)))
+          .catch(err => {
+            console.log(err)
+            message.reply(noMention(errorCard('An error has occured'))).catch((err) => console.log(err))
+          })
     }
   }
 }

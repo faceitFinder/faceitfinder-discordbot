@@ -13,9 +13,9 @@ module.exports = {
       embeds: [
         new Discord.MessageEmbed()
           .setColor(color.primary)
-          .setAuthor(name, 'attachment://logo.png')
+          .setAuthor({ name: name, iconURL: 'attachment://logo.png' })
           .setDescription(`Hey <@${message.author.id}> you can vote for me on the following link\n${vote}`)
-          .setFooter(`${name} Vote`)
+          .setFooter({ text: `${name} Vote` })
       ],
       files: [
         new Discord.MessageAttachment('./images/logo.png', 'logo.png')

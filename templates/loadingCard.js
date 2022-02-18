@@ -7,9 +7,9 @@ module.exports = (interation) => {
     embeds: [
       new Discord.MessageEmbed()
         .setColor(color.primary)
-        .setAuthor(name, 'attachment://logo.png')
+        .setAuthor({ name: name, iconURL: 'attachment://logo.png' })
         .setDescription('Your request is currently processing..')
-        .setFooter('FaceitFinder Loader')
+        .setFooter({ text: 'FaceitFinder Loader' })
     ],
     attachments: [],
     components: [],
