@@ -39,7 +39,7 @@ const sendCardWithInfos = async (message, steamParam, type = CustomType.TYPES.EL
   const rankImageCanvas = await Graph.getRankImage(faceitLevel, faceitElo, size)
 
   const card = new Discord.MessageEmbed()
-    .setAuthor(playerDatas.nickname, playerDatas.avatar, `https://www.faceit.com/fr/players/${playerDatas.nickname}`)
+    .setAuthor({ name: playerDatas.nickname, iconURL: playerDatas.avatar, url: `https://www.faceit.com/fr/players/${playerDatas.nickname}` })
     .setTitle('Steam')
     .setURL(steamDatas.profileurl)
     .setThumbnail(`attachment://${faceitLevel}level.png`)
@@ -51,7 +51,7 @@ const sendCardWithInfos = async (message, steamParam, type = CustomType.TYPES.EL
       { name: `:flag_${playerRegion.toLowerCase()}:`, value: ladderRegion.position.toString(), inline: true })
     .setImage('attachment://graph.png')
     .setColor(color.levels[faceitLevel].color)
-    .setFooter(`Steam: ${steamDatas.personaname}`)
+    .setFooter({ text: `Steam: ${steamDatas.personaname}` })
 
   return {
     content: ' ',

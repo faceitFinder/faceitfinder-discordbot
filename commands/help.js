@@ -56,7 +56,7 @@ module.exports = {
       .setColor(color.primary)
       .setTitle('Commands')
       .setDescription(`\`${prefix}help {command}\` for more info on a specific command`)
-      .setFooter(`${name} Help`)
+      .setFooter({ text: `${name} Help` })
 
     if (args.length === 0) return getCommands(helpCard)
     else return getCommandsHelp(args[0], helpCard)

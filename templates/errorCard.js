@@ -6,6 +6,6 @@ module.exports = (description) => {
     embeds: [new Discord.MessageEmbed()
       .setColor(color.error)
       .setDescription(description)
-      .setFooter(`${name} Error`)]
+      .setFooter({ text: `${name} Error` })]
   }
 }

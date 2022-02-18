@@ -57,7 +57,7 @@ const sendCardWithInfos = async (message, steamParam, matchId = null) => {
     if (playerStats !== undefined && playerDatas !== undefined) {
       filesAtt.push(new Discord.MessageAttachment(rankImageCanvas.toBuffer(), `${faceitLevel}.png`))
 
-      card.setAuthor(playerDatas.nickname, playerDatas.avatar, `https://www.faceit.com/fr/players/${playerDatas.nickname}`)
+      card.setAuthor({ name: playerDatas.nickname, iconURL: playerDatas.avatar, url: `https://www.faceit.com/fr/players/${playerDatas.nickname}` })
         .setDescription(`[Steam](${steamDatas.profileurl}), [Game Lobby](https://www.faceit.com/fr/csgo/room/${matchId}/scoreboard)`)
         .addFields({ name: 'Score', value: r.round_stats.Score.toString(), inline: true },
           { name: 'Map', value: r.round_stats.Map, inline: true },
@@ -73,7 +73,7 @@ const sendCardWithInfos = async (message, steamParam, matchId = null) => {
         .setThumbnail(`attachment://${faceitLevel}.png`)
         .setImage(`attachment://${r.round_stats.Map}.jpg`)
         .setColor(parseInt(playerStats.Result) ? color.won : color.lost)
-        .setFooter(`Steam: ${steamDatas.personaname}`)
+        .setFooter({ text: `Steam: ${steamDatas.personaname}` })
 
       if (fs.existsSync(mapThumbnail))
         filesAtt.push(new Discord.MessageAttachment(mapThumbnail, `${r.round_stats.Map}.jpg`))
