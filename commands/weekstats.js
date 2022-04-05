@@ -1,10 +1,11 @@
 const Discord = require('discord.js')
+const { emojis, maxMatchsDateStats } = require('../config.json')
 const Steam = require('../functions/steam')
 const Player = require('../functions/player')
 const errorCard = require('../templates/errorCard')
 const DateStats = require('../functions/dateStats')
 const { getCardsConditions } = require('../functions/commands')
-const { maxMatchsDateStats } = require('../config.json')
+const CustomType = require('../templates/customType')
 
 const getMonday = date => {
   const week = [6, 0, 1, 2, 3, 4, 5]
@@ -22,12 +23,13 @@ const sendCardWithInfos = async (message, steamParam) => {
 
   const options = []
   const dates = await DateStats.getDates(playerId, maxMatchsDateStats, getMonday)
+  let first = false
 
   dates.forEach(date => {
     const from = new Date(date.date)
     const to = new Date(from.setDate(from.getDate() + 7))
 
-    options.push({
+    let option = {
       label: [new Date(date.date).toDateString(), '-', new Date(new Date(to).setHours(-24)).toDateString()].join(' '),
       description: `${date.number} match played`,
       value: JSON.stringify({
@@ -36,8 +38,14 @@ const sendCardWithInfos = async (message, steamParam) => {
         t: to.getTime() / 1000,
         u: message.author.id
       })
-    })
+    }
+
+    if (!first) {
+      first = true
+      option = DateStats.setOption(option, true)
+    } options.push(option)
   })
+
 
   if (options.length === 0) return errorCard(`Couldn\'t get matchs of ${playerStats.nickname}`)
   if (playerStats.lifetime.Matches > maxMatchsDateStats) options.pop()
@@ -46,12 +54,9 @@ const sendCardWithInfos = async (message, steamParam) => {
       new Discord.MessageSelectMenu()
         .setCustomId('dateStatsSelector')
         .setPlaceholder('Select a week')
-        .addOptions(options.splice(0, 24)))
+        .addOptions(options.slice(0, 24)))
 
-  return {
-    content: `Select one of the following week to get the stats related (${playerDatas.nickname})`,
-    components: [row]
-  }
+  return DateStats.getCardWithInfos(row, JSON.parse(options[0].value), CustomType.TYPES.ELO)
 }
 
 module.exports = {

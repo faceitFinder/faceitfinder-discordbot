@@ -1,10 +1,11 @@
 const Discord = require('discord.js')
+const { emojis, maxMatchsDateStats } = require('../config.json')
 const Steam = require('../functions/steam')
 const Player = require('../functions/player')
 const errorCard = require('../templates/errorCard')
-const { getCardsConditions } = require('../functions/commands')
 const DateStats = require('../functions/dateStats')
-const { maxMatchsDateStats } = require('../config.json')
+const { getCardsConditions } = require('../functions/commands')
+const CustomType = require('../templates/customType')
 
 const getDay = date => {
   date = new Date(date)
@@ -20,12 +21,13 @@ const sendCardWithInfos = async (message, steamParam) => {
 
   const options = []
   const dates = await DateStats.getDates(playerId, maxMatchsDateStats, getDay)
+  let first = false
 
   dates.forEach(date => {
     const from = new Date(date.date)
     const to = new Date(date.date).setHours(24)
-
-    options.push({
+    
+    let option = {
       label: from.toDateString(),
       description: `${date.number} match played`,
       value: JSON.stringify({
@@ -34,7 +36,12 @@ const sendCardWithInfos = async (message, steamParam) => {
         t: to / 1000,
         u: message.author.id
       })
-    })
+    }
+
+    if (!first) {
+      first = true
+      option = DateStats.setOption(option, true)
+    } options.push(option)
   })
 
   if (options.length === 0) return errorCard(`Couldn't get matchs of ${playerDatas.nickname}`)
@@ -46,10 +53,7 @@ const sendCardWithInfos = async (message, steamParam) => {
         .setPlaceholder('Select a day')
         .addOptions(options.slice(0, 24)))
 
-  return {
-    content: `Select one of the following day to get the stats related (${playerDatas.nickname})`,
-    components: [row]
-  }
+  return DateStats.getCardWithInfos(row, JSON.parse(options[0].value), CustomType.TYPES.ELO)
 }
 
 module.exports = {
