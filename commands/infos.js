@@ -16,9 +16,8 @@ module.exports = {
           .setColor(color.primary)
           .setAuthor({ name: name, iconURL: 'attachment://logo.png' })
           .setDescription('**Bot infos**')
-          .addFields(
+          .addFields({ name: 'Creator', value: `<@${creator}>` },
             { name: 'Web App', value: webapp },
-            { name: 'Creator', value: `<@${creator}>` },
             { name: 'Github', value: github },
             { name: 'Invitation link', value: invite },
             { name: 'Vote link', value: vote },
