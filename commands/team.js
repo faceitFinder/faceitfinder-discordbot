@@ -129,7 +129,7 @@ module.exports = {
     },
     {
       name: CREATE,
-      slashDescription: 'create your team',
+      description: 'create your team',
       type: 1,
       slash: true,
       options: [
@@ -149,7 +149,7 @@ module.exports = {
     },
     {
       name: UPDATE,
-      slashDescription: 'update your team',
+      description: 'update your team',
       type: 1,
       slash: true,
       options: [
@@ -169,13 +169,13 @@ module.exports = {
     },
     {
       name: DELETE,
-      slashDescription: 'delete your team',
+      description: 'delete your team',
       type: 1,
       slash: true
     },
     {
       name: ADD_USER,
-      slashDescription: 'add a user to your team',
+      description: 'add a user to your team',
       type: 1,
       slash: true,
       options: [
@@ -189,7 +189,7 @@ module.exports = {
     },
     {
       name: REMOVE_USER,
-      slashDescription: 'remove a user from your team',
+      description: 'remove a user from your team',
       type: 1,
       slash: true,
       options: [
@@ -203,7 +203,7 @@ module.exports = {
     }
   ],
   description: 'Create a team and link up to 5 users to it (limited to 1 team by discord account).',
-  usage: ':\n`create` [team name]\n`delete`\n`update` [access] {name}\n`infos`\n`add_user` [steamID / steam custom ID / url of one steam profile / @user / CSGO status]\n`remove_user` [steamID / steam custom ID / url of one steam profile / @user / CSGO status]',
+  usage: `\n- \`${CREATE}\` [team name]\n- \`${DELETE}\`\n- \`${UPDATE}\` [access] {name}\n- \`${INFOS}\`\n- \`${ADD_USER}\` [steamID / steam custom ID / url of one steam profile / @user / CSGO status]\n- \`${REMOVE_USER}\` [steamID / steam custom ID / url of one steam profile / @user / CSGO status]`,
   type: 'utility',
   async execute(interaction) {
     const user = interaction.user.id
