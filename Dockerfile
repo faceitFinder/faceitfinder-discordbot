@@ -1,4 +1,4 @@
-FROM node:16.8.0
+FROM node:17.1.0
 
 ENV APP /usr/src/app
 
