@@ -38,7 +38,7 @@ module.exports = {
     // check if user is part of the team if not the creator
     const currentUser = await User.get(interaction.user.id)
     if (currentTeam.creator !== interaction.user.id && currentUser) {
-      const userIsPartOfTeam = teamUsers.find(user => user.steamId === interaction.user.id)
+      const userIsPartOfTeam = teamUsers.find(user => user.steamId === currentUser.steamId)
       if (!userIsPartOfTeam) return {
         ...errorCard('You are not part of this team'),
         components: [
