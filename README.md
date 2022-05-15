@@ -15,8 +15,6 @@ Want to contribute? Great!
 
 ### Installation
 
-FaceitFinder require `docker-compose` v3. 
-
 **Clone the repository:**
 
 ```sh
@@ -30,6 +28,12 @@ Rename the `.env.example` to `.env` and complete/update it with yours informatio
 
 ```sh
 docker-compose -f docker-compose.dev.yml up
+```
+
+**Run linter:**
+
+```sh
+docker exec -it faceitfinder_dev npm run lint
 ```
 
 **Run docker on a prod environment:**
