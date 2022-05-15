@@ -24,7 +24,6 @@ const getCommands = (card) => {
 }
 
 const getCommandsHelp = (commandName, card) => {
-  console.log(commandName)
   try { command = require(`./${commandName}.js`) }
   catch { return errorCard('Command not found') }
 
