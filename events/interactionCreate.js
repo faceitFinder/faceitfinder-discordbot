@@ -1,4 +1,3 @@
-const { buildMessageFromInteraction } = require('../functions/commands')
 const noMention = require('../templates/noMention')
 const errorCard = require('../templates/errorCard')
 
@@ -29,9 +28,8 @@ module.exports = {
     } else if (interaction.client.commands.has(interaction.commandName)) {
       if (interaction.client.antispam.isIgnored(interaction.user.id, interaction.createdAt, interaction.channel)) return
       else {
-        const { message, args } = buildMessageFromInteraction(interaction)
         interaction.deferReply().then(async () => {
-          interaction.client.commands.get(interaction.commandName)?.execute(message, args)
+          interaction.client.commands.get(interaction.commandName)?.execute(interaction)
             .then(resp => {
               if (Array.isArray(resp)) resp.forEach(r => interaction.followUp(r))
               else interaction.followUp(resp)

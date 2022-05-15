@@ -10,8 +10,6 @@ module.exports = {
     
     loadingCard(interaction)
 
-    const { message, args } = buildMessageFromInteraction(interaction)
-
-    return await Stats.sendCardWithInfos(message, json.s, CustomType.getType(interaction.component.label))
+    return await Stats.sendCardWithInfos(interaction, json.s, CustomType.getType(interaction.component.label))
   }
 }

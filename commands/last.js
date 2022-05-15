@@ -16,7 +16,7 @@ const getPlayerStats = (teams, playerId) => {
   }
 }
 
-const sendCardWithInfos = async (message, steamParam, matchId = null) => {
+const sendCardWithInfos = async (interaction, steamParam, matchId = null) => {
   const steamId = await Steam.getId(steamParam)
   const steamDatas = await Steam.getDatas(steamId)
   const playerId = await Player.getId(steamId)
@@ -97,7 +97,7 @@ const sendCardWithInfos = async (message, steamParam, matchId = null) => {
           emoji: playerResult !== undefined ? parseInt(playerResult) ? emojis.won.balise : emojis.lost.balise : null,
           default: e.match_id === matchId,
           value: JSON.stringify({
-            u: message.author.id,
+            u: interaction.user.id,
             m: e.match_id,
             s: steamId
           })
@@ -121,7 +121,6 @@ const sendCardWithInfos = async (message, steamParam, matchId = null) => {
 
 module.exports = {
   name: 'last',
-  aliasses: ['last', 'l', 'lst'],
   options: [
     {
       name: 'steam_parameters',
@@ -141,13 +140,20 @@ module.exports = {
       required: false,
       type: 3,
       slash: true
+    },
+    {
+      name: 'team',
+      slashDescription: 'team slug (you need to be a part of it, the creator, or it has to be public)',
+      required: false,
+      type: 3,
+      slash: true
     }
   ],
   description: 'Get the stats of last game.',
   usage: 'multiple steam params and @user or CSGO status, max 10 users',
   type: 'stats',
-  async execute(message, args) {
-    return getCardsConditions(message, args, sendCardWithInfos)
+  async execute(interaction) {
+    return getCardsConditions(interaction, sendCardWithInfos)
   },
 }
 

@@ -1,6 +1,5 @@
 const { emojis } = require('../../config.json')
 const Discord = require('discord.js')
-const Player = require('../../functions/player')
 const loadingCard = require('../../templates/loadingCard')
 const CustomType = require('../../templates/customType')
 const DateStats = require('../../functions/dateStats')

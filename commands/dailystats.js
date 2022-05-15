@@ -1,5 +1,5 @@
 const Discord = require('discord.js')
-const { emojis, maxMatchsDateStats } = require('../config.json')
+const { maxMatchsDateStats } = require('../config.json')
 const Steam = require('../functions/steam')
 const Player = require('../functions/player')
 const errorCard = require('../templates/errorCard')
@@ -13,7 +13,7 @@ const getDay = date => {
   return date.getTime()
 }
 
-const sendCardWithInfos = async (message, steamParam) => {
+const sendCardWithInfos = async (interaction, steamParam) => {
   const steamId = await Steam.getId(steamParam)
   const playerId = await Player.getId(steamId)
   const playerStats = await Player.getStats(playerId)
@@ -26,7 +26,7 @@ const sendCardWithInfos = async (message, steamParam) => {
   dates.forEach(date => {
     const from = new Date(date.date)
     const to = new Date(date.date).setHours(24)
-    
+
     let option = {
       label: from.toDateString(),
       description: `${date.number} match played`,
@@ -34,7 +34,7 @@ const sendCardWithInfos = async (message, steamParam) => {
         s: steamId,
         f: from.getTime() / 1000,
         t: to / 1000,
-        u: message.author.id
+        u: interaction.user.id
       })
     }
 
@@ -58,7 +58,6 @@ const sendCardWithInfos = async (message, steamParam) => {
 
 module.exports = {
   name: 'dailystats',
-  aliasses: ['dailystats', 'ds'],
   options: [
     {
       name: 'steam_parameters',
@@ -78,12 +77,19 @@ module.exports = {
       required: false,
       type: 3,
       slash: true
+    },
+    {
+      name: 'team',
+      slashDescription: 'team slug (you need to be a part of it, the creator, or it has to be public)',
+      required: false,
+      type: 3,
+      slash: true
     }
   ],
   description: 'Displays the stats of the choosen day. With elo graph of the day.',
   usage: 'multiple steam params and @user or CSGO status, max 10 users',
   type: 'stats',
-  async execute(message, args) {
-    return getCardsConditions(message, args, sendCardWithInfos)
+  async execute(interaction) {
+    return getCardsConditions(interaction, sendCardWithInfos)
   }
 }

@@ -17,20 +17,28 @@ module.exports = {
      * Setup commands
      */
     client.commands = new Discord.Collection()
-    client.slashCommands = []
-    fs.readdirSync('./commands').filter(file => file.endsWith('.js')).forEach(async (file) => {
-      const command = require(`../commands/${file}`)
+    client.slashCommands = fs.readdirSync('./commands').filter(file => file.endsWith('.js'))
+      .map(file => {
+        const command = require(`../commands/${file}`)
+        client.commands.set(command.name, command)
 
-      command.aliasses.forEach(e => { client.commands.set(e, command) })
+        return {
+          name: command.name,
+          description: command?.slashDescription || command.description,
+          options: command.options.filter(c => c.slash !== undefined && c.slash === true).map(c => {
+            let option = {
+              name: c.name,
+              description: c.description || c.slashDescription,
+              type: c.type
+            }
+            if (c.choices) option.choices = c.choices
+            if (c.options) option.options = c.options
+            if (c.required) option.required = c.required
 
-      client.slashCommands.push({
-        name: command.name,
-        description: command?.slashDescription || command.description,
-        options: command.options.filter(c => c.slash !== undefined && c.slash === true).map(c => {
-          return { name: c.name, description: c.description || c.slashDescription, required: c.required, type: c.type }
-        })
+            return option
+          })
+        }
       })
-    })
 
     /**
      * Setup / commands

@@ -1,17 +1,18 @@
 const { prefix } = require('../config.json')
 const User = require('../database/user')
+const Team = require('../database/team')
+const UserTeam = require('../database/userTeam')
 const errorCard = require('../templates/errorCard')
 const RegexFun = require('../functions/regex')
-const Discord = require('discord.js')
 const noMention = require('../templates/noMention')
 
-const getCards = async (message, array, fn) => {
+const getCards = async (interaction, array, fn) => {
   return Promise.all(array.map(async obj => {
     if (obj.discord) {
       const user = await User.exists(obj.param)
-      if (user) return fn(message, user.steamId).catch(err => noMention(errorCard(err)))
+      if (user) return fn(interaction, user.steamId).catch(err => noMention(errorCard(err)))
       else return errorCard('This user hasn\'t linked his profile')
-    } else return fn(message, obj.param).catch(err => noMention(errorCard(err)))
+    } else return fn(interaction, obj.param).catch(err => noMention(errorCard(err)))
   })).then(msgs => msgs.map(msg => {
     const data = {
       embeds: msg.embeds || [],
@@ -25,17 +26,37 @@ const getCards = async (message, array, fn) => {
   }))
 }
 
-const getCardsConditions = async (message, args, fn, maxUser = 10) => {
+const getCardsConditions = async (interaction, fn, maxUser = 10, name = 'parameters') => {
+  let team = getInteractionOption(interaction, 'team')?.trim().split(' ')[0]
+  const currentUser = await User.get(interaction.user.id)
+  let parameters
+
+  if (team) {
+    team = await Team.getTeamSlug(team)
+    if (!team) return errorCard('This team doesn\'t exist')
+    else {
+      const teamUsers = await UserTeam.getTeamUsers(team.slug)
+      if (!teamUsers.length > 0) return errorCard('This team has no members')
+      else if (
+        await Team.getCreatorTeam(interaction.user.id).slug === team.slug ||
+        team.access ||
+        teamUsers?.find(user => user.steamId === currentUser.steamId)
+      ) parameters = teamUsers.map(e => e.steamId).join(' ')
+      else return errorCard('You don\'t have access to this team')
+    }
+  } else parameters = getInteractionOption(interaction, name)
+  const args = parameters?.trim().split(' ').filter(e => e !== '') || []
+
   if (args.length === 0)
-    return await User.get(message.author.id) ?
-      getCards(message, [{ param: message.author.id, discord: true }], fn) :
+    return currentUser ?
+      getCards(interaction, [{ param: interaction.user.id, discord: true }], fn) :
       errorCard(`You need to link your account to do that without a parameter, do \`${prefix}help link\` to see how.`)
 
-  const steamIds = RegexFun.findSteamUIds(message.content)
+  const steamIds = RegexFun.findSteamUIds(parameters)
     .slice(0, maxUser)
     .map(e => { return { param: e, discord: false } })
 
-  if (steamIds.length > 0) return getCards(message, steamIds, fn)
+  if (steamIds.length > 0) return getCards(interaction, steamIds, fn)
 
   let params = []
   args.forEach(e => {
@@ -52,27 +73,19 @@ const getCardsConditions = async (message, args, fn, maxUser = 10) => {
     )
   })
 
-  return getCards(message, params.slice(0, maxUser), fn)
+  return getCards(interaction, params.slice(0, maxUser), fn)
 }
 
-const buildMessageFromInteraction = interaction => {
-  const message = {
-    author: interaction.user,
-    mentions: {
-      users: new Discord.Collection()
-    },
-    content: ''
-  }
-  const args = []
-  interaction.options?._hoistedOptions?.filter(o => o.type === 'STRING').forEach(o => {
-    o.value.split(' ').forEach(e => { if (e !== '') args.push(e) })
-    message.content += o.value
-  })
+const getInteractionOption = (interaction, name) => {
+  return interaction.options?._hoistedOptions?.filter(o => o.name === name)[0]?.value
+}
 
-  return { message, args }
+const isInteractionSubcommandEqual = (interaction, name) => {
+  return interaction.options?._subcommand === name
 }
 
 module.exports = {
   getCardsConditions,
-  buildMessageFromInteraction
+  getInteractionOption,
+  isInteractionSubcommandEqual
 }

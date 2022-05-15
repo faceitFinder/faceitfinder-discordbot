@@ -3,18 +3,17 @@ const Discord = require('discord.js')
 
 module.exports = {
   name: 'join',
-  aliasses: ['join'],
   options: [],
   description: 'Get the link to join the community server of the bot .',
   usage: '',
   type: 'system',
-  async execute(message, args) {
+  async execute(interaction) {
     return {
       embeds: [
         new Discord.MessageEmbed()
           .setColor(color.primary)
           .setAuthor({ name: name, iconURL: 'attachment://logo.png' })
-          .setDescription(`Hey <@${message.author.id}> you can join my server by clicking on the following link\n${join}`)
+          .setDescription(`Hey <@${interaction.user.id}> you can join my server by clicking on the following link\n${join}`)
           .setFooter({ text: `${name} Join` })
       ],
       files: [

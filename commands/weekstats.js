@@ -1,5 +1,5 @@
 const Discord = require('discord.js')
-const { emojis, maxMatchsDateStats } = require('../config.json')
+const { maxMatchsDateStats } = require('../config.json')
 const Steam = require('../functions/steam')
 const Player = require('../functions/player')
 const errorCard = require('../templates/errorCard')
@@ -15,7 +15,7 @@ const getMonday = date => {
   return new Date(date.setDate(date.getDate() - week[date.getDay()])).getTime()
 }
 
-const sendCardWithInfos = async (message, steamParam) => {
+const sendCardWithInfos = async (interaction, steamParam) => {
   const steamId = await Steam.getId(steamParam)
   const playerId = await Player.getId(steamId)
   const playerStats = await Player.getStats(playerId)
@@ -36,7 +36,7 @@ const sendCardWithInfos = async (message, steamParam) => {
         s: steamId,
         f: date.date / 1000,
         t: to.getTime() / 1000,
-        u: message.author.id
+        u: interaction.user.id
       })
     }
 
@@ -46,8 +46,7 @@ const sendCardWithInfos = async (message, steamParam) => {
     } options.push(option)
   })
 
-
-  if (options.length === 0) return errorCard(`Couldn\'t get matchs of ${playerStats.nickname}`)
+  if (options.length === 0) return errorCard(`Couldn\'t get matchs of ${playerDatas.nickname}`)
   if (playerStats.lifetime.Matches > maxMatchsDateStats) options.pop()
   const row = new Discord.MessageActionRow()
     .addComponents(
@@ -61,7 +60,6 @@ const sendCardWithInfos = async (message, steamParam) => {
 
 module.exports = {
   name: 'weekstats',
-  aliasses: ['weekstats', 'ws'],
   options: [
     {
       name: 'steam_parameters',
@@ -81,12 +79,19 @@ module.exports = {
       required: false,
       type: 3,
       slash: true
+    },
+    {
+      name: 'team',
+      slashDescription: 'team slug (you need to be a part of it, the creator, or it has to be public)',
+      required: false,
+      type: 3,
+      slash: true
     }
   ],
   description: 'Displays the stats of the choosen week. With elo graph of the week.',
   usage: 'multiple steam params and @user or CSGO status, max 10 users',
   type: 'stats',
-  async execute(message, args) {
-    return getCardsConditions(message, args, sendCardWithInfos)
+  async execute(interaction) {
+    return getCardsConditions(interaction, sendCardWithInfos)
   }
 }
