@@ -78,6 +78,13 @@ module.exports = {
       required: false,
       type: 3,
       slash: true
+    },
+    {
+      name: 'team',
+      slashDescription: 'team slug (you need to be a part of it, the creator, or it has to be public)',
+      required: false,
+      type: 3,
+      slash: true
     }
   ],
   description: 'Displays the stats of the choosen month. With elo graph of the month.',

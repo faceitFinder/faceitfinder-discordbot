@@ -1,5 +1,7 @@
 const { prefix } = require('../config.json')
 const User = require('../database/user')
+const Team = require('../database/team')
+const UserTeam = require('../database/userTeam')
 const errorCard = require('../templates/errorCard')
 const RegexFun = require('../functions/regex')
 const noMention = require('../templates/noMention')
@@ -25,11 +27,28 @@ const getCards = async (interaction, array, fn) => {
 }
 
 const getCardsConditions = async (interaction, fn, maxUser = 10, name = 'parameters') => {
-  const parameters = getInteractionOption(interaction, 'team') || getInteractionOption(interaction, name)
-  let args = parameters?.trim().split(' ') || []
+  let team = getInteractionOption(interaction, 'team')?.trim().split(' ')[0]
+  const currentUser = await User.get(interaction.user.id)
+  let parameters
+
+  if (team) {
+    team = await Team.getTeamSlug(team)
+    if (!team) return errorCard('This team doesn\'t exist')
+    else {
+      const teamUsers = await UserTeam.getTeamUsers(team.slug)
+      if (!teamUsers.length > 0) return errorCard('This team has no members')
+      else if (
+        await Team.getCreatorTeam(interaction.user.id).slug === team.slug ||
+        team.access ||
+        teamUsers?.find(user => user.steamId === currentUser.steamId)
+      ) parameters = teamUsers.map(e => e.steamId).join(' ')
+      else return errorCard('You don\'t have access to this team')
+    }
+  } else parameters = getInteractionOption(interaction, name)
+  const args = parameters?.trim().split(' ').filter(e => e !== '') || []
 
   if (args.length === 0)
-    return await User.get(interaction.user.id) ?
+    return currentUser ?
       getCards(interaction, [{ param: interaction.user.id, discord: true }], fn) :
       errorCard(`You need to link your account to do that without a parameter, do \`${prefix}help link\` to see how.`)
 

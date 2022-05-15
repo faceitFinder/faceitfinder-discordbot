@@ -41,7 +41,7 @@ const sendCardWithInfos = async (interaction, steamParam, type = CustomType.TYPE
   const card = new Discord.MessageEmbed()
     .setAuthor({
       name: playerDatas.nickname,
-      iconURL: playerDatas.avatar, 
+      iconURL: playerDatas.avatar,
       url: `https://www.faceit.com/fr/players/${playerDatas.nickname}`
     })
     .setTitle('Steam')
@@ -98,6 +98,13 @@ module.exports = {
     {
       name: 'parameters',
       slashDescription: 'steamIDs / steam custom IDs / url of one or more steam profiles / @users / CSGO status.',
+      required: false,
+      type: 3,
+      slash: true
+    },
+    {
+      name: 'team',
+      slashDescription: 'team slug (you need to be a part of it, the creator, or it has to be public)',
       required: false,
       type: 3,
       slash: true
