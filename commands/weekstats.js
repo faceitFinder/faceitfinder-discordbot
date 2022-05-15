@@ -46,8 +46,7 @@ const sendCardWithInfos = async (interaction, steamParam) => {
     } options.push(option)
   })
 
-
-  if (options.length === 0) return errorCard(`Couldn\'t get matchs of ${playerStats.nickname}`)
+  if (options.length === 0) return errorCard(`Couldn\'t get matchs of ${playerDatas.nickname}`)
   if (playerStats.lifetime.Matches > maxMatchsDateStats) options.pop()
   const row = new Discord.MessageActionRow()
     .addComponents(
@@ -77,6 +76,13 @@ module.exports = {
     {
       name: 'parameters',
       slashDescription: 'steamIDs / steam custom IDs / url of one or more steam profiles / @users / CSGO status.',
+      required: false,
+      type: 3,
+      slash: true
+    },
+    {
+      name: 'team',
+      slashDescription: 'team slug (you need to be a part of it, the creator, or it has to be public)',
       required: false,
       type: 3,
       slash: true
