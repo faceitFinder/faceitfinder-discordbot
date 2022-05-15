@@ -9,7 +9,7 @@ const CustomType = require('../templates/customType')
 const CustomTypeFunc = require('../functions/customType')
 const { getCardsConditions } = require('../functions/commands')
 
-const sendCardWithInfos = async (message, steamParam, type = CustomType.TYPES.ELO) => {
+const sendCardWithInfos = async (interaction, steamParam, type = CustomType.TYPES.ELO) => {
   const steamId = await Steam.getId(steamParam)
   const steamDatas = await Steam.getDatas(steamId)
   const playerId = await Player.getId(steamId)
@@ -20,7 +20,7 @@ const sendCardWithInfos = async (message, steamParam, type = CustomType.TYPES.EL
   const buttonValues = {
     id: 'updateStatsGraph',
     s: steamId,
-    u: message.author.id
+    u: interaction.user.id
   }
 
   const graphCanvas = Graph.generateCanvas(CustomTypeFunc.getGraph(type, playerHistory, faceitElo),
@@ -39,7 +39,11 @@ const sendCardWithInfos = async (message, steamParam, type = CustomType.TYPES.EL
   const rankImageCanvas = await Graph.getRankImage(faceitLevel, faceitElo, size)
 
   const card = new Discord.MessageEmbed()
-    .setAuthor({ name: playerDatas.nickname, iconURL: playerDatas.avatar, url: `https://www.faceit.com/fr/players/${playerDatas.nickname}` })
+    .setAuthor({
+      name: playerDatas.nickname,
+      iconURL: playerDatas.avatar, 
+      url: `https://www.faceit.com/fr/players/${playerDatas.nickname}`
+    })
     .setTitle('Steam')
     .setURL(steamDatas.profileurl)
     .setThumbnail(`attachment://${faceitLevel}level.png`)
@@ -78,7 +82,6 @@ const sendCardWithInfos = async (message, steamParam, type = CustomType.TYPES.EL
 
 module.exports = {
   name: 'stats',
-  aliasses: ['stats', 's'],
   options: [
     {
       name: 'steam_parameters',
@@ -103,8 +106,8 @@ module.exports = {
   description: 'Displays general stats. With elo graph of the 20 last games.',
   usage: 'multiple steam params and @user or CSGO status, max 10 users',
   type: 'stats',
-  async execute(message, args) {
-    return getCardsConditions(message, args, sendCardWithInfos)
+  async execute(interaction) {
+    return getCardsConditions(interaction, sendCardWithInfos)
   }
 }
 

@@ -3,7 +3,7 @@ const Player = require('../functions/player')
 const Steam = require('../functions/steam')
 const { getCardsConditions } = require('../functions/commands')
 
-const sendCardWithInfos = async (message, steamParam) => {
+const sendCardWithInfos = async (interaction, steamParam) => {
   const steamId = await Steam.getId(steamParam)
   const playerId = await Player.getId(steamId)
   const playerStats = await Player.getStats(playerId)
@@ -17,7 +17,7 @@ const sendCardWithInfos = async (message, steamParam) => {
       m: e.label,
       v: e.mode,
       s: steamId,
-      u: message.author.id
+      u: interaction.user.id
     }
 
     if (!options.filter(e => e.label === label).length > 0) options.push({
@@ -43,7 +43,6 @@ const sendCardWithInfos = async (message, steamParam) => {
 
 module.exports = {
   name: 'map',
-  aliasses: ['map'],
   options: [
     {
       name: 'steam_parameters',
@@ -68,7 +67,7 @@ module.exports = {
   description: 'Displays the stats of the choosen map.',
   usage: 'multiple steam params and @user or CSGO status, max 10 users',
   type: 'stats',
-  async execute(message, args) {
-    return getCardsConditions(message, args, sendCardWithInfos)
+  async execute(interaction) {
+    return getCardsConditions(interaction, sendCardWithInfos)
   }
 }

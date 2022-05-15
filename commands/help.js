@@ -1,18 +1,22 @@
-const { prefix, name, color } = require('../config.json')
+const { name, color } = require('../config.json')
 const Discord = require('discord.js')
 const fs = require('fs')
 const errorCard = require('../templates/errorCard')
+const { getInteractionOption } = require('../functions/commands')
+
+const getCommandsList = () => {
+  return fs.readdirSync('./commands')
+    .filter(file => file.endsWith('.js') && !file.startsWith('help'))
+    .map(cf => require(`./${cf}`))
+}
 
 const getCommands = (card) => {
-  const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'))
-  const commands = []
-  const types = []
+  const commands = getCommandsList()
+  const types = [...new Set(commands.map(c => c.type))]
 
-  commandFiles.forEach(cf => commands.push(require(`./${cf}`)))
-  commands.forEach(c => { if (!types.includes(c.type)) types.push(c.type) })
   types.forEach(t => {
     let value = ''
-    commands.forEach(c => { if (c.type === t) value += `\`${prefix} ${c.name}\` ` })
+    commands.forEach(c => { if (c.type === t) value += `\`${c.name}\` ` })
     card.addField(t, value)
   })
 
@@ -20,6 +24,7 @@ const getCommands = (card) => {
 }
 
 const getCommandsHelp = (commandName, card) => {
+  console.log(commandName)
   try { command = require(`./${commandName}.js`) }
   catch { return errorCard('Command not found') }
 
@@ -28,37 +33,42 @@ const getCommandsHelp = (commandName, card) => {
   command.options.forEach(o => { if (o.description) optionsDesc += `\`${o.name}\`: ${o.description}\n` })
 
   card.setDescription(`Informations about the ${command.name} command`)
-    .addFields({ name: 'Aliases', value: command.aliasses.join(', ') },
-      { name: 'Description', value: command.description },
+    .addFields({ name: 'Description', value: command.description },
       { name: 'Options', value: optionsDesc.length > 0 ? optionsDesc : 'This command do not required options' },
-      { name: 'Usage', value: `${prefix}${command.name} ${command.usage}` })
+      { name: 'Usage', value: `/${command.name} ${command.usage}` })
 
   return { embeds: [card] }
 }
 
 module.exports = {
   name: 'help',
-  aliasses: ['help', 'h'],
   options: [
     {
       name: 'command',
       description: 'One of the command name.',
       required: false,
       type: 3,
-      slash: true
+      slash: true,
+      choices: [
+        ...getCommandsList().map(c => {
+          if (c?.name) return { name: c.name, value: c.name }
+        }).filter(c => c !== undefined)
+      ]
     }
   ],
   description: 'Display the command list.',
   usage: 'command name',
   type: 'system',
-  async execute(message, args) {
+  async execute(interaction) {
+    const command = getInteractionOption(interaction, 'command')?.trim().split(' ')[0]
+
     const helpCard = new Discord.MessageEmbed()
       .setColor(color.primary)
       .setTitle('Commands')
-      .setDescription(`\`${prefix}help {command}\` for more info on a specific command`)
+      .setDescription('`/help {command}` for more info on a specific command')
       .setFooter({ text: `${name} Help` })
 
-    if (args.length === 0) return getCommands(helpCard)
-    else return getCommandsHelp(args[0], helpCard)
+    if (command) return getCommandsHelp(command, helpCard)
+    else return getCommands(helpCard)
   }
 }
