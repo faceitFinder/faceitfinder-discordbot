@@ -89,10 +89,6 @@ const deleteTeam = async (currentTeam, user) => {
 const addUser = async (interaction, steamParam) => {
   const user = interaction.user.id
   const currentTeam = await Team.getCreatorTeam(user)
-  const teamUsers = await UserTeam.getTeamUsers(currentTeam.slug)
-
-  if (teamUsers.length >= 5) return errorCard('You can\'t add more users to your team')
-
   const steamId = await Steam.getId(steamParam)
   const steamDatas = await Steam.getDatas(steamId)
   const playerId = await Player.getId(steamId)
@@ -219,8 +215,11 @@ module.exports = {
     else if (isInteractionSubcommandEqual(interaction, INFOS)) return infosTeam(currentTeam, user)
     else if (isInteractionSubcommandEqual(interaction, UPDATE)) return updateTeam(interaction, currentTeam, user)
     else if (isInteractionSubcommandEqual(interaction, DELETE)) return deleteTeam(currentTeam, user)
-    else if (isInteractionSubcommandEqual(interaction, ADD_USER)) return getCardsConditions(interaction, addUser, 5)
-    else if (isInteractionSubcommandEqual(interaction, REMOVE_USER)) return getCardsConditions(interaction, removeUser, 5)
+    else if (isInteractionSubcommandEqual(interaction, ADD_USER)) {
+      const teamUsers = await UserTeam.getTeamUsers(currentTeam.slug)
+      if (teamUsers.length >= 5) return errorCard('You can\'t add more than 5 users to your team')
+      return getCardsConditions(interaction, addUser, 5 - teamUsers.length)
+    } else if (isInteractionSubcommandEqual(interaction, REMOVE_USER)) return getCardsConditions(interaction, removeUser, 5)
     else return errorCard('Unknown subcommand')
   }
 }
