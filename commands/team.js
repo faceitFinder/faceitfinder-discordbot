@@ -111,7 +111,7 @@ const removeUser = async (interaction, steamParam) => {
   const playerDatas = await Player.getDatas(playerId)
 
   if (!await UserTeam.getUserTeam(steamId, currentTeam.slug))
-    return errorCard(`**${playerDatas.name}** is not part of the team **${currentTeam.name}**`)
+    return errorCard(`**${playerDatas.nickname}** is not part of the team **${currentTeam.name}**`)
 
   UserTeam.remove(steamId, currentTeam.slug)
 
@@ -183,14 +183,13 @@ module.exports = {
           name: 'steam_parameters',
           description: 'steamIDs / steam custom IDs / url of one or more steam profiles / CSGO status. (Max 5)',
           type: 3,
-          required: true
+          required: false
         },
         {
           name: 'faceit_parameters',
-          description: 'faceit nicknames (case sensitive)',
-          required: false,
+          description: 'faceit nicknames (case sensitive and max 1)',
           type: 3,
-          slash: true
+          required: false
         }
       ]
     },
@@ -204,14 +203,13 @@ module.exports = {
           name: 'steam_parameters',
           description: 'steamID / steam custom ID / url of one steam profiles / CSGO status. (Max 1)',
           type: 3,
-          required: true
+          required: false
         },
         {
           name: 'faceit_parameters',
-          description: 'faceit nicknames (case sensitive)',
-          required: false,
+          description: 'faceit nicknames (case sensitive and max 1) ',
           type: 3,
-          slash: true
+          required: false
         }
       ]
     }

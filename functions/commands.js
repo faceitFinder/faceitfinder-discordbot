@@ -57,7 +57,7 @@ const getCardsConditions = async (interaction, fn, maxUser = 10, name = 'steam_p
   if (args.length === 0)
     return currentUser ?
       getCards(interaction, [{ param: interaction.user.id, discord: true }], fn) :
-      errorCard(`You need to link your account to do that without a parameter, do \`${prefix}help link\` to see how.`)
+      errorCard(`It seems like you didn't executed the command correctly, do \`/help command:${interaction.commandName}\` to get more informations about it.`)
 
   const steamIds = RegexFun.findSteamUIds(parameters)
     .slice(0, maxUser)
