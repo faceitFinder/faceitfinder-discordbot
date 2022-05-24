@@ -9,6 +9,6 @@ module.exports = {
 
     loadingCard(interaction)
 
-    return sendCardWithInfos({ author: interaction.user }, s, m)
+    return sendCardWithInfos(interaction, s, m)
   }
 }
