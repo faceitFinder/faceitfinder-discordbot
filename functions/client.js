@@ -1,5 +1,4 @@
 const { Api } = require('@top-gg/sdk')
-const { prefix } = require('../config.json')
 
 require('dotenv').config()
 
@@ -14,7 +13,6 @@ const guildCount = (client) => {
       serverCount: Guilds.length
     }).catch(e => console.log(e))
   }
-
 }
 
 module.exports = {
