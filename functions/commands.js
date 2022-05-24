@@ -1,6 +1,7 @@
 const { prefix } = require('../config.json')
 const User = require('../database/user')
 const Team = require('../database/team')
+const Player = require('../functions/player')
 const UserTeam = require('../database/userTeam')
 const errorCard = require('../templates/errorCard')
 const RegexFun = require('../functions/regex')
@@ -26,8 +27,9 @@ const getCards = async (interaction, array, fn) => {
   }))
 }
 
-const getCardsConditions = async (interaction, fn, maxUser = 10, name = 'parameters') => {
+const getCardsConditions = async (interaction, fn, maxUser = 10, name = 'steam_parameters') => {
   let team = getInteractionOption(interaction, 'team')?.trim().split(' ')[0]
+  let faceit_parameters = getInteractionOption(interaction, 'faceit_parameters')?.trim().split(' ')
   const currentUser = await User.get(interaction.user.id)
   let parameters
 
@@ -44,6 +46,11 @@ const getCardsConditions = async (interaction, fn, maxUser = 10, name = 'paramet
       ) parameters = teamUsers.map(e => e.steamId).join(' ')
       else return errorCard('You don\'t have access to this team')
     }
+  } else if (faceit_parameters) {
+    await Promise.all(faceit_parameters.map(async nickname => await Player.getDatasFromNickname(nickname).catch(e => '*')))
+      .then(params => {
+        parameters = params.map(e => e?.steam_id_64 || e).join(' ')
+      })
   } else parameters = getInteractionOption(interaction, name)
   const args = parameters?.trim().split(' ').filter(e => e !== '') || []
 

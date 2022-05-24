@@ -62,33 +62,28 @@ module.exports = {
   options: [
     {
       name: 'steam_parameters',
-      description: 'steamIDs / steam custom IDs / url of one or more steam profiles / CSGO status.',
-      required: true,
-      type: 3,
-    },
-    {
-      name: 'user_mentions',
-      description: '@users that has linked their profiles to the bot.',
-      required: false,
-      type: 6,
-    },
-    {
-      name: 'parameters',
-      slashDescription: 'steamIDs / steam custom IDs / url of one or more steam profiles / @users / CSGO status.',
+      description: 'steamIDs / steam custom IDs / url of one or more steam profiles / @users / CSGO status.',
       required: false,
       type: 3,
       slash: true
     },
     {
       name: 'team',
-      slashDescription: 'team slug (you need to be a part of it, the creator, or it has to be public)',
+      description: 'team slug (you need to be a part of it, the creator, or it has to be public)',
+      required: false,
+      type: 3,
+      slash: true
+    },
+    {
+      name: 'faceit_parameters',
+      description: 'faceit nicknames (case sensitive)',
       required: false,
       type: 3,
       slash: true
     }
   ],
   description: 'Displays the stats of the choosen month. With elo graph of the month.',
-  usage: 'multiple steam params and @user or CSGO status, max 10 users',
+  usage: 'steam_parameters:multiple steam params and @user or CSGO status (max 10 users) OR team:team slug (max 1) OR faceit_parameters:multiple faceit nicknames (max 10)',
   type: 'stats',
   async execute(interaction) {
     return getCardsConditions(interaction, sendCardWithInfos)

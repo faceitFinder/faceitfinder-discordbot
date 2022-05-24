@@ -20,28 +20,23 @@ module.exports = {
   options: [
     {
       name: 'steam_parameter',
-      description: 'steamID / steam custom ID / url of one steam profile / CSGO status.',
-      required: true,
-      type: 3,
-    },
-    {
-      name: 'user_mention',
-      description: '@user that has linked his profile to the bot.',
+      description: 'steamID / steam custom ID / url of one steam profile / @user / CSGO status.',
       required: false,
-      type: 6,
+      type: 3,
+      slash: true
     },
     {
-      name: 'parameter',
-      slashDescription: 'steamID / steam custom ID / url of one steam profile / @user / CSGO status.',
-      required: true,
+      name: 'faceit_parameters',
+      description: 'faceit nickname (case sensitive)',
+      required: false,
       type: 3,
       slash: true
     }
   ],
   description: 'Link a steam profile to the discord user, to get your stats directly (no parameters needed).',
-  usage: 'steam parameter or @user, max 1 user',
+  usage: 'steam_parameter:steam param or @user or CSGO status (max 1 user) OR faceit_parameters:faceit nickname (max 1)',
   type: 'utility',
   async execute(interaction) {
-    return getCardsConditions(interaction, sendCardWithInfos, 1, 'parameter')
+    return getCardsConditions(interaction, sendCardWithInfos, 1, 'steam_parameter')
   }
 }

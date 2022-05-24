@@ -180,10 +180,17 @@ module.exports = {
       slash: true,
       options: [
         {
-          name: 'parameters',
+          name: 'steam_parameters',
           description: 'steamIDs / steam custom IDs / url of one or more steam profiles / CSGO status. (Max 5)',
           type: 3,
           required: true
+        },
+        {
+          name: 'faceit_parameters',
+          description: 'faceit nicknames (case sensitive)',
+          required: false,
+          type: 3,
+          slash: true
         }
       ]
     },
@@ -194,16 +201,23 @@ module.exports = {
       slash: true,
       options: [
         {
-          name: 'parameters',
+          name: 'steam_parameters',
           description: 'steamID / steam custom ID / url of one steam profiles / CSGO status. (Max 1)',
           type: 3,
           required: true
+        },
+        {
+          name: 'faceit_parameters',
+          description: 'faceit nicknames (case sensitive)',
+          required: false,
+          type: 3,
+          slash: true
         }
       ]
     }
   ],
   description: 'Create a team and link up to 5 users to it (limited to 1 team by discord account).',
-  usage: `\n- \`${CREATE}\` [team name]\n- \`${DELETE}\`\n- \`${UPDATE}\` [access] {name}\n- \`${INFOS}\`\n- \`${ADD_USER}\` [steamID / steam custom ID / url of one steam profile / @user / CSGO status]\n- \`${REMOVE_USER}\` [steamID / steam custom ID / url of one steam profile / @user / CSGO status]`,
+  usage: `\n- \`${CREATE}\` [team name]\n- \`${DELETE}\`\n- \`${UPDATE}\` [access] {name}\n- \`${INFOS}\`\n- \`${ADD_USER}\` [steamID / steam custom ID / url of one steam profile / @user / CSGO status OR faceit nicknames]\n- \`${REMOVE_USER}\` [steamID / steam custom ID / url of one steam profile / @user / CSGO status OR faceit nicknames]`,
   type: 'utility',
   async execute(interaction) {
     const user = interaction.user.id
