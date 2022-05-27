@@ -43,7 +43,7 @@ const infosTeam = async (currentTeam, user) => {
   const options = Array.from(new Set(userTeams.map(JSON.stringify)))
     .map(JSON.parse)
     .map(userteam => {
-      return {
+      if (userteam) return {
         label: userteam.name,
         description: `Get infos about the team ${userteam.name}`,
         value: JSON.stringify({
@@ -52,6 +52,7 @@ const infosTeam = async (currentTeam, user) => {
         })
       }
     })
+    .filter(e => e !== undefined)
 
   const row = new Discord.MessageActionRow()
     .addComponents(
@@ -71,6 +72,7 @@ const updateTeam = async (interaction, currentTeam) => {
   const teamName = getInteractionOption(interaction, 'name')
   const teamSlug = teamName?.toLowerCase().replace(/\s/g, '-')
   if (teamName && await Team.getTeamSlug(teamSlug)) return errorCard('A team with this name already exists')
+  else if (teamName) await UserTeam.updateMany(currentTeam.slug, teamSlug)
   const access = getInteractionOption(interaction, 'access')
   Team.update(currentTeam.slug, teamName || currentTeam.name, teamSlug || currentTeam.slug, access)
   return successCard(`Your team: **${teamName || currentTeam.name}** has been updated.`)
