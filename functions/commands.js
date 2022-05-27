@@ -28,7 +28,7 @@ const getCards = async (interaction, array, fn) => {
 }
 
 const getCardsConditions = async (interaction, fn, maxUser = 10, name = 'steam_parameters') => {
-  let team = getInteractionOption(interaction, 'team')?.trim().split(' ')[0]
+  let team = getInteractionOption(interaction, 'team')?.toLowerCase().trim().split(' ')[0]
   let faceit_parameters = getInteractionOption(interaction, 'faceit_parameters')?.trim().split(' ')
   const currentUser = await User.get(interaction.user.id)
   let parameters
