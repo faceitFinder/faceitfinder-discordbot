@@ -5,7 +5,7 @@ require('dotenv').config()
 const getId = (arg) => fetch(`http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?key=${process.env.STEAM_TOKEN}&vanityurl=${arg}`)
   .then(res => {
     if (res.status == 200) return res.json()
-    else throw 'An error has occured'
+    else throw res
   })
   .then(data => {
     if (data.response.success == 1) return data.response.steamid
@@ -15,7 +15,7 @@ const getId = (arg) => fetch(`http://api.steampowered.com/ISteamUser/ResolveVani
 const getDatas = (steamId) => fetch(`http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=${process.env.STEAM_TOKEN}&steamids=${steamId}`)
   .then(res => {
     if (res.status == 200) return res.json()
-    else throw 'An error has occured'
+    else throw res
   })
   .then(data => {
     if (data.response.players) return data.response.players[0]

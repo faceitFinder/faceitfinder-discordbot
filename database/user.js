@@ -1,9 +1,9 @@
 const User = require('./models/userModel')
 
-const create = (discordId, steamId) => {
+const create = (discordId, faceitId) => {
   const newUser = new User({
     discordId: discordId,
-    steamId: steamId
+    faceitId: faceitId
   })
 
   newUser.save((err) => {
@@ -17,7 +17,7 @@ const remove = (discordId) => User.deleteOne({ discordId: discordId }).exec()
 
 const exists = (discordId) => get(discordId)
 
-const update = (discordId, steamId) => User.updateOne({ discordId: discordId }, { steamId: steamId }).exec()
+const update = (discordId, faceitId) => User.updateOne({ discordId: discordId }, { faceitId: faceitId }).exec()
 
 const count = () => User.countDocuments({})
 

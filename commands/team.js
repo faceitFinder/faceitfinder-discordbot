@@ -33,7 +33,7 @@ const infosTeam = async (currentTeam, user) => {
   const userTeams = []
 
   if (currentUser) {
-    const currentUserTeams = await UserTeam.getUserTeams(currentUser.steamId)
+    const currentUserTeams = await UserTeam.getUserTeams(currentUser.faceitId)
     if (currentUserTeams)
       userTeams.push(...await Promise.all(currentUserTeams.map(async (userTeam) => await Team.getTeamSlug(userTeam.slug))))
   }
@@ -82,40 +82,35 @@ const deleteTeam = async (currentTeam, user) => {
   Team.remove(user)
   UserTeam.getTeamUsers(currentTeam.slug)
     .then(users => {
-      users.forEach(user => UserTeam.remove(user.steamId, currentTeam.slug))
+      users.forEach(user => UserTeam.remove(user.faceitId, currentTeam.slug))
     })
 
   return successCard(`Your team (**${currentTeam.name}**) has been deleted.`)
 }
 
-const addUser = async (interaction, steamParam) => {
+const addUser = async (interaction, playerId) => {
   const user = interaction.user.id
   const currentTeam = await Team.getCreatorTeam(user)
-  const steamId = await Steam.getId(steamParam)
-  const steamDatas = await Steam.getDatas(steamId)
-  const playerId = await Player.getId(steamId)
   const playerDatas = await Player.getDatas(playerId)
+  const steamDatas = await Steam.getDatas(playerDatas.steam_id_64)
 
-  if (await UserTeam.getUserTeam(steamId, currentTeam.slug))
+  if (await UserTeam.getUserTeam(playerId, currentTeam.slug))
     return errorCard(`**${playerDatas.nickname}** is already part of the team **${currentTeam.name}**`)
 
-  UserTeam.create(currentTeam.slug, steamId)
+  UserTeam.create(currentTeam.slug, playerId)
 
   return successCard(`**${playerDatas.nickname}** has been added to the team **${currentTeam.name}**, [Steam](${steamDatas.profileurl}) - [Faceit](https://www.faceit.com/fr/players/${playerDatas.nickname})`)
 }
 
-const removeUser = async (interaction, steamParam) => {
+const removeUser = async (interaction, playerId) => {
   const user = interaction.user.id
   const currentTeam = await Team.getCreatorTeam(user)
-
-  const steamId = await Steam.getId(steamParam)
-  const playerId = await Player.getId(steamId)
   const playerDatas = await Player.getDatas(playerId)
 
-  if (!await UserTeam.getUserTeam(steamId, currentTeam.slug))
+  if (!await UserTeam.getUserTeam(playerId, currentTeam.slug))
     return errorCard(`**${playerDatas.nickname}** is not part of the team **${currentTeam.name}**`)
 
-  UserTeam.remove(steamId, currentTeam.slug)
+  UserTeam.remove(playerId, currentTeam.slug)
 
   return successCard(`**${playerDatas.nickname}** has been removed from the team **${currentTeam.name}**`)
 }

@@ -1,11 +1,8 @@
 const Discord = require('discord.js')
 const Player = require('../functions/player')
-const Steam = require('../functions/steam')
 const { getCardsConditions } = require('../functions/commands')
 
-const sendCardWithInfos = async (interaction, steamParam) => {
-  const steamId = await Steam.getId(steamParam)
-  const playerId = await Player.getId(steamId)
+const sendCardWithInfos = async (interaction, playerId) => {
   const playerStats = await Player.getStats(playerId)
   const playerDatas = await Player.getDatas(playerId)
 
@@ -13,17 +10,16 @@ const sendCardWithInfos = async (interaction, steamParam) => {
 
   playerStats.segments.forEach(e => {
     const label = `${e.label} ${e.mode}`
-    const option = {
-      m: e.label,
-      v: e.mode,
-      s: steamId,
+    const values = {
+      l: label,
+      s: playerId,
       u: interaction.user.id
     }
 
     if (!options.filter(e => e.label === label).length > 0) options.push({
       label: label,
       description: `Games ${e.stats.Matches} (${e.stats['Win Rate %']}%)`,
-      value: JSON.stringify(option)
+      value: JSON.stringify(values)
     })
   })
 

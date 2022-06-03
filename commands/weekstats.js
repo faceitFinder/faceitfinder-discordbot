@@ -1,6 +1,5 @@
 const Discord = require('discord.js')
 const { maxMatchsDateStats } = require('../config.json')
-const Steam = require('../functions/steam')
 const Player = require('../functions/player')
 const errorCard = require('../templates/errorCard')
 const DateStats = require('../functions/dateStats')
@@ -15,9 +14,7 @@ const getMonday = date => {
   return new Date(date.setDate(date.getDate() - week[date.getDay()])).getTime()
 }
 
-const sendCardWithInfos = async (interaction, steamParam) => {
-  const steamId = await Steam.getId(steamParam)
-  const playerId = await Player.getId(steamId)
+const sendCardWithInfos = async (interaction, playerId) => {
   const playerStats = await Player.getStats(playerId)
   const playerDatas = await Player.getDatas(playerId)
 
@@ -33,7 +30,7 @@ const sendCardWithInfos = async (interaction, steamParam) => {
       label: [new Date(date.date).toDateString(), '-', new Date(new Date(to).setHours(-24)).toDateString()].join(' '),
       description: `${date.number} match played`,
       value: JSON.stringify({
-        s: steamId,
+        s: playerId,
         f: date.date / 1000,
         t: to.getTime() / 1000,
         u: interaction.user.id
