@@ -2,6 +2,7 @@ const mongoose = require('mongoose')
 
 const userSchema = mongoose.Schema({
   discordId: String,
+  steamId: String,
   faceitId: String,
 })
 

@@ -19,6 +19,8 @@ const exists = (discordId) => get(discordId)
 
 const update = (discordId, faceitId) => User.updateOne({ discordId: discordId }, { faceitId: faceitId }).exec()
 
+const getAll = () => User.find({}).exec()
+
 const count = () => User.countDocuments({})
 
 module.exports = {
@@ -27,5 +29,6 @@ module.exports = {
   exists,
   update,
   count,
-  remove
+  remove,
+  getAll
 }

@@ -21,6 +21,10 @@ const remove = (faceitId, slug) => UserTeam.deleteOne({ faceitId: faceitId, slug
 
 const updateMany = (slug, newSlug) => UserTeam.updateMany({ slug: slug }, { slug: newSlug }).exec()
 
+const updateOne = (steamId, faceitId) => UserTeam.updateOne({ steamId: steamId }, { faceitId: faceitId }).exec()
+
+const getAll = () => UserTeam.find({}).exec()
+
 const count = () => UserTeam.countDocuments({})
 
 module.exports = {
@@ -30,5 +34,7 @@ module.exports = {
   getTeamUsers,
   count,
   remove,
-  updateMany
+  updateMany,
+  updateOne,
+  getAll
 }
