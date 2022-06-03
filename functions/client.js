@@ -11,7 +11,7 @@ const guildCount = (client) => {
     const api = new Api(process.env.TOPGG_TOKEN)
     api.postStats({
       serverCount: Guilds.length
-    }).catch(e => console.log(e))
+    }).catch(console.error)
   }
 }
 
