@@ -50,9 +50,9 @@ const setOption = option => {
 }
 
 const getCardWithInfos = async (actionRow, values, type) => {
-  const steamDatas = await Steam.getDatas(values.s)
-  const playerId = await Player.getId(values.s)
+  const playerId = values.s
   const playerDatas = await Player.getDatas(playerId)
+  const steamDatas = await Steam.getDatas(playerDatas.steam_id_64)
 
   const faceitLevel = playerDatas.games.csgo.skill_level
   const faceitElo = playerDatas.games.csgo.faceit_elo
@@ -117,11 +117,11 @@ const getCardWithInfos = async (actionRow, values, type) => {
       new Discord.MessageActionRow()
         .addComponents([
           CustomTypeFunc.generateButtons(
-            { id: 'uDSG', ...values, n: 1 },
+            { id: 'uDSG', n: 1 },
             CustomType.TYPES.KD,
             type === CustomType.TYPES.KD),
           CustomTypeFunc.generateButtons(
-            { id: 'uDSG', ...values, n: 2 },
+            { id: 'uDSG', n: 2 },
             CustomType.TYPES.ELO,
             type === CustomType.TYPES.ELO)
         ])]

@@ -43,7 +43,7 @@ module.exports = {
             else interaction.followUp(resp).catch(console.error)
           })
           .catch((err) => {
-            console.log(err)
+            console.error(err)
             interaction.followUp(noMention(errorCard('An error has occured'))).catch(console.error)
           })
       }).catch(console.error)

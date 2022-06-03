@@ -38,7 +38,7 @@ module.exports = {
     // check if user is part of the team if not the creator
     const currentUser = await User.get(interaction.user.id)
     if (currentTeam.creator !== interaction.user.id && currentUser) {
-      const userIsPartOfTeam = teamUsers.find(user => user.steamId === currentUser.steamId)
+      const userIsPartOfTeam = teamUsers.find(user => user.faceitId === currentUser.faceitId)
       if (!userIsPartOfTeam) return {
         ...errorCard('You are not part of this team'),
         components: [
@@ -48,9 +48,8 @@ module.exports = {
     }
 
     const usersInfos = await Promise.all(teamUsers.map(async user => {
-      const steamDatas = await Steam.getDatas(user.steamId)
-      const playerId = await Player.getId(user.steamId)
-      const playerDatas = await Player.getDatas(playerId)
+      const playerDatas = await Player.getDatas(user.faceitId)
+      const steamDatas = await Steam.getDatas(playerDatas.steam_id_64)
 
       return {
         user: user,

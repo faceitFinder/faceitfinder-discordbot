@@ -9,17 +9,15 @@ const CustomType = require('../templates/customType')
 const CustomTypeFunc = require('../functions/customType')
 const { getCardsConditions } = require('../functions/commands')
 
-const sendCardWithInfos = async (interaction, steamParam, type = CustomType.TYPES.ELO) => {
-  const steamId = await Steam.getId(steamParam)
-  const steamDatas = await Steam.getDatas(steamId)
-  const playerId = await Player.getId(steamId)
+const sendCardWithInfos = async (interaction, playerId, type = CustomType.TYPES.ELO) => {
   const playerDatas = await Player.getDatas(playerId)
+  const steamDatas = await Steam.getDatas(playerDatas.steam_id_64)
   const playerStats = await Player.getStats(playerId)
   const playerHistory = await Match.getMatchElo(playerId, 20)
   const faceitElo = playerDatas.games.csgo.faceit_elo
   const buttonValues = {
     id: 'updateStatsGraph',
-    s: steamId,
+    s: playerId,
     u: interaction.user.id
   }
 

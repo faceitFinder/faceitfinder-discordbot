@@ -16,11 +16,9 @@ const getPlayerStats = (teams, playerId) => {
   }
 }
 
-const sendCardWithInfos = async (interaction, steamParam, matchId = null) => {
-  const steamId = await Steam.getId(steamParam)
-  const steamDatas = await Steam.getDatas(steamId)
-  const playerId = await Player.getId(steamId)
+const sendCardWithInfos = async (interaction, playerId, matchId = null) => {
   const playerDatas = await Player.getDatas(playerId)
+  const steamDatas = await Steam.getDatas(playerDatas.steam_id_64)
   const playerHistory = (await Player.getHistory(playerId, 5))
   const cards = []
 
@@ -96,14 +94,10 @@ const sendCardWithInfos = async (interaction, steamParam, matchId = null) => {
           description: maps.join(' '),
           emoji: playerResult !== undefined ? parseInt(playerResult) ? emojis.won.balise : emojis.lost.balise : null,
           default: e.match_id === matchId,
-          value: JSON.stringify({
-            u: interaction.user.id,
-            m: e.match_id,
-            s: steamId
-          })
+          value: `${interaction.user.id}${e.match_id}${playerId}`
         })
       })
-      .catch(err => console.log(`${err} ${e.match_id}`))
+      .catch(err => console.error(`${err} ${e.match_id}`))
   }
 
   return {

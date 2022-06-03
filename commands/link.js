@@ -1,16 +1,13 @@
 const Player = require('../functions/player')
-const Steam = require('../functions/steam')
 const User = require('../database/user')
 const { getCardsConditions } = require('../functions/commands')
 const successCard = require('../templates/successCard')
 
-const sendCardWithInfos = async (interaction, steamParam) => {
-  const steamId = await Steam.getId(steamParam)
-  const playerId = await Player.getId(steamId)
+const sendCardWithInfos = async (interaction, playerId) => {
   const playerDatas = await Player.getDatas(playerId)
   const discordId = interaction.user.id
 
-  await User.exists(discordId) ? User.update(discordId, steamId) : User.create(discordId, steamId)
+  await User.exists(discordId) ? User.update(discordId, playerId) : User.create(discordId, playerId)
 
   return successCard(`Your account has been linked to ${playerDatas.nickname}`)
 }

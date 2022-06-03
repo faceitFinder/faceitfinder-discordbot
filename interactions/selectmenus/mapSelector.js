@@ -10,13 +10,14 @@ module.exports = {
   name: 'mapSelector',
   async execute(interaction) {
     const values = JSON.parse(interaction.values)
-    if (values.u !== interaction.user.id) return false
+    if (values.u !== interaction.user.id) return
+    [values.m, values.v] = values.l.split(' ')
 
     const options = interaction.message.components.at(0).components
       .filter(e => e instanceof Discord.MessageSelectMenu)
       .map(msm => {
         return msm.options.map(o => {
-          const active = JSON.stringify(JSON.parse(o.value)) === JSON.stringify(values)
+          const active = o.value === interaction.values.at(0)
           o.emoji = active ? emojis.select.balise : null
           o.default = active
           return o
@@ -31,10 +32,10 @@ module.exports = {
 
     loadingCard(interaction)
 
-    const steamDatas = await Steam.getDatas(values.s)
-    const playerId = await Player.getId(values.s)
-    const playerStats = await Player.getStats(playerId)
+    const playerId = values.s
     const playerDatas = await Player.getDatas(playerId)
+    const playerStats = await Player.getStats(playerId)
+    const steamDatas = await Steam.getDatas(playerDatas.steam_id_64)
 
     const faceitLevel = playerDatas.games.csgo.skill_level
     const size = 40

@@ -1,13 +1,14 @@
 {
   "name": "faceitfinder",
-  "version": "4.5.23",
+  "version": "4.5.24",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "lint": "eslint --fix --ext .js ."
+    "lint": "eslint --fix --ext .js .",
+    "updatebdd": "node changeSteamIdsToFaceitIdsBdd.js"
   },
   "repository": {
     "type": "git",
