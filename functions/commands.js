@@ -29,7 +29,7 @@ const getCards = async (interaction, array, fn) => {
 
 const getCardsConditions = async (interaction, fn, maxUser = 10, name = 'steam_parameters') => {
   let team = getInteractionOption(interaction, 'team')?.toLowerCase().trim().split(' ')[0]
-  let faceit_parameters = getInteractionOption(interaction, 'faceit_parameters')?.trim().split(' ')
+  let faceitParameters = getInteractionOption(interaction, 'faceit_parameters')?.trim().split(' ')
   const currentUser = await User.get(interaction.user.id)
   let parameters
 
@@ -46,8 +46,8 @@ const getCardsConditions = async (interaction, fn, maxUser = 10, name = 'steam_p
       ) parameters = teamUsers.map(e => e.steamId).join(' ')
       else return errorCard('You don\'t have access to this team')
     }
-  } else if (faceit_parameters) {
-    await Promise.all(faceit_parameters.map(async nickname => await Player.getDatasFromNickname(nickname).catch(e => '*')))
+  } else if (faceitParameters) {
+    await Promise.all(faceitParameters.map(async nickname => await Player.getDatasFromNickname(nickname).catch(e => '*')))
       .then(params => {
         parameters = params.map(e => e?.steam_id_64 || e).join(' ')
       })

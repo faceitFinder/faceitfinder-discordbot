@@ -9,9 +9,7 @@ module.exports = {
   name: 'ready',
   async execute(client) {
     console.log('🚀 Bot started!')
-    mongo().then(() => { console.log('🧱 Connected to mongo') }).catch((e) => {
-      console.error(e)
-    })
+    mongo().then(() => { console.log('🧱 Connected to mongo') }).catch(console.error)
 
     /**
      * Setup commands

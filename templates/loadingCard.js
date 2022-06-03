@@ -1,8 +1,9 @@
 const Discord = require('discord.js')
 const { color, name } = require('../config.json')
 
-module.exports = (interation) => {
-  interation.editReply({
+module.exports = (interaction) => {
+  if (!interaction.channel.permissionsFor(interaction.client.user).has('VIEW_CHANNEL')) return
+  interaction.editReply({
     content: ' ',
     embeds: [
       new Discord.MessageEmbed()
@@ -13,5 +14,5 @@ module.exports = (interation) => {
     ],
     attachments: [],
     components: [],
-  })
+  }).catch(console.error)
 }
