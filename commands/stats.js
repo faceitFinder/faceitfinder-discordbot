@@ -43,7 +43,7 @@ const sendCardWithInfos = async (interaction, playerId, type = CustomType.TYPES.
       url: `https://www.faceit.com/fr/players/${playerDatas.nickname}`
     })
     .setTitle('Steam')
-    .setURL(steamDatas.profileurl)
+    .setURL(steamDatas?.profileurl)
     .setThumbnail(`attachment://${faceitLevel}level.png`)
     .addFields({ name: 'Games', value: `${playerStats.lifetime.Matches} (${playerStats.lifetime['Win Rate %']}% Win)`, inline: true },
       { name: 'K/D', value: playerStats.lifetime['Average K/D Ratio'], inline: true },
@@ -53,7 +53,7 @@ const sendCardWithInfos = async (interaction, playerId, type = CustomType.TYPES.
       { name: `:flag_${playerRegion.toLowerCase()}:`, value: ladderRegion.position.toString(), inline: true })
     .setImage('attachment://graph.png')
     .setColor(color.levels[faceitLevel].color)
-    .setFooter({ text: `Steam: ${steamDatas.personaname}` })
+    .setFooter({ text: `Steam: ${steamDatas?.personaname}` })
 
   return {
     content: ' ',

@@ -99,7 +99,7 @@ const addUser = async (interaction, playerId) => {
 
   UserTeam.create(currentTeam.slug, playerId)
 
-  return successCard(`**${playerDatas.nickname}** has been added to the team **${currentTeam.name}**, [Steam](${steamDatas.profileurl}) - [Faceit](https://www.faceit.com/fr/players/${playerDatas.nickname})`)
+  return successCard(`**${playerDatas.nickname}** has been added to the team **${currentTeam.name}**, [Steam](${steamDatas?.profileurl}) - [Faceit](https://www.faceit.com/fr/players/${playerDatas.nickname})`)
 }
 
 const removeUser = async (interaction, playerId) => {

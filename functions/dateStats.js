@@ -83,7 +83,7 @@ const getCardWithInfos = async (actionRow, values, type) => {
   const card = new Discord.MessageEmbed()
     .setAuthor({ name: playerDatas.nickname, iconURL: playerDatas.avatar, url: `https://www.faceit.com/fr/players/${playerDatas.nickname}` })
     .setTitle('Steam')
-    .setURL(steamDatas.profileurl)
+    .setURL(steamDatas?.profileurl)
     .setThumbnail(`attachment://${faceitLevel}level.png`)
     .addFields(
       from !== toRealTimeStamp ?
@@ -103,7 +103,7 @@ const getCardWithInfos = async (actionRow, values, type) => {
       { name: 'Average Assists', value: getAverage(playerStats['Average Assists'], playerStats.games), inline: true })
     .setImage(`attachment://${values.s}graph.png`)
     .setColor(color.levels[faceitLevel].color)
-    .setFooter({ text: `Steam: ${steamDatas.personaname}` })
+    .setFooter({ text: `Steam: ${steamDatas?.personaname}` })
 
   return {
     embeds: [card],
