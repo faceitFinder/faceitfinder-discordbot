@@ -26,7 +26,7 @@ const sendCardWithInfos = async (interaction, playerId, matchId = null) => {
   matchId = matchId || playerHistory.items[0].match_id
   if (playerHistory.items.length > 0)
     lastMatchStats = await Match.getMatchStats(matchId).catch(err => cards.push(errorCard(err)))
-  else return errorCard(`Couldn\'t get the last match of ${steamDatas.personaname}`)
+  else return errorCard(`Couldn\'t get the last match of ${steamDatas?.personaname}`)
 
   const faceitElo = playerDatas.games.csgo.faceit_elo
   const faceitLevel = playerDatas.games.csgo.skill_level
@@ -50,7 +50,7 @@ const sendCardWithInfos = async (interaction, playerId, matchId = null) => {
       const card = new Discord.MessageEmbed()
       let playerStats = getPlayerStats(r.teams, playerId)
 
-      if (playerStats === undefined) cards.push(errorCard(`Couldn\'t get the stats of ${steamDatas.personaname} from his last match`).embeds[0])
+      if (playerStats === undefined) cards.push(errorCard(`Couldn\'t get the stats of ${steamDatas?.personaname} from his last match`).embeds[0])
       if (lastMatchStats.rounds.length > 1) card.addFields({ name: 'round', value: `${r.match_round}/${lastMatchStats.rounds.length}` })
       mapThumbnail = `./images/maps/${r.round_stats.Map}.jpg`
 
@@ -58,7 +58,7 @@ const sendCardWithInfos = async (interaction, playerId, matchId = null) => {
         filesAtt.push(new Discord.MessageAttachment(rankImageCanvas.toBuffer(), `${faceitLevel}.png`))
 
         card.setAuthor({ name: playerDatas.nickname, iconURL: playerDatas.avatar, url: `https://www.faceit.com/fr/players/${playerDatas.nickname}` })
-          .setDescription(`[Steam](${steamDatas.profileurl}), [Game Lobby](https://www.faceit.com/fr/csgo/room/${matchId}/scoreboard)`)
+          .setDescription(`[Steam](${steamDatas?.profileurl}), [Game Lobby](https://www.faceit.com/fr/csgo/room/${matchId}/scoreboard)`)
           .addFields({ name: 'Score', value: r.round_stats.Score.toString(), inline: true },
             { name: 'Map', value: r.round_stats.Map, inline: true },
             { name: 'Status', value: parseInt(playerStats.Result) ? emojis.won.balise : emojis.lost.balise, inline: true },
@@ -73,7 +73,7 @@ const sendCardWithInfos = async (interaction, playerId, matchId = null) => {
           .setThumbnail(`attachment://${faceitLevel}.png`)
           .setImage(`attachment://${r.round_stats.Map}.jpg`)
           .setColor(parseInt(playerStats.Result) ? color.won : color.lost)
-          .setFooter({ text: `Steam: ${steamDatas.personaname}` })
+          .setFooter({ text: `Steam: ${steamDatas?.personaname}` })
 
         if (fs.existsSync(mapThumbnail))
           filesAtt.push(new Discord.MessageAttachment(mapThumbnail, `${r.round_stats.Map}.jpg`))
