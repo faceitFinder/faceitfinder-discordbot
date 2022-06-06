@@ -39,15 +39,17 @@ module.exports = {
       })
 
     /**
-     * Setup / commands
+     * Context Menus
      */
-    const rest = new REST({ version: '9' }).setToken(process.env.TOKEN)
-
-    try {
-      console.log('🚧 Started refreshing application (/) commands.')
-      await rest.put(Routes.applicationCommands(client.user.id), { body: client.slashCommands })
-      console.log('🎉 Successfully reloaded application (/) commands.')
-    } catch (error) { console.error(error) }
+    client.slashCommands.push(...fs.readdirSync('./interactions/contextmenus')
+      .filter(file => file.endsWith('.js'))
+      .map(file => {
+        const command = require(`../interactions/contextmenus/${file}`)
+        return {
+          name: command.name,
+          type: command.type,
+        }
+      }))
 
     /**
      * Setup interactions
@@ -60,6 +62,17 @@ module.exports = {
         client[folder].set(i.name, i)
       })
     })
+
+    /**
+     * Setup / commands
+     */
+    const rest = new REST({ version: '9' }).setToken(process.env.TOKEN)
+
+    try {
+      console.log('🚧 Started refreshing application (/) commands.')
+      await rest.put(Routes.applicationCommands(client.user.id), { body: client.slashCommands })
+      console.log('🎉 Successfully reloaded application (/) commands.')
+    } catch (error) { console.error(error) }
 
     guildCount(client)
   }

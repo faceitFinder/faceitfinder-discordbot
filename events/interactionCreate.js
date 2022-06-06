@@ -34,6 +34,12 @@ module.exports = {
         interaction.client.buttons?.get(json.id)?.execute(interaction, json)
           .then(e => editInteraction(interaction, e))
       }).catch(console.error)
+    else if (interaction.isContextMenu())
+      if (interaction.client.antispam.isIgnored(interaction.user.id, interaction.createdAt, interaction.channel)) return
+      else interaction.deferReply().then(async () => {
+        interaction.client.contextmenus.get(interaction.commandName)?.execute(interaction)
+          .then(resp => interaction.followUp(resp).catch(console.error))
+      }).catch(console.error)
     else if (interaction.client.commands.has(interaction.commandName))
       if (interaction.client.antispam.isIgnored(interaction.user.id, interaction.createdAt, interaction.channel)) return
       else interaction.deferReply().then(async () => {
