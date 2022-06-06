@@ -85,3 +85,5 @@ module.exports = {
     return getCardsConditions(interaction, sendCardWithInfos)
   }
 }
+
+module.exports.sendCardWithInfos = sendCardWithInfos
