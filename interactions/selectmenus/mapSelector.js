@@ -42,7 +42,7 @@ module.exports = {
     const filesAtt = []
 
     const rankImageCanvas = await Graph.getRankImage(faceitLevel, playerDatas.games.csgo.faceit_elo, size)
-    filesAtt.push(new Discord.MessageAttachment(rankImageCanvas.toBuffer(), 'level.png'))
+    filesAtt.push(new Discord.MessageAttachment(rankImageCanvas, 'level.png'))
 
     const mapThumbnail = `./images/maps/${values.m}.jpg`
 
