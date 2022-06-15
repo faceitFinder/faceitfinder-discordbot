@@ -66,10 +66,11 @@ const getCardWithInfos = async (actionRow, values, type) => {
   const today = new Date().setHours(24, 0, 0, 0)
 
   const checkElo = today >= from && today <= to
-  const elo = Graph.getElo(playerStats.games + 1, playerHistory.filter(e => e.date < to), faceitElo, checkElo)
+  const playerHistoryTo = playerHistory.filter(e => e.date < to)
+  const elo = Graph.getElo(playerStats.games + 1, playerHistoryTo, faceitElo, checkElo)
   const eloDiff = elo.at(0) - elo.at(-1)
 
-  const graphBuffer = await Graph.generateChart(playerHistory.filter(e => e.date < to),
+  const graphBuffer = await Graph.generateChart(playerHistoryTo,
     faceitElo,
     playerStats.games + (type === CustomType.TYPES.ELO),
     type,
@@ -124,7 +125,6 @@ const getCardWithInfos = async (actionRow, values, type) => {
         ])]
   }
 }
-
 
 module.exports = {
   getDates,

@@ -22,16 +22,13 @@ const sendCardWithInfos = async (interaction, playerId, type = CustomType.TYPES.
     u: interaction.user.id
   }
 
-  console.log(playerHistory.length)
-
-  const graphBuffer = await Graph.generateChart(playerHistory, faceitElo, maxMatch, type).catch(console.error)
+  const graphBuffer = await Graph.generateChart(playerHistory, faceitElo, maxMatch, type)
 
   const playerCountry = playerDatas.country
   const playerRegion = playerDatas.games.csgo.region
 
   const ladderCountry = await Ladder.getDatas(playerId, playerRegion, playerCountry)
   const ladderRegion = await Ladder.getDatas(playerId, playerRegion)
-
 
   const faceitLevel = playerDatas.games.csgo.skill_level
   const size = 40
