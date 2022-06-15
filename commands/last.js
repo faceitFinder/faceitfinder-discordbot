@@ -55,7 +55,7 @@ const sendCardWithInfos = async (interaction, playerId, matchId = null) => {
       mapThumbnail = `./images/maps/${r.round_stats.Map}.jpg`
 
       if (playerStats !== undefined && playerDatas !== undefined) {
-        filesAtt.push(new Discord.MessageAttachment(rankImageCanvas.toBuffer(), `${faceitLevel}.png`))
+        filesAtt.push(new Discord.MessageAttachment(rankImageCanvas, `${faceitLevel}.png`))
 
         card.setAuthor({ name: playerDatas.nickname, iconURL: playerDatas.avatar, url: `https://www.faceit.com/fr/players/${playerDatas.nickname}` })
           .setDescription(`[Steam](${steamDatas?.profileurl}), [Game Lobby](https://www.faceit.com/fr/csgo/room/${matchId}/scoreboard)`)

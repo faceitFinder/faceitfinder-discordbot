@@ -2,70 +2,100 @@ const { color } = require('../config.json')
 const path = require('path')
 const Canvas = require('canvas')
 const CustomType = require('../templates/customType.js')
+const Chart = require('chart.js')
 
-const generateCanvas = (array = null, matchHistory, playerElo, maxMatch = 20, type = CustomType.TYPES.ELO) => {
-  if (array === null) array = getElo(maxMatch, matchHistory, playerElo)
-  if (array.length === 0) throw 'No match found on this date'
+const generateChart = async (matchHistory, playerElo, maxMatch = 20, type = CustomType.TYPES.ELO, check) => {
+  const datas = getGraph(type, matchHistory, playerElo, maxMatch, check)
+  if (datas.length === 0) throw 'No match found on this date'
 
-  array.reverse()
+  datas.reverse()
 
-  const padding = 100
-  const width = padding * (array.length + 1)
-  const height = Math.max(...array) - Math.min(...array) + padding * 2
-
-  const canvas = Canvas.createCanvas(width, height)
+  const canvas = Canvas.createCanvas(600, 400)
   const ctx = canvas.getContext('2d')
 
-  /**
-   * Background
-   */
-  ctx.clearRect(0, 0, width, height)
-  ctx.fillStyle = '#2f3136'
-  ctx.fillRect(0, 0, width, height)
+  const labels = matchHistory.map(match => new Date(match.date).toLocaleString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  }))
+  const color = '#c9d1d9', gridColor = '#3c3c3c'
 
-  ctx.globalCompositeOperation = 'source-over'
-  ctx.strokeStyle = '#383838'
-  ctx.lineWidth = 5
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels.slice(0, maxMatch).reverse(),
+      datasets: [{
+        label: type.name,
+        data: datas,
+        fill: false,
+        lineTension: 0.4,
+        borderColor: (segment) => {
+          if (segment.raw) return colorFilter(type.color, segment.raw).color
+        },
+        pointBackgroundColor: (segment) => {
+          if (segment.raw) return colorFilter(type.color, segment.raw).color
+        },
+        segment: {
+          borderColor: (segment) => {
+            const prev = segment.p0, current = segment.p1
 
-  ctx.globalCompositeOperation = 'source-over'
+            ctx.strokeStyle = getGradient(prev, current, ctx, type)
+            ctx.lineWidth = 2
+            ctx.beginPath()
+            ctx.moveTo(prev.x, prev.y)
+            ctx.lineTo(current.x, current.y)
+            ctx.stroke()
 
-  /**
-   * Grid
-   */
-  for (let i = 0; i < array.length + 1; i++) {
-    ctx.beginPath()
-    ctx.moveTo(padding * i, 0)
-    ctx.lineTo(padding * i, height)
-    ctx.stroke()
-  }
-
-  ctx.globalCompositeOperation = 'source-over'
-
-  /**
-   * Elo bar
-   */
-  array.forEach((current, i) => {
-    let prev = array[i - 1] || current
-    const coordinatesStart = { x: padding * i, y: (Math.max(...array) - array[i - 1] + padding) }
-    const coordinatesEnd = { x: padding * (i + 1), y: (Math.max(...array) - current + padding) }
-    prev /= type.gap; current /= type.gap
-
-    const [value, colorObj] = colorFilter(type.color, current)
-
-    ctx.font = '30px sans-serif'
-    ctx.lineWidth = 5
-    ctx.fillStyle = colorObj.color
-    ctx.strokeStyle = getColors(prev, current, ctx, coordinatesStart, coordinatesEnd, type)
-
-    ctx.beginPath()
-    ctx.moveTo(coordinatesStart.x, coordinatesStart.y)
-    ctx.lineTo(coordinatesEnd.x, coordinatesEnd.y)
-    ctx.stroke()
-
-    ctx.fillText(parseFloat(current).toFixed(type.fixe), padding * i + padding / 1.5, height)
+            return 'transparent'
+          },
+          borderWidth: 1,
+        }
+      }]
+    },
+    options: {
+      scales: {
+        y: {
+          display: true,
+          grid: {
+            color: gridColor,
+            borderWidth: 1,
+          },
+          ticks: {
+            beginAtZero: false,
+            color: color,
+          }
+        },
+        x: {
+          grid: {
+            color: gridColor,
+          },
+          ticks: {
+            color: color,
+          }
+        }
+      },
+      plugins: {
+        legend: {
+          labels: {
+            color: color,
+            borderWidth: 1,
+          }
+        }
+      }
+    },
+    plugins: [{
+      beforeDraw: (chart) => {
+        const ctx = chart.canvas.getContext('2d')
+        ctx.save()
+        ctx.globalCompositeOperation = 'source-over'
+        ctx.fillStyle = '#2f3136'
+        ctx.fillRect(0, 0, chart.width, chart.height)
+        ctx.restore()
+      }
+    }],
   })
 
-  return canvas
+  return canvas.toBuffer()
 }
 
 const getRankImage = async (faceitLevel, faceitElo, size) => {
@@ -94,7 +124,7 @@ const getRankImage = async (faceitLevel, faceitElo, size) => {
   ctx.fillStyle = ctx.strokeStyle = color.levels[faceitLevel].color
   ctx = roundRect(ctx, x, y, width, height, space)
 
-  return canvas
+  return canvas.toBuffer()
 }
 
 const roundRect = (ctx, x, y, w, h, r) => {
@@ -130,35 +160,31 @@ const getElo = (maxMatch, matchHistory, playerElo, checkElo = true) => {
   return elo.filter(e => e !== undefined).reverse().slice(0, maxMatch)
 }
 
-const getKD = (matchHistory, maxMatch = 20) => {
+const getKD = (matchHistory, maxMatch) => {
   if (matchHistory.length === 0) throw 'Couldn\'t get matchs'
-  return matchHistory.map(e => parseFloat(e.c2).toFixed(CustomType.TYPES.KD.fixe) * CustomType.TYPES.KD.gap).slice(0, maxMatch)
+  return matchHistory.map(e => e.c2).slice(0, maxMatch)
 }
 
-const getColors = (prev, current, ctx, coordinatesStart, coordinatesEnd, type) => {
-  const gradient = ctx.createLinearGradient(coordinatesStart.x, coordinatesStart.y, coordinatesEnd.x, coordinatesEnd.y)
-  const [prevValue, prevColorObj] = colorFilter(type.color, prev)
-  const [currentValue, currentColorObj] = colorFilter(type.color, current)
-
-  let i = 1
-  if (current >= prevColorObj.min && current <= prevColorObj.max)
-    gradient.addColorStop(0, prevColorObj.color)
-  else if (current > prevColorObj.max) {
-    gradient.addColorStop(0, prevColorObj.color)
-    gradient.addColorStop(0.5, currentColorObj.color)
-  } else if (current < prevColorObj.min) {
-    gradient.addColorStop(0.5, prevColorObj.color)
-    gradient.addColorStop(1, currentColorObj.color)
-  }
-
+const getGradient = (prev, current, ctx, type) => {
+  const gradient = ctx.createLinearGradient(prev.x, prev.y, current.x, current.y)
+  gradient.addColorStop(0, colorFilter(type.color, prev.raw).color)
+  gradient.addColorStop(1, colorFilter(type.color, current.raw).color)
   return gradient
 }
 
-const colorFilter = (color, val) => Object.entries(color)
-  .filter(c => val >= c[1].min && val <= c[1].max)[0]
+const colorFilter = (colors, value) => Object.entries(colors)
+  .filter(color => parseFloat(value) >= parseFloat(color[1].min) && parseFloat(value) <= parseFloat(color[1].max))[0][1]
+
+const getGraph = (type, matchHistory, faceitElo, maxMatch, check = true) => {
+  switch (type) {
+    case CustomType.TYPES.ELO: return getElo(maxMatch, matchHistory, faceitElo, check)
+    case CustomType.TYPES.KD: return getKD(matchHistory, maxMatch)
+    default: break
+  }
+}
 
 module.exports = {
-  generateCanvas,
+  generateChart,
   getRankImage,
   getElo,
   getKD

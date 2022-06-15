@@ -63,27 +63,24 @@ const getCardWithInfos = async (actionRow, values, type) => {
   const playerHistory = await Match.getMatchElo(playerId, maxMatchsDateStats)
   const playerStats = generatePlayerStats(playerHistory.filter(e => e.date >= from && e.date < to))
 
-  const canvaSize = playerStats.games + 1
   const today = new Date().setHours(24, 0, 0, 0)
+
   const checkElo = today >= from && today <= to
-
-  const elo = Graph.getElo(canvaSize, playerHistory.filter(e => e.date < to), faceitElo, checkElo)
-  let graphDatas = elo
-
-  if (type === CustomType.TYPES.KD)
-    graphDatas = CustomTypeFunc.getGraph(type, playerHistory.filter(e => e.date < to), faceitElo, checkElo, playerStats.games)
-
+  const elo = Graph.getElo(playerStats.games + 1, playerHistory.filter(e => e.date < to), faceitElo, checkElo)
   const eloDiff = elo.at(0) - elo.at(-1)
-  const graphCanvas = Graph.generateCanvas(graphDatas, null, null, canvaSize, type)
 
+  const graphBuffer = await Graph.generateChart(playerHistory.filter(e => e.date < to),
+    faceitElo,
+    playerStats.games + (type === CustomType.TYPES.ELO),
+    type,
+    checkElo)
 
   const rankImageCanvas = await Graph.getRankImage(faceitLevel, faceitElo, size)
   const toRealTimeStamp = new Date(to).setHours(-24)
 
   const card = new Discord.MessageEmbed()
     .setAuthor({ name: playerDatas.nickname, iconURL: playerDatas.avatar, url: `https://www.faceit.com/fr/players/${playerDatas.nickname}` })
-    .setTitle('Steam')
-    .setURL(steamDatas?.profileurl)
+    .setDescription(`[Steam](${steamDatas?.profileurl}), [Faceit](https://www.faceit.com/fr/players/${playerDatas.nickname})`)
     .setThumbnail(`attachment://${faceitLevel}level.png`)
     .addFields(
       from !== toRealTimeStamp ?
@@ -109,8 +106,8 @@ const getCardWithInfos = async (actionRow, values, type) => {
     embeds: [card],
     content: null,
     files: [
-      new Discord.MessageAttachment(graphCanvas.toBuffer(), `${values.s}graph.png`),
-      new Discord.MessageAttachment(rankImageCanvas.toBuffer(), `${faceitLevel}level.png`)
+      new Discord.MessageAttachment(graphBuffer, `${values.s}graph.png`),
+      new Discord.MessageAttachment(rankImageCanvas, `${faceitLevel}level.png`)
     ],
     components: [
       actionRow,
