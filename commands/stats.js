@@ -7,6 +7,7 @@ const Match = require('../functions/match')
 const Ladder = require('../functions/ladder')
 const CustomType = require('../templates/customType')
 const CustomTypeFunc = require('../functions/customType')
+const Options = require('../templates/options')
 const { getCardsConditions } = require('../functions/commands')
 
 const sendCardWithInfos = async (interaction, playerId, type = CustomType.TYPES.ELO) => {
@@ -78,29 +79,7 @@ const sendCardWithInfos = async (interaction, playerId, type = CustomType.TYPES.
 
 module.exports = {
   name: 'stats',
-  options: [
-    {
-      name: 'steam_parameters',
-      description: 'steamIDs / steam custom IDs / url of one or more steam profiles / @users / CSGO status.',
-      required: false,
-      type: 3,
-      slash: true
-    },
-    {
-      name: 'team',
-      description: 'team slug (you need to be a part of it, the creator, or it has to be public)',
-      required: false,
-      type: 3,
-      slash: true
-    },
-    {
-      name: 'faceit_parameters',
-      description: 'faceit nicknames (case sensitive)',
-      required: false,
-      type: 3,
-      slash: true
-    }
-  ],
+  options: Options.stats,
   description: 'Displays general stats. With elo graph of the 20 last games.',
   usage: 'steam_parameters:multiple steam params and @user or CSGO status (max 10 users) OR team:team slug (max 1) OR faceit_parameters:faceit nickname (max 1)',
   type: 'stats',
