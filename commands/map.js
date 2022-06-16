@@ -90,7 +90,7 @@ const getMapList = () => {
 }
 
 const getOptions = () => {
-  const options = Options.stats
+  const options = [...Options.stats]
   options.push({
     name: 'map',
     description: 'Map name',
