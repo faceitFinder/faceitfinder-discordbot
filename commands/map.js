@@ -1,13 +1,16 @@
+const { emojis } = require('../config.json')
 const Discord = require('discord.js')
 const Player = require('../functions/player')
 const Options = require('../templates/options')
-const { getCardsConditions } = require('../functions/commands')
+const { getCardsConditions, getInteractionOption } = require('../functions/commands')
+const mapSelector = require('../interactions/selectmenus/mapSelector')
 
 const sendCardWithInfos = async (interaction, playerId) => {
   const playerStats = await Player.getStats(playerId)
   const playerDatas = await Player.getDatas(playerId)
 
   const options = []
+  const map = getInteractionOption(interaction, 'map')
 
   playerStats.segments.forEach(e => {
     const label = `${e.label} ${e.mode}`
@@ -20,7 +23,9 @@ const sendCardWithInfos = async (interaction, playerId) => {
     if (!options.filter(e => e.label === label).length > 0) options.push({
       label: label,
       description: `Games ${e.stats.Matches} (${e.stats['Win Rate %']}%)`,
-      value: JSON.stringify(values)
+      value: JSON.stringify(values),
+      emoji: emojis.maps[e.label]?.balise || null,
+      default: `${map} 5v5` === label
     })
   })
 
@@ -29,18 +34,81 @@ const sendCardWithInfos = async (interaction, playerId) => {
       new Discord.MessageSelectMenu()
         .setCustomId('mapSelector')
         .setPlaceholder('Select a map')
-        .addOptions(options),
+        .addOptions(options.slice(0, 25)),
     )
 
   return {
-    content: `Select one of the following maps to get the stats related (${playerDatas.nickname})`,
+    ...await mapSelector.sendCardWithInfos(playerId, map, '5v5'),
+    content: map ? ' ' : `Select one of the following maps to get the stats related (${playerDatas.nickname})`,
     components: [row]
   }
 }
 
+const getMapList = () => {
+  return [
+    {
+      name: 'Dust 2',
+      value: 'de_dust2'
+    },
+    {
+      name: 'Inferno',
+      value: 'de_inferno'
+    },
+    {
+      name: 'Mirage',
+      value: 'de_mirage'
+    },
+    {
+      name: 'Nuke',
+      value: 'de_nuke'
+    },
+    {
+      name: 'Overpass',
+      value: 'de_overpass'
+    },
+    {
+      name: 'Train',
+      value: 'de_train'
+    },
+    {
+      name: 'Vertigo',
+      value: 'de_vertigo'
+    },
+    {
+      name: 'Cache',
+      value: 'de_cache'
+    },
+    {
+      name: 'Cobblestone',
+      value: 'de_cbble'
+    },
+    {
+      name: 'Ancient',
+      value: 'de_ancient'
+    }
+  ]
+}
+
+const getOptions = () => {
+  Options.stats.push({
+    name: 'map',
+    description: 'Map name',
+    required: false,
+    type: 3,
+    slash: true,
+    choices: [
+      ...getMapList().map(c => {
+        if (c?.name) return { name: c.name, value: c.value }
+      }).filter(c => c !== undefined)
+    ]
+  })
+
+  return Options.stats
+}
+
 module.exports = {
   name: 'map',
-  options: Options.stats,
+  options: getOptions(),
   description: 'Displays the stats of the choosen map.',
   usage: 'steam_parameters:multiple steam params and @user or CSGO status (max 10 users) OR team:team slug (max 1) OR faceit_parameters:multiple faceit nicknames (max 10)',
   type: 'stats',

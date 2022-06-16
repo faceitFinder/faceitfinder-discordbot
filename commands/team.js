@@ -59,7 +59,7 @@ const infosTeam = async (currentTeam, user) => {
       new Discord.MessageSelectMenu()
         .setCustomId('teamInfosSelector')
         .setPlaceholder('Select a team')
-        .addOptions(options.slice(0, 24)))
+        .addOptions(options.slice(0, 25)))
 
   return {
     components: [

@@ -51,7 +51,7 @@ const sendCardWithInfos = async (interaction, playerId) => {
       new Discord.MessageSelectMenu()
         .setCustomId('dateStatsSelector')
         .setPlaceholder('Select a week')
-        .addOptions(options.slice(0, 24)))
+        .addOptions(options.slice(0, 25)))
 
   return DateStats.getCardWithInfos(row, JSON.parse(options[0].value), CustomType.TYPES.ELO)
 }
