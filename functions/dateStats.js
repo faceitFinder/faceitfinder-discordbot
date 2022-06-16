@@ -1,4 +1,4 @@
-const { color, emojis, maxMatchsDateStats } = require('../config.json')
+const { color, emojis } = require('../config.json')
 const Discord = require('discord.js')
 const Match = require('./match')
 const Steam = require('./steam')
@@ -49,7 +49,7 @@ const setOption = option => {
   return { ...option, emoji: emojis.select.balise, default: true }
 }
 
-const getCardWithInfos = async (actionRow, values, type) => {
+const getCardWithInfos = async (actionRow, values, type, maxMatch, id) => {
   const playerId = values.s
   const playerDatas = await Player.getDatas(playerId)
   const steamDatas = await Steam.getDatas(playerDatas.steam_id_64)
@@ -58,9 +58,9 @@ const getCardWithInfos = async (actionRow, values, type) => {
   const faceitElo = playerDatas.games.csgo.faceit_elo
   const size = 40
   const from = values.f * 1000
-  const to = values.t * 1000
+  const to = values.t * 1000 || new Date().getTime()
 
-  const playerHistory = await Match.getMatchElo(playerId, maxMatchsDateStats)
+  const playerHistory = await Match.getMatchElo(playerId, maxMatch)
   const playerStats = generatePlayerStats(playerHistory.filter(e => e.date >= from && e.date < to))
 
   const today = new Date().setHours(24, 0, 0, 0)
@@ -115,11 +115,11 @@ const getCardWithInfos = async (actionRow, values, type) => {
       new Discord.MessageActionRow()
         .addComponents([
           CustomTypeFunc.generateButtons(
-            { id: 'uDSG', n: 1 },
+            { id: id, n: 1 },
             CustomType.TYPES.KD,
             type === CustomType.TYPES.KD),
           CustomTypeFunc.generateButtons(
-            { id: 'uDSG', n: 2 },
+            { id: id, n: 2 },
             CustomType.TYPES.ELO,
             type === CustomType.TYPES.ELO)
         ])]

@@ -52,7 +52,7 @@ const sendCardWithInfos = async (interaction, playerId) => {
         .setPlaceholder('Select a month')
         .addOptions(options.slice(0, 25)))
 
-  return DateStats.getCardWithInfos(row, JSON.parse(options[0].value), CustomType.TYPES.ELO)
+  return DateStats.getCardWithInfos(row, JSON.parse(options[0].value), CustomType.TYPES.ELO, maxMatchsDateStats, 'uDSG')
 }
 
 module.exports = {
