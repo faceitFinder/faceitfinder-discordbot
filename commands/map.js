@@ -1,3 +1,4 @@
+const { emojis } = require('../config.json')
 const Discord = require('discord.js')
 const Player = require('../functions/player')
 const Options = require('../templates/options')
@@ -8,7 +9,7 @@ const sendCardWithInfos = async (interaction, playerId) => {
   const playerStats = await Player.getStats(playerId)
   const playerDatas = await Player.getDatas(playerId)
 
-  const options = [], card = []
+  const options = []
   const map = getInteractionOption(interaction, 'map')
 
   playerStats.segments.forEach(e => {
@@ -23,6 +24,7 @@ const sendCardWithInfos = async (interaction, playerId) => {
       label: label,
       description: `Games ${e.stats.Matches} (${e.stats['Win Rate %']}%)`,
       value: JSON.stringify(values),
+      emoji: emojis.maps[e.label]?.balise || null,
       default: `${map} 5v5` === label
     })
   })
