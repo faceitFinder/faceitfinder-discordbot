@@ -5,6 +5,7 @@ const errorCard = require('../templates/errorCard')
 const DateStats = require('../functions/dateStats')
 const { getCardsConditions } = require('../functions/commands')
 const CustomType = require('../templates/customType')
+const Options = require('../templates/options')
 
 const getFirstDay = (x) => {
   const a = new Date(x)
@@ -56,29 +57,7 @@ const sendCardWithInfos = async (interaction, playerId) => {
 
 module.exports = {
   name: 'monthstats',
-  options: [
-    {
-      name: 'steam_parameters',
-      description: 'steamIDs / steam custom IDs / url of one or more steam profiles / @users / CSGO status.',
-      required: false,
-      type: 3,
-      slash: true
-    },
-    {
-      name: 'team',
-      description: 'team slug (you need to be a part of it, the creator, or it has to be public)',
-      required: false,
-      type: 3,
-      slash: true
-    },
-    {
-      name: 'faceit_parameters',
-      description: 'faceit nicknames (case sensitive)',
-      required: false,
-      type: 3,
-      slash: true
-    }
-  ],
+  options: Options.stats,
   description: 'Displays the stats of the choosen month. With elo graph of the month.',
   usage: 'steam_parameters:multiple steam params and @user or CSGO status (max 10 users) OR team:team slug (max 1) OR faceit_parameters:multiple faceit nicknames (max 10)',
   type: 'stats',

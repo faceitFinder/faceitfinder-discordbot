@@ -5,6 +5,7 @@ const errorCard = require('../templates/errorCard')
 const DateStats = require('../functions/dateStats')
 const { getCardsConditions } = require('../functions/commands')
 const CustomType = require('../templates/customType')
+const Options = require('../templates/options')
 
 const getDay = date => {
   date = new Date(date)
@@ -48,36 +49,14 @@ const sendCardWithInfos = async (interaction, playerId) => {
       new Discord.MessageSelectMenu()
         .setCustomId('dateStatsSelector')
         .setPlaceholder('Select a day')
-        .addOptions(options.slice(0, 24)))
+        .addOptions(options.slice(0,25)))
 
   return DateStats.getCardWithInfos(row, JSON.parse(options[0].value), CustomType.TYPES.ELO)
 }
 
 module.exports = {
   name: 'dailystats',
-  options: [
-    {
-      name: 'steam_parameters',
-      description: 'steamIDs / steam custom IDs / url of one or more steam profiles / @users / CSGO status.',
-      required: false,
-      type: 3,
-      slash: true
-    },
-    {
-      name: 'team',
-      description: 'team slug (you need to be a part of it, the creator, or it has to be public)',
-      required: false,
-      type: 3,
-      slash: true
-    },
-    {
-      name: 'faceit_parameters',
-      description: 'faceit nicknames (case sensitive)',
-      required: false,
-      type: 3,
-      slash: true
-    }
-  ],
+  options: Options.stats,
   description: 'Displays the stats of the choosen day. With elo graph of the day.',
   usage: 'steam_parameters:multiple steam params and @user or CSGO status (max 10 users) OR team:team slug (max 1) OR faceit_parameters:multiple faceit nicknames (max 10)',
   type: 'stats',

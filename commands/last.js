@@ -6,8 +6,8 @@ const Steam = require('../functions/steam')
 const Player = require('../functions/player')
 const Graph = require('../functions/graph')
 const errorCard = require('../templates/errorCard')
+const Options = require('../templates/options')
 const { getCardsConditions } = require('../functions/commands')
-
 
 const getPlayerStats = (teams, playerId) => {
   for (const team of teams) {
@@ -115,29 +115,7 @@ const sendCardWithInfos = async (interaction, playerId, matchId = null) => {
 
 module.exports = {
   name: 'last',
-  options: [
-    {
-      name: 'steam_parameters',
-      description: 'steamIDs / steam custom IDs / url of one or more steam profiles / @users / CSGO status.',
-      required: false,
-      type: 3,
-      slash: true
-    },
-    {
-      name: 'team',
-      description: 'team slug (you need to be a part of it, the creator, or it has to be public)',
-      required: false,
-      type: 3,
-      slash: true
-    },
-    {
-      name: 'faceit_parameters',
-      description: 'faceit nicknames (case sensitive)',
-      required: false,
-      type: 3,
-      slash: true
-    }
-  ],
+  options: Options.stats,
   description: 'Get the stats of last game.',
   usage: 'steam_parameters:multiple steam params and @user or CSGO status (max 10 users) OR team:team slug (max 1) OR faceit_parameters:multiple faceit nicknames (max 10)',
   type: 'stats',
