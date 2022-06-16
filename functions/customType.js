@@ -5,7 +5,7 @@ const generateButtons = (values, type, disabled) => {
     .setCustomId(JSON.stringify(values))
     .setLabel(type.name)
     .setEmoji(type.emoji)
-    .setStyle('SECONDARY')
+    .setStyle(type.style)
     .setDisabled(disabled)
 }
 
