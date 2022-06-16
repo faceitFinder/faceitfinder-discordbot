@@ -1,4 +1,4 @@
-const { emojis } = require('../../config.json')
+const { emojis, maxMatchsDateStats } = require('../../config.json')
 const Discord = require('discord.js')
 const loadingCard = require('../../templates/loadingCard')
 const CustomType = require('../../templates/customType')
@@ -26,7 +26,7 @@ const sendCardWithInfos = async (interaction, values, type = CustomType.TYPES.EL
 
   loadingCard(interaction)
 
-  return DateStats.getCardWithInfos(actionRow, values, type)
+  return DateStats.getCardWithInfos(actionRow, values, type, maxMatchsDateStats, 'uDSG')
 }
 
 module.exports = {

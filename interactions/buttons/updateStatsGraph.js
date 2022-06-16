@@ -1,6 +1,5 @@
 const Stats = require('../../commands/stats')
 const CustomType = require('../../templates/customType')
-const { buildMessageFromInteraction } = require('../../functions/commands')
 const loadingCard = require('../../templates/loadingCard')
 
 module.exports = {
