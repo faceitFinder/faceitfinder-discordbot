@@ -7,6 +7,7 @@ const Graph = require('../../functions/graph')
 const loadingCard = require('../../templates/loadingCard')
 
 const sendCardWithInfos = async (playerId, map, mode) => {
+  if (!map) return
   const playerDatas = await Player.getDatas(playerId)
   const playerStats = await Player.getStats(playerId)
   const steamDatas = await Steam.getDatas(playerDatas.steam_id_64)
