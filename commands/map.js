@@ -90,7 +90,8 @@ const getMapList = () => {
 }
 
 const getOptions = () => {
-  Options.stats.push({
+  const options = Options.stats
+  options.push({
     name: 'map',
     description: 'Map name',
     required: false,
@@ -103,7 +104,7 @@ const getOptions = () => {
     ]
   })
 
-  return Options.stats
+  return options
 }
 
 module.exports = {
