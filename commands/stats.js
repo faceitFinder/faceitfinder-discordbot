@@ -23,7 +23,7 @@ const sendCardWithInfos = async (interaction, playerId, type = CustomType.TYPES.
     u: interaction.user.id
   }
 
-  const graphBuffer = await Graph.generateChart(playerHistory, faceitElo, maxMatch, type)
+  const graphBuffer = Graph.generateChart(playerHistory, faceitElo, maxMatch, type)
 
   const playerCountry = playerDatas.country
   const playerRegion = playerDatas.games.csgo.region
@@ -71,7 +71,11 @@ const sendCardWithInfos = async (interaction, playerId, type = CustomType.TYPES.
           CustomTypeFunc.generateButtons(
             { ...buttonValues, n: 2 },
             CustomType.TYPES.ELO,
-            type === CustomType.TYPES.ELO)
+            type === CustomType.TYPES.ELO),
+          CustomTypeFunc.generateButtons(
+            { ...buttonValues, n: 3 },
+            CustomType.TYPES.ELO_KD,
+            type === CustomType.TYPES.ELO_KD)
         ])
     ]
   }

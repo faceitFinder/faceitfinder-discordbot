@@ -1,15 +1,22 @@
 const { color } = require('../config.json')
 const path = require('path')
 const Canvas = require('canvas')
-const CustomType = require('../templates/customType.js')
+const CustomType = require('../templates/customType')
 const Chart = require('chart.js')
 
-const generateChart = async (matchHistory, playerElo, maxMatch = 20, type = CustomType.TYPES.ELO, check) => {
-  const datas = getGraph(type, matchHistory, playerElo, maxMatch, check)
+const generateChart = (matchHistory, playerElo, maxMatch = 20, type = CustomType.TYPES.ELO, check) => {
+  const datas = []
+  const types = type.name.split('-').map(e => {
+    return CustomType.getType(e.trim())
+  })
+
+  datas.push(...types.map(type => [type, getGraph(type, matchHistory, playerElo, maxMatch, check).reverse()]))
   if (datas.length === 0) throw 'No match found on this date'
 
-  datas.reverse()
+  return getChart(datas, matchHistory, maxMatch)
+}
 
+const getChart = (datasets, matchHistory, maxMatch) => {
   const canvas = Canvas.createCanvas(600, 400)
   const ctx = canvas.getContext('2d')
 
@@ -19,51 +26,63 @@ const generateChart = async (matchHistory, playerElo, maxMatch = 20, type = Cust
     year: 'numeric'
   }))
   const color = '#c9d1d9', gridColor = '#3c3c3c'
+  const yAxisBase = {
+    grid: {
+      color: gridColor,
+      borderWidth: 1,
+    },
+    ticks: {
+      beginAtZero: false,
+      color: color,
+    }
+  }
 
   new Chart(ctx, {
     type: 'line',
     data: {
       labels: labels.slice(0, maxMatch).reverse(),
-      datasets: [{
-        label: type.name,
-        data: datas,
-        fill: false,
-        lineTension: 0.4,
-        borderColor: (segment) => {
-          if (segment.raw) return colorFilter(type.color, segment.raw).color
-        },
-        pointBackgroundColor: (segment) => {
-          if (segment.raw) return colorFilter(type.color, segment.raw).color
-        },
-        segment: {
+      datasets: datasets.map((datas, i) => {
+        const [type, data] = datas
+        return {
+          label: type.name,
+          data: data,
+          fill: i === 0,
+          yAxisID: `y${i}`,
           borderColor: (segment) => {
-            const prev = segment.p0, current = segment.p1
-
-            ctx.strokeStyle = getGradient(prev, current, ctx, type)
-            ctx.lineWidth = 2
-            ctx.beginPath()
-            ctx.moveTo(prev.x, prev.y)
-            ctx.lineTo(current.x, current.y)
-            ctx.stroke()
-
-            return 'transparent'
+            if (segment.raw) return colorFilter(type.color, segment.raw).color
           },
-          borderWidth: 1,
+          pointBackgroundColor: (segment) => {
+            if (segment.raw) return colorFilter(type.color, segment.raw).color
+          },
+          segment: {
+            borderColor: (segment) => {
+              const prev = segment.p0, current = segment.p1
+
+              ctx.strokeStyle = getGradient(prev, current, ctx, type)
+              ctx.lineWidth = 2
+              ctx.beginPath()
+              ctx.moveTo(prev.x, prev.y)
+              ctx.lineTo(current.x, current.y)
+              ctx.stroke()
+
+              return 'transparent'
+            },
+            borderWidth: 1,
+          }
         }
-      }]
+      })
     },
     options: {
       scales: {
-        y: {
+        y0: {
           display: true,
-          grid: {
-            color: gridColor,
-            borderWidth: 1,
-          },
-          ticks: {
-            beginAtZero: false,
-            color: color,
-          }
+          position: 'left',
+          ...yAxisBase
+        },
+        y1: {
+          display: datasets.length > 1,
+          position: 'right',
+          ...yAxisBase
         },
         x: {
           grid: {

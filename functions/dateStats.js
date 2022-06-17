@@ -81,7 +81,7 @@ const getCardWithInfos = async (actionRow, values, type, maxMatch, id) => {
   const elo = Graph.getElo(playerStats.games + 1, playerHistoryTo, faceitElo, checkElo)
   const eloDiff = elo.at(0) - elo.at(-1)
 
-  const graphBuffer = await Graph.generateChart(playerHistoryTo,
+  const graphBuffer = Graph.generateChart(playerHistoryTo,
     faceitElo,
     playerStats.games + (type === CustomType.TYPES.ELO),
     type,
@@ -135,7 +135,11 @@ const getCardWithInfos = async (actionRow, values, type, maxMatch, id) => {
           CustomTypeFunc.generateButtons(
             { id: id, n: 2 },
             CustomType.TYPES.ELO,
-            type === CustomType.TYPES.ELO)
+            type === CustomType.TYPES.ELO),
+          CustomTypeFunc.generateButtons(
+            { id: id, n: 3 },
+            CustomType.TYPES.ELO_KD,
+            type === CustomType.TYPES.ELO_KD)
         ])]
   }
 }
