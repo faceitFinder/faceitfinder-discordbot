@@ -12,21 +12,32 @@ const generatePlayerStats = playerHistory => {
     wins: 0,
     games: 0,
     'Average K/D': 0,
+    'Average K/R': 0,
     'Average HS': 0,
     'Average MVPs': 0,
     'Average Kills': 0,
     'Average Deaths': 0,
     'Average Assists': 0,
+    'Red K/D': 0,
+    'Orange K/D': 0,
+    'Green K/D': 0,
   }
 
   for (const e of playerHistory) {
     playerStats.games += 1
+    const KD = parseFloat(e.c2)
     playerStats['Average HS'] += parseFloat(e.c4)
-    playerStats['Average K/D'] += parseFloat(e.c2)
+    playerStats['Average K/D'] += KD
     playerStats['Average MVPs'] += parseFloat(e.i9)
     playerStats['Average Kills'] += parseFloat(e.i6)
     playerStats['Average Deaths'] += parseFloat(e.i8)
     playerStats['Average Assists'] += parseFloat(e.i7)
+    playerStats['Average K/R'] += parseFloat(e.c3)
+
+    if (KD >= color.kd[1].min && KD <= color.kd[1].max) playerStats['Red K/D'] += 1
+    else if (KD >= color.kd[2].min && KD <= color.kd[2].max) playerStats['Orange K/D'] += 1
+    else if (KD >= color.kd[3].min && KD <= color.kd[3].max) playerStats['Green K/D'] += 1
+
     playerStats.wins += Math.max(...e.i18.split('/').map(Number)) === parseInt(e.c5)
   } return playerStats
 }
@@ -92,13 +103,16 @@ const getCardWithInfos = async (actionRow, values, type, maxMatch, id) => {
         { name: 'From', value: new Date(from).toDateString(), inline: false },
       { name: 'Games', value: `${playerStats.games} (${getAverage(playerStats.wins, playerStats.games, 2, 100)}% Win)`, inline: true },
       { name: 'Elo', value: isNaN(eloDiff) ? '0' : eloDiff > 0 ? `+${eloDiff}` : eloDiff.toString(), inline: true },
-      { name: '\u200B', value: '\u200B', inline: true },
-      { name: 'Average K/D', value: getAverage(playerStats['Average K/D'], playerStats.games), inline: true },
-      { name: 'Average HS', value: `${getAverage(playerStats['Average HS'], playerStats.games)}%`, inline: true },
       { name: 'Average MVPs', value: getAverage(playerStats['Average MVPs'], playerStats.games), inline: true },
+      { name: 'Average K/D', value: getAverage(playerStats['Average K/D'], playerStats.games), inline: true },
+      { name: 'Average K/R', value: getAverage(playerStats['Average K/R'], playerStats.games), inline: true },
+      { name: 'Average HS', value: `${getAverage(playerStats['Average HS'], playerStats.games)}%`, inline: true },
       { name: 'Average Kills', value: getAverage(playerStats['Average Kills'], playerStats.games), inline: true },
       { name: 'Average Deaths', value: getAverage(playerStats['Average Deaths'], playerStats.games), inline: true },
-      { name: 'Average Assists', value: getAverage(playerStats['Average Assists'], playerStats.games), inline: true })
+      { name: 'Average Assists', value: getAverage(playerStats['Average Assists'], playerStats.games), inline: true },
+      { name: 'Red K/D', value: playerStats['Red K/D'].toString(), inline: true },
+      { name: 'Orange K/D', value: playerStats['Orange K/D'].toString(), inline: true },
+      { name: 'Green K/D', value: playerStats['Green K/D'].toString(), inline: true })
     .setImage(`attachment://${values.s}graph.png`)
     .setColor(color.levels[faceitLevel].color)
     .setFooter({ text: `Steam: ${steamDatas?.personaname}` })
