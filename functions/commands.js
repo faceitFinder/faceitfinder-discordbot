@@ -101,7 +101,7 @@ const getCardsConditions = async (interaction, fn, maxUser = 10, name = 'steam_p
 
   let params = []
   parameters.forEach(e => {
-    const res = RegexFun.findUserMentions(e)
+    const res = RegexFun.findUserMentions(e.param)
     params = params.concat(
       res.length > 0 ?
         res.map(r => {
