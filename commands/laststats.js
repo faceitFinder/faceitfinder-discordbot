@@ -51,7 +51,7 @@ module.exports = {
   usage: 'match_number:number of matchs to display AND steam_parameters:multiple steam params and @user or CSGO status (max 10 users) OR team:team slug (max 1) OR faceit_parameters:multiple faceit nicknames (max 10)',
   type: 'stats',
   async execute(interaction) {
-    return getCardsConditions(interaction, sendCardWithInfos).catch(console.error)
+    return getCardsConditions(interaction, sendCardWithInfos)
   }
 }
 
