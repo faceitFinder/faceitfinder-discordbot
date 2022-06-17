@@ -43,10 +43,11 @@ const getCards = async (interaction, array, fn) => {
 }
 
 const getCardsConditions = async (interaction, fn, maxUser = 10, name = 'steam_parameters') => {
-  let team = getInteractionOption(interaction, 'team')?.toLowerCase().trim().split(' ')[0],
-    faceitParameters = getInteractionOption(interaction, 'faceit_parameters')?.trim().split(' '),
-    steam = false,
-    parameters = getInteractionOption(interaction, name)
+  let team = getInteractionOption(interaction, 'team')?.toLowerCase().trim().split(' ')[0]
+  let faceitParameters = getInteractionOption(interaction, 'faceit_parameters')?.trim().split(' ')
+  let steamParameters = getInteractionOption(interaction, name)
+
+  const parameters = []
   const currentUser = await User.get(interaction.user.id)
 
   if (team) {
@@ -59,31 +60,47 @@ const getCardsConditions = async (interaction, fn, maxUser = 10, name = 'steam_p
         await Team.getCreatorTeam(interaction.user.id).slug === team.slug ||
         team.access ||
         teamUsers?.find(user => user.faceitId === currentUser.faceitId)
-      ) parameters = teamUsers.map(e => e.faceitId).join(' ')
+      ) parameters.push(...teamUsers.map(e => {
+        return { param: e.faceitId, steam: false, discord: false }
+      }))
       else return errorCard('You don\'t have access to this team')
     }
-  } else if (faceitParameters) {
+  }
+  if (faceitParameters) {
     await Promise.all(faceitParameters.map(async nickname => await Player.getDatasFromNickname(nickname).catch(() => nickname)))
       .then(params => {
-        parameters = params.map(e => e?.player_id || e).join(' ')
+        parameters.push(...params.map(e => {
+          return {
+            param: e?.player_id || e,
+            steam: false,
+            discord: false
+          }
+        }))
       })
-  } else steam = true
-  const args = parameters?.trim().split(' ').filter(e => e !== '') || []
+  }
+  if (steamParameters)
+    parameters.push(...steamParameters?.trim().split(' ').filter(e => e !== '').map(e => {
+      return {
+        param: e,
+        steam: true,
+        discord: false
+      }
+    }))
 
-  if (args.length === 0)
+  if (parameters.length === 0)
     return currentUser ?
-      getCards(interaction, [{ param: interaction.user.id, discord: true }], fn) :
+      getCards(interaction, [{ param: interaction.user.id, steam: false, discord: true }], fn) :
       errorCard(`It seems like you didn't executed the command correctly, do \`/help command:${interaction.commandName}\` to get more informations about it.`)
 
-  const steamIds = RegexFun.findSteamUIds(parameters)
+  const steamIds = RegexFun.findSteamUIds(steamParameters)
     .slice(0, maxUser)
-    .map(e => { return { param: e, discord: false } })
+    .map(e => { return { param: e, steam: true, discord: false } })
 
   if (steamIds.length > 0)
-    return getCards(interaction, await Promise.all(steamIds.map(e => getPlayerDatas(e.param, steam, e.discord))), fn)
+    return getCards(interaction, await Promise.all(steamIds.map(e => getPlayerDatas(e.param, true, e.discord))), fn)
 
   let params = []
-  args.forEach(e => {
+  parameters.forEach(e => {
     const res = RegexFun.findUserMentions(e)
     params = params.concat(
       res.length > 0 ?
@@ -94,7 +111,7 @@ const getCardsConditions = async (interaction, fn, maxUser = 10, name = 'steam_p
             discord: true
           }
         })
-        : { param: e.split('/').filter(e => e).pop(), steam, discord: false }
+        : { param: e.param.split('/').filter(e => e).pop(), steam: e.steam, discord: e.discord }
     )
   })
 
