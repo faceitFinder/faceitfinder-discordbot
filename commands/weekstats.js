@@ -60,7 +60,7 @@ module.exports = {
   name: 'weekstats',
   options: Options.stats,
   description: 'Displays the stats of the choosen week. With elo graph of the week.',
-  usage: 'steam_parameters:multiple steam params and @user or CSGO status (max 10 users) OR team:team slug (max 1) OR faceit_parameters:multiple faceit nicknames (max 10)',
+  usage: Options.usage,
   type: 'stats',
   async execute(interaction) {
     return getCardsConditions(interaction, sendCardWithInfos)
