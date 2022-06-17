@@ -49,7 +49,7 @@ const sendCardWithInfos = async (interaction, playerId) => {
       new Discord.MessageSelectMenu()
         .setCustomId('dateStatsSelector')
         .setPlaceholder('Select a day')
-        .addOptions(options.slice(0,25)))
+        .addOptions(options.slice(0, 25)))
 
   return DateStats.getCardWithInfos(row, JSON.parse(options[0].value), CustomType.TYPES.ELO, maxMatchsDateStats, 'uDSG')
 }
@@ -58,7 +58,7 @@ module.exports = {
   name: 'dailystats',
   options: Options.stats,
   description: 'Displays the stats of the choosen day. With elo graph of the day.',
-  usage: 'steam_parameters:multiple steam params and @user or CSGO status (max 10 users) OR team:team slug (max 1) OR faceit_parameters:multiple faceit nicknames (max 10)',
+  usage: Options.usage,
   type: 'stats',
   async execute(interaction) {
     return getCardsConditions(interaction, sendCardWithInfos)

@@ -81,7 +81,7 @@ module.exports = {
   name: 'stats',
   options: Options.stats,
   description: 'Displays general stats. With elo graph of the 20 last games.',
-  usage: 'steam_parameters:multiple steam params and @user or CSGO status (max 10 users) OR team:team slug (max 1) OR faceit_parameters:faceit nickname (max 1)',
+  usage: Options.usage,
   type: 'stats',
   async execute(interaction) {
     return getCardsConditions(interaction, sendCardWithInfos)

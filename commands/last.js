@@ -117,7 +117,7 @@ module.exports = {
   name: 'last',
   options: Options.stats,
   description: 'Get the stats of last game.',
-  usage: 'steam_parameters:multiple steam params and @user or CSGO status (max 10 users) OR team:team slug (max 1) OR faceit_parameters:multiple faceit nicknames (max 10)',
+  usage: Options.usage,
   type: 'stats',
   async execute(interaction) {
     return getCardsConditions(interaction, sendCardWithInfos)
