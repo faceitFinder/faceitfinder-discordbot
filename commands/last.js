@@ -10,6 +10,13 @@ const Options = require('../templates/options')
 const { getCardsConditions } = require('../functions/commands')
 const { getPagination } = require('../functions/pagination')
 
+const getLevelFromElo = (elo) => {
+  const colorLevel = Object.entries(color.levels).filter(e => {
+    return elo >= e.at(1).min && elo <= e.at(1).max
+  }).at(0)
+  return colorLevel.at(0)
+}
+
 const sendCardWithInfos = async (interaction, playerId, matchId = null, page = 0) => {
   const maxMatch = 10
   const playerDatas = await Player.getDatas(playerId)
@@ -18,7 +25,6 @@ const sendCardWithInfos = async (interaction, playerId, matchId = null, page = 0
   const playerHistory = await Match.getMatchElo(playerId, maxMatch, page)
 
   const faceitElo = playerDatas.games.csgo.faceit_elo
-  const faceitLevel = playerDatas.games.csgo.skill_level
   const maxPage = Math.floor(playerStats.lifetime.Matches / maxMatch)
   const size = 40
   const filesAtt = []
@@ -31,20 +37,26 @@ const sendCardWithInfos = async (interaction, playerId, matchId = null, page = 0
 
   const filteredHistory = playerHistory.map(e => e.matchId).filter((e, i, a) => a.indexOf(e) === i)
   const matchStats = playerHistory.filter(e => e.matchId === matchId)
-  const rankImageCanvas = await Graph.getRankImage(faceitLevel, faceitElo, size)
   const lastMatchsElo = Graph.getElo(maxMatch + 1, [...playerHistory], faceitElo, page === 0)
 
+  const levelDiff = playerHistory.map(e => e.matchId === matchId)
+    .map((e, i) => e ? lastMatchsElo.at(i) : null)
+    .filter(e => e !== null)
   const eloDiff = playerHistory.map(e => e.matchId === matchId)
     .map((e, i) => e ? lastMatchsElo.at(i) - lastMatchsElo.at(i + 1) : null)
     .filter(e => e !== null)
 
   let mapThumbnail
   if (cards.length === 0)
-    matchStats.forEach((roundStats, i) => {
+    matchStats.forEach(async (roundStats, i) => {
       const card = new Discord.MessageEmbed()
       const mapName = roundStats.i1
       const result = Math.max(...roundStats.i18.split('/').map(Number)) === parseInt(roundStats.c5)
       const eloGain = isNaN(eloDiff.at(i)) ? '0' : eloDiff.at(i) > 0 ? `+${eloDiff.at(i)}` : eloDiff.at(i).toString()
+      const rankImageCanvas = await Graph.getRankImage(
+        getLevelFromElo(levelDiff.at(i)),
+        levelDiff.at(i),
+        size)
 
       if (roundStats === undefined)
         cards.push(errorCard(`Couldn\'t get the stats of ${steamDatas?.personaname} from his last match`).embeds.at(0))
@@ -53,7 +65,7 @@ const sendCardWithInfos = async (interaction, playerId, matchId = null, page = 0
 
       mapThumbnail = `./images/maps/${mapName}.jpg`
 
-      filesAtt.push(new Discord.MessageAttachment(rankImageCanvas, `${faceitLevel}.png`))
+      filesAtt.push(new Discord.MessageAttachment(rankImageCanvas, `${faceitElo}${i}.png`))
 
       card.setAuthor({ name: playerDatas.nickname, iconURL: playerDatas.avatar, url: `https://www.faceit.com/fr/players/${playerDatas.nickname}` })
         .setDescription(`[Steam](${steamDatas?.profileurl}), [Game Lobby](https://www.faceit.com/fr/csgo/room/${matchId}/scoreboard)`)
@@ -68,7 +80,7 @@ const sendCardWithInfos = async (interaction, playerId, matchId = null, page = 0
           { name: 'Assists', value: roundStats.i7, inline: true },
           { name: 'Elo', value: eloGain, inline: true },
           { name: 'Date', value: new Date(roundStats.date).toDateString(), inline: true })
-        .setThumbnail(`attachment://${faceitLevel}.png`)
+        .setThumbnail(`attachment://${faceitElo}${i}.png`)
         .setImage(`attachment://${mapName}.jpg`)
         .setColor(result ? color.won : color.lost)
         .setFooter({ text: `Steam: ${steamDatas?.personaname}` })
