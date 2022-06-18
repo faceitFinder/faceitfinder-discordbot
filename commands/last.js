@@ -32,7 +32,7 @@ const sendCardWithInfos = async (interaction, playerId, matchId = null, page = 0
   const filteredHistory = playerHistory.map(e => e.matchId).filter((e, i, a) => a.indexOf(e) === i)
   const matchStats = playerHistory.filter(e => e.matchId === matchId)
   const rankImageCanvas = await Graph.getRankImage(faceitLevel, faceitElo, size)
-  const lastMatchsElo = Graph.getElo(maxMatch + 1, [...playerHistory], faceitElo)
+  const lastMatchsElo = Graph.getElo(maxMatch + 1, [...playerHistory], faceitElo, page === 0)
 
   const eloDiff = playerHistory.map(e => e.matchId === matchId)
     .map((e, i) => e ? lastMatchsElo.at(i) - lastMatchsElo.at(i + 1) : null)
