@@ -9,10 +9,10 @@ module.exports = {
     const values = getDefaultInteractionOption(interaction).value
     json = { ...json, ...JSON.parse(values) }
 
-    if (interaction.user.id !== json.u) return false
+    if (interaction.user.id !== json.u) return
 
     loadingCard(interaction)
 
-    return await sendCardWithInfos(interaction, json, CustomType.getType(interaction.component.label))
+    return sendCardWithInfos(interaction, json, CustomType.getType(interaction.component.label))
   }
 }

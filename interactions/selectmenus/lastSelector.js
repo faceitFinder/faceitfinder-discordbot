@@ -6,10 +6,15 @@ module.exports = {
   async execute(interaction) {
     const values = interaction.values.at(0),
       u = values.slice(0, 18),
-      m = values.slice(18, 56),
-      s = values.slice(56, values.length)
+      s = values.slice(18, 54),
+      m = values.slice(54, values.length)
+
     if (u !== interaction.user.id) return
+
     loadingCard(interaction)
-    return sendCardWithInfos(interaction, s, m)
+
+    const firstItemPagination = interaction.message.components.at(1).components.at(0)
+
+    return sendCardWithInfos(interaction, s, m, JSON.parse(firstItemPagination.customId).c)
   }
 }

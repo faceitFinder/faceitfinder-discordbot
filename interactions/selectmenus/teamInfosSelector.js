@@ -12,7 +12,7 @@ module.exports = {
   name: 'teamInfosSelector',
   async execute(interaction) {
     const values = JSON.parse(interaction.values)
-    if (values.u !== interaction.user.id) return false
+    if (values.u !== interaction.user.id) return
 
     const options = interaction.message.components.at(0).components
       .filter(e => e instanceof Discord.MessageSelectMenu)

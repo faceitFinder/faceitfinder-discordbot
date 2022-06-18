@@ -8,8 +8,8 @@ const { Routes } = require('discord-api-types/v9')
 module.exports = {
   name: 'ready',
   async execute(client) {
-    console.log('🚀 Bot started!')
-    mongo().then(() => { console.log('🧱 Connected to mongo') }).catch(console.error)
+    console.info('🚀 Bot started!')
+    mongo().then(() => { console.info('🧱 Connected to mongo') }).catch(console.error)
 
     /**
      * Setup commands
@@ -69,9 +69,9 @@ module.exports = {
     const rest = new REST({ version: '9' }).setToken(process.env.TOKEN)
 
     try {
-      console.log('🚧 Started refreshing application (/) commands.')
+      console.info('🚧 Started refreshing application (/) commands.')
       await rest.put(Routes.applicationCommands(client.user.id), { body: client.slashCommands })
-      console.log('🎉 Successfully reloaded application (/) commands.')
+      console.info('🎉 Successfully reloaded application (/) commands.')
     } catch (error) { console.error(error) }
 
     guildCount(client)

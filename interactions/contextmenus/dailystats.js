@@ -8,6 +8,6 @@ module.exports = {
   async execute(interaction) {
     const user = await User.exists(interaction.targetId)
     if (!user) return errorCard('This user has not linked his profile')
-    return await Dailystats.sendCardWithInfos(interaction, user.faceitId)
+    return Dailystats.sendCardWithInfos(interaction, user.faceitId)
   }
 }

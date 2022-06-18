@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.6.7](https://github.com/JustDams/faceitFinder/compare/v4.6.6...v4.6.7) (2022-06-18)
+
 ### [4.6.6](https://github.com/JustDams/faceitFinder/compare/v4.6.5...v4.6.6) (2022-06-17)
 
 ### [4.6.5](https://github.com/JustDams/faceitFinder/compare/v4.6.4...v4.6.5) (2022-06-17)

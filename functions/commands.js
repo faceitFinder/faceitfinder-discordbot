@@ -26,9 +26,9 @@ const getCards = async (interaction, array, fn) => {
   return Promise.all(array.map(async obj => {
     if (obj.discord) {
       const user = await User.exists(obj.param)
-      if (user) return fn(interaction, user.faceitId).catch(err => noMention(errorCard(err)))
+      if (user) return fn(interaction, user.faceitId)
       else return errorCard('This user hasn\'t linked his profile')
-    } else return fn(interaction, obj.param).catch(err => noMention(errorCard(err)))
+    } else return fn(interaction, obj.param)
   })).then(msgs => msgs.map(msg => {
     const data = {
       embeds: msg.embeds || [],
