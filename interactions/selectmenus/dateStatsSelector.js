@@ -32,7 +32,7 @@ const sendCardWithInfos = async (interaction, values, type = CustomType.TYPES.EL
 module.exports = {
   name: 'dateStatsSelector',
   async execute(interaction) {
-    return await sendCardWithInfos(interaction, JSON.parse(interaction.values.at(0)))
+    return sendCardWithInfos(interaction, JSON.parse(interaction.values.at(0)))
   },
   sendCardWithInfos
 }
