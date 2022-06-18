@@ -9,7 +9,7 @@ module.exports = {
     const values = getDefaultInteractionOption(interaction).value
     json = { ...json, ...JSON.parse(values) }
 
-    if (interaction.user.id !== json.u) return false
+    if (interaction.user.id !== json.u) return
 
     loadingCard(interaction)
 

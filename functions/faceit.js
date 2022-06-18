@@ -12,7 +12,10 @@ const fetchData = async (url, error) => fetch(url, {
 })
   .then(res => {
     if (res.status == 200) return res.json()
-    else throw error
+    else {
+      console.error(res.statusText, res.url)
+      throw error
+    }
   })
   .then(data => data)
 

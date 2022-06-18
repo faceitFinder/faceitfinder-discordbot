@@ -5,7 +5,7 @@ const CustomType = require('../../templates/customType')
 const DateStats = require('../../functions/dateStats')
 
 const sendCardWithInfos = async (interaction, values, type = CustomType.TYPES.ELO) => {
-  if (values.u !== interaction.user.id) return false
+  if (values.u !== interaction.user.id) return
   const options = interaction.message.components.at(0).components
     .filter(e => e instanceof Discord.MessageSelectMenu)
     .map(msm => {
