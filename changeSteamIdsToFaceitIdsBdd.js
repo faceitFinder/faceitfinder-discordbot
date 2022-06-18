@@ -4,27 +4,27 @@ const UserTeam = require('./database/userTeam')
 const Player = require('./functions/player')
 
 mongo()
-  .then(() => { console.log('🧱 Connected to mongo') })
+  .then(() => { console.info('🧱 Connected to mongo') })
   .then(async () => {
-    console.log('Users')
+    console.info('Users')
 
     User.getAll().then(users => {
       users.forEach(async user => {
         if (!user.steamId || user.faceitId) return
         const faceitId = await Player.getId(user.steamId).catch(console.error)
         User.update(user.discordId, faceitId)
-        console.log('done')
+        console.info('done')
       })
     })
 
-    console.log('Team Users')
+    console.info('Team Users')
 
     UserTeam.getAll().then(users => {
       users.forEach(async user => {
         if (!user.steamId || user.faceitId) return
         const faceitId = await Player.getId(user.steamId).catch(console.error)
         UserTeam.updateOne(user.steamId, faceitId)
-        console.log('done')
+        console.info('done')
       })
     })
   })
