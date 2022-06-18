@@ -6,7 +6,7 @@ const getDatas = (playerId) => Faceit.fetchData(`https://open.faceit.com/data/v4
 
 const getStats = (playerId) => Faceit.fetchData(`https://open.faceit.com/data/v4/players/${playerId}/stats/csgo`, 'Couldn\'t get faceit csgo stats')
 
-const getHistory = (playerId, limit = 1, from = null, to = null) => Faceit.fetchData(`https://open.faceit.com/data/v4/players/${playerId}/history?game=csgo&offset=0&from=${from}&to=${to}&limit=${limit}`, 'Couldn\'t get csgo history')
+const getHistory = (playerId, limit = 1, offset = 0, from = null, to = null) => Faceit.fetchData(`https://open.faceit.com/data/v4/players/${playerId}/history?game=csgo&offset=${offset}&from=${from}&to=${to}&limit=${limit}`, 'Couldn\'t get csgo history')
 
 const getDatasFromNickname = (nickname) => Faceit.fetchData(`https://open.faceit.com/data/v4/players?nickname=${nickname}`, 'Couldn\'t get faceit datas')
 
