@@ -16,7 +16,7 @@ jobs:
     - name: Executing remote command
       uses: appleboy/ssh-action@master
       with:
-        HOST: ${{ secrets.HOST }}
-        USERNAME: ${{ secrets.USERNAME }}
-        PASSWORD: ${{ secrets.PASSWORD }}
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        password: ${{ secrets.PASSWORD }}
         script: cd ${{ secrets.REPO }};git pull;docker-compose -f docker-compose.prod.yml restart
