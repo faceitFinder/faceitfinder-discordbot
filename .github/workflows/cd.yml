@@ -11,12 +11,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v1
 
-    - name: Executing remote command
+    - name: executing remote ssh commands using password
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USERNAME }}
         password: ${{ secrets.PASSWORD }}
-        script: cd ${{ secrets.REPO }};git pull;docker-compose -f docker-compose.prod.yml restart
+        port: ${{ secrets.PORT }}
+        script: |
+          cd ${{ secrets.REPO }}
+          git pull
+          docker-compose -f docker-compose.prod.yml restart
