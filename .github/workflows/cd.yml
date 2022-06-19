@@ -19,4 +19,7 @@ jobs:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USERNAME }}
         password: ${{ secrets.PASSWORD }}
-        script: cd ${{ secrets.REPO }};git pull;docker-compose -f docker-compose.prod.yml restart
+        scripts: |
+          cd ${{ secrets.REPO }}
+          git pull
+          docker-compose -f docker-compose.prod.yml restart
