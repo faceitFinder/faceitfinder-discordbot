@@ -44,8 +44,8 @@ const getCards = async (interaction, array, fn) => {
 
 const getCardsConditions = async (interaction, fn, maxUser = 10, name = 'steam_parameters') => {
   let team = getInteractionOption(interaction, 'team')?.toLowerCase().trim().split(' ')[0]
-  let faceitParameters = getInteractionOption(interaction, 'faceit_parameters')?.trim().split(' ')
-  let steamParameters = getInteractionOption(interaction, name)
+  const faceitParameters = getInteractionOption(interaction, 'faceit_parameters')?.trim().split(' ')
+  const steamParameters = getInteractionOption(interaction, name)
 
   const parameters = []
   const currentUser = await User.get(interaction.user.id)
@@ -79,19 +79,20 @@ const getCardsConditions = async (interaction, fn, maxUser = 10, name = 'steam_p
       })
   }
 
-  const steamIds = RegexFun.findSteamUIds(steamParameters)
-    .slice(0, maxUser)
-    .map(e => { return { param: e, steam: true, discord: false } })
+  if (steamParameters) {
+    const steamIds = RegexFun.findSteamUIds(steamParameters)
+      .slice(0, maxUser)
+      .map(e => { return { param: e, steam: true, discord: false } })
 
-  if (steamIds.length > 0) parameters.push(...steamIds)
-  else parameters.push(...steamParameters?.trim().split(' ').filter(e => e !== '').map(e => {
-    return {
-      param: e,
-      steam: true,
-      discord: false
-    }
-  }))
-
+    if (steamIds.length > 0) parameters.push(...steamIds)
+    else parameters.push(...steamParameters?.trim().split(' ').filter(e => e !== '').map(e => {
+      return {
+        param: e,
+        steam: true,
+        discord: false
+      }
+    }))
+  }
   if (parameters.length === 0)
     return currentUser ?
       getCards(interaction, [{ param: interaction.user.id, steam: false, discord: true }], fn) :
