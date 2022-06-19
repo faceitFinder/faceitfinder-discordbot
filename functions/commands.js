@@ -78,26 +78,24 @@ const getCardsConditions = async (interaction, fn, maxUser = 10, name = 'steam_p
         }))
       })
   }
-  if (steamParameters)
-    parameters.push(...steamParameters?.trim().split(' ').filter(e => e !== '').map(e => {
-      return {
-        param: e,
-        steam: true,
-        discord: false
-      }
-    }))
-
-  if (parameters.length === 0)
-    return currentUser ?
-      getCards(interaction, [{ param: interaction.user.id, steam: false, discord: true }], fn) :
-      errorCard(`It seems like you didn't executed the command correctly, do \`/help command:${interaction.commandName}\` to get more informations about it.`)
 
   const steamIds = RegexFun.findSteamUIds(steamParameters)
     .slice(0, maxUser)
     .map(e => { return { param: e, steam: true, discord: false } })
 
-  if (steamIds.length > 0)
-    return getCards(interaction, await Promise.all(steamIds.map(e => getPlayerDatas(e.param, true, e.discord))), fn)
+  if (steamIds.length > 0) parameters.push(...steamIds)
+  else parameters.push(...steamParameters?.trim().split(' ').filter(e => e !== '').map(e => {
+    return {
+      param: e,
+      steam: true,
+      discord: false
+    }
+  }))
+
+  if (parameters.length === 0)
+    return currentUser ?
+      getCards(interaction, [{ param: interaction.user.id, steam: false, discord: true }], fn) :
+      errorCard(`It seems like you didn't executed the command correctly, do \`/help command:${interaction.commandName}\` to get more informations about it.`)
 
   let params = []
   parameters.forEach(e => {
