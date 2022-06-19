@@ -16,4 +16,4 @@ jobs:
         password: ${{ secrets.PASSWORD }}
         port: ${{ secrets.PORT }}
         script: |
-          cd ${{ secrets.REPO }} & git pull & docker-composer -f docker-compose.prod.yml restart
+          cd ${{ secrets.REPO }} & git pull & docker-compose -f docker-compose.prod.yml restart
