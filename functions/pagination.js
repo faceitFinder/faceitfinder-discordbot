@@ -12,21 +12,21 @@ const getPagination = (page, maxPage, id) => {
   return new Discord.MessageActionRow()
     .addComponents([
       CustomTypeFunc.generateButtons(
-        { id: id, page: 0, c: page, n: 1 },
+        { id: id, page: maxPage, c: page, n: 1 },
         CustomType.TYPES.FIRST,
-        false),
-      CustomTypeFunc.generateButtons(
-        { id: id, page: page - 1, c: page, n: 2 },
-        CustomType.TYPES.PREV,
-        !(page - 1 >= 0)),
+        page === maxPage),
       CustomTypeFunc.generateButtons(
         { id: id, page: page + 1, c: page, n: 3 },
-        CustomType.TYPES.NEXT,
+        CustomType.TYPES.PREV,
         !(page + 1 <= maxPage)),
       CustomTypeFunc.generateButtons(
-        { id: id, page: maxPage, c: page, n: 4 },
+        { id: id, page: page - 1, c: page, n: 2 },
+        CustomType.TYPES.NEXT,
+        !(page - 1 >= 0)),
+      CustomTypeFunc.generateButtons(
+        { id: id, page: 0, c: page, n: 4 },
         CustomType.TYPES.LAST,
-        false),
+        page === 0),
     ])
 }
 
