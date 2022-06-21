@@ -5,7 +5,6 @@ const Steam = require('./steam')
 const RegexFun = require('./regex')
 const UserTeam = require('../database/userTeam')
 const errorCard = require('../templates/errorCard')
-const noMention = require('../templates/noMention')
 const Discord = require('discord.js')
 
 const getPlayerDatas = async (param, steam, discord = false) => {
