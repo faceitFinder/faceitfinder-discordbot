@@ -13,7 +13,7 @@ const editInteraction = (interaction, resp) => {
 
 const errorInteraction = (interaction, error) => {
   console.error(error)
-  interaction.followUp(noMention(errorCard('An error has occured'))).catch(console.error)
+  interaction.followUp(noMention(errorCard(error))).catch(console.error)
 }
 
 module.exports = {
@@ -67,7 +67,7 @@ module.exports = {
             else interaction.followUp(resp)
               .catch(err => errorInteraction(interaction, err))
           })
-          .catch(err => errorInteraction(interaction, err))
+          .catch(err => errorInteraction(interaction, 'An error has occured'))
       }).catch(console.error)
   }
 }
