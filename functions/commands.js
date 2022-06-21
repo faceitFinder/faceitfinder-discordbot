@@ -6,6 +6,7 @@ const RegexFun = require('./regex')
 const UserTeam = require('../database/userTeam')
 const errorCard = require('../templates/errorCard')
 const Discord = require('discord.js')
+const noMention = require('../templates/noMention')
 
 const getPlayerDatas = async (param, steam, discord = false) => {
   if (steam) {
@@ -25,20 +26,21 @@ const getCards = async (interaction, array, fn) => {
   return Promise.all(array.map(async obj => {
     if (obj.discord) {
       const user = await User.exists(obj.param)
-      if (user) return fn(interaction, user.faceitId)
+      if (user) return fn(interaction, user.faceitId).catch(err => noMention(errorCard(err)))
       else return errorCard('This user hasn\'t linked his profile')
-    } else return fn(interaction, obj.param)
-  })).then(msgs => msgs.map(msg => {
-    const data = {
-      embeds: msg.embeds || [],
-      files: msg.files || [],
-      components: msg.components || []
-    }
-
-    if (msg.content) data.content = msg.content
-
-    return data
+    } else return fn(interaction, obj.param).catch(err => noMention(errorCard(err)))
   }))
+    .then(msgs => msgs.map(msg => {
+      const data = {
+        embeds: msg.embeds || [],
+        files: msg.files || [],
+        components: msg.components || []
+      }
+
+      if (msg.content) data.content = msg.content
+
+      return data
+    }))
 }
 
 const getCardsConditions = async (interaction, fn, maxUser = 10, name = 'steam_parameters') => {
