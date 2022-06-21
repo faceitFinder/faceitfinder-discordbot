@@ -23,8 +23,8 @@ module.exports = {
      * Checking if the user is temporary banned
      * when the interaction is command or context menu
      */
-    if (interaction.isCommand() ||
-      interaction.isContextMenu() &&
+    if ((interaction.isCommand() ||
+      interaction.isContextMenu()) &&
       interaction.client.antispam.isIgnored(interaction.user.id, interaction.createdAt, interaction.channel)) return
     /**
      * Check if the channel is accessible
