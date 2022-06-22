@@ -46,7 +46,7 @@ const getAverage = (q, d, fixe = 2, percent = 1) => { return ((q / d) * percent)
 
 const getPlayerHistory = async (playerId, maxMatch) => {
   const playerHistory = []
-  for (let page = 0; page <= Math.ceil(maxMatch / 2000) - 1; page++)
+  for (let page = 0; page <= Math.floor(maxMatch / 2000); page++)
     playerHistory.push(...await Match.getMatchElo(playerId, maxMatch, page))
   return playerHistory
 }
@@ -68,18 +68,19 @@ const setOption = option => {
   return { ...option, emoji: emojis.select.balise, default: true }
 }
 
-const getCardWithInfos = async (actionRow, values, type, maxMatch, id) => {
+const getCardWithInfos = async (actionRow, values, type, id, maxMatch) => {
   const playerId = values.s
   const playerDatas = await Player.getDatas(playerId)
+  const faceitStats = await Player.getStats(playerId)
   const steamDatas = await Steam.getDatas(playerDatas.steam_id_64)
 
   const faceitLevel = playerDatas.games.csgo.skill_level
   const faceitElo = playerDatas.games.csgo.faceit_elo
   const size = 40
   const from = values.f * 1000
-  const to = values.t * 1000 || new Date().getTime()
+  const to = values.t * 1000 || new Date().setHours(+24)
 
-  const playerHistory = await getPlayerHistory(playerId, maxMatch)
+  const playerHistory = await getPlayerHistory(playerId, maxMatch || faceitStats.lifetime.Matches)
   const playerStats = generatePlayerStats(playerHistory.filter(e => e.date >= from && e.date < to))
 
   const today = new Date().setHours(24, 0, 0, 0)

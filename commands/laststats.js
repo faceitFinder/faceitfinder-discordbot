@@ -27,7 +27,7 @@ const sendCardWithInfos = async (interaction, playerId, type = CustomType.TYPES.
       .addOptions([option])
       .setDisabled(true))
 
-  return DateStats.getCardWithInfos(row, JSON.parse(option.value), type, maxMatch, 'uLSG')
+  return DateStats.getCardWithInfos(row, JSON.parse(option.value), type, 'uLSG', maxMatch)
 }
 
 const getOptions = () => {
