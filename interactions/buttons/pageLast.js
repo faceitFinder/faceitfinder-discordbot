@@ -1,6 +1,5 @@
 const { getDefaultInteractionOption } = require('../../functions/commands')
 const { sendCardWithInfos } = require('../../commands/last')
-const CustomType = require('../../templates/customType')
 const loadingCard = require('../../templates/loadingCard')
 
 module.exports = {
