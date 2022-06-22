@@ -7,6 +7,7 @@
   "invite": "https://discord.com/oauth2/authorize?client_id=838088031222235197&permissions=274878220288&scope=bot%20applications.commands",
   "vote": "https://top.gg/bot/838088031222235197/vote",
   "join": "https://discord.gg/uPAdfvfuTP",
+  "itemByPage": 10,
   "color": {
     "primary": "#14578c",
     "won": "#64AC30",
