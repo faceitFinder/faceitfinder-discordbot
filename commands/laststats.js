@@ -3,11 +3,10 @@ const { getInteractionOption, getCardsConditions } = require('../functions/comma
 const Options = require('../templates/options')
 const DateStats = require('../functions/dateStats')
 const CustomType = require('../templates/customType')
-const Match = require('../functions/match')
 
 const sendCardWithInfos = async (interaction, playerId, type = CustomType.TYPES.ELO) => {
   const maxMatch = getInteractionOption(interaction, 'match_number') || 20
-  const playerHistory = await Match.getMatchElo(playerId, maxMatch)
+  const playerHistory = await DateStats.getPlayerHistory(playerId, maxMatch)
   const lastMatch = playerHistory.pop()
 
   const option = {
@@ -35,7 +34,7 @@ const getOptions = () => {
   const options = [...Options.stats]
   options.unshift({
     name: 'match_number',
-    description: 'Number of matchs to display. Default: 20, max: 2000',
+    description: 'Number of matchs to display. Default: 20',
     required: false,
     type: 4,
     slash: true,

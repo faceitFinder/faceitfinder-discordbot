@@ -44,14 +44,22 @@ const generatePlayerStats = playerHistory => {
 
 const getAverage = (q, d, fixe = 2, percent = 1) => { return ((q / d) * percent).toFixed(fixe) }
 
+const getPlayerHistory = async (playerId, maxMatch) => {
+  const playerHistory = []
+  for (let page = 0; page <= Math.ceil(maxMatch / 2000) - 1; page++)
+    playerHistory.push(...await Match.getMatchElo(playerId, maxMatch, page))
+  return playerHistory
+}
+
 const getDates = async (playerId, maxMatch, getDay) => {
   const dates = new Map()
-  await Match.getMatchElo(playerId, maxMatch)
-    .then(m => m.forEach(e => {
-      const day = getDay(e.date)
-      if (!dates.has(day)) dates.set(day, { number: 1, date: day })
-      else dates.set(day, { number: dates.get(day).number + 1, date: day })
-    }))
+  const playerHistory = await getPlayerHistory(playerId, maxMatch)
+
+  playerHistory.forEach(e => {
+    const day = getDay(e.date)
+    if (!dates.has(day)) dates.set(day, { number: 1, date: day })
+    else dates.set(day, { number: dates.get(day).number + 1, date: day })
+  })
 
   return dates
 }
@@ -71,7 +79,7 @@ const getCardWithInfos = async (actionRow, values, type, maxMatch, id) => {
   const from = values.f * 1000
   const to = values.t * 1000 || new Date().getTime()
 
-  const playerHistory = await Match.getMatchElo(playerId, maxMatch)
+  const playerHistory = await getPlayerHistory(playerId, maxMatch)
   const playerStats = generatePlayerStats(playerHistory.filter(e => e.date >= from && e.date < to))
 
   const today = new Date().setHours(24, 0, 0, 0)
@@ -148,4 +156,5 @@ module.exports = {
   getDates,
   getCardWithInfos,
   setOption,
+  getPlayerHistory,
 }
