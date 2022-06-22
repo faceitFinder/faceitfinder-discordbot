@@ -1,6 +1,14 @@
+const { itemByPage } = require('../config.json')
 const Discord = require('discord.js')
 const CustomTypeFunc = require('../functions/customType')
 const CustomType = require('../templates/customType')
+
+const getPageSlice = (page) => {
+  return {
+    start: page * itemByPage,
+    end: (page + 1) * itemByPage
+  }
+}
 
 const getPagination = (page, maxPage, id) => {
   /**
@@ -31,5 +39,6 @@ const getPagination = (page, maxPage, id) => {
 }
 
 module.exports = {
-  getPagination
+  getPagination,
+  getPageSlice
 }

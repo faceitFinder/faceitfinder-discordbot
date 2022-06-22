@@ -6,6 +6,7 @@ const Player = require('./player')
 const Graph = require('./graph')
 const CustomType = require('../templates/customType')
 const CustomTypeFunc = require('../functions/customType')
+const { getPagination } = require('./pagination')
 
 const generatePlayerStats = playerHistory => {
   const playerStats = {
@@ -46,7 +47,7 @@ const getAverage = (q, d, fixe = 2, percent = 1) => { return ((q / d) * percent)
 
 const getPlayerHistory = async (playerId, maxMatch) => {
   const playerHistory = []
-  for (let page = 0; page <= Math.ceil(maxMatch / 2000) - 1; page++)
+  for (let page = 0; page <= Math.floor(maxMatch / 2000); page++)
     playerHistory.push(...await Match.getMatchElo(playerId, maxMatch, page))
   return playerHistory
 }
@@ -68,16 +69,18 @@ const setOption = option => {
   return { ...option, emoji: emojis.select.balise, default: true }
 }
 
-const getCardWithInfos = async (actionRow, values, type, maxMatch, id) => {
+const getCardWithInfos = async (actionRow, values, type, id, maxMatch, maxPage = null, page = null) => {
   const playerId = values.s
   const playerDatas = await Player.getDatas(playerId)
   const steamDatas = await Steam.getDatas(playerDatas.steam_id_64)
+
+  if (maxMatch === null) maxMatch = (await Player.getStats(playerId)).lifetime.Matches
 
   const faceitLevel = playerDatas.games.csgo.skill_level
   const faceitElo = playerDatas.games.csgo.faceit_elo
   const size = 40
   const from = values.f * 1000
-  const to = values.t * 1000 || new Date().getTime()
+  const to = values.t * 1000 || new Date().setHours(+24)
 
   const playerHistory = await getPlayerHistory(playerId, maxMatch)
   const playerStats = generatePlayerStats(playerHistory.filter(e => e.date >= from && e.date < to))
@@ -86,7 +89,7 @@ const getCardWithInfos = async (actionRow, values, type, maxMatch, id) => {
 
   const checkElo = today >= from && today <= to
   const playerHistoryTo = playerHistory.filter(e => e.date < to)
-  const elo = Graph.getElo(playerStats.games + 1, playerHistoryTo, faceitElo, checkElo)
+  const elo = await Graph.getElo(playerStats.games + 1, playerHistoryTo, faceitElo, checkElo)
   const eloDiff = elo.at(0) - elo.at(-1)
 
   const graphBuffer = Graph.generateChart(playerHistoryTo,
@@ -125,6 +128,26 @@ const getCardWithInfos = async (actionRow, values, type, maxMatch, id) => {
     .setColor(color.levels[faceitLevel].color)
     .setFooter({ text: `Steam: ${steamDatas?.personaname}` })
 
+  const components = [
+    actionRow,
+    new Discord.MessageActionRow()
+      .addComponents([
+        CustomTypeFunc.generateButtons(
+          { id: id, n: 1 },
+          CustomType.TYPES.KD,
+          type === CustomType.TYPES.KD),
+        CustomTypeFunc.generateButtons(
+          { id: id, n: 2 },
+          CustomType.TYPES.ELO,
+          type === CustomType.TYPES.ELO),
+        CustomTypeFunc.generateButtons(
+          { id: id, n: 3 },
+          CustomType.TYPES.ELO_KD,
+          type === CustomType.TYPES.ELO_KD)
+      ])]
+
+  if (page !== null) components.push(getPagination(page, maxPage, 'pageDS'))
+
   return {
     embeds: [card],
     content: null,
@@ -132,23 +155,7 @@ const getCardWithInfos = async (actionRow, values, type, maxMatch, id) => {
       new Discord.MessageAttachment(graphBuffer, `${values.s}graph.png`),
       new Discord.MessageAttachment(rankImageCanvas, `${faceitLevel}level.png`)
     ],
-    components: [
-      actionRow,
-      new Discord.MessageActionRow()
-        .addComponents([
-          CustomTypeFunc.generateButtons(
-            { id: id, n: 1 },
-            CustomType.TYPES.KD,
-            type === CustomType.TYPES.KD),
-          CustomTypeFunc.generateButtons(
-            { id: id, n: 2 },
-            CustomType.TYPES.ELO,
-            type === CustomType.TYPES.ELO),
-          CustomTypeFunc.generateButtons(
-            { id: id, n: 3 },
-            CustomType.TYPES.ELO_KD,
-            type === CustomType.TYPES.ELO_KD)
-        ])]
+    components: components
   }
 }
 

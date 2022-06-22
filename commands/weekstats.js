@@ -1,5 +1,5 @@
+const { itemByPage } = require('../config.json')
 const Discord = require('discord.js')
-const { maxMatchsDateStats } = require('../config.json')
 const Player = require('../functions/player')
 const errorCard = require('../templates/errorCard')
 const DateStats = require('../functions/dateStats')
@@ -15,13 +15,12 @@ const getMonday = date => {
   return new Date(date.setDate(date.getDate() - week[date.getDay()])).getTime()
 }
 
-const sendCardWithInfos = async (interaction, playerId) => {
+const sendCardWithInfos = async (interaction, playerId, page = 0) => {
   const playerStats = await Player.getStats(playerId)
   const playerDatas = await Player.getDatas(playerId)
 
   const options = []
-  const dates = await DateStats.getDates(playerId, maxMatchsDateStats, getMonday)
-  let first = false
+  const dates = await DateStats.getDates(playerId, playerStats.lifetime.Matches, getMonday)
 
   dates.forEach(date => {
     const from = new Date(date.date)
@@ -38,22 +37,30 @@ const sendCardWithInfos = async (interaction, playerId) => {
       })
     }
 
-    if (!first) {
-      first = true
-      option = DateStats.setOption(option, true)
-    } options.push(option)
+    options.push(option)
   })
 
-  if (options.length === 0) return errorCard(`Couldn\'t get matchs of ${playerDatas.nickname}`)
-  if (playerStats.lifetime.Matches > maxMatchsDateStats) options.pop()
+  const pages = getPageSlice(page)
+  const pagination = options.slice(pages.start, pages.end)
+
+  if (pagination.length === 0) return errorCard(`Couldn't get matchs of ${playerDatas.nickname}`)
+
+  pagination[0] = DateStats.setOption(pagination.at(0), true) // Set default
+
   const row = new Discord.MessageActionRow()
     .addComponents(
       new Discord.MessageSelectMenu()
         .setCustomId('dateStatsSelector')
         .setPlaceholder('Select a week')
-        .addOptions(options.slice(0, 25)))
+        .addOptions(pagination))
 
-  return DateStats.getCardWithInfos(row, JSON.parse(options[0].value), CustomType.TYPES.ELO, maxMatchsDateStats, 'uDSG')
+  return DateStats.getCardWithInfos(row,
+    JSON.parse(pagination[0].value),
+    CustomType.TYPES.ELO,
+    'uDSG',
+    playerStats.lifetime.Matches,
+    Math.floor(options.length / itemByPage),
+    page)
 }
 
 module.exports = {

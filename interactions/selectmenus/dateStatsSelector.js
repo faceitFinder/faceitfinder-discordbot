@@ -1,4 +1,4 @@
-const { emojis, maxMatchsDateStats } = require('../../config.json')
+const { emojis } = require('../../config.json')
 const Discord = require('discord.js')
 const loadingCard = require('../../templates/loadingCard')
 const CustomType = require('../../templates/customType')
@@ -6,6 +6,7 @@ const DateStats = require('../../functions/dateStats')
 
 const sendCardWithInfos = async (interaction, values, type = CustomType.TYPES.ELO) => {
   if (values.u !== interaction.user.id) return
+  const lastItemPaginationValues = JSON.parse(interaction.message.components.at(2).components.at(3).customId)
   const options = interaction.message.components.at(0).components
     .filter(e => e instanceof Discord.MessageSelectMenu)
     .map(msm => {
@@ -26,7 +27,14 @@ const sendCardWithInfos = async (interaction, values, type = CustomType.TYPES.EL
 
   loadingCard(interaction)
 
-  return DateStats.getCardWithInfos(actionRow, values, type, maxMatchsDateStats, 'uDSG')
+  return DateStats.getCardWithInfos(actionRow,
+    values,
+    type,
+    'uDSG',
+    null,
+    lastItemPaginationValues.page,
+    lastItemPaginationValues.c
+  )
 }
 
 module.exports = {
