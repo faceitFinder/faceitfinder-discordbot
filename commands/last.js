@@ -14,7 +14,7 @@ const getLevelFromElo = (elo) => {
   const colorLevel = Object.entries(color.levels).filter(e => {
     return elo >= e.at(1).min && elo <= e.at(1).max
   }).at(0)
-  return colorLevel.at(0)
+  return colorLevel?.at(0)
 }
 
 const sendCardWithInfos = async (interaction, playerId, matchId = null, page = 0) => {
@@ -53,11 +53,15 @@ const sendCardWithInfos = async (interaction, playerId, matchId = null, page = 0
       const mapName = roundStats.i1
       const result = Math.max(...roundStats.i18.split('/').map(Number)) === parseInt(roundStats.c5)
       const eloGain = isNaN(eloDiff.at(i)) ? '0' : eloDiff.at(i) > 0 ? `+${eloDiff.at(i)}` : eloDiff.at(i).toString()
-      const rankImageCanvas = await Graph.getRankImage(
-        getLevelFromElo(levelDiff.at(i)),
-        levelDiff.at(i),
-        size)
 
+      const level = getLevelFromElo(levelDiff.at(i))
+      if (level !== undefined) {
+        const rankImageCanvas = await Graph.getRankImage(
+          level,
+          levelDiff.at(i),
+          size)
+        filesAtt.push(new Discord.MessageAttachment(rankImageCanvas, `${faceitElo}${i}.png`))
+      }
       if (roundStats === undefined)
         cards.push(errorCard(`Couldn\'t get the stats of ${steamDatas?.personaname} from his last match`).embeds.at(0))
       if (matchStats.length > 1)
@@ -65,7 +69,6 @@ const sendCardWithInfos = async (interaction, playerId, matchId = null, page = 0
 
       mapThumbnail = `./images/maps/${mapName}.jpg`
 
-      filesAtt.push(new Discord.MessageAttachment(rankImageCanvas, `${faceitElo}${i}.png`))
 
       card.setAuthor({ name: playerDatas.nickname, iconURL: playerDatas.avatar, url: `https://www.faceit.com/fr/players/${playerDatas.nickname}` })
         .setDescription(`[Steam](${steamDatas?.profileurl}), [Game Lobby](https://www.faceit.com/fr/csgo/room/${matchId}/scoreboard)`)

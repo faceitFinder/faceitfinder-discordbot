@@ -117,7 +117,7 @@ const getChart = (datasets, matchHistory, maxMatch) => {
   return canvas.toBuffer()
 }
 
-const getRankImage = async (faceitLevel, faceitElo, size) => {
+const getRankImage = async (faceitLevel, faceitElo = color.levels['3'].min, size) => {
   const space = 6,
     maxWidth = size - space,
     height = 4,
