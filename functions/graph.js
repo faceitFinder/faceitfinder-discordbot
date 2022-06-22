@@ -137,7 +137,7 @@ const getRankImage = async (faceitLevel, faceitElo, size) => {
   ctx = roundRect(ctx, x, y, maxWidth, height, space)
 
   const range = color.levels[faceitLevel],
-    width = faceitLevel === 10 ? maxWidth : (maxWidth * (faceitElo - range.min) / (range.max - range.min))
+    width = parseInt(faceitLevel) === 10 ? maxWidth : (maxWidth * (faceitElo - range.min) / (range.max - range.min))
 
   ctx.globalCompositeOperation = 'source-over'
   ctx.fillStyle = ctx.strokeStyle = color.levels[faceitLevel].color
