@@ -10,7 +10,7 @@ const sendCardWithInfos = async (playerId, map, mode) => {
   if (!map) return
   const playerDatas = await Player.getDatas(playerId)
   const playerStats = await Player.getStats(playerId)
-  const steamDatas = await Steam.getDatas(playerDatas.steam_id_64)
+  const steamDatas = await Steam.getDatas(playerDatas.steam_id_64).catch(err => err.statusText)
 
   const faceitLevel = playerDatas.games.csgo.skill_level
   const size = 40
@@ -26,7 +26,7 @@ const sendCardWithInfos = async (playerId, map, mode) => {
 
     return new Discord.MessageEmbed()
       .setAuthor({ name: playerDatas.nickname, iconURL: playerDatas.avatar, url: `https://www.faceit.com/fr/players/${playerDatas.nickname}` })
-      .setDescription(`[Steam](${steamDatas?.profileurl})`)
+      .setDescription(`[Steam](https://steamcommunity.com/profiles/${playerDatas.games.csgo.game_player_id}), [Faceit](https://www.faceit.com/fr/players/${playerDatas.nickname})`)
       .setThumbnail('attachment://level.png')
       .addFields({ name: 'Games', value: `${m.stats.Matches} (${m.stats['Win Rate %']}% Win)`, inline: true },
         { name: 'Map', value: map, inline: true },
@@ -38,7 +38,7 @@ const sendCardWithInfos = async (playerId, map, mode) => {
         { name: 'Average Deaths', value: m.stats['Average Deaths'], inline: true },
         { name: 'Average Assists', value: m.stats['Average Assists'], inline: true })
       .setColor(color.levels[faceitLevel].color)
-      .setFooter({ text: `Steam: ${steamDatas?.personaname}` })
+      .setFooter({ text: `Steam: ${steamDatas?.personaname || steamDatas}` })
       .setImage(`attachment://${map}.jpg`)
   })
 

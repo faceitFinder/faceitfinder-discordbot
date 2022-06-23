@@ -49,11 +49,9 @@ module.exports = {
 
     const usersInfos = await Promise.all(teamUsers.map(async user => {
       const playerDatas = await Player.getDatas(user.faceitId)
-      const steamDatas = await Steam.getDatas(playerDatas.steam_id_64)
 
       return {
         user: user,
-        steam: steamDatas,
         faceit: playerDatas
       }
     }))
@@ -66,7 +64,7 @@ module.exports = {
     if (usersInfos.length > 0) usersInfos.forEach(user => {
       embed.addFields({
         name: `${user.faceit.nickname}`,
-        value: `[Steam](${user.steam.profileurl})\n[Faceit](https://www.faceit.com/fr/players/${user.faceit.nickname})`,
+        value: `[Steam](https://steamcommunity.com/profiles/${user.faceit.games.csgo.game_player_id})\n[Faceit](https://www.faceit.com/fr/players/${user.faceit.nickname})`,
         inline: true,
       })
     })

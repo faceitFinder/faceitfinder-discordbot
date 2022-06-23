@@ -92,14 +92,13 @@ const addUser = async (interaction, playerId) => {
   const user = interaction.user.id
   const currentTeam = await Team.getCreatorTeam(user)
   const playerDatas = await Player.getDatas(playerId)
-  const steamDatas = await Steam.getDatas(playerDatas.steam_id_64)
 
   if (await UserTeam.getUserTeam(playerId, currentTeam.slug))
     return errorCard(`**${playerDatas.nickname}** is already part of the team **${currentTeam.name}**`)
 
   UserTeam.create(currentTeam.slug, playerId)
 
-  return successCard(`**${playerDatas.nickname}** has been added to the team **${currentTeam.name}**, [Steam](${steamDatas?.profileurl}) - [Faceit](https://www.faceit.com/fr/players/${playerDatas.nickname})`)
+  return successCard(`**${playerDatas.nickname}** has been added to the team **${currentTeam.name}**, [Steam](https://steamcommunity.com/profiles/${playerDatas.games.csgo.game_player_id}) - [Faceit](https://www.faceit.com/fr/players/${playerDatas.nickname})`)
 }
 
 const removeUser = async (interaction, playerId) => {

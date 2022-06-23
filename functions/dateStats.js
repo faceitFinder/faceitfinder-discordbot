@@ -72,7 +72,7 @@ const setOption = option => {
 const getCardWithInfos = async (actionRow, values, type, id, maxMatch, maxPage = null, page = null) => {
   const playerId = values.s
   const playerDatas = await Player.getDatas(playerId)
-  const steamDatas = await Steam.getDatas(playerDatas.steam_id_64)
+  const steamDatas = await Steam.getDatas(playerDatas.steam_id_64).catch(err => err.statusText)
 
   if (maxMatch === null) maxMatch = (await Player.getStats(playerId)).lifetime.Matches
 
@@ -103,7 +103,7 @@ const getCardWithInfos = async (actionRow, values, type, id, maxMatch, maxPage =
 
   const card = new Discord.MessageEmbed()
     .setAuthor({ name: playerDatas.nickname, iconURL: playerDatas.avatar, url: `https://www.faceit.com/fr/players/${playerDatas.nickname}` })
-    .setDescription(`[Steam](${steamDatas?.profileurl}), [Faceit](https://www.faceit.com/fr/players/${playerDatas.nickname})`)
+    .setDescription(`[Steam](https://steamcommunity.com/profiles/${playerDatas.games.csgo.game_player_id}), [Faceit](https://www.faceit.com/fr/players/${playerDatas.nickname})`)
     .setThumbnail(`attachment://${faceitLevel}level.png`)
     .addFields(
       from !== toRealTimeStamp ?
@@ -126,7 +126,7 @@ const getCardWithInfos = async (actionRow, values, type, id, maxMatch, maxPage =
       { name: 'Green K/D', value: playerStats['Green K/D'].toString(), inline: true })
     .setImage(`attachment://${values.s}graph.png`)
     .setColor(color.levels[faceitLevel].color)
-    .setFooter({ text: `Steam: ${steamDatas?.personaname}` })
+    .setFooter({ text: `Steam: ${steamDatas?.personaname || steamDatas}` })
 
   const components = [
     actionRow,

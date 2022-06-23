@@ -21,7 +21,7 @@ const sendCardWithInfos = async (interaction, playerId, matchId = null, page = 0
   const maxMatch = 10
   const playerDatas = await Player.getDatas(playerId)
   const playerStats = await Player.getStats(playerId)
-  const steamDatas = await Steam.getDatas(playerDatas.steam_id_64)
+  const steamDatas = await Steam.getDatas(playerDatas.steam_id_64).catch(err => err.statusText)
   const playerHistory = await Match.getMatchElo(playerId, maxMatch, page)
 
   const faceitElo = playerDatas.games.csgo.faceit_elo
@@ -31,7 +31,7 @@ const sendCardWithInfos = async (interaction, playerId, matchId = null, page = 0
   const cards = []
 
   if (!playerHistory.length > 0)
-    return errorCard(`Couldn\'t get the last match of ${steamDatas?.personaname}`)
+    return errorCard(`Couldn\'t get the last match of ${steamDatas?.personaname || steamDatas}`)
 
   if (!matchId) matchId = playerHistory[0].matchId
 
@@ -63,7 +63,7 @@ const sendCardWithInfos = async (interaction, playerId, matchId = null, page = 0
         filesAtt.push(new Discord.MessageAttachment(rankImageCanvas, `${faceitElo}${i}.png`))
       }
       if (roundStats === undefined)
-        cards.push(errorCard(`Couldn\'t get the stats of ${steamDatas?.personaname} from his last match`).embeds.at(0))
+        cards.push(errorCard(`Couldn\'t get the stats of ${steamDatas?.personaname || steamDatas} from his last match`).embeds.at(0))
       if (matchStats.length > 1)
         card.addFields({ name: 'round', value: `${i + 1}/${matchStats.length}` })
 
@@ -71,7 +71,7 @@ const sendCardWithInfos = async (interaction, playerId, matchId = null, page = 0
 
 
       card.setAuthor({ name: playerDatas.nickname, iconURL: playerDatas.avatar, url: `https://www.faceit.com/fr/players/${playerDatas.nickname}` })
-        .setDescription(`[Steam](${steamDatas?.profileurl}), [Game Lobby](https://www.faceit.com/fr/csgo/room/${matchId}/scoreboard)`)
+        .setDescription(`[Steam](https://steamcommunity.com/profiles/${playerDatas.games.csgo.game_player_id}), [Game Lobby](https://www.faceit.com/fr/csgo/room/${matchId}/scoreboard)`)
         .addFields({ name: 'Score', value: roundStats.i18, inline: true },
           { name: 'Map', value: mapName, inline: true },
           { name: 'Status', value: result ? emojis.won.balise : emojis.lost.balise, inline: true },
@@ -86,7 +86,7 @@ const sendCardWithInfos = async (interaction, playerId, matchId = null, page = 0
         .setThumbnail(`attachment://${faceitElo}${i}.png`)
         .setImage(`attachment://${mapName}.jpg`)
         .setColor(result ? color.won : color.lost)
-        .setFooter({ text: `Steam: ${steamDatas?.personaname}` })
+        .setFooter({ text: `Steam: ${steamDatas?.personaname || steamDatas}` })
 
       if (fs.existsSync(mapThumbnail))
         filesAtt.push(new Discord.MessageAttachment(mapThumbnail, `${mapName}.jpg`))

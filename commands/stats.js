@@ -12,7 +12,7 @@ const { getCardsConditions } = require('../functions/commands')
 
 const sendCardWithInfos = async (interaction, playerId, type = CustomType.TYPES.ELO) => {
   const playerDatas = await Player.getDatas(playerId)
-  const steamDatas = await Steam.getDatas(playerDatas.steam_id_64)
+  const steamDatas = await Steam.getDatas(playerDatas.steam_id_64).catch(err => err.statusText)
   const playerStats = await Player.getStats(playerId)
   const maxMatch = 20
   const playerHistory = await Match.getMatchElo(playerId, maxMatch)
@@ -42,7 +42,7 @@ const sendCardWithInfos = async (interaction, playerId, type = CustomType.TYPES.
       iconURL: playerDatas.avatar,
       url: `https://www.faceit.com/fr/players/${playerDatas.nickname}`
     })
-    .setDescription(`[Steam](${steamDatas?.profileurl}), [Faceit](https://www.faceit.com/fr/players/${playerDatas.nickname})`)
+    .setDescription(`[Steam](https://steamcommunity.com/profiles/${playerDatas.games.csgo.game_player_id}), [Faceit](https://www.faceit.com/fr/players/${playerDatas.nickname})`)
     .setThumbnail(`attachment://${faceitLevel}level.png`)
     .addFields({ name: 'Games', value: `${playerStats.lifetime.Matches} (${playerStats.lifetime['Win Rate %']}% Win)`, inline: true },
       { name: 'K/D', value: playerStats.lifetime['Average K/D Ratio'], inline: true },
@@ -52,7 +52,7 @@ const sendCardWithInfos = async (interaction, playerId, type = CustomType.TYPES.
       { name: `:flag_${playerRegion.toLowerCase()}:`, value: ladderRegion.position.toString(), inline: true })
     .setImage('attachment://graph.png')
     .setColor(color.levels[faceitLevel].color)
-    .setFooter({ text: `Steam: ${steamDatas?.personaname}` })
+    .setFooter({ text: `Steam: ${steamDatas?.personaname || steamDatas}` })
 
   return {
     content: ' ',
