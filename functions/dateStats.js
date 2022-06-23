@@ -47,7 +47,7 @@ const getAverage = (q, d, fixe = 2, percent = 1) => { return ((q / d) * percent)
 
 const getPlayerHistory = async (playerId, maxMatch) => {
   const playerHistory = []
-  for (let page = 0; page <= Math.ceil(maxMatch / 2000); page++)
+  for (let page = 0; page < Math.ceil(maxMatch / 2000); page++)
     playerHistory.push(...await Match.getMatchElo(playerId, maxMatch, page))
   return playerHistory
 }

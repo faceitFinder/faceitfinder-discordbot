@@ -11,7 +11,7 @@ const sendCardWithInfos = async (interaction, playerId, type = CustomType.TYPES.
 
   const option = {
     label: 'Last stats',
-    description: `${lastMatch.number} match played`,
+    description: `${playerHistory.length} match played`,
     value: JSON.stringify({
       s: playerId,
       f: lastMatch.date / 1000,
