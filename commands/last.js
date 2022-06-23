@@ -25,13 +25,13 @@ const sendCardWithInfos = async (interaction, playerId, matchId = null, page = 0
   const playerHistory = await Match.getMatchElo(playerId, maxMatch, page)
 
   const faceitElo = playerDatas.games.csgo.faceit_elo
-  const maxPage = Math.floor(playerStats.lifetime.Matches / maxMatch)
+  const maxPage = Math.ceil(playerStats.lifetime.Matches / maxMatch) - 1
   const size = 40
   const filesAtt = []
   const cards = []
 
   if (!playerHistory.length > 0)
-    return errorCard(`Couldn\'t get the last match of ${steamDatas?.personaname}`).embeds.at(0)
+    return errorCard(`Couldn\'t get the last match of ${steamDatas?.personaname}`)
 
   if (!matchId) matchId = playerHistory[0].matchId
 
