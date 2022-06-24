@@ -192,13 +192,15 @@ const getGradient = (prev, current, ctx, type) => {
 }
 
 const colorFilter = (colors, value) => Object.entries(colors)
-  .filter(color => parseFloat(value) >= parseFloat(color[1].min) && parseFloat(value) <= parseFloat(color[1].max))[0][1]
+  .filter(color => parseFloat(value) >= parseFloat(color[1].min) && parseFloat(value) <= parseFloat(color[1].max))
+  .at(0)
+  .at(1)
 
 const getGraph = (type, matchHistory, faceitElo, maxMatch, check = true) => {
   switch (type) {
-  case CustomType.TYPES.ELO: return getElo(maxMatch, matchHistory, faceitElo, check)
-  case CustomType.TYPES.KD: return getKD(matchHistory, maxMatch)
-  default: break
+    case CustomType.TYPES.ELO: return getElo(maxMatch, matchHistory, faceitElo, check)
+    case CustomType.TYPES.KD: return getKD(matchHistory, maxMatch)
+    default: break
   }
 }
 
