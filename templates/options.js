@@ -22,7 +22,7 @@ const stats = [
   }
 ]
 
-const usage = 'steam_parameters:multiple steam params and @user OR CSGO status AND team:team slug (max 1) AND faceit_parameters:multiple faceit nicknames @user (max 10 users overall)'
+const usage = 'steam_parameters:multiple steam params and @user OR CSGO status AND team:team slug (max 1) AND faceit_parameters:multiple faceit nicknames and @user (max 10 users overall)'
 
 module.exports = {
   stats,
