@@ -68,16 +68,21 @@ const getCardsConditions = async (interaction, fn, maxUser = 10, name = 'steam_p
     }
   }
   if (faceitParameters) {
-    await Promise.all(faceitParameters.map(async nickname => await Player.getDatasFromNickname(nickname).catch(() => nickname)))
-      .then(params => {
-        parameters.push(...params.map(e => {
-          return {
-            param: e?.player_id || e,
-            steam: false,
-            discord: false
-          }
+    await Promise.all(faceitParameters
+      .map(async nickname => await Player.getDatasFromNickname(nickname)
+        .catch(async () => {
+          const player = await Player.searchPlayer(nickname)
+          return player.items?.at(0) || nickname
         }))
-      })
+    ).then(params => {
+      parameters.push(...params.map(e => {
+        return {
+          param: e?.player_id || e,
+          steam: false,
+          discord: false
+        }
+      }))
+    })
   }
 
   if (steamParameters) {

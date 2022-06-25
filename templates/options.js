@@ -15,7 +15,7 @@ const stats = [
   },
   {
     name: 'faceit_parameters',
-    description: 'faceit nicknames (case sensitive) / @users',
+    description: 'faceit nicknames / @users',
     required: false,
     type: 3,
     slash: true

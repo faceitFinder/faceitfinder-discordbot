@@ -10,10 +10,13 @@ const getHistory = (playerId, limit = 1, offset = 0, from = null, to = null) => 
 
 const getDatasFromNickname = (nickname) => Faceit.fetchData(`https://open.faceit.com/data/v4/players?nickname=${nickname}`, 'Couldn\'t get faceit datas')
 
+const searchPlayer = (nickname) => Faceit.fetchData(`https://open.faceit.com/data/v4/search/players?nickname=${nickname}&offset=0&limit=1`, 'Couldn\'t get faceit datas')
+
 module.exports = {
   getDatas,
   getId,
   getStats,
   getHistory,
-  getDatasFromNickname
+  getDatasFromNickname,
+  searchPlayer
 }
