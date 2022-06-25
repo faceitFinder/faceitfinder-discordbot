@@ -162,10 +162,8 @@ const roundRect = (ctx, x, y, w, h, r) => {
 }
 
 const getElo = (maxMatch, matchHistory, playerElo, checkElo = true) => {
-  const currentElo = { elo: playerElo }
-
-  if (matchHistory.length > 0 && checkElo && matchHistory[0].elo === undefined) matchHistory[0] = currentElo
-  else if (matchHistory.length === 0) throw 'Couldn\'t get matchs'
+  if (matchHistory.length <= 0) throw 'Couldn\'t get matchs'
+  else if (checkElo && matchHistory[0].elo === undefined) matchHistory[0].elo = playerElo
 
   const elo = matchHistory.map(e => e.elo)
   elo.reverse().forEach((e, i) => {
