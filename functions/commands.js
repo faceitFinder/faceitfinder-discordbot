@@ -12,7 +12,13 @@ const getPlayerDatas = async (param, steam, discord = false) => {
   if (steam) {
     const steamId = await Steam.getId(param)
     return { param: await Player.getId(steamId).catch(() => steamId), discord }
-  } else return { param, discord }
+  }
+  if (discord) {
+    const user = await User.exists(param)
+    if (user) return { param: user.faceitId, discord }
+    else throw `<@${param}> hasn't linked his profile`
+  }
+  return { param, discord }
 }
 
 const getDefaultInteractionOption = (interaction) => {
@@ -23,13 +29,7 @@ const getDefaultInteractionOption = (interaction) => {
 }
 
 const getCards = async (interaction, array, fn) => {
-  return Promise.all(array.map(async obj => {
-    if (obj.discord) {
-      const user = await User.exists(obj.param)
-      if (user) return fn(interaction, user.faceitId).catch(err => noMention(errorCard(err)))
-      else return errorCard('This user hasn\'t linked his profile')
-    } else return fn(interaction, obj.param).catch(err => noMention(errorCard(err)))
-  }))
+  return Promise.all(array.map(async obj => fn(interaction, obj.param).catch(err => noMention(errorCard(err)))))
     .then(msgs => msgs.map(msg => {
       const data = {
         embeds: msg.embeds || [],

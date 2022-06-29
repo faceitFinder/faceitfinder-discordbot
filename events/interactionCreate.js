@@ -13,7 +13,7 @@ const editInteraction = (interaction, resp) => {
 
 const errorInteraction = (interaction, error, message) => {
   console.error(error)
-  interaction.followUp(noMention(errorCard(message))).catch(console.error)
+  interaction.followUp(noMention(errorCard(typeof error !== 'string' ? message : error))).catch(console.error)
 }
 
 module.exports = {
