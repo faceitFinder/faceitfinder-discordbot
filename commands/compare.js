@@ -71,19 +71,7 @@ const sendCardWithInfos = async (interaction, player1Id, player2Id, type = Custo
       {
         name: 'From',
         value: new Date(playerWithLessMatch.playerHistory.at(-1).date).toDateString(),
-        inline: true
-      },
-      {
-        name: 'To',
-        value: new Date(playerWithLessMatch.playerHistory.at(0).date).toDateString(),
-        inline: true
-      },
-      {
-        name: 'Winrate',
-        value: `**${dateStatsDatas.at(0).winrate}%** - \
-        ${dateStatsDatas.at(1).winrate}% \
-        ${compareStats(dateStatsDatas.at(0).winrate, dateStatsDatas.at(1).winrate)}`,
-        inline: true
+        inline: false
       },
       {
         name: 'Elo',
