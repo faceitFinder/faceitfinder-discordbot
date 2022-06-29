@@ -12,7 +12,13 @@ const getPlayerDatas = async (param, steam, discord = false) => {
   if (steam) {
     const steamId = await Steam.getId(param)
     return { param: await Player.getId(steamId).catch(() => steamId), discord }
-  } else return { param, discord }
+  }
+  if (discord) {
+    const user = await User.exists(param)
+    if (user) return { param: user.faceitId, discord }
+    else throw `<@${param}> hasn't linked his profile`
+  }
+  return { param, discord }
 }
 
 const getDefaultInteractionOption = (interaction) => {
@@ -23,13 +29,7 @@ const getDefaultInteractionOption = (interaction) => {
 }
 
 const getCards = async (interaction, array, fn) => {
-  return Promise.all(array.map(async obj => {
-    if (obj.discord) {
-      const user = await User.exists(obj.param)
-      if (user) return fn(interaction, user.faceitId).catch(err => noMention(errorCard(err)))
-      else return errorCard('This user hasn\'t linked his profile')
-    } else return fn(interaction, obj.param).catch(err => noMention(errorCard(err)))
-  }))
+  return Promise.all(array.map(async obj => fn(interaction, obj.param).catch(err => noMention(errorCard(err)))))
     .then(msgs => msgs.map(msg => {
       const data = {
         embeds: msg.embeds || [],
@@ -43,10 +43,15 @@ const getCards = async (interaction, array, fn) => {
     }))
 }
 
-const getCardsConditions = async (interaction, fn, maxUser = 10, name = 'steam_parameters') => {
+const getUsers = async (
+  interaction,
+  maxUser = 10,
+  steam = 'steam_parameters',
+  faceit = 'faceit_parameters'
+) => {
   let team = getInteractionOption(interaction, 'team')?.toLowerCase().trim().split(' ')[0]
-  const faceitParameters = getInteractionOption(interaction, 'faceit_parameters')?.trim().split(' ')
-  const steamParameters = getInteractionOption(interaction, name)
+  const faceitParameters = getInteractionOption(interaction, faceit)?.trim().split(' ')
+  const steamParameters = getInteractionOption(interaction, steam)
 
   const parameters = []
   const currentUser = await User.get(interaction.user.id)
@@ -84,7 +89,6 @@ const getCardsConditions = async (interaction, fn, maxUser = 10, name = 'steam_p
       }))
     })
   }
-
   if (steamParameters) {
     const steamIds = RegexFun.findSteamUIds(steamParameters)
       .slice(0, maxUser)
@@ -99,10 +103,8 @@ const getCardsConditions = async (interaction, fn, maxUser = 10, name = 'steam_p
       }
     }))
   }
-  if (parameters.length === 0)
-    return currentUser ?
-      getCards(interaction, [{ param: interaction.user.id, steam: false, discord: true }], fn) :
-      errorCard(`It seems like you didn't executed the command correctly, do \`/help command:${interaction.commandName}\` to get more informations about it.`)
+  if (parameters.length === 0 && currentUser)
+    parameters.push({ param: currentUser.faceitId, steam: false, discord: false })
 
   let params = []
   parameters.forEach(e => {
@@ -120,14 +122,21 @@ const getCardsConditions = async (interaction, fn, maxUser = 10, name = 'steam_p
     )
   })
 
-  return getCards(
-    interaction,
-    await Promise.all(
-      params
-        .slice(0, maxUser)
-        .map(e => getPlayerDatas(e.param, e.steam, e.discord))),
-    fn)
+  return Promise.all(params
+    .slice(0, maxUser)
+    .map(e => getPlayerDatas(e.param, e.steam, e.discord)))
 }
+
+const getCardsConditions = async (
+  interaction,
+  fn,
+  maxUser = 10,
+  steam = 'steam_parameters',
+  faceit = 'faceit_parameters'
+) => getCards(
+  interaction,
+  await getUsers(interaction, maxUser, steam, faceit),
+  fn)
 
 const getInteractionOption = (interaction, name) => {
   return interaction.options?._hoistedOptions?.filter(o => o.name === name)[0]?.value
@@ -141,5 +150,6 @@ module.exports = {
   getCardsConditions,
   getInteractionOption,
   isInteractionSubcommandEqual,
-  getDefaultInteractionOption
+  getDefaultInteractionOption,
+  getUsers
 }

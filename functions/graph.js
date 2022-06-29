@@ -13,18 +13,19 @@ const generateChart = (matchHistory, playerElo, maxMatch = 20, type = CustomType
   datas.push(...types.map(type => [type, getGraph(type, matchHistory, playerElo, maxMatch, check).reverse()]))
   if (datas.length === 0) throw 'No match found on this date'
 
-  return getChart(datas, matchHistory, maxMatch)
-}
-
-const getChart = (datasets, matchHistory, maxMatch) => {
-  const canvas = Canvas.createCanvas(600, 400)
-  const ctx = canvas.getContext('2d')
-
   const labels = matchHistory.map(match => new Date(match.date).toLocaleString('en-US', {
     month: 'short',
     day: 'numeric',
     year: 'numeric'
   }))
+
+  return getChart(datas, labels.slice(0, maxMatch).reverse(), getClassicDatasets, datas.length > 1)
+}
+
+const getChart = (datasets, labels, datasetFunc, displayY1) => {
+  const canvas = Canvas.createCanvas(600, 400)
+  const ctx = canvas.getContext('2d')
+
   const color = '#c9d1d9', gridColor = '#3c3c3c'
   const yAxisBase = {
     grid: {
@@ -40,37 +41,8 @@ const getChart = (datasets, matchHistory, maxMatch) => {
   new Chart(ctx, {
     type: 'line',
     data: {
-      labels: labels.slice(0, maxMatch).reverse(),
-      datasets: datasets.map((datas, i) => {
-        const [type, data] = datas
-        return {
-          label: type.name,
-          data: data,
-          fill: i === 0,
-          yAxisID: `y${i}`,
-          borderColor: (segment) => {
-            if (segment.raw) return colorFilter(type.color, segment.raw).color
-          },
-          pointBackgroundColor: (segment) => {
-            if (segment.raw) return colorFilter(type.color, segment.raw).color
-          },
-          segment: {
-            borderColor: (segment) => {
-              const prev = segment.p0, current = segment.p1
-
-              ctx.strokeStyle = getGradient(prev, current, ctx, type)
-              ctx.lineWidth = 2
-              ctx.beginPath()
-              ctx.moveTo(prev.x, prev.y)
-              ctx.lineTo(current.x, current.y)
-              ctx.stroke()
-
-              return 'transparent'
-            },
-            borderWidth: 1,
-          }
-        }
-      })
+      labels: labels,
+      datasets: datasets.map((datas, i) => datasetFunc(datas, i, ctx)),
     },
     options: {
       scales: {
@@ -80,7 +52,7 @@ const getChart = (datasets, matchHistory, maxMatch) => {
           ...yAxisBase
         },
         y1: {
-          display: datasets.length > 1,
+          display: displayY1,
           position: 'right',
           ...yAxisBase
         },
@@ -115,6 +87,50 @@ const getChart = (datasets, matchHistory, maxMatch) => {
   })
 
   return canvas.toBuffer()
+}
+
+const getClassicDatasets = (datas, i, ctx) => {
+  const [type, data] = datas
+  return {
+    label: type.name,
+    data: data,
+    fill: i === 0,
+    yAxisID: `y${i}`,
+    borderColor: (segment) => {
+      if (segment.raw) return colorFilter(type.color, segment.raw).color
+    },
+    pointBackgroundColor: (segment) => {
+      if (segment.raw) return colorFilter(type.color, segment.raw).color
+    },
+    segment: {
+      borderColor: (segment) => {
+        const prev = segment.p0, current = segment.p1
+
+        ctx.strokeStyle = getGradient(prev, current, ctx, type)
+        ctx.lineWidth = 2
+        ctx.beginPath()
+        ctx.moveTo(prev.x, prev.y)
+        ctx.lineTo(current.x, current.y)
+        ctx.stroke()
+
+        return 'transparent'
+      },
+      borderWidth: 1,
+    }
+  }
+}
+
+const getCompareDatasets = (datas, i, ctx) => {
+  const [nickname, type, playerColor, data] = [...datas]
+  return {
+    label: nickname,
+    data: data,
+    fill: i === 0,
+    yAxisID: 'y0',
+    pointBackgroundColor: playerColor,
+    borderColor: playerColor,
+    borderWidth: 2
+  }
 }
 
 const getRankImage = async (faceitLevel, faceitElo = color.levels['3'].min, size) => {
@@ -192,9 +208,9 @@ const colorFilter = (colors, value) => Object.entries(colors)
 
 const getGraph = (type, matchHistory, faceitElo, maxMatch, check = true) => {
   switch (type) {
-  case CustomType.TYPES.ELO: return getElo(maxMatch, matchHistory, faceitElo, check)
-  case CustomType.TYPES.KD: return getKD(matchHistory, maxMatch)
-  default: break
+    case CustomType.TYPES.ELO: return getElo(maxMatch, matchHistory, faceitElo, check)
+    case CustomType.TYPES.KD: return getKD(matchHistory, maxMatch)
+    default: break
   }
 }
 
@@ -202,5 +218,8 @@ module.exports = {
   generateChart,
   getRankImage,
   getElo,
-  getKD
+  getKD,
+  getChart,
+  getGraph,
+  getCompareDatasets
 }
