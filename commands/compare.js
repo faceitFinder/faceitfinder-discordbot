@@ -61,7 +61,7 @@ const sendCardWithInfos = async (interaction, player1Id, player2Id, type = Custo
       name: firstUserDatas.playerDatas.nickname,
       iconURL: firstUserDatas.playerDatas.avatar
     })
-    .setDescription(`Comparaison between [${firstUserDatas.playerDatas.nickname}](https://www.faceit.com/fr/players/${firstUserDatas.playerDatas.nickname}) and [${secondUserDatas.playerDatas.nickname}](https://www.faceit.com/fr/players/${secondUserDatas.playerDatas.nickname})`)
+    .setDescription(`Comparison between [${firstUserDatas.playerDatas.nickname}](https://www.faceit.com/fr/players/${firstUserDatas.playerDatas.nickname}) and [${secondUserDatas.playerDatas.nickname}](https://www.faceit.com/fr/players/${secondUserDatas.playerDatas.nickname})`)
     .setColor(color.primary)
     .addFields({
       name: 'Matchs Compared',
