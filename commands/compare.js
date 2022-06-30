@@ -74,6 +74,13 @@ const sendCardWithInfos = async (interaction, player1Id, player2Id, type = Custo
         inline: false
       },
       {
+        name: 'Winrate',
+        value: `**${dateStatsDatas.at(0).winrate}%** - \
+        ${dateStatsDatas.at(1).winrate}% \
+        ${compareStats(dateStatsDatas.at(0).winrate, dateStatsDatas.at(1).winrate)}`,
+        inline: true
+      },
+      {
         name: 'Elo',
         value: `**${firstUserDatas.playerDatas.games.csgo.faceit_elo}** - \
         ${secondUserDatas.playerDatas.games.csgo.faceit_elo} ${compareStats(firstUserDatas.playerDatas.games.csgo.faceit_elo,
