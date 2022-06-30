@@ -215,28 +215,28 @@ module.exports = {
   },
   {
     name: 'first_user_steam',
-    description: 'steam parameter / @user',
+    description: 'steam parameter / @user / empty to match your linked account',
     required: false,
     type: 3,
     slash: true
   },
   {
     name: 'first_user_faceit',
-    description: 'faceit nickname / @user',
+    description: 'faceit nickname / @user / empty to match your linked account',
     required: false,
     type: 3,
     slash: true
   },
   {
     name: 'second_user_steam',
-    description: 'steam parameter / @user',
+    description: 'steam parameter / @user / empty to match your linked account',
     required: false,
     type: 3,
     slash: true
   },
   {
     name: 'second_user_faceit',
-    description: 'faceit nickname / @user',
+    description: 'faceit nickname / @user / empty to match your linked account',
     required: false,
     type: 3,
     slash: true
@@ -246,8 +246,8 @@ module.exports = {
   type: 'stats',
   async execute(interaction) {
  
-    const player1 = await getUsers(interaction, 1, 'first_user_steam', 'first_user_faceit')?.at(0)?.param
-    const player2 = await getUsers(interaction, 1, 'second_user_steam', 'second_user_faceit')?.at(0)?.param
+    const player1 = (await getUsers(interaction, 1, 'first_user_steam', 'first_user_faceit'))?.at(0)?.param
+    const player2 = (await getUsers(interaction, 1, 'second_user_steam', 'second_user_faceit'))?.at(0)?.param
 
     if (!player1 || !player2) return errorCard('There is a user missing.')
     else if (player1 === player2) return errorCard('Both users are the same !')
