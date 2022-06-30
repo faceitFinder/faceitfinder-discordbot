@@ -253,18 +253,18 @@ module.exports = {
     type: 3,
     slash: true
   },],
-  description: 'Compare both user stats. If user 2 is null it will take your stats (need link).',
+  description: 'Compare both user stats.',
   usage: 'match_number: number, default 20 AND first_user_steam:steam parameter OR first_user_faceit:faceit nickname OR @user AND second_user_steam:steam parameter OR second_user_faceit:faceit nickname OR @user',
   type: 'stats',
   async execute(interaction) {
-    if (getInteractionOption(interaction, 'first_user_steam') === undefined &&
-      getInteractionOption(interaction, 'first_user_faceit') === undefined)
-      return errorCard('Only the first user is needed if you are linked and you want to compare yourself to him, else you need to specify both users.')
+ 
+    const player1 = await getUsers(interaction, 1, 'first_user_steam', 'first_user_faceit')?.at(0)?.param
+    const player2 = await getUsers(interaction, 1, 'second_user_steam', 'second_user_faceit')?.at(0)?.param
 
-    const player1 = await getUsers(interaction, 1, 'first_user_steam', 'first_user_faceit')
-    const player2 = await getUsers(interaction, 1, 'second_user_steam', 'second_user_faceit')
+    if (!player1 || !player2) return errorCard('There is a user missing.')
+    else if (player1 === player2) return errorCard('Both users are the same !')
 
-    return sendCardWithInfos(interaction, player1.at(0).param, player2.at(0).param)
+    return sendCardWithInfos(interaction, player1, player2)
   }
 }
 
