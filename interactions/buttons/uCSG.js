@@ -13,6 +13,6 @@ module.exports = {
 
     loadingCard(interaction)
 
-    return sendCardWithInfos(interaction, json.p1, json.p2, CustomType.getType(interaction.component.label))
+    return sendCardWithInfos(interaction, json.p1, json.p2, CustomType.getType(interaction.component.label), json.m)
   }
 }
