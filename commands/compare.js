@@ -71,12 +71,7 @@ const sendCardWithInfos = async (interaction, player1Id, player2Id, type = Custo
       {
         name: 'From',
         value: new Date(playerWithLessMatch.playerHistory.at(-1).date).toDateString(),
-        inline: true
-      },
-      {
-        name: 'To',
-        value: new Date(playerWithLessMatch.playerHistory.at(0).date).toDateString(),
-        inline: true
+        inline: false
       },
       {
         name: 'Winrate',
@@ -228,28 +223,28 @@ module.exports = {
   },
   {
     name: 'first_user_steam',
-    description: 'steam parameter / @user',
+    description: 'steam parameter / @user / empty to match your linked account',
     required: false,
     type: 3,
     slash: true
   },
   {
     name: 'first_user_faceit',
-    description: 'faceit nickname / @user',
+    description: 'faceit nickname / @user / empty to match your linked account',
     required: false,
     type: 3,
     slash: true
   },
   {
     name: 'second_user_steam',
-    description: 'steam parameter / @user',
+    description: 'steam parameter / @user / empty to match your linked account',
     required: false,
     type: 3,
     slash: true
   },
   {
     name: 'second_user_faceit',
-    description: 'faceit nickname / @user',
+    description: 'faceit nickname / @user / empty to match your linked account',
     required: false,
     type: 3,
     slash: true

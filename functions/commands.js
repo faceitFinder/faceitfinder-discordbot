@@ -122,6 +122,9 @@ const getUsers = async (
     )
   })
 
+  if (params.length === 0) throw 'Please specify a user or a team. \n\
+    You can also link your profile with Faceit to use this command without parameters.'
+
   return Promise.all(params
     .slice(0, maxUser)
     .map(e => getPlayerDatas(e.param, e.steam, e.discord)))
