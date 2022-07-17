@@ -41,8 +41,8 @@ const getRandomColors = (length) => {
   return colors
 }
 
-const sendCardWithInfos = async (interaction, player1Id, player2Id, type = CustomType.TYPES.ELO) => {
-  let maxMatch = getInteractionOption(interaction, 'match_number') || 20
+const sendCardWithInfos = async (interaction, player1Id, player2Id, type = CustomType.TYPES.ELO, maxMatch = 20) => {
+  maxMatch = getInteractionOption(interaction, 'match_number') || maxMatch
   const firstUserDatas = await getPlayerDatas(player1Id, maxMatch)
   const secondUserDatas = await getPlayerDatas(player2Id, maxMatch)
   const playerWithLessMatch = [firstUserDatas, secondUserDatas]
@@ -169,6 +169,7 @@ const sendCardWithInfos = async (interaction, player1Id, player2Id, type = Custo
     value: JSON.stringify({
       p1: firstUserDatas.playerId,
       p2: secondUserDatas.playerId,
+      m: maxMatch
     }),
     default: true
   }
@@ -257,9 +258,8 @@ module.exports = {
   usage: 'match_number: number, default 20 AND first_user_steam:steam parameter OR first_user_faceit:faceit nickname OR @user AND second_user_steam:steam parameter OR second_user_faceit:faceit nickname OR @user',
   type: 'stats',
   async execute(interaction) {
- 
-    const player1 = await getUsers(interaction, 1, 'first_user_steam', 'first_user_faceit')?.at(0)?.param
-    const player2 = await getUsers(interaction, 1, 'second_user_steam', 'second_user_faceit')?.at(0)?.param
+    const player1 = (await getUsers(interaction, 1, 'first_user_steam', 'first_user_faceit'))?.at(0)?.param
+    const player2 = (await getUsers(interaction, 1, 'second_user_steam', 'second_user_faceit'))?.at(0)?.param
 
     if (!player1 || !player2) return errorCard('There is a user missing.')
     else if (player1 === player2) return errorCard('Both users are the same !')
