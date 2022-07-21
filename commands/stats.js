@@ -36,7 +36,7 @@ const sendCardWithInfos = async (interaction, playerId, type = CustomType.TYPES.
 
   const rankImageCanvas = await Graph.getRankImage(faceitLevel, faceitElo, size)
 
-  const card = new Discord.MessageEmbed()
+  const card = new Discord.EmbedBuilder()
     .setAuthor({
       name: playerDatas.nickname,
       iconURL: playerDatas.avatar,
@@ -58,11 +58,11 @@ const sendCardWithInfos = async (interaction, playerId, type = CustomType.TYPES.
     content: ' ',
     embeds: [card],
     files: [
-      new Discord.MessageAttachment(graphBuffer, 'graph.png'),
-      new Discord.MessageAttachment(rankImageCanvas, `${faceitLevel}level.png`)
+      new Discord.AttachmentBuilder(graphBuffer, { name: 'graph.png' }),
+      new Discord.AttachmentBuilder(rankImageCanvas, { name: `${faceitLevel}level.png` })
     ],
     components: [
-      new Discord.MessageActionRow()
+      new Discord.ActionRowBuilder()
         .addComponents([
           CustomTypeFunc.generateButtons(
             { ...buttonValues, n: 1 },

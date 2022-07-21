@@ -3,7 +3,7 @@ const Discord = require('discord.js')
 
 module.exports = (description) => {
   return {
-    embeds: [new Discord.MessageEmbed()
+    embeds: [new Discord.EmbedBuilder()
       .setColor(color.error)
       .setDescription(description)
       .setFooter({ text: `${name} Error` })]

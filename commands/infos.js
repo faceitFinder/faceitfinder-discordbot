@@ -11,7 +11,7 @@ module.exports = {
   async execute(interaction) {
     return {
       embeds: [
-        new Discord.MessageEmbed()
+        new Discord.EmbedBuilder()
           .setColor(color.primary)
           .setAuthor({ name: name, iconURL: 'attachment://logo.png' })
           .setDescription('**Bot infos**')
@@ -24,7 +24,7 @@ module.exports = {
           .setFooter({ text: `${name} Infos` })
       ],
       files: [
-        new Discord.MessageAttachment('./images/logo.png', 'logo.png')
+        new Discord.AttachmentBuilder('./images/logo.png', { name: 'logo.png' })
       ]
     }
   }

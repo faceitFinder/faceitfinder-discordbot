@@ -1,5 +1,6 @@
 const noMention = require('../templates/noMention')
 const errorCard = require('../templates/errorCard')
+const { InteractionType } = require('discord.js')
 
 const editInteraction = (interaction, resp) => {
   if (!resp) return
@@ -23,13 +24,12 @@ module.exports = {
      * Checking if the user is temporary banned
      * when the interaction is command or context menu
      */
-    if ((interaction.isCommand() ||
-      interaction.isContextMenu()) &&
+    if (interaction.type === InteractionType.ApplicationCommand &&
       interaction.client.antispam.isIgnored(interaction.user.id, interaction.createdAt, interaction.channel)) return
     /**
      * Check if the channel is accessible
      */
-    else if (!interaction.channel.permissionsFor(interaction.client.user).has('VIEW_CHANNEL'))
+    else if (!interaction.channel.permissionsFor(interaction.client.user).has('ViewChannel'))
       interaction
         .deferReply({ ephemeral: true })
         .then(() => {
@@ -70,7 +70,7 @@ module.exports = {
     /**
      * Check if the interaction is a contextmenu
      */
-    else if (interaction.isContextMenu())
+    else if (interaction.type === InteractionType.ApplicationCommand && interaction.targetId !== undefined)
       interaction
         .deferReply()
         .then(() => {

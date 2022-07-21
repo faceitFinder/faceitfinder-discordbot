@@ -120,25 +120,25 @@ module.exports = {
     {
       name: INFOS,
       description: 'Get informations about your team.',
-      type: 1,
+      type: Discord.ApplicationCommandOptionType.Subcommand,
       slash: true
     },
     {
       name: CREATE,
       description: 'create your team',
-      type: 1,
+      type: Discord.ApplicationCommandOptionType.Subcommand,
       slash: true,
       options: [
         {
           name: 'name',
           description: `name of your team, up to ${maxLengthTeamName} characters`,
-          type: 3,
+          type: Discord.ApplicationCommandOptionType.String,
           required: true
         },
         {
           name: 'access',
           description: 'let others discord users access your team if they are not in the team',
-          type: 5,
+          type: Discord.ApplicationCommandOptionType.Boolean,
           required: true
         }
       ]
@@ -146,19 +146,19 @@ module.exports = {
     {
       name: UPDATE,
       description: 'update your team',
-      type: 1,
+      type: Discord.ApplicationCommandOptionType.Subcommand,
       slash: true,
       options: [
         {
           name: 'access',
           description: 'let others discord users access your team if they are not in the team',
-          type: 5,
+          type: Discord.ApplicationCommandOptionType.Boolean,
           required: true
         },
         {
           name: 'name',
           description: 'name of your team',
-          type: 3,
+          type: Discord.ApplicationCommandOptionType.String,
           required: false
         }
       ]
@@ -166,25 +166,25 @@ module.exports = {
     {
       name: DELETE,
       description: 'delete your team',
-      type: 1,
+      type: Discord.ApplicationCommandOptionType.Subcommand,
       slash: true
     },
     {
       name: ADD_USER,
       description: 'add a user to your team',
-      type: 1,
+      type: Discord.ApplicationCommandOptionType.Subcommand,
       slash: true,
       options: [
         {
           name: 'steam_parameters',
           description: 'steamIDs / steam custom IDs / url of one or more steam profiles / CSGO status. (Max 5)',
-          type: 3,
+          type: Discord.ApplicationCommandOptionType.String,
           required: false
         },
         {
           name: 'faceit_parameters',
           description: 'faceit nicknames (case sensitive and max 1)',
-          type: 3,
+          type: Discord.ApplicationCommandOptionType.String,
           required: false
         }
       ]
@@ -192,19 +192,19 @@ module.exports = {
     {
       name: REMOVE_USER,
       description: 'remove a user from your team',
-      type: 1,
+      type: Discord.ApplicationCommandOptionType.Subcommand,
       slash: true,
       options: [
         {
           name: 'steam_parameters',
           description: 'steamID / steam custom ID / url of one steam profiles / CSGO status. (Max 1)',
-          type: 3,
+          type: Discord.ApplicationCommandOptionType.String,
           required: false
         },
         {
           name: 'faceit_parameters',
           description: 'faceit nicknames (case sensitive and max 1) ',
-          type: 3,
+          type: Discord.ApplicationCommandOptionType.String,
           required: false
         }
       ]

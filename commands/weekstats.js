@@ -27,16 +27,15 @@ const sendCardWithInfos = async (interaction, playerId, page = 0) => {
     const from = new Date(date.date)
     const to = new Date(from.setDate(from.getDate() + 7))
 
-    let option = {
-      label: [new Date(date.date).toDateString(), '-', new Date(new Date(to).setHours(-24)).toDateString()].join(' '),
-      description: `${date.number} match played`,
-      value: JSON.stringify({
+    let option = new Discord.SelectMenuOptionBuilder()
+      .setLabel([new Date(date.date).toDateString(), '-', new Date(new Date(to).setHours(-24)).toDateString()].join(' '))
+      .setDescription(`${date.number} match played`)
+      .setValue(JSON.stringify({
         s: playerId,
         f: date.date / 1000,
         t: to.getTime() / 1000,
         u: interaction.user.id
-      })
-    }
+      }))
 
     options.push(option)
   })
@@ -46,17 +45,17 @@ const sendCardWithInfos = async (interaction, playerId, page = 0) => {
 
   if (pagination.length === 0) return errorCard(`Couldn't get matchs of ${playerDatas.nickname}`)
 
-  pagination[0] = DateStats.setOption(pagination.at(0), true) // Set default
+  pagination[0] = DateStats.setOptionDefault(pagination.at(0))
 
-  const row = new Discord.MessageActionRow()
+  const row = new Discord.ActionRowBuilder()
     .addComponents(
-      new Discord.MessageSelectMenu()
+      new Discord.SelectMenuBuilder()
         .setCustomId('dateStatsSelector')
         .setPlaceholder('Select a week')
         .addOptions(pagination))
 
   return DateStats.getCardWithInfos(row,
-    JSON.parse(pagination[0].value),
+    JSON.parse(pagination[0].data.value),
     CustomType.TYPES.ELO,
     'uDSG',
     playerStats.lifetime.Matches,

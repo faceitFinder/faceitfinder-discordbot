@@ -49,7 +49,7 @@ const sendCardWithInfos = async (interaction, playerId, matchId = null, page = 0
   let mapThumbnail
   if (cards.length === 0)
     matchStats.forEach(async (roundStats, i) => {
-      const card = new Discord.MessageEmbed()
+      const card = new Discord.EmbedBuilder()
       const mapName = roundStats.i1
       const result = Math.max(...roundStats.i18.split('/').map(Number)) === parseInt(roundStats.c5)
       const eloGain = isNaN(eloDiff.at(i)) ? '0' : eloDiff.at(i) > 0 ? `+${eloDiff.at(i)}` : eloDiff.at(i).toString()
@@ -60,7 +60,7 @@ const sendCardWithInfos = async (interaction, playerId, matchId = null, page = 0
           level,
           levelDiff.at(i),
           size)
-        filesAtt.push(new Discord.MessageAttachment(rankImageCanvas, `${faceitElo}${i}.png`))
+        filesAtt.push(new Discord.AttachmentBuilder(rankImageCanvas, { name: `${faceitElo}${i}.png` }))
       }
       if (roundStats === undefined)
         cards.push(errorCard(`Couldn\'t get the stats of ${steamDatas?.personaname || steamDatas} from his last match`).embeds.at(0))
@@ -88,7 +88,7 @@ const sendCardWithInfos = async (interaction, playerId, matchId = null, page = 0
         .setFooter({ text: `Steam: ${steamDatas?.personaname || steamDatas}` })
 
       if (fs.existsSync(mapThumbnail))
-        filesAtt.push(new Discord.MessageAttachment(mapThumbnail, `${mapName}.jpg`))
+        filesAtt.push(new Discord.AttachmentBuilder(mapThumbnail, { name: `${mapName}.jpg` }))
 
       cards.push(card)
     })
@@ -115,9 +115,9 @@ const sendCardWithInfos = async (interaction, playerId, matchId = null, page = 0
     embeds: cards,
     files: filesAtt,
     components: [
-      new Discord.MessageActionRow()
+      new Discord.ActionRowBuilder()
         .addComponents(
-          new Discord.MessageSelectMenu()
+          new Discord.SelectMenuBuilder()
             .setCustomId('lastSelector')
             .setPlaceholder('Select another match')
             .addOptions(options),

@@ -10,14 +10,14 @@ module.exports = {
   async execute(interaction) {
     return {
       embeds: [
-        new Discord.MessageEmbed()
+        new Discord.EmbedBuilder()
           .setColor(color.primary)
           .setAuthor({ name: name, iconURL: 'attachment://logo.png' })
           .setDescription(`Hey <@${interaction.user.id}> you can invite me by clicking on the following link\n${invite}`)
           .setFooter({ text: `${name} Invite` })
       ],
       files: [
-        new Discord.MessageAttachment('./images/logo.png', 'logo.png')
+        new Discord.AttachmentBuilder('./images/logo.png', { name: 'logo.png' })
       ]
     }
   }

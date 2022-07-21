@@ -15,19 +15,19 @@ module.exports = {
     if (values.u !== interaction.user.id) return
 
     const options = interaction.message.components.at(0).components
-      .filter(e => e instanceof Discord.MessageSelectMenu)
+      .filter(e => e instanceof Discord.SelectMenuComponent)
       .map(msm => {
         return msm.options.map(o => {
           const active = JSON.stringify(JSON.parse(o.value)) === JSON.stringify(values)
-          o.emoji = active ? emojis.select.balise : null
+          o.emoji = active ? emojis.select.balise : undefined
           o.default = active
           return o
         })
       }).at(0)
 
-    const components = new Discord.MessageActionRow()
+    const components = new Discord.ActionRowBuilder()
       .addComponents(
-        new Discord.MessageSelectMenu()
+        new Discord.SelectMenuBuilder()
           .setCustomId('teamInfosSelector')
           .addOptions(options))
 
@@ -56,7 +56,7 @@ module.exports = {
       }
     }))
 
-    const embed = new Discord.MessageEmbed()
+    const embed = new Discord.EmbedBuilder()
       .setColor(color.primary)
       .setTitle(`${currentTeam.name}`)
       .setDescription(`**Slug**: ${currentTeam?.slug}\n**Public Access**: ${currentTeam.access ? 'Yes' : 'No'}`)

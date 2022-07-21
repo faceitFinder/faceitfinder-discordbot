@@ -40,7 +40,7 @@ const generatePlayerStats = playerHistory => {
     else if (KD >= color.kd[3].min && KD <= color.kd[3].max) playerStats['Green K/D'] += 1
 
     playerStats.wins += Math.max(...e.i18.split('/').map(Number)) === parseInt(e.c5)
-  } 
+  }
 
   playerStats.winrate = getAverage(playerStats.wins, playerStats.games, 2, 100)
   playerStats['Average K/D'] = getAverage(playerStats['Average K/D'], playerStats.games)
@@ -78,8 +78,11 @@ const getDates = async (playerId, maxMatch, getDay) => {
   return dates
 }
 
-const setOption = option => {
-  return { ...option, emoji: emojis.select.balise, default: true }
+const setOptionDefault = option => {
+  option.setEmoji(emojis.select.balise)
+    .setDefault(true)
+
+  return option
 }
 
 const getCardWithInfos = async (actionRow, values, type, id, maxMatch, maxPage = null, page = null) => {
@@ -114,7 +117,7 @@ const getCardWithInfos = async (actionRow, values, type, id, maxMatch, maxPage =
   const rankImageCanvas = await Graph.getRankImage(faceitLevel, faceitElo, size)
   const toRealTimeStamp = new Date(to).setHours(-24)
 
-  const card = new Discord.MessageEmbed()
+  const card = new Discord.EmbedBuilder()
     .setAuthor({ name: playerDatas.nickname, iconURL: playerDatas.avatar, url: `https://www.faceit.com/fr/players/${playerDatas.nickname}` })
     .setDescription(`[Steam](https://steamcommunity.com/profiles/${playerDatas.games.csgo.game_player_id}), [Faceit](https://www.faceit.com/fr/players/${playerDatas.nickname})`)
     .setThumbnail(`attachment://${faceitLevel}level.png`)
@@ -143,7 +146,7 @@ const getCardWithInfos = async (actionRow, values, type, id, maxMatch, maxPage =
 
   const components = [
     actionRow,
-    new Discord.MessageActionRow()
+    new Discord.ActionRowBuilder()
       .addComponents([
         CustomTypeFunc.generateButtons(
           { id: id, n: 1 },
@@ -165,8 +168,8 @@ const getCardWithInfos = async (actionRow, values, type, id, maxMatch, maxPage =
     embeds: [card],
     content: null,
     files: [
-      new Discord.MessageAttachment(graphBuffer, `${values.s}graph.png`),
-      new Discord.MessageAttachment(rankImageCanvas, `${faceitLevel}level.png`)
+      new Discord.AttachmentBuilder(graphBuffer, { name: `${values.s}graph.png` }),
+      new Discord.AttachmentBuilder(rankImageCanvas, { name: `${faceitLevel}level.png` })
     ],
     components: components
   }
@@ -175,7 +178,7 @@ const getCardWithInfos = async (actionRow, values, type, id, maxMatch, maxPage =
 module.exports = {
   getDates,
   getCardWithInfos,
-  setOption,
+  setOptionDefault,
   getPlayerHistory,
   generatePlayerStats,
 }
