@@ -39,7 +39,7 @@ const sendCardWithInfos = async (interaction, playerId, type = CustomType.TYPES.
   const card = new Discord.EmbedBuilder()
     .setAuthor({
       name: playerDatas.nickname,
-      iconURL: playerDatas.avatar,
+      iconURL: playerDatas.avatar || null,
       url: `https://www.faceit.com/fr/players/${playerDatas.nickname}`
     })
     .setDescription(`[Steam](https://steamcommunity.com/profiles/${playerDatas.games.csgo.game_player_id}), [Faceit](https://www.faceit.com/fr/players/${playerDatas.nickname})`)

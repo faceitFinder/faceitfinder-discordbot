@@ -118,7 +118,7 @@ const getCardWithInfos = async (actionRow, values, type, id, maxMatch, maxPage =
   const toRealTimeStamp = new Date(to).setHours(-24)
 
   const card = new Discord.EmbedBuilder()
-    .setAuthor({ name: playerDatas.nickname, iconURL: playerDatas.avatar, url: `https://www.faceit.com/fr/players/${playerDatas.nickname}` })
+    .setAuthor({ name: playerDatas.nickname, iconURL: playerDatas.avatar || null, url: `https://www.faceit.com/fr/players/${playerDatas.nickname}` })
     .setDescription(`[Steam](https://steamcommunity.com/profiles/${playerDatas.games.csgo.game_player_id}), [Faceit](https://www.faceit.com/fr/players/${playerDatas.nickname})`)
     .setThumbnail(`attachment://${faceitLevel}level.png`)
     .addFields(
