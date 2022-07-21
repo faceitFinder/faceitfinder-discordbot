@@ -23,7 +23,7 @@ const getPlayerDatas = async (param, steam, discord = false) => {
 
 const getDefaultInteractionOption = (interaction) => {
   return interaction.message.components.at(0).components
-    .filter(e => e instanceof Discord.MessageSelectMenu).at(0)
+    .filter(e => e instanceof Discord.SelectMenuComponent).at(0)
     .options
     .filter(e => e.default).at(0)
 }
@@ -58,10 +58,10 @@ const getUsers = async (
 
   if (team) {
     team = await Team.getTeamSlug(team)
-    if (!team) return errorCard('This team doesn\'t exist')
+    if (!team) throw 'This team doesn\'t exist'
     else {
       const teamUsers = await UserTeam.getTeamUsers(team.slug)
-      if (!teamUsers.length > 0) return errorCard('This team has no members')
+      if (!teamUsers.length > 0) throw 'This team has no members'
       else if (
         await Team.getCreatorTeam(interaction.user.id).slug === team.slug ||
         team.access ||
@@ -69,7 +69,7 @@ const getUsers = async (
       ) parameters.push(...teamUsers.map(e => {
         return { param: e.faceitId, steam: false, discord: false }
       }))
-      else return errorCard('You don\'t have access to this team')
+      else throw 'You don\'t have access to this team'
     }
   }
   if (faceitParameters) {

@@ -4,7 +4,7 @@ const Discord = require('discord.js')
 module.exports = (description) => {
   return {
     embeds: [
-      new Discord.MessageEmbed()
+      new Discord.EmbedBuilder()
         .setColor(color.primary)
         .setDescription(description)
         .setFooter({ text: `${name} Infos` })

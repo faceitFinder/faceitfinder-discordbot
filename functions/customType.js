@@ -1,7 +1,7 @@
 const Discord = require('discord.js')
 
 const generateButtons = (values, type, disabled) => {
-  return new Discord.MessageButton()
+  return new Discord.ButtonBuilder()
     .setCustomId(JSON.stringify(values))
     .setLabel(type.name)
     .setEmoji(type.emoji)

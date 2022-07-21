@@ -1,7 +1,7 @@
-const Discord = require('discord.js')
+const { Client, GatewayIntentBits } = require('discord.js')
 const fs = require('fs')
 const AntiSpam = require('./templates/antispam')
-const client = new Discord.Client({ intents: [Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.GUILD_MESSAGES] })
+const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages] })
 
 require('dotenv').config()
 

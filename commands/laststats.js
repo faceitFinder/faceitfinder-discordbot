@@ -21,8 +21,8 @@ const sendCardWithInfos = async (interaction, playerId, type = CustomType.TYPES.
     default: true
   }
 
-  const row = new Discord.MessageActionRow()
-    .addComponents(new Discord.MessageSelectMenu()
+  const row = new Discord.ActionRowBuilder()
+    .addComponents(new Discord.SelectMenuBuilder()
       .setCustomId('lastStatsSelector')
       .addOptions([option])
       .setDisabled(true))
@@ -36,7 +36,7 @@ const getOptions = () => {
     name: 'match_number',
     description: 'Number of matchs to display. Default: 20',
     required: false,
-    type: 4,
+    type: Discord.ApplicationCommandOptionType.Integer,
     slash: true,
   })
 

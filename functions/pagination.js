@@ -17,7 +17,7 @@ const getPagination = (page, maxPage, id) => {
    * c: current page
    * n: prevent custom id duplication
    */
-  return new Discord.MessageActionRow()
+  return new Discord.ActionRowBuilder()
     .addComponents([
       CustomTypeFunc.generateButtons(
         { id: id, page: 0, c: page, n: 1 },

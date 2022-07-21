@@ -2,11 +2,11 @@ const Discord = require('discord.js')
 const { color, name } = require('../config.json')
 
 module.exports = (interaction) => {
-  if (!interaction.channel.permissionsFor(interaction.client.user).has('VIEW_CHANNEL')) return
+  if (!interaction.channel.permissionsFor(interaction.client.user).has('ViewChannel')) return
   interaction.editReply({
     content: ' ',
     embeds: [
-      new Discord.MessageEmbed()
+      new Discord.EmbedBuilder()
         .setColor(color.primary)
         .setAuthor({ name: name, iconURL: 'attachment://logo.png' })
         .setDescription('Your request is currently processing..')

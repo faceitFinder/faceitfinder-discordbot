@@ -17,7 +17,7 @@ const getCommands = (card) => {
   types.forEach(t => {
     let value = ''
     commands.forEach(c => { if (c.type === t) value += `\`${c.name}\` ` })
-    card.addField(t, value)
+    card.addFields({ name: t, value: value })
   })
 
   return { embeds: [card] }
@@ -46,7 +46,7 @@ module.exports = {
       name: 'command',
       description: 'One of the command name.',
       required: false,
-      type: 3,
+      type: Discord.ApplicationCommandOptionType.String,
       slash: true,
       choices: [
         ...getCommandsList().map(c => {
@@ -61,7 +61,7 @@ module.exports = {
   async execute(interaction) {
     const command = getInteractionOption(interaction, 'command')?.trim().split(' ')[0]
 
-    const helpCard = new Discord.MessageEmbed()
+    const helpCard = new Discord.EmbedBuilder()
       .setColor(color.primary)
       .setTitle('Commands')
       .setDescription('`/help {command}` for more info on a specific command')

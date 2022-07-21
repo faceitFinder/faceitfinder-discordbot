@@ -17,14 +17,14 @@ const sendCardWithInfos = async (playerId, map, mode) => {
   const filesAtt = []
 
   const rankImageCanvas = await Graph.getRankImage(faceitLevel, playerDatas.games.csgo.faceit_elo, size)
-  filesAtt.push(new Discord.MessageAttachment(rankImageCanvas, 'level.png'))
+  filesAtt.push(new Discord.AttachmentBuilder(rankImageCanvas, { name: 'level.png' }))
 
   const mapThumbnail = `./images/maps/${map}.jpg`
 
   const cards = playerStats.segments.filter(e => e.label === map && e.mode == mode).map(m => {
-    if (fs.existsSync(mapThumbnail)) filesAtt.push(new Discord.MessageAttachment(mapThumbnail, `${map}.jpg`))
+    if (fs.existsSync(mapThumbnail)) filesAtt.push(new Discord.AttachmentBuilder(mapThumbnail, { name: `${map}.jpg` }))
 
-    return new Discord.MessageEmbed()
+    return new Discord.EmbedBuilder()
       .setAuthor({ name: playerDatas.nickname, iconURL: playerDatas.avatar, url: `https://www.faceit.com/fr/players/${playerDatas.nickname}` })
       .setDescription(`[Steam](https://steamcommunity.com/profiles/${playerDatas.games.csgo.game_player_id}), [Faceit](https://www.faceit.com/fr/players/${playerDatas.nickname})`)
       .setThumbnail('attachment://level.png')
@@ -56,7 +56,7 @@ module.exports = {
     [values.m, values.v] = values.l.split(' ')
 
     const options = interaction.message.components.at(0).components
-      .filter(e => e instanceof Discord.MessageSelectMenu)
+      .filter(e => e instanceof Discord.SelectMenuComponent)
       .map(msm => {
         return msm.options.map(o => {
           const active = o.value === interaction.values.at(0)
@@ -65,9 +65,9 @@ module.exports = {
         })
       }).at(0)
 
-    const components = new Discord.MessageActionRow()
+    const components = new Discord.ActionRowBuilder()
       .addComponents(
-        new Discord.MessageSelectMenu()
+        new Discord.SelectMenuBuilder()
           .setCustomId('mapSelector')
           .addOptions(options))
 

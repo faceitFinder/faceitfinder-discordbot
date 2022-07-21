@@ -20,18 +20,23 @@ const sendCardWithInfos = async (interaction, playerId) => {
       u: interaction.user.id
     }
 
-    if (!options.filter(e => e.label === label).length > 0) options.push({
-      label: label,
-      description: `Games ${e.stats.Matches} (${e.stats['Win Rate %']}%)`,
-      value: JSON.stringify(values),
-      emoji: emojis.maps[e.label]?.balise || null,
-      default: `${map} 5v5` === label
-    })
+    if (!options.filter(e => e.label === label).length > 0) {
+      const option = new Discord.SelectMenuOptionBuilder()
+        .setLabel(label)
+        .setDescription(`Games ${e.stats.Matches} (${e.stats['Win Rate %']}%)`)
+        .setValue(JSON.stringify(values))
+        .setDefault(`${map} 5v5` === label)
+
+      const emoji = emojis.maps[e.label]
+      if (emoji) option.setEmoji(emoji.balise)
+
+      options.push(option)
+    }
   })
 
-  const row = new Discord.MessageActionRow()
+  const row = new Discord.ActionRowBuilder()
     .addComponents(
-      new Discord.MessageSelectMenu()
+      new Discord.SelectMenuBuilder()
         .setCustomId('mapSelector')
         .setPlaceholder('Select a map')
         .addOptions(options.slice(0, 25)),
@@ -95,7 +100,7 @@ const getOptions = () => {
     name: 'map',
     description: 'Map name',
     required: false,
-    type: 3,
+    type: Discord.ApplicationCommandOptionType.String,
     slash: true,
     choices: [
       ...getMapList().map(c => {
