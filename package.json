@@ -1,0 +1,39 @@
+{
+  "name": "faceitfinder",
+  "version": "4.6.11",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js",
+    "dev": "nodemon --trace-warnings index.js",
+    "lint": "eslint --fix --ext .js .",
+    "updatebdd": "node changeSteamIdsToFaceitIdsBdd.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JustDams/faceitFinder.git"
+  },
+  "author": "Dams_",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JustDams/faceitFinder/issues"
+  },
+  "homepage": "https://github.com/JustDams/faceitFinder#readme",
+  "dependencies": {
+    "@discordjs/rest": "^1.0.0",
+    "@top-gg/sdk": "^3.1.3",
+    "big.js": "^6.2.1",
+    "canvas": "^2.9.1",
+    "chart.js": "^3.8.0",
+    "discord-api-types": "^0.36.2",
+    "discord.js": "^14.0.3",
+    "dotenv": "^16.0.1",
+    "mongoose": "^6.4.6",
+    "node-fetch": "^2.6.1"
+  },
+  "devDependencies": {
+    "eslint": "^8.5.0",
+    "nodemon": "^2.0.15"
+  }
+}
