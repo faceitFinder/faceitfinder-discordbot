@@ -7,7 +7,10 @@ const UserTeam = require('../database/userTeam')
 const errorCard = require('../templates/errorCard')
 const Discord = require('discord.js')
 const noMention = require('../templates/noMention')
+<<<<<<< HEAD
 const { updateRoles } = require('./roles')
+=======
+>>>>>>> 32fe027373a465b1df5f9e1024227ea8448436c0
 
 const getPlayerDatas = async (param, steam, discord = false) => {
   if (steam) {
@@ -104,10 +107,15 @@ const getUsers = async (
       }
     }))
   }
+<<<<<<< HEAD
   if (parameters.length === 0 && currentUser) {
     parameters.push({ param: currentUser.faceitId, steam: false, discord: false })
     updateRoles(interaction.client, [currentUser])
   }
+=======
+  if (parameters.length === 0 && currentUser)
+    parameters.push({ param: currentUser.faceitId, steam: false, discord: false })
+>>>>>>> 32fe027373a465b1df5f9e1024227ea8448436c0
 
   let params = []
   parameters.forEach(e => {
