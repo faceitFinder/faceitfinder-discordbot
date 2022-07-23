@@ -4,11 +4,7 @@
   "webapp": "https://faceitfinder.app/",
   "github": "https://github.com/JustDams/faceitFinder",
   "prefix": ".ff",
-<<<<<<< HEAD
   "invite": "https://discord.com/oauth2/authorize?client_id=838088031222235197&permissions=275146459136&scope=bot%20applications.commands",
-=======
-  "invite": "https://discord.com/oauth2/authorize?client_id=838088031222235197&permissions=274878220288&scope=bot%20applications.commands",
->>>>>>> 32fe027373a465b1df5f9e1024227ea8448436c0
   "vote": "https://top.gg/bot/838088031222235197/vote",
   "join": "https://discord.gg/uPAdfvfuTP",
   "itemByPage": 10,
