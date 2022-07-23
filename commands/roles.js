@@ -27,7 +27,7 @@ const setupRoles = async (interaction) => {
   GuildRoles.create(interaction.guild.id,
     roles[9], roles[8], roles[7], roles[6], roles[5], roles[4], roles[3], roles[2], roles[1], roles[0])
 
-  updateRoles(interaction.client, null, GuildRoles.getRolesOf(interaction.guild.id))
+  await updateRoles(interaction.client, null, interaction.guild.id)
 
   const card = new Discord.EmbedBuilder()
     .setAuthor({ name: name, iconURL: 'attachment://logo.png' })
@@ -35,7 +35,7 @@ const setupRoles = async (interaction) => {
     .setColor(color.primary)
     .setFooter({ text: `${name} Infos` })
 
-  roles.forEach(e => card.addFields({ name: `Level ${roles.indexOf(e) + 1}`, value: `<@&${e}>`, inline: true }))
+  roles.forEach(e => card.addFields({ name: `Level ${10 - roles.indexOf(e)}`, value: `<@&${e}>`, inline: true }))
 
   return {
     embeds: [card],

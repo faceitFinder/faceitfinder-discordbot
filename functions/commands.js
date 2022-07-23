@@ -106,7 +106,7 @@ const getUsers = async (
   }
   if (parameters.length === 0 && currentUser) {
     parameters.push({ param: currentUser.faceitId, steam: false, discord: false })
-    updateRoles(interaction.client, [currentUser])
+    updateRoles(interaction.client, interaction.user.id)
   }
 
   let params = []

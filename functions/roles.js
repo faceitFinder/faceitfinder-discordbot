@@ -2,9 +2,12 @@ const GuildRoles = require('../database/guildRoles')
 const User = require('../database/user')
 const Player = require('./player')
 
-const updateRoles = async (client, users, guilds) => {
-  if (!users) users = await User.getAll()
-  if (!guilds) guilds = await GuildRoles.getAll()
+const updateRoles = async (client, userId, guildId) => {
+  let users = await User.getAll()
+  let guilds = await GuildRoles.getAll()
+  if (userId) users = [await User.get(userId)]
+  if (guildId) guilds = [await GuildRoles.getRolesOf(guildId)]
+
   const clientGuilds = await client.guilds.fetch()
 
   clientGuilds.forEach(async (guild) => {
