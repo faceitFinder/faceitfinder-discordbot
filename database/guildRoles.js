@@ -22,10 +22,13 @@ const create = (id, level1, level2, level3, level4, level5, level6, level7, leve
 
 const remove = (id) => GuildRoles.deleteOne({ id: id }).exec()
 
+const getAll = () => GuildRoles.find({}).exec()
+
 const getRolesOf = (id) => GuildRoles.findOne({ id: id }).exec()
 
 module.exports = {
   create,
   remove,
-  getRolesOf
+  getRolesOf,
+  getAll
 }
