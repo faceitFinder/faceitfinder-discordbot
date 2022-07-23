@@ -1,0 +1,37 @@
+version: '3'
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: on-failure
+    container_name: faceitfinder_prod
+    command: npm start
+    links:
+      - mongodb
+    volumes:
+      - /usr/src/app/node_modules
+      - .:/usr/src/app
+    environment:
+      - NODE_ENV=prod
+    env_file:
+      - .env
+    networks:
+      - app
+
+  mongodb:
+    image: mongo:latest
+    container_name: faceitfinder_mongodb
+    hostname: mongodb
+    ports:
+      - '27017:27017'
+    command: [ --auth ]
+    volumes:
+      - ~/mongo-volume:/data/db
+    env_file:
+      - .env
+    networks:
+      - app
+
+networks:
+  app:

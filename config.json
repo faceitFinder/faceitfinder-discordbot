@@ -1,0 +1,177 @@
+{
+  "name": "FaceitFinder",
+  "creator": "275395358316560384",
+  "webapp": "https://faceitfinder.app/",
+  "github": "https://github.com/JustDams/faceitFinder",
+  "prefix": ".ff",
+  "invite": "https://discord.com/oauth2/authorize?client_id=838088031222235197&permissions=275146459136&scope=bot%20applications.commands",
+  "vote": "https://top.gg/bot/838088031222235197/vote",
+  "join": "https://discord.gg/uPAdfvfuTP",
+  "itemByPage": 10,
+  "color": {
+    "primary": "#14578c",
+    "won": "#64AC30",
+    "lost": "#AD4142",
+    "players": {
+      "1": "#662E9B",
+      "2": "#EE6055",
+      "3": "#43BCCD",
+      "4": "#4EE478",
+      "5": "#F8B062"
+    },
+    "levels": {
+      "1": {
+        "min": 0,
+        "max": 800,
+        "color": "#eeeeee"
+      },
+      "2": {
+        "min": 801,
+        "max": 950,
+        "color": "#1ce300"
+      },
+      "3": {
+        "min": 951,
+        "max": 1100,
+        "color": "#1ce300"
+      },
+      "4": {
+        "min": 1101,
+        "max": 1250,
+        "color": "#ffc800"
+      },
+      "5": {
+        "min": 1251,
+        "max": 1400,
+        "color": "#ffc800"
+      },
+      "6": {
+        "min": 1401,
+        "max": 1550,
+        "color": "#ffc800"
+      },
+      "7": {
+        "min": 1551,
+        "max": 1700,
+        "color": "#ffc800"
+      },
+      "8": {
+        "min": 1701,
+        "max": 1850,
+        "color": "#fe630a"
+      },
+      "9": {
+        "min": 1851,
+        "max": 2000,
+        "color": "#fe630a"
+      },
+      "10": {
+        "min": 2001,
+        "max": 100000,
+        "color": "#d91a00"
+      }
+    },
+    "kd": {
+      "1": {
+        "min": -100000,
+        "max": 0.49,
+        "color": "#D71D20"
+      },
+      "2": {
+        "min": 0.5,
+        "max": 0.99,
+        "color": "#F8961E"
+      },
+      "3": {
+        "min": 1.00,
+        "max": 10000,
+        "color": "#6B9B46"
+      }
+    },
+    "error": "#770000"
+  },
+  "emojis": {
+    "won": {
+      "name": "won",
+      "id": "885455757343084564",
+      "balise": "<:won:885455757343084564>"
+    },
+    "lost": {
+      "name": "lost",
+      "id": "885455779044401192",
+      "balise": "<:lost:885455779044401192>"
+    },
+    "better": {
+      "name": "better",
+      "id": "991622480483586108",
+      "balise": "<:better:991622480483586108>"
+    },
+    "worse": {
+      "name": "worse",
+      "id": "991622670263267358",
+      "balise": "<:worse:991622670263267358>"
+    },
+    "even": {
+      "name": "even",
+      "id": "991622876614623275",
+      "balise": "<:even:991622876614623275>"
+    },
+    "maps": {
+      "de_vertigo": {
+        "name": "de_vertigo",
+        "id": "986939217290612776",
+        "balise": "<:de_vertigo:986939217290612776>"
+      },
+      "de_ancient": {
+        "name": "de_ancient",
+        "id": "986939233283498004",
+        "balise": "<:de_ancient:986939233283498004>"
+      },
+      "de_nuke": {
+        "name": "de_nuke",
+        "id": "986939223938572348",
+        "balise": "<:de_nuke:986939223938572348>"
+      },
+      "de_cache": {
+        "name": "de_cache",
+        "id": "986939234881531927",
+        "balise": "<:de_cache:986939234881531927>"
+      },
+      "de_dust2": {
+        "name": "de_dust2",
+        "id": "986939229445697546",
+        "balise": "<:de_dust2:986939229445697546>"
+      },
+      "de_cbble": {
+        "name": "de_cbble",
+        "id": "986939231454773279",
+        "balise": "<:de_cbble:986939231454773279>"
+      },
+      "de_inferno": {
+        "name": "de_inferno",
+        "id": "986939227017207838",
+        "balise": "<:de_inferno:986939227017207838>"
+      },
+      "de_mirage": {
+        "name": "de_mirage",
+        "id": "986939225440124978",
+        "balise": "<:de_mirage:986939225440124978>"
+      },
+      "de_overpass": {
+        "name": "de_overpass",
+        "id": "986939221434589195",
+        "balise": "<:de_overpass:986939221434589195>"
+      },
+      "de_train": {
+        "name": "de_train",
+        "id": "986939219295498290",
+        "balise": "<:de_train:986939219295498290>"
+      }
+    },
+    "select": {
+      "name": "select",
+      "id": "918877215901483048",
+      "balise": "<:select:918877215901483048>"
+    }
+  }
+}
