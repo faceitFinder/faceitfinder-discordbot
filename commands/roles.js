@@ -75,7 +75,7 @@ module.exports = {
   usage: `\n - ${SETUP}\n - ${REMOVE}`,
   type: 'utility',
   async execute(interaction) {
-    if (!interaction.member.permissions.has(Discord.GatewayIntentBits.manageRoles))
+    if (!interaction.member.permissions.has('ManageRoles'))
       return errorCard('You don\'t have the permission to manage roles')
 
     if (!interaction.channel.permissionsFor(interaction.client.user).has('ManageRoles'))
