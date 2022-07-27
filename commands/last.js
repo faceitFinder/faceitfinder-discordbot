@@ -107,7 +107,7 @@ const sendCardWithInfos = async (interaction, playerId, matchId = null, page = 0
       description: maps.join(' '),
       emoji: result !== undefined ? result ? emojis.won.balise : emojis.lost.balise : null,
       default: e === matchId,
-      value: `${interaction.user.id}${playerId}${e}`
+      value: e.toString()
     }
   })
 
@@ -118,10 +118,23 @@ const sendCardWithInfos = async (interaction, playerId, matchId = null, page = 0
       new Discord.ActionRowBuilder()
         .addComponents(
           new Discord.SelectMenuBuilder()
+            .setCustomId('lastSelectorInfos')
+            .setPlaceholder('Select one of the match bellow.')
+            .setDisabled(true)
+            .setOptions([{
+              label: 'Last match stats infos.',
+              description: 'Infos about the last match.',
+              value: JSON.stringify({
+                u: interaction.user.id,
+                s: playerId
+              })
+            }])),
+      new Discord.ActionRowBuilder()
+        .addComponents(
+          new Discord.SelectMenuBuilder()
             .setCustomId('lastSelector')
             .setPlaceholder('Select another match')
-            .addOptions(options),
-        ),
+            .addOptions(options)),
       getPagination(page, maxPage, 'pageLast')
     ]
   }

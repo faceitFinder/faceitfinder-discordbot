@@ -22,8 +22,8 @@ const getPlayerDatas = async (param, steam, discord = false) => {
   return { param, discord }
 }
 
-const getDefaultInteractionOption = (interaction) => {
-  return interaction.message.components.at(0).components
+const getDefaultInteractionOption = (interaction, index = 0) => {
+  return interaction.message.components.at(index).components
     .filter(e => e instanceof Discord.SelectMenuComponent).at(0)
     .options
     .filter(e => e.default).at(0)

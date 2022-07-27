@@ -5,12 +5,9 @@ const loadingCard = require('../../templates/loadingCard')
 module.exports = {
   name: 'pageLast',
   async execute(interaction, json) {
-    const values = getDefaultInteractionOption(interaction).value,
-      u = values.slice(0, 18),
-      s = values.slice(18, 54),
-      m = values.slice(54, values.length)
+    const value = JSON.parse(interaction.message.components.at(0).components.at(0).options.at(0).value)
 
-    json = { ...json, u, m, s }
+    json = { ...json, ...value }
 
     if (interaction.user.id !== json.u) return
 
