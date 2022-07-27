@@ -35,14 +35,14 @@ Article 3.1 : Données collectées
 Les données collectées dans le cadre de notre activité sont les suivantes :
 •	Lors d'une utilisation normale aucune donnée n'est collectée
 •	Lorsque l'utilisateur lie son discord à un compte faceit les données suivantes sont collectées :
-  - identifiant discord
-  - identifiant faceit
+	•	identifiant discord
+	•	identifiant faceit
 •	Lorsque l'utilisateur initialise des rangs sur son serveur discord les données suivantes sont collectées :
-  - identifiant des rôles
-  - identifiant du serveur discord
+	•	identifiant des rôles
+	•	identifiant du serveur discord
 •	Lorsque l'utilisateur créé une team les données suivantes sont collectées :
-  - identifiant discord de l'utilisateur qui a initié la team
-  - identifiant faceit et steam des utilisateurs ajouté a la team
+	•	identifiant discord de l'utilisateur qui a initié la team
+	•	identifiant faceit et steam des utilisateurs ajouté a la team
 
 La collecte et le traitement de ces données répond à la (aux) finalité(s) suivante(s) : 
 Toutes les données récoltées permettent le bon fonctionnement des commandes associées, elles ne sont collectés que lorsque l'utilisateur le souhaite.
