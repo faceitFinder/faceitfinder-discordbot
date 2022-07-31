@@ -30,7 +30,7 @@
     "discord.js": "^14.0.3",
     "dotenv": "^16.0.1",
     "mongoose": "^6.4.6",
-    "node-fetch": "^2.6.1"
+    "node-fetch": "^3.2.10"
   },
   "devDependencies": {
     "eslint": "^8.5.0",
