@@ -183,7 +183,7 @@ module.exports = {
         },
         {
           name: 'faceit_parameters',
-          description: 'faceit nicknames (case sensitive and max 1)',
+          description: 'faceit nicknames / @users (Max 5)',
           type: Discord.ApplicationCommandOptionType.String,
           required: false
         }
@@ -203,7 +203,7 @@ module.exports = {
         },
         {
           name: 'faceit_parameters',
-          description: 'faceit nicknames (case sensitive and max 1) ',
+          description: 'faceit nicknames / @users (Max 5)',
           type: Discord.ApplicationCommandOptionType.String,
           required: false
         }

@@ -27,7 +27,7 @@ module.exports = {
     },
     {
       name: 'faceit_parameters',
-      description: 'faceit nickname (case sensitive)',
+      description: 'faceit nickname / @user',
       required: false,
       type: 3,
       slash: true
