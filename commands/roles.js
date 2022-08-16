@@ -202,7 +202,7 @@ module.exports = {
     }
   ],
   description: 'Ranks are updated every hour and when you get your personnal stats.',
-  usage: `\n - ${SETUP}\n - ${REMOVE}`,
+  usage: `\n - ${GENERATE}\n - ${SETUP}\n - ${REMOVE}`,
   type: 'utility',
   async execute(interaction) {
     if (!interaction.member.permissions.has('ManageRoles'))
