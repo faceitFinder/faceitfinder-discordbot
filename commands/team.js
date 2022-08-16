@@ -54,9 +54,9 @@ const infosTeam = async (currentTeam, user) => {
     })
     .filter(e => e !== undefined)
 
-  const row = new Discord.MessageActionRow()
+  const row = new Discord.ActionRowBuilder()
     .addComponents(
-      new Discord.MessageSelectMenu()
+      new Discord.SelectMenuBuilder()
         .setCustomId('teamInfosSelector')
         .setPlaceholder('Select a team')
         .addOptions(options.slice(0, 25)))

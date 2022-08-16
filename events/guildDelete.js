@@ -5,6 +5,6 @@ module.exports = {
   name: 'guildDelete',
   async execute(guild) {
     guildCount(guild.client)
-    await GuildRoles.remove(guild.id)
+    await GuildRoles.remove(guild.id).catch(console.error)
   }
 }
