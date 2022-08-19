@@ -15,6 +15,14 @@ module.exports = {
 
     const actionRow = interaction.message.components.at(0)
 
-    return getCardWithInfos(actionRow, json, CustomType.getType(interaction.component.label), 'uLSG', json.m)
+    return getCardWithInfos(
+      actionRow, json,
+      CustomType.getType(interaction.component.label),
+      'uLSG',
+      json.m,
+      null,
+      null,
+      json.c
+    )
   }
 }

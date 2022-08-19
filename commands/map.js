@@ -4,6 +4,7 @@ const Player = require('../functions/player')
 const Options = require('../templates/options')
 const { getCardsConditions, getInteractionOption } = require('../functions/commands')
 const mapSelector = require('../interactions/selectmenus/mapSelector')
+const { getMapChoice } = require('../functions/map')
 
 const sendCardWithInfos = async (interaction, playerId) => {
   const playerStats = await Player.getStats(playerId)
@@ -49,51 +50,6 @@ const sendCardWithInfos = async (interaction, playerId) => {
   }
 }
 
-const getMapList = () => {
-  return [
-    {
-      name: 'Dust 2',
-      value: 'de_dust2'
-    },
-    {
-      name: 'Inferno',
-      value: 'de_inferno'
-    },
-    {
-      name: 'Mirage',
-      value: 'de_mirage'
-    },
-    {
-      name: 'Nuke',
-      value: 'de_nuke'
-    },
-    {
-      name: 'Overpass',
-      value: 'de_overpass'
-    },
-    {
-      name: 'Train',
-      value: 'de_train'
-    },
-    {
-      name: 'Vertigo',
-      value: 'de_vertigo'
-    },
-    {
-      name: 'Cache',
-      value: 'de_cache'
-    },
-    {
-      name: 'Cobblestone',
-      value: 'de_cbble'
-    },
-    {
-      name: 'Ancient',
-      value: 'de_ancient'
-    }
-  ]
-}
-
 const getOptions = () => {
   const options = [...Options.stats]
   options.push({
@@ -102,11 +58,7 @@ const getOptions = () => {
     required: false,
     type: Discord.ApplicationCommandOptionType.String,
     slash: true,
-    choices: [
-      ...getMapList().map(c => {
-        if (c?.name) return { name: c.name, value: c.value }
-      }).filter(c => c !== undefined)
-    ]
+    choices: getMapChoice()
   })
 
   return options

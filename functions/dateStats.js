@@ -85,20 +85,24 @@ const setOptionDefault = option => {
   return option
 }
 
-const getCardWithInfos = async (actionRow, values, type, id, maxMatch, maxPage = null, page = null) => {
+const getCardWithInfos = async (actionRow, values, type, id, maxMatch, maxPage = null, page = null, map = null) => {
   const playerId = values.s
   const playerDatas = await Player.getDatas(playerId)
   const steamDatas = await Steam.getDatas(playerDatas.steam_id_64).catch(err => err.statusText)
+  const pStats = await Player.getStats(playerId)
 
-  if (maxMatch === null) maxMatch = (await Player.getStats(playerId)).lifetime.Matches
+  if (maxMatch === null) maxMatch = pStats.lifetime.Matches
 
   const faceitLevel = playerDatas.games.csgo.skill_level
   const faceitElo = playerDatas.games.csgo.faceit_elo
   const size = 40
-  const from = values.f * 1000
+
+  let playerHistory = await getPlayerHistory(playerId, map ? pStats.lifetime.Matches : maxMatch)
+  if (map) playerHistory = playerHistory.filter(e => e.i1 === map).slice(0, maxMatch)
+
+  let from = values.f * 1000 || playerHistory.at(-1).date
   const to = values.t * 1000 || new Date().setHours(+24)
 
-  const playerHistory = await getPlayerHistory(playerId, maxMatch)
   const playerStats = generatePlayerStats(playerHistory.filter(e => e.date >= from && e.date < to))
 
   const today = new Date().setHours(24, 0, 0, 0)
@@ -124,10 +128,12 @@ const getCardWithInfos = async (actionRow, values, type, id, maxMatch, maxPage =
     .addFields(
       from !== toRealTimeStamp ?
         {
-          name: 'From - To', value: [new Date(from).toDateString(), '-', new Date(toRealTimeStamp).toDateString()].join(' '),
-          inline: false
+          name: 'From - To', value: [new Date(from).toDateString(), '\n', new Date(toRealTimeStamp).toDateString()].join(' '),
+          inline: true
         } :
         { name: 'From', value: new Date(from).toDateString(), inline: false },
+      { name: 'Map', value: map || 'All', inline: true },
+      { name: '\u200b', value: '\u200b', inline: true },
       { name: 'Games', value: `${playerStats.games} (${playerStats.winrate}% Win)`, inline: true },
       { name: 'Elo', value: isNaN(eloDiff) ? '0' : eloDiff > 0 ? `+${eloDiff}` : eloDiff.toString(), inline: true },
       { name: 'Average MVPs', value: playerStats['Average MVPs'], inline: true },
