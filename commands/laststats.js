@@ -3,18 +3,18 @@ const { getInteractionOption, getCardsConditions } = require('../functions/comma
 const Options = require('../templates/options')
 const DateStats = require('../functions/dateStats')
 const CustomType = require('../templates/customType')
+const { getMapChoice } = require('../functions/map')
 
 const sendCardWithInfos = async (interaction, playerId, type = CustomType.TYPES.ELO) => {
+  const map = getInteractionOption(interaction, 'map')
   const maxMatch = getInteractionOption(interaction, 'match_number') || 20
-  const playerHistory = await DateStats.getPlayerHistory(playerId, maxMatch)
-  const lastMatch = playerHistory.pop()
 
   const option = {
     label: 'Last stats',
-    description: `${playerHistory.length} match played`,
+    description: 'Last stats',
     value: JSON.stringify({
       s: playerId,
-      f: lastMatch.date / 1000,
+      c: map,
       m: maxMatch,
       u: interaction.user.id
     }),
@@ -27,7 +27,7 @@ const sendCardWithInfos = async (interaction, playerId, type = CustomType.TYPES.
       .addOptions([option])
       .setDisabled(true))
 
-  return DateStats.getCardWithInfos(row, JSON.parse(option.value), type, 'uLSG', maxMatch)
+  return DateStats.getCardWithInfos(row, JSON.parse(option.value), type, 'uLSG', maxMatch, null, null, map)
 }
 
 const getOptions = () => {
@@ -38,6 +38,13 @@ const getOptions = () => {
     required: false,
     type: Discord.ApplicationCommandOptionType.Integer,
     slash: true,
+  }, {
+    name: 'map',
+    description: 'Specify a map to get the stats related',
+    required: false,
+    type: Discord.ApplicationCommandOptionType.String,
+    slash: true,
+    choices: getMapChoice()
   })
 
   return options
