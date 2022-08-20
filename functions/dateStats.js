@@ -128,7 +128,7 @@ const getCardWithInfos = async (actionRow, values, type, id, maxMatch, maxPage =
     inline: map ? true : false
   })
   else head.push({ name: 'From', value: new Date(from).toDateString(), inline: false })
-  if (map) head.push({ name: 'Map', value: map, inline: false }, { name: '\u200b', value: '\u200b', inline: true })
+  if (map) head.push({ name: 'Map', value: map, inline: true }, { name: '\u200b', value: '\u200b', inline: true })
 
   const card = new Discord.EmbedBuilder()
     .setAuthor({ name: playerDatas.nickname, iconURL: playerDatas.avatar || null, url: `https://www.faceit.com/fr/players/${playerDatas.nickname}` })
