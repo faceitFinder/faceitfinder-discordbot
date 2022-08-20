@@ -5,6 +5,7 @@ const Player = require('../../functions/player')
 const Steam = require('../../functions/steam')
 const Graph = require('../../functions/graph')
 const loadingCard = require('../../templates/loadingCard')
+const errorCard = require('../../templates/errorCard')
 
 const sendCardWithInfos = async (playerId, map, mode) => {
   if (!map) return
@@ -20,8 +21,11 @@ const sendCardWithInfos = async (playerId, map, mode) => {
   filesAtt.push(new Discord.AttachmentBuilder(rankImageCanvas, { name: 'level.png' }))
 
   const mapThumbnail = `./images/maps/${map}.jpg`
+  const playerMapStats = playerStats.segments.filter(e => e.label === map && e.mode == mode)
 
-  const cards = playerStats.segments.filter(e => e.label === map && e.mode == mode).map(m => {
+  if (playerMapStats.length === 0) return errorCard(`**${playerDatas.nickname}** has not played this map.`)
+
+  const cards = playerMapStats.map(m => {
     if (fs.existsSync(mapThumbnail)) filesAtt.push(new Discord.AttachmentBuilder(mapThumbnail, { name: `${map}.jpg` }))
 
     return new Discord.EmbedBuilder()
