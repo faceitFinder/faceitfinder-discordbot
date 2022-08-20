@@ -121,19 +121,20 @@ const getCardWithInfos = async (actionRow, values, type, id, maxMatch, maxPage =
   const rankImageCanvas = await Graph.getRankImage(faceitLevel, faceitElo, size)
   const toRealTimeStamp = new Date(to).setHours(-24)
 
+  const head = []
+
+  if (from !== toRealTimeStamp) head.push({
+    name: 'From - To', value: [new Date(from).toDateString(), '\n', new Date(toRealTimeStamp).toDateString()].join(' '),
+    inline: map ? true : false
+  })
+  else head.push({ name: 'From', value: new Date(from).toDateString(), inline: false })
+  if (map) head.push({ name: 'Map', value: map, inline: false }, { name: '\u200b', value: '\u200b', inline: true })
+
   const card = new Discord.EmbedBuilder()
     .setAuthor({ name: playerDatas.nickname, iconURL: playerDatas.avatar || null, url: `https://www.faceit.com/fr/players/${playerDatas.nickname}` })
     .setDescription(`[Steam](https://steamcommunity.com/profiles/${playerDatas.games.csgo.game_player_id}), [Faceit](https://www.faceit.com/fr/players/${playerDatas.nickname})`)
     .setThumbnail(`attachment://${faceitLevel}level.png`)
-    .addFields(
-      from !== toRealTimeStamp ?
-        {
-          name: 'From - To', value: [new Date(from).toDateString(), '\n', new Date(toRealTimeStamp).toDateString()].join(' '),
-          inline: true
-        } :
-        { name: 'From', value: new Date(from).toDateString(), inline: false },
-      { name: 'Map', value: map || 'All', inline: true },
-      { name: '\u200b', value: '\u200b', inline: true },
+    .addFields(...head,
       { name: 'Games', value: `${playerStats.games} (${playerStats.winrate}% Win)`, inline: true },
       { name: 'Elo', value: isNaN(eloDiff) ? '0' : eloDiff > 0 ? `+${eloDiff}` : eloDiff.toString(), inline: true },
       { name: 'Average MVPs', value: playerStats['Average MVPs'], inline: true },
