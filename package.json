@@ -26,7 +26,7 @@
     "big.js": "^6.2.1",
     "canvas": "^2.9.1",
     "chart.js": "^3.8.0",
-    "discord-api-types": "^0.36.2",
+    "discord-api-types": "^0.37.2",
     "discord.js": "^14.0.3",
     "dotenv": "^16.0.1",
     "mongoose": "^6.5.2",
