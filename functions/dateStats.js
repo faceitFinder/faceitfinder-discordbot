@@ -56,12 +56,17 @@ const generatePlayerStats = playerHistory => {
 
 const getAverage = (q, d, fixe = 2, percent = 1) => ((parseFloat(q) / parseFloat(d)) * percent).toFixed(fixe)
 
-const getPlayerHistory = async (playerId, maxMatch) => {
+const getPlayerHistory = async (playerId, maxMatch, eloMatches = true) => {
   const playerHistory = []
   const playerStats = await Player.getStats(playerId)
-  if (maxMatch > playerStats.lifetime.Matches) maxMatch = playerStats.lifetime.Matches
-  for (let page = 0; page < Math.ceil(maxMatch / 2000); page++)
+  if (maxMatch === null || maxMatch > playerStats.lifetime.Matches) maxMatch = playerStats.lifetime.Matches
+  if (eloMatches) for (let page = 0; page < Math.ceil(maxMatch / 2000); page++)
     playerHistory.push(...await Match.getMatchElo(playerId, maxMatch, page))
+  else {
+    limit = 100
+    for (let page = 0; page < Math.ceil(maxMatch / limit); page++)
+      playerHistory.push(...(await Player.getHistory(playerId, limit, page * limit)).items)
+  }
   return playerHistory
 }
 
@@ -182,10 +187,22 @@ const getCardWithInfos = async (actionRow, values, type, id, maxMatch, maxPage =
   }
 }
 
+const updateOptions = (components, values, updateEmoji = true) => {
+  return components.filter(e => e instanceof Discord.SelectMenuComponent)
+    .map(msm => msm.options.map(o => {
+      const active = o.value.normalize() === values.normalize()
+      if (updateEmoji) o.emoji = active ? emojis.select.balise : undefined
+      o.default = active
+
+      return o
+    })).at(0)
+}
+
 module.exports = {
   getDates,
   getCardWithInfos,
   setOptionDefault,
   getPlayerHistory,
   generatePlayerStats,
+  updateOptions,
 }

@@ -1,20 +1,52 @@
-const { sendCardWithInfos } = require('../../commands/last')
-const { getDefaultInteractionOption } = require('../../functions/commands')
+const Discord = require('discord.js')
 const loadingCard = require('../../templates/loadingCard')
+const Match = require('../../functions/match')
+const { updateOptions, getPlayerHistory } = require('../../functions/dateStats')
+const Player = require('../../functions/player')
+const Steam = require('../../functions/steam')
+const { getMatchItems } = require('../../commands/last')
+
+const updateEmbedMessage = async (playerId, matchId, page) => {
+  const playerDatas = await Player.getDatas(playerId)
+  const steamDatas = await Steam.getDatas(playerId)
+  const playerHistory = await getPlayerHistory(playerId, null)
+
+  return getMatchItems(playerDatas, steamDatas, playerHistory, playerHistory.length, page, matchId)
+}
 
 module.exports = {
   name: 'lastSelector',
   async execute(interaction) {
-    const value = JSON.parse(interaction.message.components.at(0).components.at(0).options.at(0).value)
+    const dataRow = interaction.message.components.at(0)
+    const value = JSON.parse(dataRow.components.at(0).options.at(0).value)
     const m = interaction.values.at(0)
     const json = { ...value, m }
 
     if (json.u !== interaction.user.id) return
 
+    const optionsComponents = interaction.message.components.at(1).components
+    const paginationComponents = interaction.message.components.at(2)
+    const playerComponents = interaction.message.components.at(3)
+
+    const currentPage = JSON.parse(paginationComponents.components.at(0).customId).c
+
     loadingCard(interaction)
 
-    const firstItemPagination = interaction.message.components.at(2).components.at(0)
+    const components = [
+      dataRow,
+      new Discord.ActionRowBuilder()
+        .addComponents(
+          new Discord.SelectMenuBuilder()
+            .setCustomId('lastSelector')
+            .addOptions(updateOptions(optionsComponents, m, false))),
+      paginationComponents
+    ]
 
-    return sendCardWithInfos(interaction, json.s, json.m, JSON.parse(firstItemPagination.customId).c)
+    if (playerComponents !== undefined) components.push(playerComponents)
+
+    return {
+      ...await updateEmbedMessage(json.s, json.m, currentPage),
+      components: components
+    }
   }
 }
