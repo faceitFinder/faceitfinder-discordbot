@@ -23,7 +23,7 @@ module.exports = {
   usage: `player_aimed:the history in which one you are searching AND ${Options.usage}`,
   type: 'stats',
   async execute(interaction) {
-    const playerAimed = (await getUsers(interaction, 1, 'player_aimed', 'player_aimed'))[0].param
+    const playerAimed = (await getUsers(interaction, 1, 'player_aimed', 'player_aimed', false))[0].param
     const users = (await getUsers(interaction, 5)).map(p => p.param)
 
     return sendCardWithInfos(interaction, playerAimed, null, 0, users.filter(e => e.normalize() !== playerAimed.normalize()))
