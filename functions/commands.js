@@ -48,7 +48,8 @@ const getUsers = async (
   interaction,
   maxUser = 10,
   steam = 'steam_parameters',
-  faceit = 'faceit_parameters'
+  faceit = 'faceit_parameters',
+  searchTeam = true
 ) => {
   let team = getInteractionOption(interaction, 'team')?.toLowerCase().trim().split(' ')[0]
   const faceitParameters = getInteractionOption(interaction, faceit)?.trim().split(' ')
@@ -57,7 +58,7 @@ const getUsers = async (
   const parameters = []
   const currentUser = await User.get(interaction.user.id)
 
-  if (team) {
+  if (searchTeam && team) {
     team = await Team.getTeamSlug(team)
     if (!team) throw 'This team doesn\'t exist'
     else {
