@@ -20,7 +20,7 @@ module.exports = {
   name: 'find',
   options: getOptions(),
   description: 'Find all the games that includes the player requested (up to 5).',
-  usage: Options.usage,
+  usage: `player_aimed:the history in which one you are searching AND ${Options.usage}`,
   type: 'stats',
   async execute(interaction) {
     const playerAimed = (await getUsers(interaction, 1, 'player_aimed', 'player_aimed'))[0].param
