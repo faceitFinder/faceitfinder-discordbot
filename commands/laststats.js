@@ -34,7 +34,7 @@ const getOptions = () => {
   const options = [...Options.stats]
   options.unshift({
     name: 'match_number',
-    description: 'Number of matchs to display. Default: 20',
+    description: 'Number of matches to display. Default: 20',
     required: false,
     type: Discord.ApplicationCommandOptionType.Integer,
     slash: true,
@@ -54,7 +54,7 @@ module.exports = {
   name: 'laststats',
   options: getOptions(),
   description: 'Displays the stats of the x last match. With elo graph of the x last match.',
-  usage: `match_number:number of matchs to display AND ${Options.usage}`,
+  usage: `match_number:number of matches to display AND ${Options.usage}`,
   type: 'stats',
   async execute(interaction) {
     return getCardsConditions(interaction, sendCardWithInfos)

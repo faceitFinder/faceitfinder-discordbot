@@ -8,7 +8,7 @@ const getMatchElo = (playerId, limit = 20, page = 0) => fetch(`https://api.facei
     if (res.status == 200) return res.json()
     else {
       console.error(res.statusText, res.url)
-      throw 'Couldn\'t get matchs'
+      throw 'Couldn\'t get matches'
     }
   })
   .then(data => data)

@@ -41,7 +41,7 @@ const sendCardWithInfos = async (interaction, playerId, page = 0) => {
   const pages = getPageSlice(page)
   const pagination = options.slice(pages.start, pages.end)
 
-  if (pagination.length === 0) return errorCard(`Couldn't get matchs of ${playerDatas.nickname}`)
+  if (pagination.length === 0) return errorCard(`Couldn't get matches of ${playerDatas.nickname}`)
 
   pagination[0] = DateStats.setOptionDefault(pagination.at(0))
 
