@@ -1,4 +1,3 @@
-const { getDefaultInteractionOption } = require('../../functions/commands')
 const { sendCardWithInfos } = require('../../commands/last')
 const loadingCard = require('../../templates/loadingCard')
 
@@ -11,8 +10,10 @@ module.exports = {
 
     if (interaction.user.id !== json.u) return
 
+    const players = interaction.message.components.at(3)?.components.map(p => JSON.parse(p.customId).s) | []
+
     loadingCard(interaction)
 
-    return sendCardWithInfos(interaction, json.s, null, json.page)
+    return sendCardWithInfos(interaction, json.s, null, json.page, players)
   }
 }

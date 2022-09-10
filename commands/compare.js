@@ -65,7 +65,7 @@ const sendCardWithInfos = async (interaction, player1Id, player2Id, type = Custo
     .setDescription(`Comparison between [${firstUserDatas.playerDatas.nickname}](https://www.faceit.com/fr/players/${firstUserDatas.playerDatas.nickname}) and [${secondUserDatas.playerDatas.nickname}](https://www.faceit.com/fr/players/${secondUserDatas.playerDatas.nickname})`)
     .setColor(color.primary)
     .addFields({
-      name: 'Matchs Compared',
+      name: 'Matches Compared',
       value: maxMatch.toString(),
       inline: true
     },
@@ -217,7 +217,7 @@ module.exports = {
   name: 'compare',
   options: [{
     name: 'match_number',
-    description: 'Number of matchs to display. Default: 20',
+    description: 'Number of matches to display. Default: 20',
     required: false,
     type: Discord.ApplicationCommandOptionType.Integer,
     slash: true,

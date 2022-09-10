@@ -6,9 +6,11 @@ const Steam = require('../functions/steam')
 const Player = require('../functions/player')
 const Graph = require('../functions/graph')
 const errorCard = require('../templates/errorCard')
+const successCard = require('../templates/successCard')
 const Options = require('../templates/options')
 const { getCardsConditions } = require('../functions/commands')
 const { getPagination } = require('../functions/pagination')
+const { getPlayerHistory } = require('../functions/dateStats')
 
 const getLevelFromElo = (elo) => {
   const colorLevel = Object.entries(color.levels).filter(e => {
@@ -17,33 +19,20 @@ const getLevelFromElo = (elo) => {
   return colorLevel?.at(0)
 }
 
-const sendCardWithInfos = async (interaction, playerId, matchId = null, page = 0) => {
-  const maxMatch = 10
-  const playerDatas = await Player.getDatas(playerId)
-  const playerStats = await Player.getStats(playerId)
-  const steamDatas = await Steam.getDatas(playerDatas.steam_id_64).catch(err => err.statusText)
-  const playerHistory = await Match.getMatchElo(playerId, maxMatch, page)
-
-  const faceitElo = playerDatas.games.csgo.faceit_elo
-  const maxPage = Math.ceil(playerStats.lifetime.Matches / maxMatch) - 1
+const getMatchItems = (playerDatas, steamDatas, playerHistory, maxMatch, page, matchId) => {
   const size = 40
   const filesAtt = []
   const cards = []
+  const faceitElo = playerDatas.games.csgo.faceit_elo
 
-  if (!playerHistory.length > 0)
-    return errorCard(`Couldn\'t get the last match of ${steamDatas?.personaname || steamDatas}`)
-
-  if (!matchId) matchId = playerHistory[0].matchId
-
-  const filteredHistory = playerHistory.map(e => e.matchId).filter((e, i, a) => a.indexOf(e) === i)
   const matchStats = playerHistory.filter(e => e.matchId === matchId)
-  const lastMatchsElo = Graph.getElo(maxMatch + 1, [...playerHistory], faceitElo, page === 0)
+  const lastMatchesElo = Graph.getElo(maxMatch + 1, [...playerHistory], faceitElo, page === 0)
 
   const levelDiff = playerHistory.map(e => e.matchId === matchId)
-    .map((e, i) => e ? lastMatchsElo.at(i) : null)
+    .map((e, i) => e ? lastMatchesElo.at(i) : null)
     .filter(e => e !== null)
   const eloDiff = playerHistory.map(e => e.matchId === matchId)
-    .map((e, i) => e ? lastMatchsElo.at(i) - lastMatchsElo.at(i + 1) : null)
+    .map((e, i) => e ? lastMatchesElo.at(i) - lastMatchesElo.at(i + 1) : null)
     .filter(e => e !== null)
 
   let mapThumbnail
@@ -93,8 +82,48 @@ const sendCardWithInfos = async (interaction, playerId, matchId = null, page = 0
       cards.push(card)
     })
 
+  return {
+    embeds: cards,
+    files: filesAtt
+  }
+}
+
+const sendCardWithInfos = async (interaction, playerId, matchId = null, page = 0, players = []) => {
+  const maxMatch = 25
+  const playerDatas = await Player.getDatas(playerId)
+  const playerStats = await Player.getStats(playerId)
+  const steamDatas = await Steam.getDatas(playerDatas.steam_id_64).catch(err => err.statusText)
+  const playerFullHistory = await getPlayerHistory(playerId, playerStats.lifetime.Matches, true)
+  let playerHistory
+  const funFactCard = []
+  const firstPage = page * maxMatch
+  const lastPage = firstPage + maxMatch
+
+  if (players.length > 0) {
+    const playerHistoryMatches = (await getPlayerHistory(playerId, playerStats.lifetime.Matches, false))
+      .filter(m => players.every(p => m.playing_players.includes(p)))
+    const matchIds = playerHistoryMatches.map(e => e.match_id)
+
+    playerHistory = (await getPlayerHistory(playerId, playerStats.lifetime.Matches))
+      .filter(m => matchIds.includes(m.matchId))
+
+    funFactCard.push(successCard(`**${playerDatas.nickname}** played ${playerHistoryMatches.length} game(s) with the player(s) selected.\nThis corresponds to ${((playerHistoryMatches.length * 100) / playerStats.lifetime.Matches).toFixed(2)}% of **${playerDatas.nickname}**'s matches played.`).embeds[0])
+  } else playerHistory = playerFullHistory
+
+  const maxPage = Math.floor(playerHistory.length / maxMatch)
+
+  if (!playerHistory.length > 0)
+    return errorCard(`Couldn\'t get the last matches of ${steamDatas?.personaname || steamDatas} ${players.length > 0 ? 'with the requested users.' : ''}`)
+
+  // Removing multiple ids 
+  const filteredHistory = playerHistory.map(e => e.matchId).filter((e, i, a) => a.indexOf(e) === i)
+
+  if (!matchId) matchId = filteredHistory.slice(firstPage, lastPage).at(0)
+
+  const matchItems = getMatchItems(playerDatas, steamDatas, playerFullHistory, playerFullHistory.length, page, matchId)
+
   const options = filteredHistory.map(e => {
-    const matchRounds = playerHistory.filter(matchs => matchs.matchId === e)
+    const matchRounds = playerHistory.filter(matches => matches.matchId === e)
     const match = matchRounds.at(0)
     const result = matchRounds
       .map(e => Math.max(...e.i18.split('/').map(Number)) === parseInt(e.c5))
@@ -111,32 +140,48 @@ const sendCardWithInfos = async (interaction, playerId, matchId = null, page = 0
     }
   })
 
-  return {
-    embeds: cards,
-    files: filesAtt,
-    components: [
+  matchItems.embeds.push(...funFactCard)
+
+  const components = [
+    new Discord.ActionRowBuilder()
+      .addComponents(
+        new Discord.SelectMenuBuilder()
+          .setCustomId('lastSelectorInfos')
+          .setPlaceholder('Select one of the match bellow.')
+          .setDisabled(true)
+          .setOptions([{
+            label: 'Last match stats infos.',
+            description: 'Infos about the last match.',
+            value: JSON.stringify({
+              u: interaction.user.id,
+              s: playerId
+            })
+          }])),
+    new Discord.ActionRowBuilder()
+      .addComponents(
+        new Discord.SelectMenuBuilder()
+          .setCustomId('lastSelector')
+          .setPlaceholder('Select another match')
+          .addOptions(options.slice(firstPage, lastPage))),
+    getPagination(page, maxPage, 'pageLast')
+  ]
+
+  if (players.length > 0)
+    components.push(
       new Discord.ActionRowBuilder()
-        .addComponents(
-          new Discord.SelectMenuBuilder()
-            .setCustomId('lastSelectorInfos')
-            .setPlaceholder('Select one of the match bellow.')
+        .addComponents(await Promise.all(players.map(async (p) => {
+          const playerDatas = await Player.getDatas(p)
+
+          return new Discord.ButtonBuilder()
+            .setCustomId(JSON.stringify({ s: p }))
+            .setLabel(playerDatas.nickname)
+            .setStyle(Discord.ButtonStyle.Success)
             .setDisabled(true)
-            .setOptions([{
-              label: 'Last match stats infos.',
-              description: 'Infos about the last match.',
-              value: JSON.stringify({
-                u: interaction.user.id,
-                s: playerId
-              })
-            }])),
-      new Discord.ActionRowBuilder()
-        .addComponents(
-          new Discord.SelectMenuBuilder()
-            .setCustomId('lastSelector')
-            .setPlaceholder('Select another match')
-            .addOptions(options)),
-      getPagination(page, maxPage, 'pageLast')
-    ]
+        }))))
+
+  return {
+    ...matchItems,
+    components: components
   }
 }
 
@@ -152,3 +197,4 @@ module.exports = {
 }
 
 module.exports.sendCardWithInfos = sendCardWithInfos
+module.exports.getMatchItems = getMatchItems

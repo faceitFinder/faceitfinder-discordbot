@@ -178,7 +178,7 @@ const roundRect = (ctx, x, y, w, h, r) => {
 }
 
 const getElo = (maxMatch, matchHistory, playerElo, checkElo = true) => {
-  if (matchHistory.length <= 0) throw 'Couldn\'t get matchs'
+  if (matchHistory.length <= 0) throw 'Couldn\'t get matches'
   else if (checkElo && matchHistory[0].elo === undefined) matchHistory[0].elo = playerElo
 
   const elo = matchHistory.map(e => e.elo)
@@ -190,7 +190,7 @@ const getElo = (maxMatch, matchHistory, playerElo, checkElo = true) => {
 }
 
 const getKD = (matchHistory, maxMatch) => {
-  if (matchHistory.length === 0) throw 'Couldn\'t get matchs'
+  if (matchHistory.length === 0) throw 'Couldn\'t get matches'
   return matchHistory.map(e => e.c2).slice(0, maxMatch)
 }
 
