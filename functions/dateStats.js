@@ -190,7 +190,7 @@ const getCardWithInfos = async (actionRow, values, type, id, maxMatch, maxPage =
 const updateOptions = (components, values, updateEmoji = true) => {
   return components.filter(e => e instanceof Discord.SelectMenuComponent)
     .map(msm => msm.options.map(o => {
-      if (JSON.parse(values).id.normalize() !== 'uDSG') { // Do not reset if a button is clicked
+      if (JSON.parse(values).id?.normalize() !== 'uDSG') { // Do not reset if a button is clicked
         const active = o.value.normalize() === values.normalize()
         if (updateEmoji) o.emoji = active ? emojis.select.balise : undefined
         o.default = active
