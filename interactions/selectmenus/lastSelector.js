@@ -46,7 +46,7 @@ module.exports = {
     if (playerComponents !== undefined) components.push(playerComponents)
 
     const messageItems = await updateEmbedMessage(json.s, json.m, currentPage)
-    messageItems.embeds.unshift(funFactCard)
+    if (funFactCard) messageItems.embeds.unshift(funFactCard)
 
     return {
       ...messageItems,
