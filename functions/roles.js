@@ -26,16 +26,17 @@ const updateRoles = async (client, discordId, guildId, remove = false) => {
         const roleLevels = Object.keys(Object.entries(guildRoles)[2][1])
           .filter(e => e.startsWith('level')).map(e => guildRoles[e])
 
+        const roleToAdd = roleLevels[playerLevel - 1]
+        const rolesFit = member.roles.resolve(roleToAdd)
+
+        if (rolesFit) return
+
         await member.roles.remove(roleLevels).catch(console.error)
 
         if (remove) {
           User.remove(discordId)
           return
         }
-
-        const roleToAdd = roleLevels[playerLevel - 1]
-        const rolesFit = member.roles.resolve()
-        if (rolesFit) return
 
         await member.roles.add(roleToAdd).catch(console.error)
       }))
