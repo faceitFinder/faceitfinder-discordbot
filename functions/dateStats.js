@@ -98,7 +98,7 @@ const setOptionDefault = option => {
   return option
 }
 
-const getCardWithInfos = async (actionRow, values, type, id, maxMatch, maxPage = null, page = null, map = null) => {
+const getCardWithInfos = async (actionRow, values, type, id, maxMatch, maxPage = null, page = null, map = null, updateFrom = false) => {
   const playerId = values.s
   const playerDatas = await Player.getDatas(playerId)
   const steamDatas = await Steam.getDatas(playerDatas.steam_id_64).catch(err => err.statusText)
@@ -127,6 +127,7 @@ const getCardWithInfos = async (actionRow, values, type, id, maxMatch, maxPage =
   const eloDiff = elo.at(0) - elo.at(-1)
 
   if (!map) playerHistory = filteredHistory
+  if (updateFrom) from = playerHistory.at(-1).date
 
   const graphBuffer = Graph.generateChart(playerHistoryTo,
     faceitElo,

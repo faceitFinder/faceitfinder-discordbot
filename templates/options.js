@@ -27,14 +27,14 @@ const stats = [
 const dateRange = [
   {
     name: 'from_date',
-    description: 'enter the start date',
+    description: 'enter the start date, format MM/DD/YYYY',
     required: false,
     type: ApplicationCommandOptionType.String,
     slash: true
   },
   {
     name: 'to_date',
-    description: 'enter the end date, if empty gets the current day.',
+    description: 'enter the end date, if empty gets the current day. Format MM/DD/YYYY',
     required: false,
     type: ApplicationCommandOptionType.String,
     slash: true
