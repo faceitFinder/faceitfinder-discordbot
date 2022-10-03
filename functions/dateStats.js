@@ -7,11 +7,15 @@ const Graph = require('./graph')
 const CustomType = require('../templates/customType')
 const CustomTypeFunc = require('../functions/customType')
 const { getPagination } = require('./pagination')
+const { getInteractionOption } = require('./commands')
 
 const generatePlayerStats = playerHistory => {
   const playerStats = {
     wins: 0,
     games: 0,
+    kills: 0,
+    deaths: 0,
+    kd: 0,
     'Average K/D': 0,
     'Average K/R': 0,
     'Average HS': 0,
@@ -27,6 +31,7 @@ const generatePlayerStats = playerHistory => {
   for (const e of playerHistory) {
     playerStats.games += 1
     const KD = parseFloat(e.c2)
+
     playerStats['Average K/D'] += KD
     playerStats['Average K/R'] += parseFloat(e.c3)
     playerStats['Average HS'] += parseFloat(e.c4)
@@ -34,6 +39,8 @@ const generatePlayerStats = playerHistory => {
     playerStats['Average Kills'] += parseFloat(e.i6)
     playerStats['Average Deaths'] += parseFloat(e.i8)
     playerStats['Average Assists'] += parseFloat(e.i7)
+    playerStats.kills += parseFloat(e.i6)
+    playerStats.deaths += parseFloat(e.i8)
 
     if (KD >= color.kd[1].min && KD <= color.kd[1].max) playerStats['Red K/D'] += 1
     else if (KD >= color.kd[2].min && KD <= color.kd[2].max) playerStats['Orange K/D'] += 1
@@ -50,6 +57,7 @@ const generatePlayerStats = playerHistory => {
   playerStats['Average Kills'] = getAverage(playerStats['Average Kills'], playerStats.games)
   playerStats['Average Deaths'] = getAverage(playerStats['Average Deaths'], playerStats.games)
   playerStats['Average Assists'] = getAverage(playerStats['Average Assists'], playerStats.games)
+  playerStats.kd = getAverage(playerStats.kills, playerStats.deaths)
 
   return playerStats
 }
@@ -102,20 +110,23 @@ const getCardWithInfos = async (actionRow, values, type, id, maxMatch, maxPage =
   const faceitElo = playerDatas.games.csgo.faceit_elo
   const size = 40
 
-  let playerHistory = await getPlayerHistory(playerId, map ? pStats.lifetime.Matches : maxMatch)
-  if (map) playerHistory = playerHistory.filter(e => e.i1 === map).slice(0, maxMatch)
+  let playerHistory = await getPlayerHistory(playerId, pStats.lifetime.Matches)
 
   let from = values.f * 1000 || playerHistory.at(-1).date
   const to = values.t * 1000 || new Date().setHours(+24)
 
-  const playerStats = generatePlayerStats(playerHistory.filter(e => e.date >= from && e.date < to))
+  const filteredHistory = playerHistory.filter(e => e.date >= from && e.date < to).slice(0, maxMatch)
+  const playerStats = generatePlayerStats(filteredHistory)
 
+  if (map) playerHistory = playerHistory.filter(e => e.i1 === map).slice(0, maxMatch)
   const today = new Date().setHours(24, 0, 0, 0)
 
   const checkElo = today >= from && today <= to
   const playerHistoryTo = playerHistory.filter(e => e.date < to)
   const elo = await Graph.getElo(playerStats.games + 1, playerHistoryTo, faceitElo, checkElo)
   const eloDiff = elo.at(0) - elo.at(-1)
+
+  if (!map) playerHistory = filteredHistory
 
   const graphBuffer = Graph.generateChart(playerHistoryTo,
     faceitElo,
@@ -143,6 +154,9 @@ const getCardWithInfos = async (actionRow, values, type, id, maxMatch, maxPage =
       { name: 'Games', value: `${playerStats.games} (${playerStats.winrate}% Win)`, inline: true },
       { name: 'Elo', value: isNaN(eloDiff) ? '0' : eloDiff > 0 ? `+${eloDiff}` : eloDiff.toString(), inline: true },
       { name: 'Average MVPs', value: playerStats['Average MVPs'], inline: true },
+      { name: 'K/D', value: playerStats.kd.toString(), inline: true },
+      { name: 'Kills', value: playerStats.kills.toString(), inline: true },
+      { name: 'Deaths', value: playerStats.deaths.toString(), inline: true },
       { name: 'Average K/D', value: playerStats['Average K/D'], inline: true },
       { name: 'Average K/R', value: playerStats['Average K/R'], inline: true },
       { name: 'Average HS', value: `${playerStats['Average HS']}%`, inline: true },
@@ -192,7 +206,7 @@ const updateOptions = (components, values, updateEmoji = true) => {
     .map(msm => msm.options.map(o => {
       // Do not reset if a button is clicked
       try { if (JSON.parse(values).id.normalize() === 'uDSG') return o }
-      catch (error) {  }
+      catch (error) { }
 
       const active = o.value.normalize() === values.normalize()
       if (updateEmoji) o.emoji = active ? emojis.select.balise : undefined
@@ -202,6 +216,13 @@ const updateOptions = (components, values, updateEmoji = true) => {
     })).at(0)
 }
 
+const getFromTo = (interaction, name_from = 'from_date', name_to = 'to_date') => {
+  const from = new Date(getInteractionOption(interaction, name_from)?.trim())
+  const to = new Date(getInteractionOption(interaction, name_to)?.trim())
+
+  return { from: new Date(from), to: new Date(to) }
+}
+
 module.exports = {
   getDates,
   getCardWithInfos,
@@ -209,4 +230,5 @@ module.exports = {
   getPlayerHistory,
   generatePlayerStats,
   updateOptions,
+  getFromTo,
 }
