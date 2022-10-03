@@ -14,10 +14,10 @@ module.exports = {
     loadingCard(interaction)
 
     const actionRow = interaction.message.components.at(0)
-    const [from, to] = interaction.message.embeds.at(0).data.fields[0].value.split('\n').map(e => new Date(e.trim()).getTime() / 1000)
+    const [from, to] = interaction.message.embeds.at(0).data.fields[0].value.split('\n').map(e => new Date(e.trim()))
 
-    json.f = from
-    json.t = to
+    json.f = from.getTime() / 1000
+    json.t = to.setHours(+24) / 1000
 
     return getCardWithInfos(
       actionRow, json,
