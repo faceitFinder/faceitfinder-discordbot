@@ -6,6 +6,8 @@ const CustomType = require('../templates/customType')
 const { getMapChoice } = require('../functions/map')
 
 const sendCardWithInfos = async (interaction, playerId, type = CustomType.TYPES.ELO) => {
+  const { from, to } = DateStats.getFromTo(interaction)
+
   const map = getInteractionOption(interaction, 'map')
   const maxMatch = getInteractionOption(interaction, 'match_number') || 20
 
@@ -27,7 +29,12 @@ const sendCardWithInfos = async (interaction, playerId, type = CustomType.TYPES.
       .addOptions([option])
       .setDisabled(true))
 
-  return DateStats.getCardWithInfos(row, JSON.parse(option.value), type, 'uLSG', maxMatch, null, null, map)
+  let values = JSON.parse(option.value)
+
+  if (from.toString() !== 'Invalid Date') values.f = from.getTime() / 1000
+  if (to.toString() !== 'Invalid Date') values.t = to.getTime() / 1000
+
+  return DateStats.getCardWithInfos(row, values, type, 'uLSG', maxMatch, null, null, map)
 }
 
 const getOptions = () => {
@@ -45,7 +52,8 @@ const getOptions = () => {
     type: Discord.ApplicationCommandOptionType.String,
     slash: true,
     choices: getMapChoice()
-  })
+  },
+    ...Options.dateRange)
 
   return options
 }

@@ -24,9 +24,27 @@ const stats = [
   }
 ]
 
+const dateRange = [
+  {
+    name: 'from_date',
+    description: 'enter the start date',
+    required: false,
+    type: ApplicationCommandOptionType.String,
+    slash: true
+  },
+  {
+    name: 'to_date',
+    description: 'enter the end date, if empty gets the current day.',
+    required: false,
+    type: ApplicationCommandOptionType.String,
+    slash: true
+  }
+]
+
 const usage = 'steam_parameters:multiple steam params and @user OR CSGO status AND team:team slug (max 1) AND faceit_parameters:multiple faceit nicknames and @user'
 
 module.exports = {
   stats,
-  usage
+  usage,
+  dateRange
 }
