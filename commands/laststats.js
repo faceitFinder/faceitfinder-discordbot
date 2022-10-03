@@ -34,7 +34,7 @@ const sendCardWithInfos = async (interaction, playerId, type = CustomType.TYPES.
   if (from.toString() !== 'Invalid Date') values.f = from.getTime() / 1000
   if (to.toString() !== 'Invalid Date') values.t = to.getTime() / 1000
 
-  return DateStats.getCardWithInfos(row, values, type, 'uLSG', maxMatch, null, null, map)
+  return DateStats.getCardWithInfos(row, values, type, 'uLSG', maxMatch, null, null, map, true)
 }
 
 const getOptions = () => {
