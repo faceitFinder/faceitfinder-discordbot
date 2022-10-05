@@ -21,7 +21,7 @@ const sendCardWithInfos = async (interaction, playerId) => {
       u: interaction.user.id
     }
 
-    if (!options.filter(e => e.label === label).length > 0) {
+    if (!options.filter(e => e.data.label === label).length > 0) {
       const option = new Discord.SelectMenuOptionBuilder()
         .setLabel(label)
         .setDescription(`Games ${e.stats.Matches} (${e.stats['Win Rate %']}%)`)
