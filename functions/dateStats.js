@@ -115,10 +115,10 @@ const getCardWithInfos = async (actionRow, values, type, id, maxMatch, maxPage =
   let from = values.f * 1000 || playerHistory.at(-1).date
   const to = values.t * 1000 || new Date().setHours(+24)
 
-  const filteredHistory = playerHistory.filter(e => e.date >= from && e.date < to).slice(0, maxMatch)
-  const playerStats = generatePlayerStats(filteredHistory)
-
+  const filteredHistory = playerHistory.filter(e => (map ? e.i1 === map : true) && e.date >= from && e.date < to).slice(0, maxMatch)
   if (map) playerHistory = playerHistory.filter(e => e.i1 === map).slice(0, maxMatch)
+
+  const playerStats = generatePlayerStats(filteredHistory)
   const today = new Date().setHours(24, 0, 0, 0)
 
   const checkElo = today >= from && today <= to
@@ -127,6 +127,7 @@ const getCardWithInfos = async (actionRow, values, type, id, maxMatch, maxPage =
   const eloDiff = elo.at(0) - elo.at(-1)
 
   if (!map) playerHistory = filteredHistory
+  if (!playerHistory.length > 0) throw `${playerDatas.nickname} played 0 match on that period.`
   if (updateFrom) from = playerHistory.at(-1).date
 
   const graphBuffer = Graph.generateChart(playerHistoryTo,
