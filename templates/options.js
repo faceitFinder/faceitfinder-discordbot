@@ -27,14 +27,14 @@ const stats = [
 const dateRange = [
   {
     name: 'from_date',
-    description: 'Start date, format MM/DD/YYYY',
+    description: 'INCLUDED. Start date, format MM/DD/YYYY',
     required: false,
     type: ApplicationCommandOptionType.String,
     slash: true
   },
   {
     name: 'to_date',
-    description: 'End date (at least 1 day interval), if empty gets the current day. Format MM/DD/YYYY',
+    description: 'EXCLUDED. End date (at least 1 day interval), if empty gets the current day. Format MM/DD/YYYY',
     required: false,
     type: ApplicationCommandOptionType.String,
     slash: true
