@@ -5,7 +5,7 @@ const DateStats = require('../functions/dateStats')
 const { getCardsConditions } = require('../functions/commands')
 const CustomType = require('../templates/customType')
 const Options = require('../templates/options')
-const { getPageSlice } = require('../functions/pagination')
+const { getPageSlice, getMaxPage } = require('../functions/pagination')
 
 const getMonday = date => {
   const week = [6, 0, 1, 2, 3, 4, 5]
