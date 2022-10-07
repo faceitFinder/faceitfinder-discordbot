@@ -1,4 +1,3 @@
-const { itemByPage } = require('../config.json')
 const Discord = require('discord.js')
 const Player = require('../functions/player')
 const errorCard = require('../templates/errorCard')
@@ -58,7 +57,7 @@ const sendCardWithInfos = async (interaction, playerId, page = 0) => {
     CustomType.TYPES.ELO,
     'uDSG',
     playerStats.lifetime.Matches,
-    Math.floor(options.length / itemByPage),
+    getMaxPage(options),
     page)
 }
 

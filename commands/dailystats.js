@@ -1,4 +1,3 @@
-const { itemByPage } = require('../config.json')
 const Discord = require('discord.js')
 const Player = require('../functions/player')
 const errorCard = require('../templates/errorCard')
@@ -6,7 +5,7 @@ const DateStats = require('../functions/dateStats')
 const { getCardsConditions } = require('../functions/commands')
 const CustomType = require('../templates/customType')
 const Options = require('../templates/options')
-const { getPageSlice } = require('../functions/pagination')
+const { getPageSlice, getMaxPage } = require('../functions/pagination')
 
 const getDay = date => {
   date = new Date(date)
@@ -57,7 +56,7 @@ const sendCardWithInfos = async (interaction, playerId, page = 0) => {
     CustomType.TYPES.ELO,
     'uDSG',
     playerStats.lifetime.Matches,
-    Math.floor(options.length / itemByPage),
+    getMaxPage(options),
     page)
 }
 
