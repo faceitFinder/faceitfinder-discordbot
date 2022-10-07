@@ -1,7 +1,6 @@
 const { color, emojis } = require('../config.json')
 const Discord = require('discord.js')
 const fs = require('fs')
-const Match = require('../functions/match')
 const Steam = require('../functions/steam')
 const Player = require('../functions/player')
 const Graph = require('../functions/graph')
@@ -9,7 +8,7 @@ const errorCard = require('../templates/errorCard')
 const successCard = require('../templates/successCard')
 const Options = require('../templates/options')
 const { getCardsConditions } = require('../functions/commands')
-const { getPagination } = require('../functions/pagination')
+const { getPagination, getPageSlice, getMaxPage } = require('../functions/pagination')
 const { getPlayerHistory } = require('../functions/dateStats')
 
 const getLevelFromElo = (elo) => {
@@ -89,15 +88,13 @@ const getMatchItems = (playerDatas, steamDatas, playerHistory, maxMatch, page, m
 }
 
 const sendCardWithInfos = async (interaction, playerId, matchId = null, page = 0, players = []) => {
-  const maxMatch = 25
   const playerDatas = await Player.getDatas(playerId)
   const playerStats = await Player.getStats(playerId)
   const steamDatas = await Steam.getDatas(playerDatas.steam_id_64).catch(err => err.statusText)
   const playerFullHistory = await getPlayerHistory(playerId, playerStats.lifetime.Matches, true)
   let playerHistory
   const funFactCard = []
-  const firstPage = page * maxMatch
-  const lastPage = firstPage + maxMatch
+  const pagination = getPageSlice(page)
 
   if (players.length > 0) {
     const playerHistoryMatches = (await getPlayerHistory(playerId, playerStats.lifetime.Matches, false))
@@ -110,18 +107,16 @@ const sendCardWithInfos = async (interaction, playerId, matchId = null, page = 0
     funFactCard.push(successCard(`**${playerDatas.nickname}** played ${playerHistoryMatches.length} game(s) with the player(s) selected.\nThis corresponds to ${((playerHistoryMatches.length * 100) / playerStats.lifetime.Matches).toFixed(2)}% of **${playerDatas.nickname}**'s matches played.`).embeds[0])
   } else playerHistory = playerFullHistory
 
-  const maxPage = Math.floor(playerHistory.length / maxMatch)
-
   if (!playerHistory.length > 0)
     return errorCard(`Couldn\'t get the last matches of ${steamDatas?.personaname || steamDatas} ${players.length > 0 ? 'with the requested users.' : ''}`)
 
-  // Removing multiple ids 
+  // Removing multiple ids
   const filteredHistory = playerHistory.map(e => e.matchId).filter((e, i, a) => a.indexOf(e) === i)
+  const maxPage = getMaxPage(filteredHistory)
 
-  if (!matchId) matchId = filteredHistory.slice(firstPage, lastPage).at(0)
+  if (!matchId) matchId = filteredHistory.slice(pagination.start, pagination.end).at(0)
 
   const matchItems = getMatchItems(playerDatas, steamDatas, playerFullHistory, playerFullHistory.length, page, matchId)
-
   const options = filteredHistory.map(e => {
     const matchRounds = playerHistory.filter(matches => matches.matchId === e)
     const match = matchRounds.at(0)
@@ -162,7 +157,7 @@ const sendCardWithInfos = async (interaction, playerId, matchId = null, page = 0
         new Discord.SelectMenuBuilder()
           .setCustomId('lastSelector')
           .setPlaceholder('Select another match')
-          .addOptions(options.slice(firstPage, lastPage))),
+          .addOptions(options.slice(pagination.start, pagination.end))),
     getPagination(page, maxPage, 'pageLast')
   ]
 

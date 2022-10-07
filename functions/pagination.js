@@ -3,11 +3,15 @@ const Discord = require('discord.js')
 const CustomTypeFunc = require('../functions/customType')
 const CustomType = require('../templates/customType')
 
-const getPageSlice = (page) => {
+const getPageSlice = (page, items = itemByPage) => {
   return {
-    start: page * itemByPage,
-    end: (page + 1) * itemByPage
+    start: page * items,
+    end: (page + 1) * items
   }
+}
+
+const getMaxPage = (array, items = itemByPage) => {
+  return Math.floor(array.length / items) - !(array.length % items >= 1)
 }
 
 const getPagination = (page, maxPage, id) => {
@@ -40,5 +44,6 @@ const getPagination = (page, maxPage, id) => {
 
 module.exports = {
   getPagination,
-  getPageSlice
+  getPageSlice,
+  getMaxPage
 }
