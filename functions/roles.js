@@ -10,9 +10,13 @@ const updateRoles = async (client, discordId, guildId, remove = false) => {
 
   const clientGuilds = await client.guilds.fetch()
 
-  clientGuilds.forEach(async (guild) => {
+  clientGuilds.forEach(async (guild, index) => {
     const guildRoles = guilds.find(e => e.id === guild.id)
-    if (!guildRoles) return
+
+    if (!guildRoles) {
+      if (remove && clientGuilds.size >= index) User.remove(discordId)
+      return
+    }
 
     const guildDatas = await guild.fetch()
 
@@ -29,7 +33,7 @@ const updateRoles = async (client, discordId, guildId, remove = false) => {
         const roleToAdd = roleLevels[playerLevel - 1]
         const rolesFit = member.roles.resolve(roleToAdd)
 
-        if (rolesFit) return
+        if (rolesFit && !remove) return
 
         await member.roles.remove(roleLevels).catch(console.error)
 
