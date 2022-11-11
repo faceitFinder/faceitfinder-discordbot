@@ -72,7 +72,7 @@ module.exports = {
     }
   ],
   description: 'Link a steam profile to the discord user, to get your stats directly (no parameters needed).',
-  usage: 'steam_parameter:steam param or @user or CSGO status (max 1 user) OR faceit_parameters:faceit nickname (max 1)',
+  usage: 'steam_parameter:steam param or @user or CSGO status (max 1 user) OR faceit_parameters:faceit nickname (max 1) AND discord_user: @user',
   type: 'utility',
   async execute(interaction) {
     return getCardsConditions(interaction, sendCardWithInfos, 1, 'steam_parameter')
