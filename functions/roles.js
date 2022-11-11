@@ -5,27 +5,28 @@ const Player = require('./player')
 const updateRoles = async (client, discordId, guildId, remove = false) => {
   let users = await User.getAll()
   let guilds = await GuildRoles.getAll()
-  if (discordId) users = [await User.get(discordId)]
+  if (discordId) users = await User.get(discordId)
   if (guildId) guilds = [await GuildRoles.getRolesOf(guildId)]
+
+  if (!guilds.filter(e => e).find(e => e.id === guildId) && remove) User.remove(discordId, guildId)
 
   const clientGuilds = await client.guilds.fetch()
 
-  clientGuilds.forEach(async (guild, index) => {
-    const guildRoles = guilds.find(e => e.id === guild.id)
-
-    if (!guildRoles) {
-      if (remove && clientGuilds.size >= index) User.remove(discordId)
-      return
-    }
-
+  clientGuilds.forEach(async (guild) => {
+    const guildRoles = guilds.filter(e => e).find(e => e.id === guild.id)
     const guildDatas = await guild.fetch()
 
-    guildDatas.members.fetch({ user: users.map(e => e.discordId) })
-      .then(async members => members.forEach(async (member) => {
-        const user = await User.get(member.user.id)
-        if (!user) return
+    if (!guildRoles) return
 
-        const playerDatas = await Player.getDatas(user.faceitId)
+    guildDatas.members.fetch({ user: users.filter(e => e.guildId === guildDatas.id || !e.guildId).map(e => e.discordId) })
+      .then(async members => members.forEach(async (member) => {
+        let user = await User.get(member.user.id)
+        if (!(user.length > 0)) return
+        else if (user.length > 1) user = user.filter(e => e.guildId === guildDatas.id)
+
+        user = user.flat().at(0)
+
+        const playerDatas = await Player.getDatas(user.faceitId).catch(console.error)
         const playerLevel = playerDatas.games.csgo.skill_level
         const roleLevels = Object.keys(Object.entries(guildRoles)[2][1])
           .filter(e => e.startsWith('level')).map(e => guildRoles[e])
@@ -38,7 +39,7 @@ const updateRoles = async (client, discordId, guildId, remove = false) => {
         await member.roles.remove(roleLevels).catch(console.error)
 
         if (remove) {
-          User.remove(discordId)
+          User.remove(discordId, guildId)
           return
         }
 

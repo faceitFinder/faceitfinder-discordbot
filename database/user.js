@@ -1,9 +1,10 @@
 const User = require('./models/userModel')
 
-const create = (discordId, faceitId) => {
+const create = (discordId, faceitId, guildId) => {
   const newUser = new User({
     discordId: discordId,
-    faceitId: faceitId
+    faceitId: faceitId,
+    guildId: guildId
   })
 
   newUser.save((err) => {
@@ -11,13 +12,17 @@ const create = (discordId, faceitId) => {
   })
 }
 
-const get = (discordId) => User.findOne({ discordId: discordId }).exec()
+const get = (discordId) => User.find({ discordId: discordId }).exec()
 
-const remove = (discordId) => User.deleteOne({ discordId: discordId }).exec()
+const getWithGuild = (discordId, guildId = null) => User.findOne({ discordId: discordId, guildId: guildId }).exec()
 
-const exists = (discordId) => get(discordId)
+const remove = (discordId, guildId = null) => guildId ?
+  User.deleteOne({ discordId: discordId, guildId: guildId }).exec() :
+  User.deleteMany({ discordId: discordId }).exec()
 
-const update = (discordId, faceitId) => User.updateOne({ discordId: discordId }, { faceitId: faceitId }).exec()
+const exists = (discordId, guildId = null) => getWithGuild(discordId, guildId)
+
+const update = (discordId, faceitId, guildId = null) => User.updateOne({ discordId: discordId, guildId: guildId }, { faceitId: faceitId }).exec()
 
 const getAll = () => User.find({}).exec()
 
@@ -30,5 +35,6 @@ module.exports = {
   update,
   count,
   remove,
-  getAll
+  getAll,
+  getWithGuild
 }
