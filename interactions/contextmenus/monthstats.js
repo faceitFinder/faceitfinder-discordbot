@@ -7,8 +7,11 @@ module.exports = {
   name: 'monthstats',
   type: 2,
   async execute(interaction) {
-    const user = await User.exists(interaction.targetId)
-    if (!user) return errorCard('This user has not linked his profile')
+    let user = await User.exists(interaction.targetId)
+    if (!user) {
+      user = await User.exists(interaction.targetId, interaction.guildId)
+      if (!user) return errorCard('This user has not linked his profile')
+    }
     await GuildRoles.updateRoles(interaction.client, user.discordId)
     return Monthstats.sendCardWithInfos(interaction, user.faceitId)
   }

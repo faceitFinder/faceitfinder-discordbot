@@ -37,7 +37,6 @@ module.exports = {
             .followUp({
               content: ' ',
               ...errorCard('I do not have the permission to send messages in this channel.'),
-              ephemeral: true
             })
             .catch(console.error)
         })

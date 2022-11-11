@@ -56,7 +56,8 @@ const getUsers = async (
   const steamParameters = getInteractionOption(interaction, steam)
 
   const parameters = []
-  const currentUser = await User.get(interaction.user.id)
+  let currentUser = await User.getWithGuild(interaction.user.id, null)
+  if (!currentUser) currentUser = await User.getWithGuild(interaction.user.id, interaction.guild.id)
 
   if (searchTeam && team) {
     team = await Team.getTeamSlug(team)

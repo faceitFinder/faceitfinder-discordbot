@@ -114,66 +114,14 @@ module.exports = {
       type: Discord.ApplicationCommandOptionType.Subcommand,
       slash: true,
       options: [
-        {
-          name: 'level_1',
-          description: 'The role for the level 1',
-          type: Discord.ApplicationCommandOptionType.Role,
-          required: true
-        },
-        {
-          name: 'level_2',
-          description: 'The role for the level 2',
-          type: Discord.ApplicationCommandOptionType.Role,
-          required: true
-        },
-        {
-          name: 'level_3',
-          description: 'The role for the level 3',
-          type: Discord.ApplicationCommandOptionType.Role,
-          required: true
-        },
-        {
-          name: 'level_4',
-          description: 'The role for the level 4',
-          type: Discord.ApplicationCommandOptionType.Role,
-          required: true
-        },
-        {
-          name: 'level_5',
-          description: 'The role for the level 5',
-          type: Discord.ApplicationCommandOptionType.Role,
-          required: true
-        },
-        {
-          name: 'level_6',
-          description: 'The role for the level 6',
-          type: Discord.ApplicationCommandOptionType.Role,
-          required: true
-        },
-        {
-          name: 'level_7',
-          description: 'The role for the level 7',
-          type: Discord.ApplicationCommandOptionType.Role,
-          required: true
-        },
-        {
-          name: 'level_8',
-          description: 'The role for the level 8',
-          type: Discord.ApplicationCommandOptionType.Role,
-          required: true
-        },
-        {
-          name: 'level_9',
-          description: 'The role for the level 9',
-          type: Discord.ApplicationCommandOptionType.Role,
-          required: true
-        },
-        {
-          name: 'level_10',
-          description: 'The role for the level 10',
-          type: Discord.ApplicationCommandOptionType.Role,
-          required: true
-        },
+        ...Array(10).fill('').map((k, i) => {
+          return {
+            name: `level_${i + 1}`,
+            description: `The role for the level ${i + 1}`,
+            type: Discord.ApplicationCommandOptionType.Role,
+            required: true
+          }
+        }),
         {
           name: 'remove_old',
           description: 'Remove the old roles if they exist.',

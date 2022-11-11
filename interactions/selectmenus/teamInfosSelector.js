@@ -36,7 +36,9 @@ module.exports = {
     const teamUsers = await UserTeam.getTeamUsers(currentTeam.slug)
 
     // check if user is part of the team if not the creator
-    const currentUser = await User.get(interaction.user.id)
+    let currentUser = await User.getWithGuild(interaction.user.id, null)
+    if (!currentUser) currentUser = await User.getWithGuild(interaction.user.id, interaction.guild.id)
+
     if (currentTeam.creator !== interaction.user.id && currentUser) {
       const userIsPartOfTeam = teamUsers.find(user => user.faceitId === currentUser.faceitId)
       if (!userIsPartOfTeam) return {

@@ -28,8 +28,9 @@ const createTeam = async (interaction, currentTeam, user) => {
   return successCard(`Your team: **${teamName}** has been created.`)
 }
 
-const infosTeam = async (currentTeam, user) => {
-  const currentUser = await User.get(user)
+const infosTeam = async (interaction, currentTeam, user) => {
+  let currentUser = await User.getWithGuild(user, null)
+  if (!currentUser) currentUser = await User.getWithGuild(user, interaction.guild.id)
   const userTeams = []
 
   if (currentUser) {
@@ -220,7 +221,7 @@ module.exports = {
     if (!currentTeam && !isInteractionSubcommandEqual(interaction, CREATE) &&
       !isInteractionSubcommandEqual(interaction, INFOS)) return errorCard('You don\'t own a team')
     else if (isInteractionSubcommandEqual(interaction, CREATE)) return createTeam(interaction, currentTeam, user)
-    else if (isInteractionSubcommandEqual(interaction, INFOS)) return infosTeam(currentTeam, user)
+    else if (isInteractionSubcommandEqual(interaction, INFOS)) return infosTeam(interaction, currentTeam, user)
     else if (isInteractionSubcommandEqual(interaction, UPDATE)) return updateTeam(interaction, currentTeam, user)
     else if (isInteractionSubcommandEqual(interaction, DELETE)) return deleteTeam(currentTeam, user)
     else if (isInteractionSubcommandEqual(interaction, ADD_USER)) {
