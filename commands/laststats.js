@@ -53,7 +53,7 @@ const getOptions = () => {
     slash: true,
     choices: getMapChoice()
   },
-    ...Options.dateRange)
+  ...Options.dateRange)
 
   return options
 }

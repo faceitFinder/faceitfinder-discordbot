@@ -218,9 +218,9 @@ const updateOptions = (components, values, updateEmoji = true) => {
     })).at(0)
 }
 
-const getFromTo = (interaction, name_from = 'from_date', name_to = 'to_date') => {
-  const from = new Date(getInteractionOption(interaction, name_from)?.trim())
-  const to = new Date(getInteractionOption(interaction, name_to)?.trim())
+const getFromTo = (interaction, nameFrom = 'from_date', nameTo = 'to_date') => {
+  const from = new Date(getInteractionOption(interaction, nameFrom)?.trim())
+  const to = new Date(getInteractionOption(interaction, nameTo)?.trim())
 
   return { from: new Date(from), to: new Date(to) }
 }
