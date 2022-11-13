@@ -9,15 +9,20 @@ const Discord = require('discord.js')
 const noMention = require('../templates/noMention')
 const { updateRoles } = require('./roles')
 
-const getPlayerDatas = async (param, steam, discord = false) => {
+const getPlayerDatas = async (interaction, param, steam, discord = false) => {
   if (steam) {
     const steamId = await Steam.getId(param)
     return { param: await Player.getId(steamId).catch(() => steamId), discord }
   }
   if (discord) {
-    const user = await User.exists(param)
-    if (user) return { param: user.faceitId, discord }
-    else throw `<@${param}> hasn't linked his profile`
+    const userGuilds = await User.get(param)
+
+    if (userGuilds.length > 0) {
+      let user = userGuilds.find(e => e.guildId === null)
+      if (!user) user = userGuilds.find(e => e.guildId === interaction.guild.id)
+      if (user) return { param: user.faceitId, discord }
+    }
+    throw `<@${param}> hasn't linked his profile`
   }
   return { param, discord }
 }
@@ -132,7 +137,7 @@ const getUsers = async (
 
   return Promise.all(params
     .slice(0, maxUser)
-    .map(e => getPlayerDatas(e.param, e.steam, e.discord)))
+    .map(e => getPlayerDatas(interaction, e.param, e.steam, e.discord)))
 }
 
 const getCardsConditions = async (
