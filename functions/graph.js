@@ -102,8 +102,10 @@ const getClassicDatasets = (datas, i, ctx) => {
     pointBackgroundColor: (segment) => {
       if (segment.raw) return colorFilter(type.color, segment.raw).color
     },
+    spanGaps: true,
     segment: {
       borderColor: (segment) => {
+        if (segment.p0.skip || segment.p1.skip) return 'rgb(0,0,0,0.2)'
         const prev = segment.p0, current = segment.p1
 
         ctx.strokeStyle = getGradient(prev, current, ctx, type)
@@ -115,6 +117,7 @@ const getClassicDatasets = (datas, i, ctx) => {
 
         return 'transparent'
       },
+      borderDash: (segment) => segment.p0.skip || segment.p1.skip ? [6, 6] : undefined,
       borderWidth: 1,
     }
   }
@@ -180,13 +183,7 @@ const roundRect = (ctx, x, y, w, h, r) => {
 const getElo = (maxMatch, matchHistory, playerElo, checkElo = true) => {
   if (matchHistory.length <= 0) throw 'Couldn\'t get matches'
   else if (checkElo && matchHistory[0].elo === undefined) matchHistory[0].elo = playerElo
-
-  const elo = matchHistory.map(e => e.elo)
-  elo.reverse().forEach((e, i) => {
-    if (e === undefined && elo[i - 1] !== undefined) elo[i] = elo[i - 1]
-  })
-
-  return elo.filter(e => e !== undefined).reverse().slice(0, maxMatch)
+  return matchHistory.map(e => e.elo).slice(0, maxMatch)
 }
 
 const getKD = (matchHistory, maxMatch) => {
@@ -208,9 +205,9 @@ const colorFilter = (colors, value) => Object.entries(colors)
 
 const getGraph = (type, matchHistory, faceitElo, maxMatch, check = true) => {
   switch (type) {
-  case CustomType.TYPES.ELO: return getElo(maxMatch, matchHistory, faceitElo, check)
-  case CustomType.TYPES.KD: return getKD(matchHistory, maxMatch)
-  default: break
+    case CustomType.TYPES.ELO: return getElo(maxMatch, matchHistory, faceitElo, check)
+    case CustomType.TYPES.KD: return getKD(matchHistory, maxMatch)
+    default: break
   }
 }
 
