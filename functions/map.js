@@ -39,6 +39,10 @@ const getMapList = () => {
     {
       name: 'Ancient',
       value: 'de_ancient'
+    },
+    {
+      name: 'Anubis',
+      value: 'de_anubis'
     }
   ]
 }
