@@ -104,7 +104,7 @@ const sendCardWithInfo = async (interaction, playerId, matchId = null, page = 0,
     playerHistory = (await getPlayerHistory(playerId, playerStats.lifetime.Matches))
       .filter(m => matchIds.includes(m.matchId))
 
-    funFactCard.push(successCard(`**${playerDatas.nickname}** played ${playerHistoryMatches.length} game(s) with the player(s) selected.\nThis corresponds to ${((playerHistoryMatches.length * 100) / playerStats.lifetime.Matches).toFixed(2)}% of **${playerDatas.nickname}**'s matches played.`).embeds[0])
+    funFactCard.push(successCard(`**${playerDatas.nickname}** played ${playerHistoryMatches.length} game(s) *(${((playerHistoryMatches.length * 100) / playerStats.lifetime.Matches).toFixed(2)}%)* with the player(s) selected.`).embeds[0])
   } else playerHistory = playerFullHistory
 
   if (!playerHistory.length > 0)

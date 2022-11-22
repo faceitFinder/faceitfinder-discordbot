@@ -19,7 +19,7 @@ const getOptions = () => {
 module.exports = {
   name: 'find',
   options: getOptions(),
-  description: 'Find all the games that includes the player requested (up to 5).',
+  description: 'Find the games that includes the player requested (up to 5), last 1000 games.',
   usage: `player_aimed:the history in which one you are searching AND ${Options.usage}`,
   type: 'stats',
   async execute(interaction) {

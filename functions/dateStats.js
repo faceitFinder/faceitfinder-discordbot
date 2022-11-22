@@ -72,7 +72,9 @@ const getPlayerHistory = async (playerId, maxMatch, eloMatches = true) => {
     playerHistory.push(...await Match.getMatchElo(playerId, maxMatch, page))
   else {
     limit = 100
-    for (let page = 0; page < Math.ceil(maxMatch / limit); page++)
+    let max = Math.ceil(maxMatch / limit)
+    max = max > 10 ? 10 : max
+    for (let page = 0; page < max; page++)
       playerHistory.push(...(await Player.getHistory(playerId, limit, page * limit)).items)
   }
   return playerHistory
