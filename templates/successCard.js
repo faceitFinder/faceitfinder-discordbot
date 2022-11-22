@@ -7,7 +7,7 @@ module.exports = (description) => {
       new Discord.EmbedBuilder()
         .setColor(color.primary)
         .setDescription(description)
-        .setFooter({ text: `${name} Infos` })
+        .setFooter({ text: `${name} Info` })
     ]
   }
 }

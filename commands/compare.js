@@ -42,7 +42,7 @@ const getRandomColors = (length) => {
   return colors
 }
 
-const sendCardWithInfos = async (interaction, player1Id, player2Id, type = CustomType.TYPES.ELO, maxMatch = 20) => {
+const sendCardWithInfo = async (interaction, player1Id, player2Id, type = CustomType.TYPES.ELO, maxMatch = 20) => {
   maxMatch = getInteractionOption(interaction, 'match_number') || maxMatch
   const firstUserDatas = await getPlayerDatas(player1Id, maxMatch)
   const secondUserDatas = await getPlayerDatas(player2Id, maxMatch)
@@ -275,8 +275,8 @@ module.exports = {
     if (!player1 || !player2) return errorCard('There is a user missing.')
     else if (player1 === player2) return errorCard('Both users are the same !')
 
-    return sendCardWithInfos(interaction, player1, player2)
+    return sendCardWithInfo(interaction, player1, player2)
   }
 }
 
-module.exports.sendCardWithInfos = sendCardWithInfos
+module.exports.sendCardWithInfo = sendCardWithInfo

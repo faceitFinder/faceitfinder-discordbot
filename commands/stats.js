@@ -10,7 +10,7 @@ const CustomTypeFunc = require('../functions/customType')
 const Options = require('../templates/options')
 const { getCardsConditions } = require('../functions/commands')
 
-const sendCardWithInfos = async (interaction, playerId, type = CustomType.TYPES.ELO) => {
+const sendCardWithInfo = async (interaction, playerId, type = CustomType.TYPES.ELO) => {
   const playerDatas = await Player.getDatas(playerId)
   const steamDatas = await Steam.getDatas(playerDatas.steam_id_64).catch(err => err.statusText)
   const playerStats = await Player.getStats(playerId)
@@ -88,8 +88,8 @@ module.exports = {
   usage: Options.usage,
   type: 'stats',
   async execute(interaction) {
-    return getCardsConditions(interaction, sendCardWithInfos)
+    return getCardsConditions(interaction, sendCardWithInfo)
   }
 }
 
-module.exports.sendCardWithInfos = sendCardWithInfos
+module.exports.sendCardWithInfo = sendCardWithInfo

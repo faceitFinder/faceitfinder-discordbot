@@ -13,7 +13,7 @@ const getDay = date => {
   return date.getTime()
 }
 
-const sendCardWithInfos = async (interaction, playerId, page = 0) => {
+const sendCardWithInfo = async (interaction, playerId, page = 0) => {
   const playerDatas = await Player.getDatas(playerId)
   const playerStats = await Player.getStats(playerId)
 
@@ -51,7 +51,7 @@ const sendCardWithInfos = async (interaction, playerId, page = 0) => {
         .setPlaceholder('Select a day')
         .addOptions(pagination))
 
-  return DateStats.getCardWithInfos(row,
+  return DateStats.getCardWithInfo(row,
     JSON.parse(pagination[0].data.value),
     CustomType.TYPES.ELO,
     'uDSG',
@@ -67,8 +67,8 @@ module.exports = {
   usage: Options.usage,
   type: 'stats',
   async execute(interaction) {
-    return getCardsConditions(interaction, sendCardWithInfos)
+    return getCardsConditions(interaction, sendCardWithInfo)
   }
 }
 
-module.exports.sendCardWithInfos = sendCardWithInfos
+module.exports.sendCardWithInfo = sendCardWithInfo

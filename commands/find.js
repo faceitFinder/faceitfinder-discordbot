@@ -1,7 +1,7 @@
 const { ApplicationCommandOptionType } = require('discord.js')
 const Options = require('../templates/options')
 const { getUsers } = require('../functions/commands')
-const { sendCardWithInfos } = require('./last')
+const { sendCardWithInfo } = require('./last')
 
 const getOptions = () => {
   const options = [...Options.stats]
@@ -26,6 +26,6 @@ module.exports = {
     const playerAimed = (await getUsers(interaction, 1, 'player_aimed', 'player_aimed', false))[0].param
     const users = (await getUsers(interaction, 5)).map(p => p.param)
 
-    return sendCardWithInfos(interaction, playerAimed, null, 0, users.filter(e => e.normalize() !== playerAimed.normalize()))
+    return sendCardWithInfo(interaction, playerAimed, null, 0, users.filter(e => e.normalize() !== playerAimed.normalize()))
   }
 }

@@ -1,4 +1,4 @@
-const { sendCardWithInfos } = require('../selectmenus/dateStatsSelector')
+const { sendCardWithInfo } = require('../selectmenus/dateStatsSelector')
 const CustomType = require('../../templates/customType')
 const loadingCard = require('../../templates/loadingCard')
 const { getDefaultInteractionOption } = require('../../functions/commands')
@@ -14,6 +14,6 @@ module.exports = {
 
     loadingCard(interaction)
 
-    return sendCardWithInfos(interaction, json, CustomType.getType(interaction.component.label))
+    return sendCardWithInfo(interaction, json, CustomType.getType(interaction.component.label))
   }
 }

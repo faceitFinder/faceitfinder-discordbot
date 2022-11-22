@@ -1,5 +1,5 @@
 const { getDefaultInteractionOption } = require('../../functions/commands')
-const { sendCardWithInfos } = require('../../commands/compare')
+const { sendCardWithInfo } = require('../../commands/compare')
 const CustomType = require('../../templates/customType')
 const loadingCard = require('../../templates/loadingCard')
 
@@ -13,6 +13,6 @@ module.exports = {
 
     loadingCard(interaction)
 
-    return sendCardWithInfos(interaction, json.p1, json.p2, CustomType.getType(interaction.component.label), json.m)
+    return sendCardWithInfo(interaction, json.p1, json.p2, CustomType.getType(interaction.component.label), json.m)
   }
 }

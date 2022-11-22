@@ -13,6 +13,6 @@ module.exports = {
       if (!user) return errorCard('This user has not linked his profile')
     }
     await GuildRoles.updateRoles(interaction.client, user.discordId)
-    return Weekstats.sendCardWithInfos(interaction, user.faceitId)
+    return Weekstats.sendCardWithInfo(interaction, user.faceitId)
   }
 }

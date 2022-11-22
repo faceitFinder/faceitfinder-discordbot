@@ -12,6 +12,6 @@ module.exports = {
     loadingCard(interaction)
 
     return await require(`../../commands/${interaction.message.interaction.commandName}.js`)
-      .sendCardWithInfos(interaction, json.s, json.page)
+      .sendCardWithInfo(interaction, json.s, json.page)
   }
 }
