@@ -6,7 +6,7 @@ const successCard = require('../templates/successCard')
 const { updateRoles } = require('../functions/roles')
 const errorCard = require('../templates/errorCard')
 
-const sendCardWithInfos = async (interaction, playerId) => {
+const sendCardWithInfo = async (interaction, playerId) => {
   const discordId = interaction.user.id
   const discordUserId = getInteractionOption(interaction, 'discord_user')
 
@@ -75,6 +75,6 @@ module.exports = {
   usage: 'steam_parameter:steam param or @user or CSGO status (max 1 user) OR faceit_parameters:faceit nickname (max 1) AND discord_user: @user',
   type: 'utility',
   async execute(interaction) {
-    return getCardsConditions(interaction, sendCardWithInfos, 1, 'steam_parameter')
+    return getCardsConditions(interaction, sendCardWithInfo, 1, 'steam_parameter')
   }
 }

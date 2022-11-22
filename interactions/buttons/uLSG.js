@@ -1,5 +1,5 @@
 const { getDefaultInteractionOption } = require('../../functions/commands')
-const { getCardWithInfos } = require('../../functions/dateStats')
+const { getCardWithInfo } = require('../../functions/dateStats')
 const CustomType = require('../../templates/customType')
 const loadingCard = require('../../templates/loadingCard')
 
@@ -19,7 +19,7 @@ module.exports = {
     json.f = from.getTime() / 1000
     json.t = to.setHours(+24) / 1000
 
-    return getCardWithInfos(
+    return getCardWithInfo(
       actionRow, json,
       CustomType.getType(interaction.component.label),
       'uLSG',

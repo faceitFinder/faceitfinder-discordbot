@@ -34,7 +34,7 @@ const setupRoles = async (interaction) => {
 
   const card = new Discord.EmbedBuilder()
     .setAuthor({ name: name, iconURL: 'attachment://logo.png' })
-    .setFooter({ text: `${name} Infos` })
+    .setFooter({ text: `${name} Info` })
 
 
   rolesFields.reverse().forEach((v, i) => card.addFields({ name: `Level ${10 - i}`, value: v, inline: true }))
@@ -83,7 +83,7 @@ const generateRoles = async (interaction) => {
     .setAuthor({ name: name, iconURL: 'attachment://logo.png' })
     .setDescription('The roles have been generated successfully')
     .setColor(color.primary)
-    .setFooter({ text: `${name} Infos` })
+    .setFooter({ text: `${name} Info` })
 
   roles.forEach(e => card.addFields({ name: `Level ${10 - roles.indexOf(e)}`, value: `<@&${e}>`, inline: true }))
 

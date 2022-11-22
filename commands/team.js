@@ -8,7 +8,7 @@ const errorCard = require('../templates/errorCard')
 const { isInteractionSubcommandEqual, getInteractionOption, getCardsConditions } = require('../functions/commands')
 const successCard = require('../templates/successCard')
 
-const INFOS = 'infos'
+const INFO = 'info'
 const CREATE = 'create'
 const DELETE = 'delete'
 const UPDATE = 'update'
@@ -28,7 +28,7 @@ const createTeam = async (interaction, currentTeam, user) => {
   return successCard(`Your team: **${teamName}** has been created.`)
 }
 
-const infosTeam = async (interaction, currentTeam, user) => {
+const infoTeam = async (interaction, currentTeam, user) => {
   let currentUser = await User.getWithGuild(user, null)
   if (!currentUser) currentUser = await User.getWithGuild(user, interaction.guild.id)
   const userTeams = []
@@ -46,7 +46,7 @@ const infosTeam = async (interaction, currentTeam, user) => {
     .map(userteam => {
       if (userteam) return {
         label: userteam.name,
-        description: `Get infos about the team ${userteam.name}`,
+        description: `Get info about the team ${userteam.name}`,
         value: JSON.stringify({
           tn: userteam.slug,
           u: user,
@@ -58,7 +58,7 @@ const infosTeam = async (interaction, currentTeam, user) => {
   const row = new Discord.ActionRowBuilder()
     .addComponents(
       new Discord.SelectMenuBuilder()
-        .setCustomId('teamInfosSelector')
+        .setCustomId('teamInfoSelector')
         .setPlaceholder('Select a team')
         .addOptions(options.slice(0, 25)))
 
@@ -119,8 +119,8 @@ module.exports = {
   name: 'team',
   options: [
     {
-      name: INFOS,
-      description: 'Get informations about your team.',
+      name: INFO,
+      description: 'Get information about your team.',
       type: Discord.ApplicationCommandOptionType.Subcommand,
       slash: true
     },
@@ -212,16 +212,16 @@ module.exports = {
     }
   ],
   description: 'Create a team and link up to 5 users to it (limited to 1 team by discord account).',
-  usage: `\n- \`${CREATE}\` [team name]\n- \`${DELETE}\`\n- \`${UPDATE}\` [access] {name}\n- \`${INFOS}\`\n- \`${ADD_USER}\` [steamID / steam custom ID / url of one steam profile / @user / CSGO status OR faceit nicknames]\n- \`${REMOVE_USER}\` [steamID / steam custom ID / url of one steam profile / @user / CSGO status OR faceit nicknames]`,
+  usage: `\n- \`${CREATE}\` [team name]\n- \`${DELETE}\`\n- \`${UPDATE}\` [access] {name}\n- \`${INFO}\`\n- \`${ADD_USER}\` [steamID / steam custom ID / url of one steam profile / @user / CSGO status OR faceit nicknames]\n- \`${REMOVE_USER}\` [steamID / steam custom ID / url of one steam profile / @user / CSGO status OR faceit nicknames]`,
   type: 'utility',
   async execute(interaction) {
     const user = interaction.user.id
     const currentTeam = await Team.getCreatorTeam(user)
 
     if (!currentTeam && !isInteractionSubcommandEqual(interaction, CREATE) &&
-      !isInteractionSubcommandEqual(interaction, INFOS)) return errorCard('You don\'t own a team')
+      !isInteractionSubcommandEqual(interaction, INFO)) return errorCard('You don\'t own a team')
     else if (isInteractionSubcommandEqual(interaction, CREATE)) return createTeam(interaction, currentTeam, user)
-    else if (isInteractionSubcommandEqual(interaction, INFOS)) return infosTeam(interaction, currentTeam, user)
+    else if (isInteractionSubcommandEqual(interaction, INFO)) return infoTeam(interaction, currentTeam, user)
     else if (isInteractionSubcommandEqual(interaction, UPDATE)) return updateTeam(interaction, currentTeam, user)
     else if (isInteractionSubcommandEqual(interaction, DELETE)) return deleteTeam(currentTeam, user)
     else if (isInteractionSubcommandEqual(interaction, ADD_USER)) {

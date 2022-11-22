@@ -1,7 +1,7 @@
 const { ApplicationCommandOptionType } = require('discord.js')
 const Options = require('../templates/options')
 const { getUsers } = require('../functions/commands')
-const { sendCardWithInfos } = require('./last')
+const { sendCardWithInfo } = require('./last')
 
 const getOptions = () => {
   const options = [...Options.stats]
@@ -19,13 +19,13 @@ const getOptions = () => {
 module.exports = {
   name: 'find',
   options: getOptions(),
-  description: 'Find all the games that includes the player requested (up to 5).',
+  description: 'Find the games that includes the player requested (up to 5), last 1000 games.',
   usage: `player_aimed:the history in which one you are searching AND ${Options.usage}`,
   type: 'stats',
   async execute(interaction) {
     const playerAimed = (await getUsers(interaction, 1, 'player_aimed', 'player_aimed', false))[0].param
     const users = (await getUsers(interaction, 5)).map(p => p.param)
 
-    return sendCardWithInfos(interaction, playerAimed, null, 0, users.filter(e => e.normalize() !== playerAimed.normalize()))
+    return sendCardWithInfo(interaction, playerAimed, null, 0, users.filter(e => e.normalize() !== playerAimed.normalize()))
   }
 }

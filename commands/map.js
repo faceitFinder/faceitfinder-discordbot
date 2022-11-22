@@ -6,7 +6,7 @@ const { getCardsConditions, getInteractionOption } = require('../functions/comma
 const mapSelector = require('../interactions/selectmenus/mapSelector')
 const { getMapChoice } = require('../functions/map')
 
-const sendCardWithInfos = async (interaction, playerId) => {
+const sendCardWithInfo = async (interaction, playerId) => {
   const playerStats = await Player.getStats(playerId)
   const playerDatas = await Player.getDatas(playerId)
 
@@ -44,7 +44,7 @@ const sendCardWithInfos = async (interaction, playerId) => {
     )
 
   return {
-    ...await mapSelector.sendCardWithInfos(playerId, map, '5v5'),
+    ...await mapSelector.sendCardWithInfo(playerId, map, '5v5'),
     content: map ? ' ' : `Select one of the following maps to get the stats related (${playerDatas.nickname})`,
     components: [row]
   }
@@ -71,6 +71,6 @@ module.exports = {
   usage: `map:choose a map name AND ${Options.usage}`,
   type: 'stats',
   async execute(interaction) {
-    return getCardsConditions(interaction, sendCardWithInfos)
+    return getCardsConditions(interaction, sendCardWithInfo)
   }
 }

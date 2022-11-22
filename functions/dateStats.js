@@ -72,7 +72,9 @@ const getPlayerHistory = async (playerId, maxMatch, eloMatches = true) => {
     playerHistory.push(...await Match.getMatchElo(playerId, maxMatch, page))
   else {
     limit = 100
-    for (let page = 0; page < Math.ceil(maxMatch / limit); page++)
+    let max = Math.ceil(maxMatch / limit)
+    max = max > 10 ? 10 : max
+    for (let page = 0; page < max; page++)
       playerHistory.push(...(await Player.getHistory(playerId, limit, page * limit)).items)
   }
   return playerHistory
@@ -98,7 +100,7 @@ const setOptionDefault = option => {
   return option
 }
 
-const getCardWithInfos = async (actionRow, values, type, id, maxMatch, maxPage = null, page = null, map = null, updateFrom = false) => {
+const getCardWithInfo = async (actionRow, values, type, id, maxMatch, maxPage = null, page = null, map = null, updateFrom = false) => {
   const playerId = values.s
   const playerDatas = await Player.getDatas(playerId)
   const steamDatas = await Steam.getDatas(playerDatas.steam_id_64).catch(err => err.statusText)
@@ -227,7 +229,7 @@ const getFromTo = (interaction, nameFrom = 'from_date', nameTo = 'to_date') => {
 
 module.exports = {
   getDates,
-  getCardWithInfos,
+  getCardWithInfo,
   setOptionDefault,
   getPlayerHistory,
   generatePlayerStats,

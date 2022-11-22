@@ -132,7 +132,14 @@ const getCompareDatasets = (datas, i, ctx) => {
     yAxisID: 'y0',
     pointBackgroundColor: playerColor,
     borderColor: playerColor,
-    borderWidth: 2
+    segment: {
+      borderDash: (segment) => segment.p0.skip || segment.p1.skip ? [6, 6] : undefined,
+      borderColor: (segment) => {
+        if (segment.p0.skip || segment.p1.skip) return 'rgb(0,0,0,0.2)'
+      }
+    },
+    borderWidth: 2,
+    spanGaps: true
   }
 }
 
@@ -205,9 +212,9 @@ const colorFilter = (colors, value) => Object.entries(colors)
 
 const getGraph = (type, matchHistory, faceitElo, maxMatch, check = true) => {
   switch (type) {
-  case CustomType.TYPES.ELO: return getElo(maxMatch, matchHistory, faceitElo, check)
-  case CustomType.TYPES.KD: return getKD(matchHistory, maxMatch)
-  default: break
+    case CustomType.TYPES.ELO: return getElo(maxMatch, matchHistory, faceitElo, check)
+    case CustomType.TYPES.KD: return getKD(matchHistory, maxMatch)
+    default: break
   }
 }
 

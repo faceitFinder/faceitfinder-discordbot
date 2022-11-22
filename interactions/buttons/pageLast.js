@@ -1,4 +1,4 @@
-const { sendCardWithInfos } = require('../../commands/last')
+const { sendCardWithInfo } = require('../../commands/last')
 const loadingCard = require('../../templates/loadingCard')
 
 module.exports = {
@@ -14,6 +14,6 @@ module.exports = {
 
     loadingCard(interaction)
 
-    return sendCardWithInfos(interaction, json.s, null, json.page, players)
+    return sendCardWithInfo(interaction, json.s, null, json.page, players)
   }
 }

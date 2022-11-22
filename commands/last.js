@@ -87,7 +87,7 @@ const getMatchItems = (playerDatas, steamDatas, playerHistory, maxMatch, page, m
   }
 }
 
-const sendCardWithInfos = async (interaction, playerId, matchId = null, page = 0, players = []) => {
+const sendCardWithInfo = async (interaction, playerId, matchId = null, page = 0, players = []) => {
   const playerDatas = await Player.getDatas(playerId)
   const playerStats = await Player.getStats(playerId)
   const steamDatas = await Steam.getDatas(playerDatas.steam_id_64).catch(err => err.statusText)
@@ -104,7 +104,7 @@ const sendCardWithInfos = async (interaction, playerId, matchId = null, page = 0
     playerHistory = (await getPlayerHistory(playerId, playerStats.lifetime.Matches))
       .filter(m => matchIds.includes(m.matchId))
 
-    funFactCard.push(successCard(`**${playerDatas.nickname}** played ${playerHistoryMatches.length} game(s) with the player(s) selected.\nThis corresponds to ${((playerHistoryMatches.length * 100) / playerStats.lifetime.Matches).toFixed(2)}% of **${playerDatas.nickname}**'s matches played.`).embeds[0])
+    funFactCard.push(successCard(`**${playerDatas.nickname}** played ${playerHistoryMatches.length} game(s) *(${((playerHistoryMatches.length * 100) / playerStats.lifetime.Matches).toFixed(2)}%)* with the player(s) selected.`).embeds[0])
   } else playerHistory = playerFullHistory
 
   if (!playerHistory.length > 0)
@@ -141,12 +141,12 @@ const sendCardWithInfos = async (interaction, playerId, matchId = null, page = 0
     new Discord.ActionRowBuilder()
       .addComponents(
         new Discord.SelectMenuBuilder()
-          .setCustomId('lastSelectorInfos')
+          .setCustomId('lastSelectorInfo')
           .setPlaceholder('Select one of the match bellow.')
           .setDisabled(true)
           .setOptions([{
-            label: 'Last match stats infos.',
-            description: 'Infos about the last match.',
+            label: 'Last match stats info.',
+            description: 'Info about the last match.',
             value: JSON.stringify({
               u: interaction.user.id,
               s: playerId
@@ -187,9 +187,9 @@ module.exports = {
   usage: Options.usage,
   type: 'stats',
   async execute(interaction) {
-    return getCardsConditions(interaction, sendCardWithInfos)
+    return getCardsConditions(interaction, sendCardWithInfo)
   },
 }
 
-module.exports.sendCardWithInfos = sendCardWithInfos
+module.exports.sendCardWithInfo = sendCardWithInfo
 module.exports.getMatchItems = getMatchItems

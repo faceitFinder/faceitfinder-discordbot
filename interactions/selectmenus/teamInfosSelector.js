@@ -9,7 +9,7 @@ const Steam = require('../../functions/steam')
 const errorCard = require('../../templates/errorCard')
 
 module.exports = {
-  name: 'teamInfosSelector',
+  name: 'teamInfoSelector',
   async execute(interaction) {
     const values = JSON.parse(interaction.values)
     if (values.u !== interaction.user.id) return
@@ -28,7 +28,7 @@ module.exports = {
     const components = new Discord.ActionRowBuilder()
       .addComponents(
         new Discord.SelectMenuBuilder()
-          .setCustomId('teamInfosSelector')
+          .setCustomId('teamInfoSelector')
           .addOptions(options))
 
     loadingCard(interaction)
@@ -49,7 +49,7 @@ module.exports = {
       }
     }
 
-    const usersInfos = await Promise.all(teamUsers.map(async user => {
+    const usersInfo = await Promise.all(teamUsers.map(async user => {
       const playerDatas = await Player.getDatas(user.faceitId)
 
       return {
@@ -63,7 +63,7 @@ module.exports = {
       .setTitle(`${currentTeam.name}`)
       .setDescription(`**Slug**: ${currentTeam?.slug}\n**Public Access**: ${currentTeam.access ? 'Yes' : 'No'}`)
 
-    if (usersInfos.length > 0) usersInfos.forEach(user => {
+    if (usersInfo.length > 0) usersInfo.forEach(user => {
       embed.addFields({
         name: `${user.faceit.nickname}`,
         value: `[Steam](https://steamcommunity.com/profiles/${user.faceit.games.csgo.game_player_id})\n[Faceit](https://www.faceit.com/fr/players/${user.faceit.nickname})`,

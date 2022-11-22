@@ -7,7 +7,7 @@ const Graph = require('../../functions/graph')
 const loadingCard = require('../../templates/loadingCard')
 const errorCard = require('../../templates/errorCard')
 
-const sendCardWithInfos = async (playerId, map, mode) => {
+const sendCardWithInfo = async (playerId, map, mode) => {
   if (!map) return
   const playerDatas = await Player.getDatas(playerId)
   const playerStats = await Player.getStats(playerId)
@@ -78,11 +78,11 @@ module.exports = {
     loadingCard(interaction)
 
     return {
-      ...await sendCardWithInfos(values.s, values.m, values.v),
+      ...await sendCardWithInfo(values.s, values.m, values.v),
       content: null,
       components: [components]
     }
   }
 }
 
-module.exports.sendCardWithInfos = sendCardWithInfos
+module.exports.sendCardWithInfo = sendCardWithInfo

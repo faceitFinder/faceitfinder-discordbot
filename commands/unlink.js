@@ -5,7 +5,7 @@ const { updateRoles } = require('../functions/roles')
 const errorCard = require('../templates/errorCard')
 const successCard = require('../templates/successCard')
 
-const sendCardWithInfos = async (interaction) => {
+const sendCardWithInfo = async (interaction) => {
   const discordId = interaction.user.id
 
   if (await User.exists(discordId) || getInteractionOption(interaction, 'global')) {
@@ -34,6 +34,6 @@ module.exports = {
   usage: '',
   type: 'utility',
   async execute(interaction) {
-    return sendCardWithInfos(interaction)
+    return sendCardWithInfo(interaction)
   }
 }
