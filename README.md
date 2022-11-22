@@ -22,7 +22,7 @@ git clone git@github.com:JustDams/faceitFinder.git
 cd faceitFinder
 ```
 
-Rename the `.env.example` to `.env` and complete/update it with yours informations.
+Rename the `.env.example` to `.env` and complete/update it with your information.
 
 **Run docker on a dev environment:**
 

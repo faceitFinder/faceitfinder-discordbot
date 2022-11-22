@@ -31,7 +31,7 @@ const getCommandsHelp = (commandName, card) => {
 
   command.options.forEach(o => { if (o.description) optionsDesc += `\`${o.name}\`: ${o.description}\n` })
 
-  card.setDescription(`Informations about the ${command.name} command`)
+  card.setDescription(`Information about the ${command.name} command`)
     .addFields({ name: 'Description', value: command.description },
       { name: 'Options', value: optionsDesc.length > 0 ? optionsDesc : 'This command do not required options' },
       { name: 'Usage', value: `/${command.name} ${command.usage}` })

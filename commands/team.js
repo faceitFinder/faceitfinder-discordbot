@@ -120,7 +120,7 @@ module.exports = {
   options: [
     {
       name: INFO,
-      description: 'Get informations about your team.',
+      description: 'Get information about your team.',
       type: Discord.ApplicationCommandOptionType.Subcommand,
       slash: true
     },
