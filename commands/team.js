@@ -1,7 +1,7 @@
+const { maxLengthTeamName } = require('../config.json')
 const Discord = require('discord.js')
 const Team = require('../database/team')
 const UserTeam = require('../database/userTeam')
-const Steam = require('../functions/steam')
 const Player = require('../functions/player')
 const User = require('../database/user')
 const errorCard = require('../templates/errorCard')
@@ -14,7 +14,6 @@ const DELETE = 'delete'
 const UPDATE = 'update'
 const ADD_USER = 'add_user'
 const REMOVE_USER = 'remove_user'
-const maxLengthTeamName = 14
 
 const createTeam = async (interaction, currentTeam, user) => {
   if (currentTeam) return errorCard(`You already own the team: **${currentTeam.name}**`)

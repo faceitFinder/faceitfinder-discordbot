@@ -30,7 +30,7 @@ module.exports = {
       slash: true
     }
   ],
-  description: 'Unlink your steam id to the discord bot.',
+  description: 'Unlink your faceit id from the discord bot.',
   usage: '',
   type: 'utility',
   async execute(interaction) {

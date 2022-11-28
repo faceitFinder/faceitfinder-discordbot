@@ -44,7 +44,7 @@ module.exports = {
   options: [
     {
       name: 'command',
-      description: 'One of the command name.',
+      description: 'The name of one command.',
       required: false,
       type: Discord.ApplicationCommandOptionType.String,
       slash: true,
