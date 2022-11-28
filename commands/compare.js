@@ -108,7 +108,7 @@ const sendCardWithInfo = async (interaction, player1Id, player2Id, type = Custom
     {
       name: 'Deaths', value: `**${dateStatsDatas.at(0).deaths}** - \
       ${dateStatsDatas.at(1).deaths} ${compareStats(dateStatsDatas.at(0).deaths,
-  dateStatsDatas.at(1).deaths)}`, inline: true
+  dateStatsDatas.at(1).deaths, false)}`, inline: true
     },
     {
       name: 'Average K/D',
