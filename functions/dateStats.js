@@ -113,6 +113,10 @@ const getCardWithInfo = async (actionRow, values, type, id, maxMatch, maxPage = 
   const size = 40
 
   let playerHistory = await getPlayerHistory(playerId, pStats.lifetime.Matches)
+  playerHistory = playerHistory.map((e, i, a) => {
+    e.elo = isNaN(e.elo) ? a[i - 1].elo ?? undefined : e.elo
+    return e
+  })
 
   let from = values.f * 1000 || playerHistory.at(-1).date
   const to = values.t * 1000 || new Date().setHours(+24)
