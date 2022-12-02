@@ -114,7 +114,7 @@ const getCardWithInfo = async (actionRow, values, type, id, maxMatch, maxPage = 
 
   let playerHistory = await getPlayerHistory(playerId, pStats.lifetime.Matches)
   playerHistory = playerHistory.map((e, i, a) => {
-    e.elo = isNaN(e.elo) ? a[i - 1].elo ?? undefined : e.elo
+    e.elo = isNaN(e.elo) ? a[i - 1]?.elo ?? undefined : e.elo
     return e
   })
 
