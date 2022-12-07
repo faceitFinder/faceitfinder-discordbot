@@ -166,6 +166,11 @@
         "name": "de_train",
         "id": "986939219295498290",
         "balise": "<:de_train:986939219295498290>"
+      },
+      "de_anubis": {
+        "name": "de_anubis",
+        "id": "1050088011016192020",
+        "balise": "<:de_anubis:1050088011016192020>"
       }
     },
     "select": {
