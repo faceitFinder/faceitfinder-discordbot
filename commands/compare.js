@@ -72,14 +72,6 @@ const sendCardWithInfo = async (interaction, player1Id, player2Id, type = Custom
 
   if (map) head.push({ name: 'Map', value: map, inline: true })
 
-  const head = [{
-    name: 'Matches Compared',
-    value: playerWithLessMatch.playerHistory.length.toString(),
-    inline: true
-  }]
-
-  if (map) head.push({ name: 'Map', value: map, inline: true })
-
   const card = new Discord.EmbedBuilder()
     .setAuthor({
       name: firstUserDatas.playerDatas.nickname,
