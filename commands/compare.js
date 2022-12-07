@@ -8,6 +8,7 @@ const CustomType = require('../templates/customType')
 const Graph = require('../functions/graph')
 const errorCard = require('../templates/errorCard')
 const { getMapChoice } = require('../functions/map')
+const { getMapChoice } = require('../functions/map')
 
 const compareStats = (stats1, stats2, positive = true) => {
   if (positive) {
@@ -24,17 +25,17 @@ const compareStats = (stats1, stats2, positive = true) => {
 const getPlayerDatas = async (playerId, maxMatch, map) => {
   const playerStats = await Player.getStats(playerId)
   const playerDatas = await Player.getDatas(playerId)
-  const playerHistory = await DateStats.getPlayerHistory(playerId, maxMatch)
+  const playerHistory = await DateStats.getPlayerHistory(playerId, map ? null : maxMatch)
   let filteredHistory = playerHistory
 
-  if (map !== null) filteredHistory = playerHistory.filter(e => e.i1 === map)
+  if (map !== null) filteredHistory = playerHistory.filter(e => e.i1 === map).slice(0, maxMatch)
 
   return {
     playerId,
     playerDatas,
     playerStats,
     playerHistory: filteredHistory,
-    maxMatch: playerHistory.length
+    maxMatch: filteredHistory.length
   }
 }
 
