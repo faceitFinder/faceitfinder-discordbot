@@ -7,6 +7,7 @@ const CustomTypeFunc = require('../functions/customType')
 const CustomType = require('../templates/customType')
 const Graph = require('../functions/graph')
 const errorCard = require('../templates/errorCard')
+const { getMapChoice } = require('../functions/map')
 
 const compareStats = (stats1, stats2, positive = true) => {
   if (positive) {
@@ -20,16 +21,20 @@ const compareStats = (stats1, stats2, positive = true) => {
   return emojis.even.balise
 }
 
-const getPlayerDatas = async (playerId, maxMatch) => {
+const getPlayerDatas = async (playerId, maxMatch, map) => {
   const playerStats = await Player.getStats(playerId)
   const playerDatas = await Player.getDatas(playerId)
-  const playerHistory = await DateStats.getPlayerHistory(playerId, maxMatch)
+  const playerHistory = await DateStats.getPlayerHistory(playerId, map ? null : maxMatch)
+  let filteredHistory = playerHistory
+
+  if (map !== null) filteredHistory = playerHistory.filter(e => e.i1 === map).slice(0, maxMatch)
 
   return {
     playerId,
     playerDatas,
     playerStats,
-    playerHistory
+    playerHistory: filteredHistory,
+    maxMatch: filteredHistory.length
   }
 }
 
@@ -42,20 +47,30 @@ const getRandomColors = (length) => {
   return colors
 }
 
-const sendCardWithInfo = async (interaction, player1Id, player2Id, type = CustomType.TYPES.ELO, maxMatch = 20) => {
+const sendCardWithInfo = async (interaction, player1Id, player2Id, type = CustomType.TYPES.ELO, maxMatch = 20, map = null) => {
   maxMatch = getInteractionOption(interaction, 'match_number') || maxMatch
-  const firstUserDatas = await getPlayerDatas(player1Id, maxMatch)
-  const secondUserDatas = await getPlayerDatas(player2Id, maxMatch)
+  map = getInteractionOption(interaction, 'map') || map
+
+  const firstUserDatas = await getPlayerDatas(player1Id, maxMatch, map)
+  const secondUserDatas = await getPlayerDatas(player2Id, maxMatch, map)
   const playerWithLessMatch = [firstUserDatas, secondUserDatas]
-    .sort((a, b) => a.playerHistory.length - b.playerHistory.length)[0]
-  maxMatch = playerWithLessMatch.playerHistory.length
-  const buttonValues = {
-    id: 'uCSG',
-    u: interaction.user.id
-  }
+    .sort((a, b) => a.maxMatch - b.maxMatch)[0]
+  const buttonValues = { id: 'uCSG', u: interaction.user.id }
+
+  if (map) buttonValues.c = map
+
+  maxMatch = playerWithLessMatch.maxMatch
 
   const dateStatsDatas = [firstUserDatas, secondUserDatas]
     .map(userDatas => DateStats.generatePlayerStats(userDatas.playerHistory))
+
+  const head = [{
+    name: 'Matches Compared',
+    value: playerWithLessMatch.playerHistory.length.toString(),
+    inline: true
+  }]
+
+  if (map) head.push({ name: 'Map', value: map, inline: true })
 
   const card = new Discord.EmbedBuilder()
     .setAuthor({
@@ -64,126 +79,129 @@ const sendCardWithInfo = async (interaction, player1Id, player2Id, type = Custom
     })
     .setDescription(`Comparison between [${firstUserDatas.playerDatas.nickname}](https://www.faceit.com/fr/players/${firstUserDatas.playerDatas.nickname}) and [${secondUserDatas.playerDatas.nickname}](https://www.faceit.com/fr/players/${secondUserDatas.playerDatas.nickname})`)
     .setColor(color.primary)
-    .addFields({
-      name: 'Matches Compared',
-      value: maxMatch.toString(),
-      inline: true
-    },
-    {
-      name: 'From',
-      value: new Date(playerWithLessMatch.playerHistory.at(-1).date).toDateString(),
-      inline: false
-    },
-    {
-      name: 'Winrate',
-      value: `**${dateStatsDatas.at(0).winrate}%** - \
+    .addFields(
+      ...head,
+      {
+        name: 'From',
+        value: new Date(playerWithLessMatch.playerHistory.at(-1).date).toDateString(),
+        inline: false
+      },
+      {
+        name: 'Winrate',
+        value: `**${dateStatsDatas.at(0).winrate}%** - \
         ${dateStatsDatas.at(1).winrate}% \
         ${compareStats(dateStatsDatas.at(0).winrate, dateStatsDatas.at(1).winrate)}`,
-      inline: true
-    },
-    {
-      name: 'Elo',
-      value: `**${firstUserDatas.playerDatas.games.csgo.faceit_elo}** - \
+        inline: true
+      },
+      {
+        name: 'Elo',
+        value: `**${firstUserDatas.playerDatas.games.csgo.faceit_elo}** - \
         ${secondUserDatas.playerDatas.games.csgo.faceit_elo} ${compareStats(firstUserDatas.playerDatas.games.csgo.faceit_elo,
-  secondUserDatas.playerDatas.games.csgo.faceit_elo)}`,
-      inline: true
-    },
-    {
-      name: 'Average MVPs',
-      value: `**${dateStatsDatas.at(0)['Average MVPs']}** - \
+          secondUserDatas.playerDatas.games.csgo.faceit_elo)}`,
+        inline: true
+      },
+      {
+        name: 'Average MVPs',
+        value: `**${dateStatsDatas.at(0)['Average MVPs']}** - \
         ${dateStatsDatas.at(1)['Average MVPs']} ${compareStats(dateStatsDatas.at(0)['Average MVPs'],
-  dateStatsDatas.at(1)['Average MVPs'])}`,
-      inline: true
-    },
-    {
-      name: 'K/D', value: `**${dateStatsDatas.at(0).kd}** - \
+          dateStatsDatas.at(1)['Average MVPs'])}`,
+        inline: true
+      },
+      {
+        name: 'K/D', value: `**${dateStatsDatas.at(0).kd}** - \
       ${dateStatsDatas.at(1).kd} ${compareStats(dateStatsDatas.at(0).kd,
-  dateStatsDatas.at(1).kd)}`, inline: true
-    },
-    {
-      name: 'Kills', value: `**${dateStatsDatas.at(0).kills}** - \
+          dateStatsDatas.at(1).kd)}`, inline: true
+      },
+      {
+        name: 'Kills', value: `**${dateStatsDatas.at(0).kills}** - \
       ${dateStatsDatas.at(1).kills} ${compareStats(dateStatsDatas.at(0).kills,
-  dateStatsDatas.at(1).kills)}`, inline: true
-    },
-    {
-      name: 'Deaths', value: `**${dateStatsDatas.at(0).deaths}** - \
+          dateStatsDatas.at(1).kills)}`, inline: true
+      },
+      {
+        name: 'Deaths', value: `**${dateStatsDatas.at(0).deaths}** - \
       ${dateStatsDatas.at(1).deaths} ${compareStats(dateStatsDatas.at(0).deaths,
-  dateStatsDatas.at(1).deaths, false)}`, inline: true
-    },
-    {
-      name: 'Average K/D',
-      value: `**${dateStatsDatas.at(0)['Average K/D']}** - \
+          dateStatsDatas.at(1).deaths, false)}`, inline: true
+      },
+      {
+        name: 'Average K/D',
+        value: `**${dateStatsDatas.at(0)['Average K/D']}** - \
         ${dateStatsDatas.at(1)['Average K/D']} ${compareStats(dateStatsDatas.at(0)['Average K/D'],
-  dateStatsDatas.at(1)['Average K/D'])}`,
-      inline: true
-    },
-    {
-      name: 'Average K/R',
-      value: `**${dateStatsDatas.at(0)['Average K/R']}** - \
+          dateStatsDatas.at(1)['Average K/D'])}`,
+        inline: true
+      },
+      {
+        name: 'Average K/R',
+        value: `**${dateStatsDatas.at(0)['Average K/R']}** - \
         ${dateStatsDatas.at(1)['Average K/R']} ${compareStats(dateStatsDatas.at(0)['Average K/R'],
-  dateStatsDatas.at(1)['Average K/R'])}`,
-      inline: true
-    },
-    {
-      name: 'Average HS',
-      value: `**${dateStatsDatas.at(0)['Average HS']}%** - \
+          dateStatsDatas.at(1)['Average K/R'])}`,
+        inline: true
+      },
+      {
+        name: 'Average HS',
+        value: `**${dateStatsDatas.at(0)['Average HS']}%** - \
         ${dateStatsDatas.at(1)['Average HS']}% ${compareStats(dateStatsDatas.at(0)['Average HS'],
-  dateStatsDatas.at(1)['Average HS'])}`,
-      inline: true
-    },
-    {
-      name: 'Average Kills',
-      value: `**${dateStatsDatas.at(0)['Average Kills']}** - \
+          dateStatsDatas.at(1)['Average HS'])}`,
+        inline: true
+      },
+      {
+        name: 'Average Kills',
+        value: `**${dateStatsDatas.at(0)['Average Kills']}** - \
         ${dateStatsDatas.at(1)['Average Kills']} ${compareStats(dateStatsDatas.at(0)['Average Kills'],
-  dateStatsDatas.at(1)['Average Kills'])}`,
-      inline: true
-    },
-    {
-      name: 'Average Deaths',
-      value: `**${dateStatsDatas.at(0)['Average Deaths']}** - \
+          dateStatsDatas.at(1)['Average Kills'])}`,
+        inline: true
+      },
+      {
+        name: 'Average Deaths',
+        value: `**${dateStatsDatas.at(0)['Average Deaths']}** - \
         ${dateStatsDatas.at(1)['Average Deaths']} ${compareStats(dateStatsDatas.at(0)['Average Deaths'],
-  dateStatsDatas.at(1)['Average Deaths'], false)}`,
-      inline: true
-    },
-    {
-      name: 'Average Assists',
-      value: `**${dateStatsDatas.at(0)['Average Assists']}** - \
+          dateStatsDatas.at(1)['Average Deaths'], false)}`,
+        inline: true
+      },
+      {
+        name: 'Average Assists',
+        value: `**${dateStatsDatas.at(0)['Average Assists']}** - \
         ${dateStatsDatas.at(1)['Average Assists']} ${compareStats(dateStatsDatas.at(0)['Average Assists'],
-  dateStatsDatas.at(1)['Average Assists'])}`,
-      inline: true
-    },
-    {
-      name: 'Red K/D',
-      value: `**${dateStatsDatas.at(0)['Red K/D']}** - \
+          dateStatsDatas.at(1)['Average Assists'])}`,
+        inline: true
+      },
+      {
+        name: 'Red K/D',
+        value: `**${dateStatsDatas.at(0)['Red K/D']}** - \
         ${dateStatsDatas.at(1)['Red K/D']} ${compareStats(dateStatsDatas.at(0)['Red K/D'],
-  dateStatsDatas.at(1)['Red K/D'], false)}`,
-      inline: true
-    },
-    {
-      name: 'Orange K/D',
-      value: `**${dateStatsDatas.at(0)['Orange K/D']}** - \
+          dateStatsDatas.at(1)['Red K/D'], false)}`,
+        inline: true
+      },
+      {
+        name: 'Orange K/D',
+        value: `**${dateStatsDatas.at(0)['Orange K/D']}** - \
         ${dateStatsDatas.at(1)['Orange K/D']} ${compareStats(dateStatsDatas.at(0)['Orange K/D'],
-  dateStatsDatas.at(1)['Orange K/D'], false)}`,
-      inline: true
-    },
-    {
-      name: 'Green K/D',
-      value: `**${dateStatsDatas.at(0)['Green K/D']}** - \
+          dateStatsDatas.at(1)['Orange K/D'], false)}`,
+        inline: true
+      },
+      {
+        name: 'Green K/D',
+        value: `**${dateStatsDatas.at(0)['Green K/D']}** - \
         ${dateStatsDatas.at(1)['Green K/D']} ${compareStats(dateStatsDatas.at(0)['Green K/D'],
-  dateStatsDatas.at(1)['Green K/D'])}`,
-      inline: true
-    })
+          dateStatsDatas.at(1)['Green K/D'])}`,
+        inline: true
+      })
     .setImage('attachment://graph.png')
 
-  const option = {
+  const options = [{
     label: `Compare ${firstUserDatas.playerDatas.nickname} and ${secondUserDatas.playerDatas.nickname}`,
     value: JSON.stringify({
       p1: firstUserDatas.playerId,
       p2: secondUserDatas.playerId,
-      m: maxMatch
     }),
     default: true
-  }
+  },
+  {
+    label: 'Datas',
+    value: JSON.stringify({
+      m: maxMatch,
+      c: map
+    })
+  }]
 
   const playerColor = getRandomColors(2)
 
@@ -211,7 +229,7 @@ const sendCardWithInfo = async (interaction, player1Id, player2Id, type = Custom
       new Discord.ActionRowBuilder()
         .addComponents(new Discord.SelectMenuBuilder()
           .setCustomId('compareStatsSelector')
-          .addOptions([option])
+          .addOptions(options)
           .setDisabled(true)),
       new Discord.ActionRowBuilder()
         .addComponents([
@@ -264,9 +282,17 @@ module.exports = {
     required: false,
     type: Discord.ApplicationCommandOptionType.String,
     slash: true
+  },
+  {
+    name: 'map',
+    description: 'Map name',
+    required: false,
+    type: Discord.ApplicationCommandOptionType.String,
+    slash: true,
+    choices: getMapChoice()
   },],
   description: 'Compare both user stats.',
-  usage: 'match_number: number, default 20 AND first_user_steam:steam parameter OR first_user_faceit:faceit nickname OR @user AND second_user_steam:steam parameter OR second_user_faceit:faceit nickname OR @user',
+  usage: 'match_number: number, default 20 AND first_user_steam:steam parameter OR first_user_faceit:faceit nickname OR @user AND second_user_steam:steam parameter OR second_user_faceit:faceit nickname OR @user, map: map name',
   type: 'stats',
   async execute(interaction) {
     const player1 = (await getUsers(interaction, 1, 'first_user_steam', 'first_user_faceit'))?.at(0)?.param

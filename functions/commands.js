@@ -27,11 +27,12 @@ const getPlayerDatas = async (interaction, param, steam, discord = false) => {
   return { param, discord }
 }
 
-const getDefaultInteractionOption = (interaction, index = 0) => {
-  return interaction.message.components.at(index).components
-    .filter(e => e instanceof Discord.SelectMenuComponent).at(0)
-    .options
-    .filter(e => e.default).at(0)
+const getDefaultInteractionOption = (interaction, componentIndex = 0, selectMenuIndex = 0, optionIndex = 0, defaultValue = true) => {
+  let res = interaction.message.components.at(componentIndex).components
+    .filter(e => e instanceof Discord.SelectMenuComponent).at(selectMenuIndex).options
+  if (defaultValue) res = res.filter(e => e.default)
+
+  return res.at(optionIndex)
 }
 
 const getCards = async (interaction, array, fn) => {
