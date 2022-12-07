@@ -8,7 +8,6 @@ const CustomType = require('../templates/customType')
 const Graph = require('../functions/graph')
 const errorCard = require('../templates/errorCard')
 const { getMapChoice } = require('../functions/map')
-const { getMapChoice } = require('../functions/map')
 
 const compareStats = (stats1, stats2, positive = true) => {
   if (positive) {
