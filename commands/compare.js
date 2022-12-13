@@ -227,7 +227,7 @@ const sendCardWithInfo = async (interaction, player1Id, player2Id, type = Custom
     ],
     components: [
       new Discord.ActionRowBuilder()
-        .addComponents(new Discord.SelectMenuBuilder()
+        .addComponents(new Discord.StringSelectMenuBuilder()
           .setCustomId('compareStatsSelector')
           .addOptions(options)
           .setDisabled(true)),

@@ -15,7 +15,7 @@ module.exports = {
     if (values.u !== interaction.user.id) return
 
     const options = interaction.message.components.at(0).components
-      .filter(e => e instanceof Discord.SelectMenuComponent)
+      .filter(e => e instanceof Discord.StringSelectMenuComponent)
       .map(msm => {
         return msm.options.map(o => {
           const active = JSON.stringify(JSON.parse(o.value)) === JSON.stringify(values)
@@ -27,7 +27,7 @@ module.exports = {
 
     const components = new Discord.ActionRowBuilder()
       .addComponents(
-        new Discord.SelectMenuBuilder()
+        new Discord.StringSelectMenuBuilder()
           .setCustomId('teamInfoSelector')
           .addOptions(options))
 

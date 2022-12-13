@@ -60,7 +60,7 @@ module.exports = {
     [values.m, values.v] = values.l.split(' ')
 
     const options = interaction.message.components.at(0).components
-      .filter(e => e instanceof Discord.SelectMenuComponent)
+      .filter(e => e instanceof Discord.StringSelectMenuComponent)
       .map(msm => {
         return msm.options.map(o => {
           const active = o.value === interaction.values.at(0)
@@ -71,7 +71,7 @@ module.exports = {
 
     const components = new Discord.ActionRowBuilder()
       .addComponents(
-        new Discord.SelectMenuBuilder()
+        new Discord.StringSelectMenuBuilder()
           .setCustomId('mapSelector')
           .addOptions(options))
 

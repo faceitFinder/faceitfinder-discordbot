@@ -18,7 +18,7 @@ const sendCardWithInfo = async (interaction, playerId, type = CustomType.TYPES.E
   const playerHistory = await Match.getMatchElo(playerId, maxMatch)
   const faceitElo = playerDatas.games.csgo.faceit_elo
   const buttonValues = {
-    id: 'updateStatsGraph',
+    id: 'uSG',
     s: playerId,
     u: interaction.user.id
   }
