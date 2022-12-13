@@ -1,6 +1,5 @@
 const Discord = require('discord.js')
 const loadingCard = require('../../templates/loadingCard')
-const Match = require('../../functions/match')
 const { updateOptions, getPlayerHistory } = require('../../functions/dateStats')
 const Player = require('../../functions/player')
 const Steam = require('../../functions/steam')
@@ -27,7 +26,7 @@ module.exports = {
     const optionsComponents = interaction.message.components.at(1).components
     const paginationComponents = interaction.message.components.at(2)
     const playerComponents = interaction.message.components.at(3)
-    const funFactCard = interaction.message.embeds.filter(e => e.data.color === 1333132)?.at(0)
+    const playerStatsCard = interaction.message.embeds.filter(e => e.data.image.url.includes('graph'))?.at(0)
 
     const currentPage = JSON.parse(paginationComponents.components.at(0).customId).c
 
@@ -46,7 +45,7 @@ module.exports = {
     if (playerComponents !== undefined) components.push(playerComponents)
 
     const messageItems = await updateEmbedMessage(json.s, json.m, currentPage)
-    if (funFactCard) messageItems.embeds.unshift(funFactCard)
+    if (playerStatsCard) messageItems.embeds.unshift(playerStatsCard)
 
     return {
       ...messageItems,

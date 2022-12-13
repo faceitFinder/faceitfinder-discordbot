@@ -3,6 +3,9 @@ const { sendCardWithInfo } = require('../../commands/compare')
 const CustomType = require('../../templates/customType')
 const loadingCard = require('../../templates/loadingCard')
 
+/**
+ * Update compare stats graph.
+ */
 module.exports = {
   name: 'uCSG',
   async execute(interaction, json) {

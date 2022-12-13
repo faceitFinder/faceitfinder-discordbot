@@ -5,11 +5,12 @@ const Steam = require('../functions/steam')
 const Player = require('../functions/player')
 const Graph = require('../functions/graph')
 const errorCard = require('../templates/errorCard')
-const successCard = require('../templates/successCard')
 const Options = require('../templates/options')
 const { getCardsConditions } = require('../functions/commands')
 const { getPagination, getPageSlice, getMaxPage } = require('../functions/pagination')
-const { getPlayerHistory } = require('../functions/dateStats')
+const { getPlayerHistory, generatePlayerStats } = require('../functions/dateStats')
+const { findPlayersStats } = require('../functions/find')
+const { TYPES } = require('../templates/customType')
 
 const getLevelFromElo = (elo) => {
   const colorLevel = Object.entries(color.levels).filter(e => {
@@ -94,17 +95,12 @@ const sendCardWithInfo = async (interaction, playerId, matchId = null, page = 0,
   const playerFullHistory = await getPlayerHistory(playerId, playerStats.lifetime.Matches, true)
   let playerHistory
   const funFactCard = []
+  const files = []
   const pagination = getPageSlice(page)
 
   if (players.length > 0) {
-    const playerHistoryMatches = (await getPlayerHistory(playerId, playerStats.lifetime.Matches, false))
-      .filter(m => players.every(p => m.playing_players.includes(p)))
-    const matchIds = playerHistoryMatches.map(e => e.match_id)
-
-    playerHistory = (await getPlayerHistory(playerId, playerStats.lifetime.Matches))
-      .filter(m => matchIds.includes(m.matchId))
-
-    funFactCard.push(successCard(`**${playerDatas.nickname}** played ${playerHistoryMatches.length} game(s) *(${((playerHistoryMatches.length * 100) / playerStats.lifetime.Matches).toFixed(2)}%)* with the player(s) selected.`).embeds[0])
+    playerHistory = await findPlayersStats(playerId, players, playerStats.lifetime.Matches, playerDatas)
+    if (!players.includes(playerId)) players.push(playerId)
   } else playerHistory = playerFullHistory
 
   if (!playerHistory.length > 0)
@@ -135,12 +131,67 @@ const sendCardWithInfo = async (interaction, playerId, matchId = null, page = 0,
     }
   })
 
-  matchItems.embeds.push(...funFactCard)
+  if (players.length > 0) {
+    const faceitLevel = playerDatas.games.csgo.skill_level
+    const faceitElo = playerDatas.games.csgo.faceit_elo
+    const size = 40
+
+    const from = playerHistory.at(-1).date
+    const to = playerHistory.at(0).date
+    const playerStats = generatePlayerStats(playerHistory)
+
+    const elo = await Graph.getElo(playerHistory.length, playerHistory, faceitElo, false)
+    const eloDiff = elo.at(0) - elo.at(-1)
+
+    const graphBuffer = Graph.generateChart(playerHistory,
+      faceitElo,
+      playerStats.games,
+      TYPES.ELO_KD,
+      false)
+
+    const rankImageCanvas = await Graph.getRankImage(faceitLevel, faceitElo, size)
+
+    files.push(new Discord.AttachmentBuilder(graphBuffer, { name: `${playerId}graph.png` }),
+      new Discord.AttachmentBuilder(rankImageCanvas, { name: `${faceitLevel}level.png` }))
+
+    const selectedPlayerStats = new Discord.EmbedBuilder()
+      .setAuthor({ name: playerDatas.nickname, iconURL: playerDatas.avatar || null, url: `https://www.faceit.com/fr/players/${playerDatas.nickname}` })
+      .setDescription(`[Steam](https://steamcommunity.com/profiles/${playerDatas.games.csgo.game_player_id}), [Faceit](https://www.faceit.com/fr/players/${playerDatas.nickname})`)
+      .setThumbnail(`attachment://${faceitLevel}level.png`)
+      .addFields({
+        name: 'From - To',
+        value: [new Date(from).toDateString(), '\n', new Date(to).toDateString()].join(' '),
+        inline: false
+      },
+        { name: 'Games', value: `${playerStats.games} (${playerStats.winrate}% Win)`, inline: true },
+        { name: 'Elo', value: isNaN(eloDiff) ? '0' : eloDiff > 0 ? `+${eloDiff}` : eloDiff.toString(), inline: true },
+        { name: 'Average MVPs', value: playerStats['Average MVPs'], inline: true },
+        { name: 'K/D', value: playerStats.kd.toString(), inline: true },
+        { name: 'Kills', value: playerStats.kills.toString(), inline: true },
+        { name: 'Deaths', value: playerStats.deaths.toString(), inline: true },
+        { name: 'Average K/D', value: playerStats['Average K/D'], inline: true },
+        { name: 'Average K/R', value: playerStats['Average K/R'], inline: true },
+        { name: 'Average HS', value: `${playerStats['Average HS']}%`, inline: true },
+        { name: 'Average Kills', value: playerStats['Average Kills'], inline: true },
+        { name: 'Average Deaths', value: playerStats['Average Deaths'], inline: true },
+        { name: 'Average Assists', value: playerStats['Average Assists'], inline: true },
+        { name: 'Red K/D', value: playerStats['Red K/D'].toString(), inline: true },
+        { name: 'Orange K/D', value: playerStats['Orange K/D'].toString(), inline: true },
+        { name: 'Green K/D', value: playerStats['Green K/D'].toString(), inline: true })
+      .setImage(`attachment://${playerId}graph.png`)
+      .setColor(color.levels[faceitLevel].color)
+      .setFooter({ text: `Steam: ${steamDatas?.personaname || steamDatas}` })
+
+    funFactCard.push(selectedPlayerStats)
+  }
+
+  matchItems.embeds.unshift(...funFactCard)
+  matchItems.files.push(...files)
 
   const components = [
     new Discord.ActionRowBuilder()
       .addComponents(
-        new Discord.SelectMenuBuilder()
+        new Discord.StringSelectMenuBuilder()
           .setCustomId('lastSelectorInfo')
           .setPlaceholder('Select one of the match bellow.')
           .setDisabled(true)
@@ -154,7 +205,7 @@ const sendCardWithInfo = async (interaction, playerId, matchId = null, page = 0,
           }])),
     new Discord.ActionRowBuilder()
       .addComponents(
-        new Discord.SelectMenuBuilder()
+        new Discord.StringSelectMenuBuilder()
           .setCustomId('lastSelector')
           .setPlaceholder('Select another match')
           .addOptions(options.slice(pagination.start, pagination.end))),
@@ -168,15 +219,18 @@ const sendCardWithInfo = async (interaction, playerId, matchId = null, page = 0,
           const playerDatas = await Player.getDatas(p)
 
           return new Discord.ButtonBuilder()
-            .setCustomId(JSON.stringify({ s: p }))
+            .setCustomId(JSON.stringify({
+              id: 'fUSG',
+              s: p
+            }))
             .setLabel(playerDatas.nickname)
             .setStyle(Discord.ButtonStyle.Success)
-            .setDisabled(true)
+            .setDisabled(playerId === p)
         }))))
 
   return {
     ...matchItems,
-    components: components
+    components: components,
   }
 }
 
