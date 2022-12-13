@@ -3,6 +3,9 @@ const CustomType = require('../../templates/customType')
 const loadingCard = require('../../templates/loadingCard')
 const { getDefaultInteractionOption } = require('../../functions/commands')
 
+/**
+ * Update date stats graph.
+ */
 module.exports = {
   name: 'uDSG',
   async execute(interaction, json) {

@@ -3,6 +3,9 @@ const { getCardWithInfo } = require('../../functions/dateStats')
 const CustomType = require('../../templates/customType')
 const loadingCard = require('../../templates/loadingCard')
 
+/**
+ * Update last stats graph.
+ */
 module.exports = {
   name: 'uLSG',
   async execute(interaction, json) {
