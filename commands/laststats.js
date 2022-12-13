@@ -24,7 +24,7 @@ const sendCardWithInfo = async (interaction, playerId, type = CustomType.TYPES.E
   }
 
   const row = new Discord.ActionRowBuilder()
-    .addComponents(new Discord.SelectMenuBuilder()
+    .addComponents(new Discord.StringSelectMenuBuilder()
       .setCustomId('lastStatsSelector')
       .addOptions([option])
       .setDisabled(true))

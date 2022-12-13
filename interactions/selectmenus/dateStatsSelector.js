@@ -10,7 +10,7 @@ const sendCardWithInfo = async (interaction, values, type = CustomType.TYPES.ELO
 
   const actionRow = new Discord.ActionRowBuilder()
     .addComponents(
-      new Discord.SelectMenuBuilder()
+      new Discord.StringSelectMenuBuilder()
         .setCustomId('dateStatsSelector')
         .addOptions(options))
 

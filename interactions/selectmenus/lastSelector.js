@@ -37,7 +37,7 @@ module.exports = {
       dataRow,
       new Discord.ActionRowBuilder()
         .addComponents(
-          new Discord.SelectMenuBuilder()
+          new Discord.StringSelectMenuBuilder()
             .setCustomId('lastSelector')
             .addOptions(updateOptions(optionsComponents, m, false))),
       paginationComponents

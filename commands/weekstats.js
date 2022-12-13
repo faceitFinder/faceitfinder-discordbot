@@ -26,7 +26,7 @@ const sendCardWithInfo = async (interaction, playerId, page = 0) => {
     const from = new Date(date.date)
     const to = new Date(from.setDate(from.getDate() + 7))
 
-    let option = new Discord.SelectMenuOptionBuilder()
+    let option = new Discord.StringSelectMenuOptionBuilder()
       .setLabel([new Date(date.date).toDateString(), '-', new Date(new Date(to).setHours(-24)).toDateString()].join(' '))
       .setDescription(`${date.number} match played`)
       .setValue(JSON.stringify({
@@ -48,7 +48,7 @@ const sendCardWithInfo = async (interaction, playerId, page = 0) => {
 
   const row = new Discord.ActionRowBuilder()
     .addComponents(
-      new Discord.SelectMenuBuilder()
+      new Discord.StringSelectMenuBuilder()
         .setCustomId('dateStatsSelector')
         .setPlaceholder('Select a week')
         .addOptions(pagination))
