@@ -10,7 +10,7 @@ module.exports = {
 
     if (interaction.user.id !== json.u) return
 
-    const players = interaction.message.components.at(3)?.components.map(p => JSON.parse(p.customId).s) | []
+    const players = interaction.message.components.at(3)?.components.map(p => JSON.parse(p.customId).s) || []
 
     loadingCard(interaction)
 

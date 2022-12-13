@@ -44,7 +44,7 @@ module.exports = {
     /**
      * Check if the interaction is a selectmenu
      */
-    else if (interaction.isSelectMenu())
+    else if (interaction.isStringSelectMenu())
       interaction
         .deferUpdate()
         .then(() => {
