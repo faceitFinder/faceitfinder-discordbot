@@ -1,4 +1,6 @@
+const CommandsStats = require('../../database/commandsStats')
 const Stats = require('../../commands/stats')
+const { getTypeGraph } = require('../../functions/commandStats')
 const CustomType = require('../../templates/customType')
 const loadingCard = require('../../templates/loadingCard')
 
@@ -9,6 +11,8 @@ module.exports = {
   name: 'uSG',
   async execute(interaction, json) {
     if (interaction.user.id !== json.u) return
+
+    CommandsStats.create('stats', `button - ${getTypeGraph(json)}`, interaction.createdAt)
 
     loadingCard(interaction)
 

@@ -1,4 +1,6 @@
+const CommandsStats = require('../../database/commandsStats')
 const { getDefaultInteractionOption } = require('../../functions/commands')
+const { getTypeGraph } = require('../../functions/commandStats')
 const { getCardWithInfo } = require('../../functions/dateStats')
 const CustomType = require('../../templates/customType')
 const loadingCard = require('../../templates/loadingCard')
@@ -13,6 +15,8 @@ module.exports = {
     json = { ...json, ...JSON.parse(values) }
 
     if (interaction.user.id !== json.u) return
+
+    CommandsStats.create('laststats', `button - ${getTypeGraph(json)}`, interaction.createdAt)
 
     loadingCard(interaction)
 
