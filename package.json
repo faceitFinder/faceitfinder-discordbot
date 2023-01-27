@@ -29,7 +29,7 @@
     "discord-api-types": "^0.37.19",
     "discord.js": "^14.7.1",
     "dotenv": "^16.0.3",
-    "mongoose": "^6.8.1",
+    "mongoose": "^6.8.3",
     "node-fetch": "^2.6.1"
   },
   "devDependencies": {
