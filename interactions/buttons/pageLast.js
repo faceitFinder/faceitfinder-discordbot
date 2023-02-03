@@ -16,6 +16,6 @@ module.exports = {
 
     loadingCard(interaction)
 
-    return sendCardWithInfo(interaction, json.s, null, json.page, players)
+    return sendCardWithInfo(interaction, json.s, null, json.page, players, json.m)
   }
 }
