@@ -6,11 +6,12 @@ const Player = require('../functions/player')
 const Graph = require('../functions/graph')
 const errorCard = require('../templates/errorCard')
 const Options = require('../templates/options')
-const { getCardsConditions } = require('../functions/commands')
+const { getCardsConditions, getInteractionOption } = require('../functions/commands')
 const { getPagination, getPageSlice, getMaxPage } = require('../functions/pagination')
 const { getPlayerHistory, generatePlayerStats } = require('../functions/dateStats')
 const { findPlayersStats } = require('../functions/find')
 const { TYPES } = require('../templates/customType')
+const { getMapChoice } = require('../functions/map')
 
 const getLevelFromElo = (elo) => {
   const colorLevel = Object.entries(color.levels).filter(e => {
@@ -88,7 +89,7 @@ const getMatchItems = (playerDatas, steamDatas, playerHistory, maxMatch, page, m
   }
 }
 
-const sendCardWithInfo = async (interaction, playerId, matchId = null, page = 0, players = []) => {
+const sendCardWithInfo = async (interaction, playerId, matchId = null, page = 0, players = [], mapName = null) => {
   const playerDatas = await Player.getDatas(playerId)
   const playerStats = await Player.getStats(playerId)
   const steamDatas = await Steam.getDatas(playerDatas.steam_id_64).catch(err => err.statusText)
@@ -97,11 +98,16 @@ const sendCardWithInfo = async (interaction, playerId, matchId = null, page = 0,
   const funFactCard = []
   const files = []
   const pagination = getPageSlice(page)
+  const map = getInteractionOption(interaction, 'map')
+
+  if (map) mapName = map
 
   if (players.length > 0) {
     playerHistory = await findPlayersStats(playerId, players, playerStats.lifetime.Matches, playerDatas)
     if (!players.includes(playerId)) players.push(playerId)
   } else playerHistory = playerFullHistory
+
+  if (mapName) playerHistory = playerHistory.filter(e => e.i1 === mapName)
 
   if (!playerHistory.length > 0)
     return errorCard(`Couldn\'t get the last matches of ${steamDatas?.personaname || steamDatas} ${players.length > 0 ? 'with the requested users.' : ''}`)
@@ -200,7 +206,8 @@ const sendCardWithInfo = async (interaction, playerId, matchId = null, page = 0,
             description: 'Info about the last match.',
             value: JSON.stringify({
               u: interaction.user.id,
-              s: playerId
+              s: playerId,
+              m: mapName,
             })
           }])),
     new Discord.ActionRowBuilder()
@@ -234,11 +241,26 @@ const sendCardWithInfo = async (interaction, playerId, matchId = null, page = 0,
   }
 }
 
+const getOptions = () => {
+  const options = [...Options.stats]
+
+  options.unshift({
+    name: 'map',
+    description: 'Specify a map to get the stats related',
+    required: false,
+    type: Discord.ApplicationCommandOptionType.String,
+    slash: true,
+    choices: getMapChoice()
+  })
+
+  return options
+}
+
 module.exports = {
   name: 'last',
-  options: Options.stats,
+  options: getOptions(),
   description: 'Get the stats of last game.',
-  usage: Options.usage,
+  usage: `${Options.usage} AND map name`,
   type: 'stats',
   async execute(interaction) {
     return getCardsConditions(interaction, sendCardWithInfo)
