@@ -67,16 +67,18 @@ const getAverage = (q, d, fixe = 2, percent = 1) => ((parseFloat(q) / parseFloat
 const getPlayerHistory = async (playerId, maxMatch, eloMatches = true) => {
   const playerHistory = []
   const playerStats = await Player.getStats(playerId)
+  const limit = 100
+
   if (maxMatch === null || maxMatch > playerStats.lifetime.Matches) maxMatch = playerStats.lifetime.Matches
-  if (eloMatches) for (let page = 0; page < Math.ceil(maxMatch / 2000); page++)
+  if (eloMatches) for (let page = 0; page < Math.ceil(maxMatch / limit); page++)
     playerHistory.push(...await Match.getMatchElo(playerId, maxMatch, page))
-  else {
-    limit = 100
+  else {  
     let max = Math.ceil(maxMatch / limit)
     max = max > 10 ? 10 : max
     for (let page = 0; page < max; page++)
       playerHistory.push(...(await Player.getHistory(playerId, limit, page * limit)).items)
   }
+
   return playerHistory
 }
 
