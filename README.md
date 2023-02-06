@@ -10,36 +10,6 @@
 
 Want to contribute? Great!
 
-### Run docker on a dev environment
-
-**Clone the repository:**
-
-```sh
-git clone git@github.com:JustDams/faceitFinder.git
-cd faceitFinder
-```
-
-**Setup env files:**
-
-Copy the `.env.example` in `.env` and `.env.mongodb.example` in `.env.mongodb` then complete/update it with your information.
-
-```sh
-cp .env.example .env
-cp .env.mongodb.example .env.mongodb
-```
-
-**Run compose:**
-
-```sh
-docker-compose -f docker-compose.dev.yml up
-```
-
-**To run the linter:**
-
-```sh
-docker exec -it faceitfinder_dev npm run lint
-```
-
 ### Run docker on a prod environment
 
 **Clone the repository:**
