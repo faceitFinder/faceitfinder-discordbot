@@ -6,10 +6,6 @@
 
 - Retrieve a Faceit account using a **Steam ID**, **Steam UID**, **Steam profile link**, **in-game status**, **Faceit username** or by **mentioning a Discord user** who has linked to a Faceit account.
 
-## Development
-
-Want to contribute? Great!
-
 ### Run docker on a prod environment
 
 **Clone the repository:**
