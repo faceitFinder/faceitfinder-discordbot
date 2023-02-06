@@ -1,19 +1,16 @@
 # FaceitFinder
-## _Discord Bot which permit to find a faceit profile & its stats from a Steam id_
- [![Discord](https://badgen.net/badge/icon/discord?icon=discord&label)](https://discord.com/) [![Docker](https://badgen.net/badge/icon/docker?icon=docker&label)](https://docker.com/) [![Gitmoji](https://img.shields.io/badge/gitmoji-%20😜%20😍-FFDD67.svg)](https://gitmoji.dev/) 
+## _Discord Bot which permit to find a faceit profile & its stats from different parameters_
+ [![Discord](https://badgen.net/badge/icon/discord?icon=discord&label)](https://discord.com/) [![Docker](https://badgen.net/badge/icon/docker?icon=docker&label)](https://docker.com/)
  
 ## Features
 
-- Retrieve a Faceit account using a Steam ID, Steam UID, Steam profile link, in-game status or by mentioning  a Discord user who has linked to a Faceit account.
-- Get an elo graph.
-- Get statistics from the last game.
-- Link a Discord account whith a Faceit profile to get his statistics easily.
+- Retrieve a Faceit account using a **Steam ID**, **Steam UID**, **Steam profile link**, **in-game status**, **Faceit username** or by **mentioning a Discord user** who has linked to a Faceit account.
 
 ## Development
 
 Want to contribute? Great!
 
-### Installation
+### Run docker on a dev environment
 
 **Clone the repository:**
 
@@ -22,24 +19,55 @@ git clone git@github.com:JustDams/faceitFinder.git
 cd faceitFinder
 ```
 
-Rename the `.env.example` to `.env` and complete/update it with your information.
+**Setup env files:**
 
-**Run docker on a dev environment:**
+Copy the `.env.example` in `.env` and `.env.mongodb.example` in `.env.mongodb` then complete/update it with your information.
+
+```sh
+cp .env.example .env
+cp .env.mongodb.example .env.mongodb
+```
+
+**Run compose:**
 
 ```sh
 docker-compose -f docker-compose.dev.yml up
 ```
 
-**Run linter:**
+**To run the linter:**
 
 ```sh
 docker exec -it faceitfinder_dev npm run lint
 ```
 
-**Run docker on a prod environment:**
+### Run docker on a prod environment
+
+**Clone the repository:**
 
 ```sh
-docker-compose -f docker-compose.prod.yml up
+git clone git@github.com:JustDams/faceitFinder.git
+cd faceitFinder
+```
+
+**Got to the prod branch:**
+
+```sh
+git checkout prod
+```
+
+**Setup env files:**
+
+Copy the `.env.example` in `.env` and `.env.mongodb.example` in `.env.mongodb` then complete/update it with your information.
+
+```sh
+cp .env.example .env
+cp .env.mongodb.example .env.mongodb
+```
+
+**Run compose:**
+
+```sh
+docker-compose -f docker-compose.prod.yml up --build -d
 ```
 
 ## License
