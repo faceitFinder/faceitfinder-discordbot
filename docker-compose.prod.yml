@@ -1,9 +1,7 @@
 version: '3'
 services:
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: justdams/faceitfinder-discordbot:latest
     restart: on-failure
     container_name: faceitfinder_prod
     command: npm start
@@ -29,7 +27,7 @@ services:
     volumes:
       - ~/mongo-volume:/data/db
     env_file:
-      - .env
+      - .env.mongodb
     networks:
       - app
 
