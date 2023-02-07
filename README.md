@@ -15,8 +15,8 @@ Want to contribute? Great!
 **Clone the repository:**
 
 ```sh
-git clone git@github.com:JustDams/faceitFinder.git
-cd faceitFinder
+git@github.com:faceitFinder/faceitfinder-discordbot.git
+cd faceitfinder-discordbot
 ```
 
 **Setup env files:**
@@ -45,8 +45,8 @@ docker exec -it faceitfinder_dev npm run lint
 **Clone the repository:**
 
 ```sh
-git clone git@github.com:JustDams/faceitFinder.git
-cd faceitFinder
+git@github.com:faceitFinder/faceitfinder-discordbot.git
+cd faceitfinder-discordbot
 ```
 
 **Got to the prod branch:**
