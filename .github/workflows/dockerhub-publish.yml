@@ -1,4 +1,4 @@
-name: Publish Docker image
+name: Publish Docker image And Deploy To Server
 
 on:
   push:
@@ -32,3 +32,20 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+  deploy:
+    needs: push_to_registry
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: executing remote ssh commands using password
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          port: ${{ secrets.PORT }}
+          script: |
+            cd ${{ secrets.REPO }}
+            docker-compose -f docker-compose.prod.yml --force-recreate --build -d
+            docker image prune -f
