@@ -11,8 +11,8 @@
 **Clone the repository:**
 
 ```sh
-git clone git@github.com:JustDams/faceitFinder.git
-cd faceitFinder
+git clone git@github.com:faceitFinder/faceitfinder-discordbot.git
+cd faceitfinder-discordbot
 ```
 
 **Got to the prod branch:**
