@@ -15,7 +15,7 @@ Want to contribute? Great!
 **Clone the repository:**
 
 ```sh
-git@github.com:faceitFinder/faceitfinder-discordbot.git
+git clone git@github.com:faceitFinder/faceitfinder-discordbot.git
 cd faceitfinder-discordbot
 ```
 
@@ -45,7 +45,7 @@ docker exec -it faceitfinder_dev npm run lint
 **Clone the repository:**
 
 ```sh
-git@github.com:faceitFinder/faceitfinder-discordbot.git
+git clone git@github.com:faceitFinder/faceitfinder-discordbot.git
 cd faceitfinder-discordbot
 ```
 
