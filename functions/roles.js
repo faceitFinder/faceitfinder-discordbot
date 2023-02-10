@@ -2,6 +2,11 @@ const GuildRoles = require('../database/guildRoles')
 const User = require('../database/user')
 const Player = require('./player')
 
+const getGuildRoles = (guild, guilds) => guilds.filter(e => e).find(e => e.id === guild.id)
+
+const getRoleIds = (guildRoles) => Object.keys(Object.entries(guildRoles)[2][1])
+  .filter(e => e.startsWith('level')).map(e => guildRoles[e])
+
 const updateRoles = async (client, discordId, guildId, remove = false) => {
   let users = await User.getAll()
   let guilds = await GuildRoles.getAll()
@@ -13,9 +18,19 @@ const updateRoles = async (client, discordId, guildId, remove = false) => {
   const clientGuilds = await client.guilds.fetch()
 
   clientGuilds.forEach(async (guild) => {
-    const guildRoles = guilds.filter(e => e).find(e => e.id === guild.id)
+    let guildRoles = getGuildRoles(guild, guilds)
+    if (!guildRoles) return
+
     const guildDatas = await guild.fetch()
 
+    // Check if roles still exists in the database
+    getRoleIds(guildRoles).forEach(role => {
+      const roleDatas = guildDatas.roles.cache.find(e => e.id === role.id)
+      if (!roleDatas) guildRoles.remove(role.id)
+    })
+
+    guilds = await GuildRoles.getAll()
+    guildRoles = getGuildRoles(guild, guilds)
     if (!guildRoles) return
 
     guildDatas.members.fetch({ user: users.filter(e => e.guildId === guildDatas.id || !e.guildId).map(e => e.discordId) })
@@ -28,8 +43,7 @@ const updateRoles = async (client, discordId, guildId, remove = false) => {
 
         const playerDatas = await Player.getDatas(user.faceitId).catch(console.error)
         const playerLevel = playerDatas.games.csgo.skill_level
-        const roleLevels = Object.keys(Object.entries(guildRoles)[2][1])
-          .filter(e => e.startsWith('level')).map(e => guildRoles[e])
+        const roleLevels = getRoleIds(guildRoles)
 
         const roleToAdd = roleLevels[playerLevel - 1]
         const rolesFit = member.roles.resolve(roleToAdd)
