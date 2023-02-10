@@ -97,92 +97,92 @@ const sendCardWithInfo = async (interaction, player1Id, player2Id, type = Custom
         name: 'Elo',
         value: `**${firstUserDatas.playerDatas.games.csgo.faceit_elo}** - \
         ${secondUserDatas.playerDatas.games.csgo.faceit_elo} ${compareStats(firstUserDatas.playerDatas.games.csgo.faceit_elo,
-          secondUserDatas.playerDatas.games.csgo.faceit_elo)}`,
+  secondUserDatas.playerDatas.games.csgo.faceit_elo)}`,
         inline: true
       },
       {
         name: 'Average MVPs',
         value: `**${dateStatsDatas.at(0)['Average MVPs']}** - \
         ${dateStatsDatas.at(1)['Average MVPs']} ${compareStats(dateStatsDatas.at(0)['Average MVPs'],
-          dateStatsDatas.at(1)['Average MVPs'])}`,
+  dateStatsDatas.at(1)['Average MVPs'])}`,
         inline: true
       },
       {
         name: 'K/D', value: `**${dateStatsDatas.at(0).kd}** - \
       ${dateStatsDatas.at(1).kd} ${compareStats(dateStatsDatas.at(0).kd,
-          dateStatsDatas.at(1).kd)}`, inline: true
+  dateStatsDatas.at(1).kd)}`, inline: true
       },
       {
         name: 'Kills', value: `**${dateStatsDatas.at(0).kills}** - \
       ${dateStatsDatas.at(1).kills} ${compareStats(dateStatsDatas.at(0).kills,
-          dateStatsDatas.at(1).kills)}`, inline: true
+  dateStatsDatas.at(1).kills)}`, inline: true
       },
       {
         name: 'Deaths', value: `**${dateStatsDatas.at(0).deaths}** - \
       ${dateStatsDatas.at(1).deaths} ${compareStats(dateStatsDatas.at(0).deaths,
-          dateStatsDatas.at(1).deaths, false)}`, inline: true
+  dateStatsDatas.at(1).deaths, false)}`, inline: true
       },
       {
         name: 'Average K/D',
         value: `**${dateStatsDatas.at(0)['Average K/D']}** - \
         ${dateStatsDatas.at(1)['Average K/D']} ${compareStats(dateStatsDatas.at(0)['Average K/D'],
-          dateStatsDatas.at(1)['Average K/D'])}`,
+  dateStatsDatas.at(1)['Average K/D'])}`,
         inline: true
       },
       {
         name: 'Average K/R',
         value: `**${dateStatsDatas.at(0)['Average K/R']}** - \
         ${dateStatsDatas.at(1)['Average K/R']} ${compareStats(dateStatsDatas.at(0)['Average K/R'],
-          dateStatsDatas.at(1)['Average K/R'])}`,
+  dateStatsDatas.at(1)['Average K/R'])}`,
         inline: true
       },
       {
         name: 'Average HS',
         value: `**${dateStatsDatas.at(0)['Average HS']}%** - \
         ${dateStatsDatas.at(1)['Average HS']}% ${compareStats(dateStatsDatas.at(0)['Average HS'],
-          dateStatsDatas.at(1)['Average HS'])}`,
+  dateStatsDatas.at(1)['Average HS'])}`,
         inline: true
       },
       {
         name: 'Average Kills',
         value: `**${dateStatsDatas.at(0)['Average Kills']}** - \
         ${dateStatsDatas.at(1)['Average Kills']} ${compareStats(dateStatsDatas.at(0)['Average Kills'],
-          dateStatsDatas.at(1)['Average Kills'])}`,
+  dateStatsDatas.at(1)['Average Kills'])}`,
         inline: true
       },
       {
         name: 'Average Deaths',
         value: `**${dateStatsDatas.at(0)['Average Deaths']}** - \
         ${dateStatsDatas.at(1)['Average Deaths']} ${compareStats(dateStatsDatas.at(0)['Average Deaths'],
-          dateStatsDatas.at(1)['Average Deaths'], false)}`,
+  dateStatsDatas.at(1)['Average Deaths'], false)}`,
         inline: true
       },
       {
         name: 'Average Assists',
         value: `**${dateStatsDatas.at(0)['Average Assists']}** - \
         ${dateStatsDatas.at(1)['Average Assists']} ${compareStats(dateStatsDatas.at(0)['Average Assists'],
-          dateStatsDatas.at(1)['Average Assists'])}`,
+  dateStatsDatas.at(1)['Average Assists'])}`,
         inline: true
       },
       {
         name: 'Red K/D',
         value: `**${dateStatsDatas.at(0)['Red K/D']}** - \
         ${dateStatsDatas.at(1)['Red K/D']} ${compareStats(dateStatsDatas.at(0)['Red K/D'],
-          dateStatsDatas.at(1)['Red K/D'], false)}`,
+  dateStatsDatas.at(1)['Red K/D'], false)}`,
         inline: true
       },
       {
         name: 'Orange K/D',
         value: `**${dateStatsDatas.at(0)['Orange K/D']}** - \
         ${dateStatsDatas.at(1)['Orange K/D']} ${compareStats(dateStatsDatas.at(0)['Orange K/D'],
-          dateStatsDatas.at(1)['Orange K/D'], false)}`,
+  dateStatsDatas.at(1)['Orange K/D'], false)}`,
         inline: true
       },
       {
         name: 'Green K/D',
         value: `**${dateStatsDatas.at(0)['Green K/D']}** - \
         ${dateStatsDatas.at(1)['Green K/D']} ${compareStats(dateStatsDatas.at(0)['Green K/D'],
-          dateStatsDatas.at(1)['Green K/D'])}`,
+  dateStatsDatas.at(1)['Green K/D'])}`,
         inline: true
       })
     .setImage('attachment://graph.png')

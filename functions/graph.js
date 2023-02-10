@@ -2,7 +2,7 @@ const { color } = require('../config.json')
 const path = require('path')
 const Canvas = require('canvas')
 const CustomType = require('../templates/customType')
-const Chart = require('chart.js')
+const Chart = require('chart.js/auto')
 
 const generateChart = (matchHistory, playerElo, maxMatch = 20, type = CustomType.TYPES.ELO, check) => {
   const datas = []
@@ -28,9 +28,11 @@ const getChart = (datasets, labels, datasetFunc, displayY1) => {
 
   const color = '#c9d1d9', gridColor = '#3c3c3c'
   const yAxisBase = {
+    border: {
+      width: 1,
+    },
     grid: {
       color: gridColor,
-      borderWidth: 1,
     },
     ticks: {
       beginAtZero: false,
@@ -212,9 +214,9 @@ const colorFilter = (colors, value) => Object.entries(colors)
 
 const getGraph = (type, matchHistory, faceitElo, maxMatch, check = true) => {
   switch (type) {
-    case CustomType.TYPES.ELO: return getElo(maxMatch, matchHistory, faceitElo, check)
-    case CustomType.TYPES.KD: return getKD(matchHistory, maxMatch)
-    default: break
+  case CustomType.TYPES.ELO: return getElo(maxMatch, matchHistory, faceitElo, check)
+  case CustomType.TYPES.KD: return getKD(matchHistory, maxMatch)
+  default: break
   }
 }
 

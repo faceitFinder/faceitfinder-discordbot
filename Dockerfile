@@ -1,6 +1,6 @@
-FROM node:17.9.0
+FROM node:19-bullseye-slim
 
-ENV APP /usr/src/app
+ARG APP=/usr/src/app
 
 ENV NODE_ENV=
 ENV TOKEN=
@@ -9,13 +9,19 @@ ENV STEAM_TOKEN=
 ENV TOPGG_TOKEN=
 ENV MONGO_URI=
 
-RUN mkdir -p $APP
-WORKDIR $APP
+RUN apt-get update && apt-get install -y \
+  build-essential \
+  libcairo2-dev \
+  libpango1.0-dev \
+  libjpeg-dev \
+  libgif-dev \
+  librsvg2-dev
 
-COPY package.json $APP
+WORKDIR $APP
+COPY package.json .
 
 RUN npm install
 
-COPY . $APP
+COPY . .
 
 CMD ["npm", "start"]
