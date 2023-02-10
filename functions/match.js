@@ -1,11 +1,9 @@
-const { default: fetch } = require('node-fetch')
+const axios = require('axios')
 const Faceit = require('./faceit')
 
-const getMatchElo = (playerId, limit = 20, page = 0) => fetch(`https://api.faceit.com/stats/api/v1/stats/time/users/${playerId}/games/csgo?size=${limit}&page=${page}`, {
-  method: 'GET',
-})
+const getMatchElo = (playerId, limit = 20, page = 0) => axios.get(`https://api.faceit.com/stats/api/v1/stats/time/users/${playerId}/games/csgo?size=${limit}&page=${page}`)
   .then(res => {
-    if (res.status == 200) return res.json()
+    if (res.status == 200) return res.data
     else {
       console.error(res.statusText, res.url)
       throw 'Couldn\'t get matches'
