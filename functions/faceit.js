@@ -9,14 +9,11 @@ const headerFaceit = {
 const fetchData = async (url, error) => axios.get(url, {
   headers: headerFaceit
 })
-  .then(res => {
-    if (res.status == 200) return res.data
-    else {
-      console.error(res.statusText, res.url)
-      throw error
-    }
+  .then(res => res.data)
+  .catch(e => {
+    console.error(e.response.status, e.response.statusText, url)
+    throw error
   })
-  .then(data => data)
 
 module.exports = {
   fetchData
