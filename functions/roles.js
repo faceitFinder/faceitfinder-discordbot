@@ -23,16 +23,6 @@ const updateRoles = async (client, discordId, guildId, remove = false) => {
 
     const guildDatas = await guild.fetch()
 
-    // Check if roles still exists in the database
-    getRoleIds(guildRoles).forEach(role => {
-      const roleDatas = guildDatas.roles.cache.find(e => e.id === role.id)
-      if (!roleDatas) guildRoles.remove(role.id)
-    })
-
-    guilds = await GuildRoles.getAll()
-    guildRoles = getGuildRoles(guild, guilds)
-    if (!guildRoles) return
-
     guildDatas.members.fetch({ user: users.filter(e => e.guildId === guildDatas.id || !e.guildId).map(e => e.discordId) })
       .then(async members => members.forEach(async (member) => {
         let user = await User.get(member.user.id)
