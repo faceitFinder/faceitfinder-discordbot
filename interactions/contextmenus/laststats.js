@@ -1,10 +1,10 @@
 const User = require('../../database/user')
 const errorCard = require('../../templates/errorCard')
-const Weekstats = require('../../commands/weekstats')
+const Laststats = require('../../commands/laststats')
 const GuildRoles = require('../../functions/roles')
 
 module.exports = {
-  name: 'weekstats',
+  name: 'laststats',
   type: 2,
   async execute(interaction) {
     let user = await User.exists(interaction.targetId)
@@ -13,6 +13,6 @@ module.exports = {
       if (!user) return errorCard('This user has not linked his profile')
     }
     await GuildRoles.updateRoles(interaction.client, user.discordId)
-    return Weekstats.sendCardWithInfo(interaction, user.faceitId)
+    return Laststats.sendCardWithInfo(interaction, user.faceitId)
   }
 }
