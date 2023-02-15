@@ -8,14 +8,17 @@ const getRoleIds = (guildRoles) => Object.keys(Object.entries(guildRoles)[2][1])
   .filter(e => e.startsWith('level')).map(e => guildRoles[e])
 
 const updateRoles = async (client, discordId, guildId, remove = false) => {
-  let users = await User.getAll()
-  let guilds = await GuildRoles.getAll()
+  let users, guilds
+
   if (discordId) users = await User.get(discordId)
+  else users = await User.getAll()
+  
   if (guildId) guilds = [await GuildRoles.getRolesOf(guildId)]
+  else guilds = await GuildRoles.getAll()
 
   if (!guilds.filter(e => e).find(e => e.id === guildId) && remove) User.remove(discordId, guildId)
 
-  const clientGuilds = await client.guilds.fetch()
+  const clientGuilds = client.guilds.cache
 
   clientGuilds.forEach(async (guild) => {
     let guildRoles = getGuildRoles(guild, guilds)
