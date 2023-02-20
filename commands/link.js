@@ -33,7 +33,9 @@ const sendCardWithInfo = async (interaction, playerId) => {
 }
 
 const link = async (interaction, playerId, discordId, guildId = null) => {
-  const playerDatas = await Player.getDatas(playerId)
+  let playerDatas
+  try { playerDatas = await Player.getDatas(playerId) }
+  catch (error) { return errorCard(error) }
 
   if (!guildId) await User.remove(discordId)
 
@@ -41,7 +43,7 @@ const link = async (interaction, playerId, discordId, guildId = null) => {
     User.update(discordId, playerId, guildId) :
     User.create(discordId, playerId, guildId)
 
-  updateRoles(interaction.client, discordId)
+  if (await User.get(discordId)) updateRoles(interaction.client, discordId, guildId)
 
   return successCard(`<@${discordId}> has been linked to ${playerDatas.nickname}`)
 }
