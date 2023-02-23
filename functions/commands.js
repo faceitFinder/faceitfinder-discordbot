@@ -58,7 +58,7 @@ const getUsers = async (
   searchTeam = true
 ) => {
   let team = getInteractionOption(interaction, 'team')?.toLowerCase().trim().split(' ')[0]
-  const faceitParameters = getInteractionOption(interaction, faceit)?.trim().split(' ')
+  const faceitParameters = getInteractionOption(interaction, faceit)?.replace(/\s+/g, ' ').split(' ')
   const steamParameters = getInteractionOption(interaction, steam)
 
   const parameters = []
@@ -85,7 +85,7 @@ const getUsers = async (
     await Promise.all(faceitParameters
       .map(async nickname => await Player.getDatasFromNickname(nickname)
         .catch(async () => {
-          const player = await Player.searchPlayer(nickname)
+          const player = await Player.searchPlayer(nickname).catch(e => e)
           return player.items?.at(0) || nickname
         }))
     ).then(params => {
@@ -104,7 +104,7 @@ const getUsers = async (
       .map(e => { return { param: e, steam: true, discord: false } })
 
     if (steamIds.length > 0) parameters.push(...steamIds)
-    else parameters.push(...steamParameters?.trim().split(' ').filter(e => e !== '').map(e => {
+    else parameters.push(...steamParameters?.replace(/\s+/g, ' ').split(' ').map(e => {
       return {
         param: e,
         steam: true,
