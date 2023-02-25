@@ -2,6 +2,7 @@ const { ApplicationCommandOptionType } = require('discord.js')
 const Options = require('../templates/options')
 const { getUsers } = require('../functions/commands')
 const { sendCardWithInfo } = require('./last')
+const { getMapChoice } = require('../functions/map')
 
 const getOptions = () => {
   const options = [...Options.stats]
@@ -11,6 +12,13 @@ const getOptions = () => {
     required: false,
     type: ApplicationCommandOptionType.String,
     slash: true
+  }, {
+    name: 'map',
+    description: 'Specify a map to get the stats related',
+    required: false,
+    type: ApplicationCommandOptionType.String,
+    slash: true,
+    choices: getMapChoice()
   })
 
   return options
