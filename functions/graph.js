@@ -189,10 +189,20 @@ const roundRect = (ctx, x, y, w, h, r) => {
   return ctx
 }
 
-const getElo = (maxMatch, matchHistory, playerElo, checkElo = true) => {
+const eloVerification = (matchHistory, playerElo, checkElo = true) => {
   if (matchHistory.length <= 0) throw 'Couldn\'t get matches'
   else if (checkElo && matchHistory[0].elo === undefined) matchHistory[0].elo = playerElo
+  return matchHistory
+}
+
+const getElo = (maxMatch, matchHistory, playerElo, checkElo = true) => {
+  matchHistory = eloVerification(matchHistory, playerElo, checkElo)
   return matchHistory.map(e => e.elo).slice(0, maxMatch)
+}
+
+const getEloGain = (maxMatch, matchHistory, playerElo, checkElo) => {
+  matchHistory = eloVerification(matchHistory, playerElo, checkElo)
+  return matchHistory.map(e => e.eloGain).slice(0, maxMatch)
 }
 
 const getKD = (matchHistory, maxMatch) => {
@@ -227,5 +237,6 @@ module.exports = {
   getKD,
   getChart,
   getGraph,
-  getCompareDatasets
+  getCompareDatasets,
+  getEloGain
 }
