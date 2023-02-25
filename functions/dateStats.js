@@ -65,14 +65,19 @@ const generatePlayerStats = playerHistory => {
 const getAverage = (q, d, fixe = 2, percent = 1) => ((parseFloat(q) / parseFloat(d)) * percent).toFixed(fixe)
 
 const getPlayerHistory = async (playerId, maxMatch, eloMatches = true) => {
-  const playerHistory = []
   const playerStats = await Player.getStats(playerId)
   const limit = 100
+  let playerHistory = []
 
   if (maxMatch === null || maxMatch > playerStats.lifetime.Matches) maxMatch = playerStats.lifetime.Matches
-  if (eloMatches) for (let page = 0; page < Math.ceil(maxMatch / limit); page++)
-    playerHistory.push(...await Match.getMatchElo(playerId, maxMatch, page))
-  else {  
+  if (eloMatches) {
+    for (let page = 0; page < Math.ceil(maxMatch / limit); page++) playerHistory.push(...await Match.getMatchElo(playerId, maxMatch, page))
+
+    playerHistory = playerHistory.map((e, i, a) => {
+      e.eloGain = e.elo - a[i + 1]?.elo || 0
+      return e
+    })
+  } else {
     let max = Math.ceil(maxMatch / limit)
     max = max > 10 ? 10 : max
     for (let page = 0; page < max; page++)
@@ -115,11 +120,6 @@ const getCardWithInfo = async (actionRow, values, type, id, maxMatch, maxPage = 
   const size = 40
 
   let playerHistory = await getPlayerHistory(playerId, pStats.lifetime.Matches)
-  playerHistory = playerHistory.map((e, i, a) => {
-    e.elo = isNaN(e.elo) ? a[i - 1]?.elo ?? undefined : e.elo
-    return e
-  })
-
   let from = values.f * 1000 || playerHistory.at(-1).date
   const to = values.t * 1000 || new Date().setHours(+24)
 
@@ -131,8 +131,8 @@ const getCardWithInfo = async (actionRow, values, type, id, maxMatch, maxPage = 
 
   const checkElo = today >= from && today <= to
   const playerHistoryTo = playerHistory.filter(e => e.date < to)
-  const elo = await Graph.getElo(playerStats.games + 1, playerHistoryTo, faceitElo, checkElo)
-  const eloDiff = elo.at(0) - elo.at(-1)
+  const elo = Graph.getEloGain(playerStats.games, playerHistoryTo, faceitElo, checkElo)
+  const eloDiff = elo.reduce((a, b) => a + b, 0)
 
   if (!map) playerHistory = filteredHistory
   if (!playerHistory.length > 0) throw `${playerDatas.nickname} played 0 match on that period.`

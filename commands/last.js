@@ -28,12 +28,9 @@ const getMatchItems = (playerDatas, steamDatas, playerHistory, maxMatch, page, m
 
   const matchStats = playerHistory.filter(e => e.matchId === matchId)
   const lastMatchesElo = Graph.getElo(maxMatch + 1, [...playerHistory], faceitElo, page === 0)
-
+  const eloDiff = Graph.getEloGain(maxMatch, [...matchStats], faceitElo, page === 0)
   const levelDiff = playerHistory.map(e => e.matchId === matchId)
     .map((e, i) => e ? lastMatchesElo.at(i) : null)
-    .filter(e => e !== null)
-  const eloDiff = playerHistory.map(e => e.matchId === matchId)
-    .map((e, i) => e ? lastMatchesElo.at(i) - lastMatchesElo.at(i + 1) : null)
     .filter(e => e !== null)
 
   let mapThumbnail
@@ -146,8 +143,8 @@ const sendCardWithInfo = async (interaction, playerId, matchId = null, page = 0,
     const to = playerHistory.at(0).date
     const playerStats = generatePlayerStats(playerHistory)
 
-    const elo = await Graph.getElo(playerHistory.length, playerHistory, faceitElo, false)
-    const eloDiff = elo.at(0) - elo.at(-1)
+    const elo = Graph.getEloGain(playerHistory.length, playerHistory, faceitElo, false)
+    const eloDiff = elo.reduce((a, b) => a + b, 0)
 
     const graphBuffer = Graph.generateChart(playerHistory,
       faceitElo,
