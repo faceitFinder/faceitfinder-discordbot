@@ -191,7 +191,10 @@ const roundRect = (ctx, x, y, w, h, r) => {
 
 const eloVerification = (matchHistory, playerElo, checkElo = true) => {
   if (matchHistory.length <= 0) throw 'Couldn\'t get matches'
-  else if (checkElo && matchHistory[0].elo === undefined) matchHistory[0].elo = playerElo
+  else if (checkElo) {
+    if (isNaN(matchHistory[0].elo)) matchHistory[0].elo = playerElo
+    if (isNaN(matchHistory[0].eloGain)) matchHistory[0].eloGain = matchHistory[0].elo - matchHistory[1].elo
+  }
   return matchHistory
 }
 
@@ -224,9 +227,9 @@ const colorFilter = (colors, value) => Object.entries(colors)
 
 const getGraph = (type, matchHistory, faceitElo, maxMatch, check = true) => {
   switch (type) {
-  case CustomType.TYPES.ELO: return getElo(maxMatch, matchHistory, faceitElo, check)
-  case CustomType.TYPES.KD: return getKD(matchHistory, maxMatch)
-  default: break
+    case CustomType.TYPES.ELO: return getElo(maxMatch, matchHistory, faceitElo, check)
+    case CustomType.TYPES.KD: return getKD(matchHistory, maxMatch)
+    default: break
   }
 }
 
