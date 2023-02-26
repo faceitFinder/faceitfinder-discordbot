@@ -74,7 +74,7 @@ const getPlayerHistory = async (playerId, maxMatch, eloMatches = true) => {
     for (let page = 0; page < Math.ceil(maxMatch / limit); page++) playerHistory.push(...await Match.getMatchElo(playerId, maxMatch, page))
 
     playerHistory = playerHistory.map((e, i, a) => {
-      e.eloGain = e.elo - a[i + 1]?.elo || 0
+      e.eloGain = e.elo - a[i + 1]?.elo || undefined
       return e
     })
   } else {
