@@ -132,7 +132,7 @@ const getCardWithInfo = async (actionRow, values, type, id, maxMatch, maxPage = 
   const checkElo = today >= from && today <= to
   const playerHistoryTo = playerHistory.filter(e => e.date < to)
   const elo = Graph.getEloGain(playerStats.games, playerHistoryTo, faceitElo, checkElo)
-  const eloDiff = elo.reduce((a, b) => a + b, 0)
+  const eloDiff = elo.filter(e => e).reduce((a, b) => a + b, 0)
 
   if (!map) playerHistory = filteredHistory
   if (!playerHistory.length > 0) throw `${playerDatas.nickname} played 0 match on that period.`
