@@ -192,25 +192,25 @@ const roundRect = (ctx, x, y, w, h, r) => {
 const eloVerification = (matchHistory, playerElo, checkElo = true) => {
   if (matchHistory.length <= 0) throw 'Couldn\'t get matches'
   else if (checkElo) {
-    if (isNaN(matchHistory[0].elo)) matchHistory[0].elo = playerElo
-    if (isNaN(matchHistory[0].eloGain)) matchHistory[0].eloGain = matchHistory[0].elo - matchHistory[1].elo
+    if (isNaN(matchHistory[0]?.elo)) matchHistory[0]?.elo = playerElo
+    if (isNaN(matchHistory[0]?.eloGain)) matchHistory[0]?.eloGain = matchHistory[0]?.elo - matchHistory[1]?.elo
   }
   return matchHistory
 }
 
 const getElo = (maxMatch, matchHistory, playerElo, checkElo = true) => {
   matchHistory = eloVerification(matchHistory, playerElo, checkElo)
-  return matchHistory.map(e => e.elo).slice(0, maxMatch)
+  return matchHistory.map(e => e?.elo).slice(0, maxMatch)
 }
 
 const getEloGain = (maxMatch, matchHistory, playerElo, checkElo) => {
   matchHistory = eloVerification(matchHistory, playerElo, checkElo)
-  return matchHistory.map(e => e.eloGain).slice(0, maxMatch)
+  return matchHistory.map(e => e?.eloGain).slice(0, maxMatch)
 }
 
 const getKD = (matchHistory, maxMatch) => {
   if (matchHistory.length === 0) throw 'Couldn\'t get matches'
-  return matchHistory.map(e => e.c2).slice(0, maxMatch)
+  return matchHistory.map(e => e?.c2).slice(0, maxMatch)
 }
 
 const getGradient = (prev, current, ctx, type) => {
