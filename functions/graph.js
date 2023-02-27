@@ -192,8 +192,10 @@ const roundRect = (ctx, x, y, w, h, r) => {
 const eloVerification = (matchHistory, playerElo, checkElo = true) => {
   if (matchHistory.length <= 0) throw 'Couldn\'t get matches'
   else if (checkElo) {
-    if (isNaN(matchHistory[0]?.elo)) matchHistory[0]?.elo = playerElo
-    if (isNaN(matchHistory[0]?.eloGain)) matchHistory[0]?.eloGain = matchHistory[0]?.elo - matchHistory[1]?.elo
+    const match1 = matchHistory[0]
+    const match2 = matchHistory[1]
+    if (isNaN(match1?.elo)) match1?.elo = playerElo
+    if (isNaN(match1?.eloGain)) match1?.eloGain = match1?.elo - match2?.elo
   }
   return matchHistory
 }
