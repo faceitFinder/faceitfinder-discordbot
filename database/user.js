@@ -1,10 +1,11 @@
 const User = require('./models/userModel')
 
-const create = (discordId, faceitId, guildId) => {
+const create = (discordId, faceitId, guildId, nickname) => {
   const newUser = new User({
     discordId: discordId,
     faceitId: faceitId,
-    guildId: guildId
+    guildId: guildId,
+    nickname: nickname,
   })
 
   newUser.save((err) => {
@@ -22,7 +23,11 @@ const remove = (discordId, guildId = null) => guildId ?
 
 const exists = (discordId, guildId = null) => getWithGuild(discordId, guildId)
 
-const update = (discordId, faceitId, guildId = null) => User.updateOne({ discordId: discordId, guildId: guildId }, { faceitId: faceitId }).exec()
+const update = (discordId, faceitId, guildId = null, nickname) => User.updateOne(
+  { discordId: discordId, guildId: guildId },
+  { faceitId: faceitId, nickname: nickname }
+).exec()
+
 
 const getAll = () => User.find({}).exec()
 
