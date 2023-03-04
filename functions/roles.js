@@ -27,6 +27,7 @@ const setupRoles = async (users, data, remove) => {
     const roleToAdd = roleLevels[playerLevel - 1]
     const rolesFit = member.roles.resolve(roleToAdd)
 
+    if (user.nickname) await member.edit({ nick: playerDatas.nickname }).catch(console.error)
     if (remove || !rolesFit) await member.roles.remove(roleLevels).catch(console.error)
     if (!remove && !rolesFit) await member.roles.add(roleToAdd).catch(console.error)
   })
