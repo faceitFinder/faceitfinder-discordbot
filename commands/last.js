@@ -86,7 +86,7 @@ const getMatchItems = (playerDatas, steamDatas, playerHistory, maxMatch, page, m
   }
 }
 
-const sendCardWithInfo = async (interaction, playerId, matchId = null, page = 0, players = [], mapName = null) => {
+const sendCardWithInfo = async (interaction, playerId, matchId = null, page = 0, players = [], mapName = null, excludedPlayers = []) => {
   const playerDatas = await Player.getDatas(playerId)
   const playerStats = await Player.getStats(playerId)
   const steamDatas = await Steam.getDatas(playerDatas.steam_id_64).catch(err => err.statusText)
@@ -99,10 +99,12 @@ const sendCardWithInfo = async (interaction, playerId, matchId = null, page = 0,
 
   if (map) mapName = map
 
-  if (players.length > 0) {
-    playerHistory = await findPlayersStats(playerId, players, playerStats.lifetime.Matches, playerDatas)
+  playerHistory = playerFullHistory
+
+  if (players.length > 0 || excludedPlayers.length > 0) {
+    playerHistory = await findPlayersStats(playerId, players, excludedPlayers, playerStats.lifetime.Matches, playerDatas)
     if (!players.includes(playerId)) players.push(playerId)
-  } else playerHistory = playerFullHistory
+  }
 
   if (mapName) playerHistory = playerHistory.filter(e => e.i1 === mapName)
 
@@ -134,7 +136,7 @@ const sendCardWithInfo = async (interaction, playerId, matchId = null, page = 0,
     }
   })
 
-  if (players.length > 0) {
+  if (players.length > 0 || excludedPlayers.length > 0) {
     const faceitLevel = playerDatas.games.csgo.skill_level
     const faceitElo = playerDatas.games.csgo.faceit_elo
     const size = 40
@@ -166,6 +168,9 @@ const sendCardWithInfo = async (interaction, playerId, matchId = null, page = 0,
         value: [new Date(from).toDateString(), '\n', new Date(to).toDateString()].join(' '),
         inline: false
       },
+      { name: 'Highest Elo', value: playerStats['Highest Elo'], inline: true },
+      { name: 'Lowest Elo', value: playerStats['Lowest Elo'], inline: true },
+      { name: '\u200b', value: '\u200b', inline: true },
       { name: 'Games', value: `${playerStats.games} (${playerStats.winrate}% Win)`, inline: true },
       { name: 'Elo', value: isNaN(eloDiff) ? '0' : eloDiff > 0 ? `+${eloDiff}` : eloDiff.toString(), inline: true },
       { name: 'Average MVPs', value: playerStats['Average MVPs'], inline: true },
@@ -230,6 +235,18 @@ const sendCardWithInfo = async (interaction, playerId, matchId = null, page = 0,
             .setLabel(playerDatas.nickname)
             .setStyle(Discord.ButtonStyle.Success)
             .setDisabled(playerId === p)
+        }))))
+
+  if (excludedPlayers.length > 0)
+    components.push(
+      new Discord.ActionRowBuilder()
+        .addComponents(await Promise.all(excludedPlayers.map(async (p) => {
+          const playerDatas = await Player.getDatas(p)
+          return new Discord.ButtonBuilder()
+            .setCustomId(p)
+            .setLabel(playerDatas.nickname)
+            .setStyle(Discord.ButtonStyle.Danger)
+            .setDisabled(true)
         }))))
 
   return {

@@ -26,6 +26,7 @@ module.exports = {
     const optionsComponents = interaction.message.components.at(1).components
     const paginationComponents = interaction.message.components.at(2)
     const playerComponents = interaction.message.components.at(3)
+    const excludedPlayerComponents = interaction.message.components.at(4)
     const playerStatsCard = interaction.message.embeds.filter(e => e.data.image.url.includes('graph'))?.at(0)
 
     const currentPage = JSON.parse(paginationComponents.components.at(0).customId).c
@@ -43,6 +44,7 @@ module.exports = {
     ]
 
     if (playerComponents !== undefined) components.push(playerComponents)
+    if (excludedPlayerComponents !== undefined) components.push(excludedPlayerComponents)
 
     const messageItems = await updateEmbedMessage(json.s, json.m, currentPage)
     if (playerStatsCard) messageItems.embeds.unshift(playerStatsCard)

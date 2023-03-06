@@ -1,8 +1,8 @@
 const { getPlayerHistory } = require('../functions/dateStats')
 
-const findPlayersStats = async (playerId, players, maxMatch = null) => {
+const findPlayersStats = async (playerId, players, excludedPlayers, maxMatch = null) => {
   const playerHistoryMatches = (await getPlayerHistory(playerId, maxMatch, false))
-    .filter(m => players.every(p => m.playing_players.includes(p)))
+    .filter(m => players.every(p => m.playing_players.includes(p)) && !excludedPlayers.some(p => m.playing_players.includes(p)))
 
   const matchIds = playerHistoryMatches.map(e => e.match_id)
 
