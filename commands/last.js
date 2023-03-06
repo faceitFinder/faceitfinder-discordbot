@@ -101,7 +101,7 @@ const sendCardWithInfo = async (interaction, playerId, matchId = null, page = 0,
 
   playerHistory = playerFullHistory
 
-  if (players.length > 0) {
+  if (players.length > 0 || excludedPlayers.length > 0) {
     playerHistory = await findPlayersStats(playerId, players, excludedPlayers, playerStats.lifetime.Matches, playerDatas)
     if (!players.includes(playerId)) players.push(playerId)
   }
@@ -136,7 +136,7 @@ const sendCardWithInfo = async (interaction, playerId, matchId = null, page = 0,
     }
   })
 
-  if (players.length > 0) {
+  if (players.length > 0 || excludedPlayers.length > 0) {
     const faceitLevel = playerDatas.games.csgo.skill_level
     const faceitElo = playerDatas.games.csgo.faceit_elo
     const size = 40
