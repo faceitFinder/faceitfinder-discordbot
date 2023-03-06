@@ -86,7 +86,7 @@ const getMatchItems = (playerDatas, steamDatas, playerHistory, maxMatch, page, m
   }
 }
 
-const sendCardWithInfo = async (interaction, playerId, matchId = null, page = 0, players = [], mapName = null) => {
+const sendCardWithInfo = async (interaction, playerId, matchId = null, page = 0, players = [], mapName = null, excludedPlayers = []) => {
   const playerDatas = await Player.getDatas(playerId)
   const playerStats = await Player.getStats(playerId)
   const steamDatas = await Steam.getDatas(playerDatas.steam_id_64).catch(err => err.statusText)
@@ -99,10 +99,12 @@ const sendCardWithInfo = async (interaction, playerId, matchId = null, page = 0,
 
   if (map) mapName = map
 
+  playerHistory = playerFullHistory
+
   if (players.length > 0) {
-    playerHistory = await findPlayersStats(playerId, players, playerStats.lifetime.Matches, playerDatas)
+    playerHistory = await findPlayersStats(playerId, players, excludedPlayers, playerStats.lifetime.Matches, playerDatas)
     if (!players.includes(playerId)) players.push(playerId)
-  } else playerHistory = playerFullHistory
+  }
 
   if (mapName) playerHistory = playerHistory.filter(e => e.i1 === mapName)
 
@@ -233,6 +235,18 @@ const sendCardWithInfo = async (interaction, playerId, matchId = null, page = 0,
             .setLabel(playerDatas.nickname)
             .setStyle(Discord.ButtonStyle.Success)
             .setDisabled(playerId === p)
+        }))))
+
+  if (excludedPlayers.length > 0)
+    components.push(
+      new Discord.ActionRowBuilder()
+        .addComponents(await Promise.all(excludedPlayers.map(async (p) => {
+          const playerDatas = await Player.getDatas(p)
+          return new Discord.ButtonBuilder()
+            .setCustomId(p)
+            .setLabel(playerDatas.nickname)
+            .setStyle(Discord.ButtonStyle.Danger)
+            .setDisabled(true)
         }))))
 
   return {
