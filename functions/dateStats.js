@@ -26,6 +26,8 @@ const generatePlayerStats = playerHistory => {
     'Red K/D': 0,
     'Orange K/D': 0,
     'Green K/D': 0,
+    'Highest elo': 0,
+    'Lowest elo': 0,
   }
 
   for (const e of playerHistory) {
@@ -59,6 +61,11 @@ const generatePlayerStats = playerHistory => {
   playerStats['Average Assists'] = getAverage(playerStats['Average Assists'], playerStats.games)
   playerStats.kd = getAverage(playerStats.kills, playerStats.deaths)
 
+  const elo = playerHistory.filter(e => e.elo).map(e => e.elo)
+
+  playerStats['Highest Elo'] = Math.max(...elo).toString()
+  playerStats['Lowest Elo'] = Math.min(...elo).toString()
+
   return playerStats
 }
 
@@ -73,7 +80,7 @@ const getPlayerHistory = async (playerId, maxMatch, eloMatches = true) => {
   if (eloMatches) {
     for (let page = 0; page < Math.ceil(maxMatch / limit); page++) playerHistory.push(...await Match.getMatchElo(playerId, maxMatch, page))
 
-    playerHistory = playerHistory.map((e, i, a) => {
+    playerHistory = playerHistory.filter(e => e?.elo).map((e, i, a) => {
       e.eloGain = e.elo - a[i + 1]?.elo || undefined
       return e
     })
@@ -161,6 +168,9 @@ const getCardWithInfo = async (actionRow, values, type, id, maxMatch, maxPage = 
     .setDescription(`[Steam](https://steamcommunity.com/profiles/${playerDatas.games.csgo.game_player_id}), [Faceit](https://www.faceit.com/fr/players/${playerDatas.nickname})`)
     .setThumbnail(`attachment://${faceitLevel}level.png`)
     .addFields(...head,
+      { name: 'Highest Elo', value: playerStats['Highest Elo'], inline: true },
+      { name: 'Lowest Elo', value: playerStats['Lowest Elo'], inline: true },
+      { name: '\u200b', value: '\u200b', inline: true },
       { name: 'Games', value: `${playerStats.games} (${playerStats.winrate}% Win)`, inline: true },
       { name: 'Elo', value: isNaN(eloDiff) ? '0' : eloDiff > 0 ? `+${eloDiff}` : eloDiff.toString(), inline: true },
       { name: 'Average MVPs', value: playerStats['Average MVPs'], inline: true },
