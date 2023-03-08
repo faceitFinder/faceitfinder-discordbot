@@ -80,8 +80,14 @@ const getPlayerHistory = async (playerId, maxMatch, eloMatches = true) => {
   if (eloMatches) {
     for (let page = 0; page < Math.ceil(maxMatch / limit); page++) playerHistory.push(...await Match.getMatchElo(playerId, maxMatch, page))
 
-    playerHistory = playerHistory.filter(e => e?.elo).map((e, i, a) => {
+    playerEloGain = playerHistory.filter(e => e?.elo).map((e, i, a) => {
       e.eloGain = e.elo - a[i + 1]?.elo || undefined
+      return e
+    })
+
+    playerHistory = playerHistory.map(e => {
+      const match = playerEloGain.find(m => m.matchId === e.matchId)
+      if (match) e.eloGain = match.eloGain
       return e
     })
   } else {
