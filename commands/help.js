@@ -33,7 +33,7 @@ const getCommandsHelp = (commandName, card) => {
 
   card.setDescription(`Information about the ${command.name} command`)
     .addFields({ name: 'Description', value: command.description },
-      { name: 'Options', value: optionsDesc.length > 0 ? optionsDesc : 'This command do not required options' },
+      { name: 'Options', value: optionsDesc.length > 0 ? optionsDesc : 'This command does not require any options' },
       { name: 'Usage', value: `/${command.name} ${command.usage}` })
 
   return { embeds: [card] }
