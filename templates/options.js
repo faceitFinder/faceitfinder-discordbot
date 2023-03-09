@@ -41,7 +41,7 @@ const dateRange = [
   }
 ]
 
-const usage = 'steam_parameters:multiple steam params and @user OR CSGO status AND team:team slug (max 1) AND faceit_parameters:multiple faceit nicknames and @user'
+const usage = '{<steam_parameters> <faceit_parameters> <team>}'
 
 module.exports = {
   stats,

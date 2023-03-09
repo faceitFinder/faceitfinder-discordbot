@@ -8,7 +8,7 @@ const getOptions = () => {
   const options = [...Options.stats]
   options.unshift({
     name: 'player_aimed',
-    description: 'steam_params / faceit_params / @user / empty if linked.',
+    description: 'steam_params / faceit_params / @user / empty if linked. History of the player you want to search in.',
     required: false,
     type: ApplicationCommandOptionType.String,
     slash: true
@@ -40,7 +40,7 @@ module.exports = {
   name: 'find',
   options: getOptions(),
   description: 'Find the games that includes the player requested (up to 5), last 1000 games.',
-  usage: `player_aimed:the history in which one you are searching AND ${Options.usage} AND map:the map you want to search AND excluded_steam_parameters:the steam parameters you want to exclude AND excluded_faceit_parameters:the faceit parameters you want to exclude`,
+  usage: `<player_aimed> AND ${Options.usage} AND map:the map you want to search AND excluded_steam_parameters:the steam parameters you want to exclude AND excluded_faceit_parameters:the faceit parameters you want to exclude`,
   type: 'stats',
   async execute(interaction) {
     const playerAimed = (await getUsers(interaction, 1, 'player_aimed', 'player_aimed', false))[0].param

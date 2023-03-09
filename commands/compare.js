@@ -292,7 +292,8 @@ module.exports = {
     choices: getMapChoice()
   },],
   description: 'Compare both user stats.',
-  usage: 'match_number: number, default 20 AND first_user_steam:steam parameter OR first_user_faceit:faceit nickname OR @user AND second_user_steam:steam parameter OR second_user_faceit:faceit nickname OR @user, map: map name',
+  usage: '<match_number> {<first_user_steam> <first_user_faceit>} [<second_user_steam> <second_user_faceit>] <map>',
+  example: 'match_number: 100 first_user_steam: justdams second_user_steam: sheraw map: Vertigo',
   type: 'stats',
   async execute(interaction) {
     const player1 = (await getUsers(interaction, 1, 'first_user_steam', 'first_user_faceit'))?.at(0)?.param
