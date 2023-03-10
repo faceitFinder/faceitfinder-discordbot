@@ -58,7 +58,7 @@ module.exports = {
     }
   ],
   description: 'Display the command list.',
-  usage: 'command name',
+  usage: '<command>',
   type: 'system',
   async execute(interaction) {
     const command = getInteractionOption(interaction, 'command')?.trim().split(' ')[0]
@@ -66,7 +66,7 @@ module.exports = {
     const helpCard = new Discord.EmbedBuilder()
       .setColor(color.primary)
       .setTitle('Commands')
-      .setDescription('`/help {command}` for more info on a specific command')
+      .setDescription('`/help <command>` for more info on a specific command')
       .setFooter({ text: `${name} Help` })
 
     if (command) return getCommandsHelp(command, helpCard)

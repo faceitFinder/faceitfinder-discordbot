@@ -1,6 +1,6 @@
 const { ApplicationCommandOptionType } = require('discord.js')
 const Options = require('../templates/options')
-const { getUsers } = require('../functions/commands')
+const { getUsers, getInteractionOption } = require('../functions/commands')
 const { sendCardWithInfo } = require('./last')
 const { getMapChoice } = require('../functions/map')
 
@@ -39,19 +39,24 @@ const getOptions = () => {
 module.exports = {
   name: 'find',
   options: getOptions(),
-  description: 'Find the games that includes the player requested (up to 5), last 1000 games.',
-  usage: `<player_aimed> AND ${Options.usage} AND map:the map you want to search AND excluded_steam_parameters:the steam parameters you want to exclude AND excluded_faceit_parameters:the faceit parameters you want to exclude`,
+  description: 'Find the games that includes the player requested (up to 5)',
+  usage: '{player_aimed} [<steam_parameters> <faceit_parameters> <team>] <map> <excluded_steam_parameters> <excluded_faceit_parameters>',
+  example: 'player_aimed: justdams steam_parameters: weder77 faceit_parameters: sheraw excluded_faceit_parameters: KanzakiR3D map: Vertigo',
   type: 'stats',
   async execute(interaction) {
-    const playerAimed = (await getUsers(interaction, 1, 'player_aimed', 'player_aimed', false))[0].param
+    const playerAimed = (await getUsers(interaction, 2, 'player_aimed', 'player_aimed', false))
+      .find(e => e.param.match(/^[0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12}$/i))
+      ?.param
+
     const users = (await getUsers(interaction, 5)).map(p => p.param).filter((e, i, a) => a.indexOf(e) === i)
     let excludedUsers = (await getUsers(interaction, 10, 'excluded_steam_parameters', 'excluded_faceit_parameters', false))
       .map(p => p.param).filter((e, i, a) => a.indexOf(e) === i)
 
-    excludedUsers = excludedUsers.filter(e => e.normalize() !== playerAimed.normalize())
+    const excludedSteam = getInteractionOption(interaction, 'excluded_steam_parameters')
+    const excludedFaceit = getInteractionOption(interaction, 'excluded_faceit_parameters')
 
-    if (excludedUsers.includes(playerAimed)) throw 'You can\'t exclude a player you are searching for.'
-    if (excludedUsers.some(e => users.includes(e))) throw 'You can\'t exclude a player you are searching for.'
+    if (!excludedSteam && !excludedFaceit) excludedUsers = excludedUsers.filter(e => e.normalize() !== playerAimed.normalize())
+    if (excludedUsers.some(e => users.includes(e)) || excludedUsers.includes(playerAimed)) throw 'You can\'t exclude a player you are searching for.'
 
     return sendCardWithInfo(interaction, playerAimed, null, 0, users.filter(e => e.normalize() !== playerAimed.normalize()), null, excludedUsers)
   }

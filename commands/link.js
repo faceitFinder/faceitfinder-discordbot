@@ -61,7 +61,7 @@ module.exports = {
       slash: true
     },
     {
-      name: 'faceit_parameters',
+      name: 'faceit_parameter',
       description: 'faceit nickname / @user',
       required: false,
       type: Discord.ApplicationCommandOptionType.String,
@@ -83,9 +83,10 @@ module.exports = {
     }
   ],
   description: 'Link a steam profile to the discord user, to get your stats directly (no parameters needed).',
-  usage: 'steam_parameter:steam param or @user or CSGO status (max 1 user) OR faceit_parameters:faceit nickname (max 1) AND discord_user: @user',
+  usage: '[<steam_parameter> <faceit_parameter>] <discord_user> <nickname>',
+  example: 'steam_parameter: justdams',
   type: 'utility',
   async execute(interaction) {
-    return getCardsConditions(interaction, sendCardWithInfo, 1, 'steam_parameter')
+    return getCardsConditions(interaction, sendCardWithInfo, 1, 'steam_parameter', 'faceit_parameter')
   }
 }
