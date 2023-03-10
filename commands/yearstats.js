@@ -70,6 +70,7 @@ module.exports = {
   options: Options.stats,
   description: 'Displays the stats of the choosen year. With elo graph of the year.',
   usage: Options.usage,
+  example: 'steam_parameters: justdams',
   type: 'stats',
   async execute(interaction) {
     return getCardsConditions(interaction, sendCardWithInfo)

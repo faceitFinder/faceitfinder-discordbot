@@ -68,7 +68,8 @@ module.exports = {
   name: 'map',
   options: getOptions(),
   description: 'Displays the stats of the choosen map.',
-  usage: `map:choose a map name AND ${Options.usage}`,
+  usage: `${Options.usage} <map>`,
+  example: 'steam_parameters: justdams map: Vertigo',
   type: 'stats',
   async execute(interaction) {
     return getCardsConditions(interaction, sendCardWithInfo)

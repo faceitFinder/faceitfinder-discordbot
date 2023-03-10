@@ -83,11 +83,14 @@ const getUsers = async (
   }
   if (faceitParameters) {
     await Promise.all(faceitParameters
-      .map(async nickname => await Player.getDatasFromNickname(nickname)
-        .catch(async () => {
-          const player = await Player.searchPlayer(nickname).catch(e => e)
-          return player.items?.at(0) || nickname
-        }))
+      .map(async nickname => {
+        nickname = nickname.split('/').filter(e => e).pop()
+        return await Player.getDatasFromNickname(nickname)
+          .catch(async () => {
+            const player = await Player.searchPlayer(nickname).catch(e => e)
+            return player.items?.at(0) || nickname
+          })
+      })
     ).then(params => {
       parameters.push(...params.map(e => {
         return {

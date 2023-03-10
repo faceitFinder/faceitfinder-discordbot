@@ -1,7 +1,6 @@
 const Discord = require('discord.js')
 const Team = require('../database/team')
 const UserTeam = require('../database/userTeam')
-const Steam = require('../functions/steam')
 const Player = require('../functions/player')
 const User = require('../database/user')
 const errorCard = require('../templates/errorCard')
@@ -212,7 +211,13 @@ module.exports = {
     }
   ],
   description: 'Create a team and link up to 5 users to it (limited to 1 team by discord account).',
-  usage: `\n- \`${CREATE}\` [team name]\n- \`${DELETE}\`\n- \`${UPDATE}\` [access] {name}\n- \`${INFO}\`\n- \`${ADD_USER}\` [steamID / steam custom ID / url of one steam profile / @user / CSGO status OR faceit nicknames]\n- \`${REMOVE_USER}\` [steamID / steam custom ID / url of one steam profile / @user / CSGO status OR faceit nicknames]`,
+  usage: `
+  - ${CREATE} [team name]
+  - ${DELETE}
+  - ${UPDATE} [access] <name>
+  - ${INFO}
+  - ${ADD_USER} [<steam_parameters> <faceit_parameters>]
+  - ${REMOVE_USER} [<steam_parameters> <faceit_parameters>]`,
   type: 'utility',
   async execute(interaction) {
     const user = interaction.user.id

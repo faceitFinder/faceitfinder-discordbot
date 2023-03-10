@@ -274,7 +274,8 @@ module.exports = {
   name: 'last',
   options: getOptions(),
   description: 'Get the stats of last game.',
-  usage: `${Options.usage} AND map name`,
+  usage: `${Options.usage} <map>`,
+  example: 'steam_parameters: justdams',
   type: 'stats',
   async execute(interaction) {
     return getCardsConditions(interaction, sendCardWithInfo)

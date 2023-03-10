@@ -67,6 +67,7 @@ module.exports = {
   options: Options.stats,
   description: 'Displays the stats of the choosen week. With elo graph of the week.',
   usage: Options.usage,
+  example: 'steam_parameters: justdams',
   type: 'stats',
   async execute(interaction) {
     return getCardsConditions(interaction, sendCardWithInfo)

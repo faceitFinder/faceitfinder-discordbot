@@ -12,6 +12,7 @@ const fetchData = async (url, error) => axios.get(url, {
   .then(res => res.data)
   .catch(e => {
     console.error(e.response.status, e.response.statusText, url)
+    if (e.response.status === 500) throw 'Faceit: internal server error.'
     throw error
   })
 

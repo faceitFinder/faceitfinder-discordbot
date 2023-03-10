@@ -31,10 +31,12 @@ const getCommandsHelp = (commandName, card) => {
 
   command.options.forEach(o => { if (o.description) optionsDesc += `\`${o.name}\`: ${o.description}\n` })
 
-  card.setDescription(`Information about the ${command.name} command`)
+  card.setDescription(`Information about the ${command.name} command \n \`<>\`: optional, \`[]\`: required, \`{}\`: required if not linked`)
     .addFields({ name: 'Description', value: command.description },
       { name: 'Options', value: optionsDesc.length > 0 ? optionsDesc : 'This command does not require any options' },
-      { name: 'Usage', value: `/${command.name} ${command.usage}` })
+      { name: 'Usage', value: `\`/${command.name} ${command.usage}\`` })
+
+  if (command?.example) card.addFields({ name: 'Example', value: `\`/${command.name} ${command.example}\`` })
 
   return { embeds: [card] }
 }
@@ -56,7 +58,7 @@ module.exports = {
     }
   ],
   description: 'Display the command list.',
-  usage: 'command name',
+  usage: '<command>',
   type: 'system',
   async execute(interaction) {
     const command = getInteractionOption(interaction, 'command')?.trim().split(' ')[0]
@@ -64,7 +66,7 @@ module.exports = {
     const helpCard = new Discord.EmbedBuilder()
       .setColor(color.primary)
       .setTitle('Commands')
-      .setDescription('`/help {command}` for more info on a specific command')
+      .setDescription('`/help <command>` for more info on a specific command')
       .setFooter({ text: `${name} Help` })
 
     if (command) return getCommandsHelp(command, helpCard)
