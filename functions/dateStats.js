@@ -8,6 +8,13 @@ const CustomType = require('../templates/customType')
 const CustomTypeFunc = require('../functions/customType')
 const { getPagination } = require('./pagination')
 const { getInteractionOption } = require('./commands')
+const { caching } = require('cache-manager')
+
+const ttl = 60 * 1000 * 5 // 5 minutes
+const cachingMemory = caching('memory', {
+  max: 100,
+  ttl: ttl,
+})
 
 const generatePlayerStats = playerHistory => {
   const playerStats = {
@@ -73,10 +80,16 @@ const getAverage = (q, d, fixe = 2, percent = 1) => ((parseFloat(q) / parseFloat
 
 const getPlayerHistory = async (playerId, maxMatch, eloMatches = true) => {
   const playerStats = await Player.getStats(playerId)
+  const cacheHistory = await cachingMemory
   const limit = 100
   let playerHistory = []
+  const cacheName = `${playerId}-${eloMatches ? 'elo' : 'match'}`
 
   if (maxMatch === null || maxMatch > playerStats.lifetime.Matches) maxMatch = playerStats.lifetime.Matches
+
+  const cache = await cacheHistory.get(cacheName)
+  if (cache && cache.length == playerStats.lifetime.Matches) return cache.slice(0, maxMatch)
+
   if (eloMatches) {
     for (let page = 0; page < Math.ceil(maxMatch / limit); page++) playerHistory.push(...await Match.getMatchElo(playerId, maxMatch, page))
 
@@ -95,6 +108,11 @@ const getPlayerHistory = async (playerId, maxMatch, eloMatches = true) => {
     max = max > 10 ? 10 : max
     for (let page = 0; page < max; page++)
       playerHistory.push(...(await Player.getHistory(playerId, limit, page * limit)).items)
+  }
+
+  if (maxMatch == playerStats.lifetime.Matches) {
+    if (cache) await cacheHistory.del(cacheName)
+    await cacheHistory.set(cacheName, playerHistory, ttl)
   }
 
   return playerHistory
