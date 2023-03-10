@@ -21,6 +21,9 @@ const setupRoles = async (users, data, remove) => {
     user = user.flat().at(0)
 
     const playerDatas = await Player.getDatas(user.faceitId).catch(console.error)
+    
+    if (!playerDatas?.games?.csgo) return
+    
     const playerLevel = playerDatas.games.csgo.skill_level
     const roleLevels = getRoleIds(guildRoles)
 
