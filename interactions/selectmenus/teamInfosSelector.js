@@ -66,7 +66,7 @@ module.exports = {
     if (usersInfo.length > 0) usersInfo.forEach(user => {
       embed.addFields({
         name: `${user.faceit.nickname}`,
-        value: `[Steam](https://steamcommunity.com/profiles/${user.faceit.games.csgo.game_player_id})\n[Faceit](https://www.faceit.com/fr/players/${user.faceit.nickname})`,
+        value: `[Steam](https://steamcommunity.com/profiles/${user.faceit.games.csgo.game_player_id})\n[Faceit](https://www.faceit.com/en/players/${user.faceit.nickname})`,
         inline: true,
       })
     })

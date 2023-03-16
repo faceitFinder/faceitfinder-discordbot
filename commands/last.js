@@ -56,8 +56,8 @@ const getMatchItems = (playerDatas, steamDatas, playerHistory, maxMatch, page, m
 
       mapThumbnail = `./images/maps/${mapName}.jpg`
 
-      card.setAuthor({ name: playerDatas.nickname, iconURL: playerDatas.avatar || null, url: `https://www.faceit.com/fr/players/${playerDatas.nickname}` })
-        .setDescription(`[Steam](https://steamcommunity.com/profiles/${playerDatas.games.csgo.game_player_id}), [Game Lobby](https://www.faceit.com/fr/csgo/room/${matchId}/scoreboard)`)
+      card.setAuthor({ name: playerDatas.nickname, iconURL: playerDatas.avatar || null, url: `https://www.faceit.com/en/players/${playerDatas.nickname}` })
+        .setDescription(`[Steam](https://steamcommunity.com/profiles/${playerDatas.games.csgo.game_player_id}), [Game Lobby](https://www.faceit.com/en/csgo/room/${matchId}/scoreboard)`)
         .addFields({ name: 'Score', value: roundStats.i18, inline: true },
           { name: 'Map', value: mapName, inline: true },
           { name: 'Status', value: result ? emojis.won.balise : emojis.lost.balise, inline: true },
@@ -160,8 +160,8 @@ const sendCardWithInfo = async (interaction, playerId, matchId = null, page = 0,
       new Discord.AttachmentBuilder(rankImageCanvas, { name: `${faceitLevel}level.png` }))
 
     const selectedPlayerStats = new Discord.EmbedBuilder()
-      .setAuthor({ name: playerDatas.nickname, iconURL: playerDatas.avatar || null, url: `https://www.faceit.com/fr/players/${playerDatas.nickname}` })
-      .setDescription(`[Steam](https://steamcommunity.com/profiles/${playerDatas.games.csgo.game_player_id}), [Faceit](https://www.faceit.com/fr/players/${playerDatas.nickname})`)
+      .setAuthor({ name: playerDatas.nickname, iconURL: playerDatas.avatar || null, url: `https://www.faceit.com/en/players/${playerDatas.nickname}` })
+      .setDescription(`[Steam](https://steamcommunity.com/profiles/${playerDatas.games.csgo.game_player_id}), [Faceit](https://www.faceit.com/en/players/${playerDatas.nickname})`)
       .setThumbnail(`attachment://${faceitLevel}level.png`)
       .addFields({
         name: 'From - To',
