@@ -40,9 +40,9 @@ const sendCardWithInfo = async (interaction, playerId, type = CustomType.TYPES.E
     .setAuthor({
       name: playerDatas.nickname,
       iconURL: playerDatas.avatar || null,
-      url: `https://www.faceit.com/fr/players/${playerDatas.nickname}`
+      url: `https://www.faceit.com/en/players/${playerDatas.nickname}`
     })
-    .setDescription(`[Steam](https://steamcommunity.com/profiles/${playerDatas.games.csgo.game_player_id}), [Faceit](https://www.faceit.com/fr/players/${playerDatas.nickname})`)
+    .setDescription(`[Steam](https://steamcommunity.com/profiles/${playerDatas.games.csgo.game_player_id}), [Faceit](https://www.faceit.com/en/players/${playerDatas.nickname})`)
     .setThumbnail(`attachment://${faceitLevel}level.png`)
     .addFields({ name: 'Games', value: `${playerStats.lifetime.Matches} (${playerStats.lifetime['Win Rate %']}% Win)`, inline: true },
       { name: 'K/D', value: playerStats.lifetime['Average K/D Ratio'], inline: true },
