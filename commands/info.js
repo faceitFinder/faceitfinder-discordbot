@@ -1,11 +1,13 @@
 const { name, invite, color, creator, vote, github, join } = require('../config.json')
 const Discord = require('discord.js')
 const User = require('../database/user')
+const { getTranslations, getTranslation } = require('../languages/setup')
 
 module.exports = {
   name: 'info',
   options: [],
-  description: 'Get the info about the bot.',
+  description: getTranslation('command.info.description', 'en-US'),
+  descriptionLocalizations: getTranslations('command.info.description'),
   usage: '',
   type: 'system',
   async execute(interaction) {

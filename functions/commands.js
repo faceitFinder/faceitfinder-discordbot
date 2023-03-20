@@ -8,6 +8,7 @@ const errorCard = require('../templates/errorCard')
 const Discord = require('discord.js')
 const noMention = require('../templates/noMention')
 const { updateRoles } = require('./roles')
+const { getTranslation } = require('../languages/setup')
 
 const getPlayerDatas = async (interaction, param, steam, discord = false) => {
   if (steam) {
@@ -36,7 +37,7 @@ const getDefaultInteractionOption = (interaction, componentIndex = 0, selectMenu
 }
 
 const getCards = async (interaction, array, fn) => {
-  return Promise.all(array.map(async obj => fn(interaction, obj.param).catch(err => noMention(errorCard(err)))))
+  return Promise.all(array.map(async obj => fn(interaction, obj.param).catch(err => noMention(errorCard(err, interaction.locale)))))
     .then(msgs => msgs.map(msg => {
       const data = {
         embeds: msg.embeds || [],
@@ -136,8 +137,7 @@ const getUsers = async (
     )
   })
 
-  if (params.length === 0) throw 'Please specify a user or a team. \n\
-    You can also link your profile with Faceit to use this command without parameters.'
+  if (params.length === 0) throw getTranslation('error.user.noParametersNoLink', interaction.locale)
 
   return Promise.all(params
     .slice(0, maxUser)

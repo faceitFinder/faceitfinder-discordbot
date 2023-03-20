@@ -2,6 +2,7 @@ const Discord = require('discord.js')
 const User = require('../database/user')
 const { getInteractionOption } = require('../functions/commands')
 const { updateRoles } = require('../functions/roles')
+const { getTranslation, getTranslations } = require('../languages/setup')
 const errorCard = require('../templates/errorCard')
 const successCard = require('../templates/successCard')
 
@@ -10,13 +11,13 @@ const sendCardWithInfo = async (interaction) => {
 
   if (await User.exists(discordId) || getInteractionOption(interaction, 'global')) {
     await updateRoles(interaction.client, discordId, null, true)
-    return successCard('Your account has been globaly unlinked.')
+    return successCard(getTranslation('success.command.unlink.global', interaction.locale), interaction.locale)
   } else if (await User.exists(discordId, interaction.guild.id)) {
     await updateRoles(interaction.client, discordId, interaction.guild.id, true)
-    return successCard('Your account has been unlinked on this server.')
+    return successCard(getTranslation('success.command.unlink.server', interaction.locale), interaction.locale)
   }
 
-  else return errorCard('Your account is not linked to a user.')
+  else return errorCard(getTranslation('error.user.notLinked', interaction.locale))
 }
 
 module.exports = {
@@ -24,13 +25,15 @@ module.exports = {
   options: [
     {
       name: 'global',
-      description: 'This will unlink your account on all servers (False by default)',
+      description: getTranslation('options.globalUnlink', 'en-US'),
+      descriptionLocalizations: getTranslations('options.globalUnlink'),
       required: false,
       type: Discord.ApplicationCommandOptionType.Boolean,
       slash: true
     }
   ],
-  description: 'Unlink your faceit id from the discord bot.',
+  description: getTranslation('command.unlink.description', 'en-US'),
+  descriptionLocalizations: getTranslations('command.unlink.description'),
   usage: '',
   type: 'utility',
   async execute(interaction) {

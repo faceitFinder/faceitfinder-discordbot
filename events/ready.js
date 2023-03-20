@@ -23,6 +23,8 @@ module.exports = {
         return {
           name: command.name,
           description: command?.slashDescription || command.description,
+          // eslint-disable-next-line camelcase
+          description_localizations: command.descriptionLocalizations || {},
           options: command.options.filter(c => c.slash !== undefined && c.slash === true).map(c => {
             let option = {
               name: c.name,

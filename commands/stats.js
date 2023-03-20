@@ -9,6 +9,7 @@ const CustomType = require('../templates/customType')
 const CustomTypeFunc = require('../functions/customType')
 const Options = require('../templates/options')
 const { getCardsConditions } = require('../functions/commands')
+const { getTranslation, getTranslations } = require('../languages/setup')
 
 const sendCardWithInfo = async (interaction, playerId, type = CustomType.TYPES.ELO) => {
   const playerDatas = await Player.getDatas(playerId)
@@ -84,7 +85,8 @@ const sendCardWithInfo = async (interaction, playerId, type = CustomType.TYPES.E
 module.exports = {
   name: 'stats',
   options: Options.stats,
-  description: 'Displays general stats. With elo graph of the 20 last games.',
+  description: getTranslation('command.stats.description', 'en-US'),
+  descriptionLocalizations: getTranslations('command.stats.description'),
   usage: Options.usage,
   type: 'stats',
   async execute(interaction) {

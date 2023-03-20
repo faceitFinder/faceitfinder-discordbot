@@ -30,7 +30,7 @@ const sendCardWithInfo = async (playerId, map, mode) => {
   const mapThumbnail = `./images/maps/${map}.jpg`
   const playerMapStats = playerStats.segments.filter(e => e.label === map && e.mode == mode)
 
-  if (playerMapStats.length === 0) return errorCard(`**${playerDatas.nickname}** has not played this map.`)
+  if (playerMapStats.length === 0) return errorCard(`**${playerDatas.nickname}** has not played this map.`, interaction.locale)
 
   const cards = playerMapStats.map(m => {
     if (fs.existsSync(mapThumbnail)) filesAtt.push(new Discord.AttachmentBuilder(mapThumbnail, { name: `${map}.jpg` }))

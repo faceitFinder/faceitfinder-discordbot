@@ -1,169 +1,88 @@
 const { maxLengthTeamName } = require('../config.json')
+const base = structuredClone(require('./base'))
 
-module.exports = {
-  commande: {
-    compare: {
-      description: 'Comparer les statistiques des 2 utilisateurs.',
-    },
-    dailystats: {
-      description: 'Affiche les statistiques des jours sélectionnés accompagnés d\'un graphique détaillant l\'elo.',
-    },
-    find: {
-      description: 'Find the games that includes the player requested (up to 5), last 1000 games.',
-    },
-    help: {
-      description: 'Display the command list.',
-    },
-    info: {
-      description: 'Get the info about the bot.',
-    },
-    invite: {
-      description: 'Get the link to invite the bot on your server.',
-    },
-    join: {
-      description: 'Get the link to join the community server of the bot .',
-    },
-    last: {
-      description: 'Get the stats of last game.',
-    },
-    laststats: {
-      description: 'Displays the stats of the x last match. With elo graph of the x last match.',
-    },
-    link: {
-      description: 'Link a steam profile to the discord user, to get your stats directly (no parameters needed).',
-    },
-    map: {
-      description: 'Displays the stats of the choosen map.',
-    },
-    monthstats: {
-      description: 'Displays the stats of the choosen month. With elo graph of the month.',
-    },
-    roles: {
-      description: 'Ranks are updated every hour and when you get your personnal stats.',
-    },
-    stats: {
-      description: 'Displays general stats. With elo graph of the 20 last games.',
-    },
-    team: {
-      description: 'Create a team and link up to 5 users to it (limited to 1 team by discord account).',
-    },
-    unlink: {
-      description: 'Unlink your faceit id from the discord bot.',
-    },
-    vote: {
-      description: 'Get the link to vote for the bot on top.gg',
-    },
-    weekstats: {
-      description: 'Displays the stats of the choosen week. With elo graph of the week.',
-    },
-    yearstats: {
-      description: 'Displays the stats of the choosen year. With elo graph of the year.',
-    }
-  },
-  options: {
-    match_number: {
-      description: 'Number of matches to display. Default: 20'
-    },
-    steam_parameter: {
-      description: 'steamID / steam custom ID / url of one steam profile / @user / CSGO status.'
-    },
-    faceit_user: {
-      description: 'faceit nickname / @user'
-    },
-    steam_parameters: {
-      description: 'steamIDs / steam custom IDs / url of one or more steam profiles / @users / CSGO status.'
-    },
-    faceit_users: {
-      description: 'faceit nicknames / @users'
-    },
-    team: {
-      description: 'team slug (you need to be a part of it, the creator, or it has to be public)'
-    },
-    from_date: {
-      description: 'INCLUDED. Start date, format MM/DD/YYYY'
-    },
-    to_date: {
-      description: 'EXCLUDED. End date (at least 1 day interval), if empty gets the current day. Format MM/DD/YYYY'
-    },
-    player_aimed: {
-      description: 'steam_parameters / faceit_parameters / @user / empty if linked.'
-    },
-    global: {
-      description: 'This will unlink your account on all servers (False by default)'
-    },
-    commande: {
-      description: 'The name of one command.'
-    },
-    map: {
-      description: 'Specify a map to get the stats related'
-    },
-    level: {
-      1: {
-        description: 'The role for the level 1'
-      },
-      2: {
-        description: 'The role for the level 2'
-      },
-      3: {
-        description: 'The role for the level 3'
-      },
-      4: {
-        description: 'The role for the level 4'
-      },
-      5: {
-        description: 'The role for the level 5'
-      },
-      6: {
-        description: 'The role for the level 6'
-      },
-      7: {
-        description: 'The role for the level 7'
-      },
-      8: {
-        description: 'The role for the level 8'
-      },
-      9: {
-        description: 'The role for the level 9'
-      },
-      10: {
-        description: 'The role for the level 10'
-      },
-    },
-    remove_old: {
-      description: 'Remove the old roles if they exist.'
-    },
-    generate: {
-      description: 'Generates the rank roles on the server.'
-    },
-    setup: {
-      description: 'Setup the roles that you want for each ranks on the server.'
-    },
-    remove: {
-      description: 'Removes the rank roles on the server.'
-    },
-    info: {
-      description: 'Get information about your team.'
-    },
-    create: {
-      description: 'Create your team'
-    },
-    delete: {
-      description: 'Delete your team'
-    },
-    update: {
-      description: 'Update your team'
-    },
-    add_user: {
-      description: 'Add a user to your team'
-    },
-    remove_user: {
-      description: 'Remove a user from your team'
-    },
-    name: {
-      description: `name of your team, up to ${maxLengthTeamName} characters`
-    },
-    access: {
-      description: 'let others discord users access your team if they are not in the team'
-    }
-  }
+base.command.compare.description = 'Comparer les statistiques des 2 joueurs.'
+base.command.dailystats.description = 'Obtenir les statistiques du jour selectionné, accompagné d\'un graphique de l\'évolution de l\'elo.'
+base.command.find.description = 'Trouver les parties qui contiennent les joueurs demandés (jusqu\'à 5).'
+base.command.help.description = 'Obtenir la liste des commandes.'
+base.command.info.description = 'Obtenir des informations sur le bot.'
+base.command.invite.description = 'Obtenir le lien pour inviter le bot sur votre serveur.'
+base.command.join.description = 'Obtenir le lien pour rejoindre le serveur communautaire du bot.'
+base.command.last.description = 'Obtenir les statistiques de la dernière partie.'
+base.command.laststats.description = 'Obtenir les statistiques des x dernières parties, accompagné d\'un graphique de l\'évolution de l\'elo.'
+base.command.link.description = 'Associer un profil faceit à un utilisateur discord, pour obtenir vos statistiques directement.'
+base.command.map.description = 'Obtenir les statistiques de la map selectionnée.'
+base.command.monthstats.description = 'Obtenir les statistiques du mois selectionné, accompagné d\'un graphique de l\'évolution de l\'elo.'
+base.command.roles.description = 'Les rangs sont mis à jour toutes les heures et quand vous obtenez vos statistiques.'
+base.command.stats.description = 'Obtenir les statistiques générales, accompagné d\'un graphique de l\'évolution de l\'elo.'
+base.command.team.description = 'Créer une équipe et lier jusqu\'à 5 utilisateurs à celle-ci (limite d\'une équipe par compte discord).'
+base.command.unlink.description = 'Supprimer l\'association entre votre compte discord et votre profil faceit.'
+base.command.vote.description = 'Obtenir le lien pour voter pour le bot sur top.gg.'
+base.command.weekstats.description = 'Obtenir les statistiques de la semaine selectionnée, accompagné d\'un graphique d\'évolution de l\'elo.'
+base.command.yearstats.description = 'Obtenir les statistiques de l\'année selectionnée, accompagné d\'un graphique d\'évolution de l\'elo.'
+
+base.options.matchNumber = 'Nombre de parties à afficher, par défaut 20.'
+base.options.steamParameter = 'steamID / steamID personnalisé / url profil steam / @utilisateur / status CSGO.'
+base.options.faceitParameter = 'pseudo faceit / @utilisateur / url profil faceit.'
+base.options.steamParameters = 'steamIDs / steamIDs personnalisés / url profils steam / @utilisateurs / status CSGO.'
+base.options.faceitParameters = 'pseudos faceit / @utilisateurs / url profils faceit.'
+base.options.teamParameter = 'slug d\'une équipe (vous devez en faire partie, être le créateur, ou que l\'équipe soit publique).'
+base.options.fromDate = 'INCLUS. Date de début au format MM/JJ/AAAA.'
+base.options.toDate = 'EXCLUS. Date de fin au format MM/JJ/AAAA, par défaut la date du jour, 1 jour d\'écart minimum.'
+base.options.playerAimed = 'steam_parameter / faceit_parameter / @user / vide (pour vous-même si lié).'
+base.options.globalUnlink = 'Supprimer l\'ensemble des associations faites avec votre compte discord.'
+base.options.commandeName = 'Nom de la commande à afficher.'
+base.options.mapName = 'Selectionner une map pour obtenir les statistiques associées.'
+base.options.levelRoles = {
+  1: 'Role associé au niveau 1.',
+  2: 'Role associé au niveau 2.',
+  3: 'Role associé au niveau 3.',
+  4: 'Role associé au niveau 4.',
+  5: 'Role associé au niveau 5.',
+  6: 'Role associé au niveau 6.',
+  7: 'Role associé au niveau 7.',
+  8: 'Role associé au niveau 8.',
+  9: 'Role associé au niveau 9.',
+  10: 'Role associé au niveau 10.',
 }
+base.options.removeOldRoles = 'Supprimer les anciens roles, si existants.'
+base.options.generateRoles = 'Générer les roles.'
+base.options.setupRoles = 'Configurer les roles.'
+base.options.removeRoles = 'Supprimer les roles.'
+base.options.infoTeam = 'Afficher les informations des équipes dans lesquelles vous êtes.'
+base.options.createTeam = 'Créer votre équipe.'
+base.options.deleteTeam = 'Supprimer votre équipe.'
+base.options.addUserTeam = 'Ajouter un joueur à votre équipe.'
+base.options.removeUserTeam = 'Retirer un joueur de votre équipe.'
+base.options.nameTeam = `Nom de l'équipe, ${maxLengthTeamName} caractères maximum.`
+base.options.accessTeam = 'Autoriser l\'ensemble des utilisateurs discord à afficher les statistiques de votre équipe.'
+base.options.excludedFaceitParameters = 'Exclure des joueurs de la recherche. (faceit_parameters)'
+base.options.excludedSteamParameters = 'Exclure des joueurs de la recherche. (steam_parameters)'
+
+base.strings.selectTeam = 'Selectionner une équipe.'
+base.strings.infoTeam = 'Afficher les informations de l\'équipe {teamName}.'
+base.strings.messageProcessing = 'Votre demande est en cours de traitement...'
+base.strings.error = 'Erreur'
+
+base.error.user.missing = 'Il semblerait qu\'un des utilisateurs soit introuvable.'
+base.error.user.compareSame = 'Vous ne pouvez pas comparer le même utilisateur.'
+base.error.user.alreadyInTeam = '**{playerName}** est déjà dans l\'équipe **{teamName}**.'
+base.error.user.notLinked = 'Aucun compte faceit n\'est lié à votre compte discord.'
+base.error.user.noParametersNoLink = 'Merci de renseigner un utilisateur ou une équipe.\n\
+Vous pouvez également lier votre compte discord à votre compte faceit afin d\'obtenir vos statistiques directement.\n\
+Pour plus d\'informations, tapez la commande `/help command: link`.'
+
+base.error.execution.command = 'Une erreur est survenue lors de l\'exécution de la commande.'
+
+base.success.command.removeUser = 'Le joueur **{playerName}** a été retiré de l\'équipe **{teamName}**.'
+base.success.command.createTeam = 'L\'équipe **{teamName}** a été créée.'
+base.success.command.deleteTeam = 'L\'équipe **{teamName}** a été supprimée.'
+base.success.command.addUser = 'Le joueur **{playerName}** a été ajouté à l\'équipe **{teamName}**.'
+base.success.command.updateTeam = 'L\'équipe **{teamName}** a été mise à jour.'
+base.success.command.unlink = {
+  global: 'Toutes les associations ont été supprimées.',
+  server: 'L\'association faites sur ce serveur a été supprimée.',
+}
+base.success.command.link = '{discord} a été associé à {playerName}.'
+
+module.exports = base

@@ -1,10 +1,12 @@
 const { name, invite, color } = require('../config.json')
 const Discord = require('discord.js')
+const { getTranslations, getTranslation } = require('../languages/setup')
 
 module.exports = {
   name: 'invite',
   options: [],
-  description: 'Get the link to invite the bot on your server.',
+  description: getTranslation('command.invite.description', 'en-US'),
+  descriptionLocalizations: getTranslations('command.invite.description'),
   usage: '',
   type: 'system',
   async execute(interaction) {

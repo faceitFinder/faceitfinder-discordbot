@@ -7,9 +7,8 @@ const CustomTypeFunc = require('../functions/customType')
 const CustomType = require('../templates/customType')
 const Graph = require('../functions/graph')
 const errorCard = require('../templates/errorCard')
-const english = require('../languages/en-US')
-const setupLanguagues = require('../languages/setup')
-const { getMapChoice } = require('../functions/map')
+const { getTranslations, getTranslation } = require('../languages/setup')
+const { getMapOption } = require('../functions/map')
 
 const compareStats = (stats1, stats2, positive = true) => {
   if (positive) {
@@ -238,49 +237,47 @@ module.exports = {
   name: 'compare',
   options: [{
     name: 'match_number',
-    description: english.options.match_number.description,
+    description: getTranslation('options.matchNumber', 'en-US'),
+    descriptionLocalizations: getTranslations('options.matchNumber'),
     required: false,
     type: Discord.ApplicationCommandOptionType.Integer,
     slash: true,
   },
   {
     name: 'first_user_steam',
-    description: english.options.steam_parameter.description,
+    description: getTranslation('options.steamParameter', 'en-US'),
+    descriptionLocalizations: getTranslations('options.steamParameter'),
     required: false,
     type: Discord.ApplicationCommandOptionType.String,
     slash: true
   },
   {
     name: 'first_user_faceit',
-    description: english.options.faceit_parameter.description,
+    description: getTranslation('options.faceitParameter', 'en-US'),
+    descriptionLocalizations: getTranslations('options.faceitParameter'),
     required: false,
     type: Discord.ApplicationCommandOptionType.String,
     slash: true
   },
   {
     name: 'second_user_steam',
-    description: english.options.steam_parameter.description,
+    description: getTranslation('options.steamParameter', 'en-US'),
+    descriptionLocalizations: getTranslations('options.steamParameter'),
     required: false,
     type: Discord.ApplicationCommandOptionType.String,
     slash: true
   },
   {
     name: 'second_user_faceit',
-    description: english.options.faceit_parameter.description,
+    description: getTranslation('options.faceitParameter', 'en-US'),
+    descriptionLocalizations: getTranslations('options.faceitParameter'),
     required: false,
     type: Discord.ApplicationCommandOptionType.String,
     slash: true
   },
-  {
-    name: 'map',
-    description: 'Map name',
-    required: false,
-    type: Discord.ApplicationCommandOptionType.String,
-    slash: true,
-    choices: getMapChoice()
-  },],
-  description: english.commande.compare.description,
-  descriptionLocalizations: setupLanguagues.getTranslations('commande.compare.description'),
+  getMapOption(),],
+  description: getTranslation('command.compare.description', 'en-US'),
+  descriptionLocalizations: getTranslations('command.compare.description'),
   usage: '<match_number> {<first_user_steam> <first_user_faceit>} [<second_user_steam> <second_user_faceit>] <map>',
   example: 'match_number: 100 first_user_steam: justdams second_user_steam: sheraw map: Vertigo',
   type: 'stats',
@@ -288,8 +285,8 @@ module.exports = {
     const player1 = (await getUsers(interaction, 1, 'first_user_steam', 'first_user_faceit'))?.at(0)?.param
     const player2 = (await getUsers(interaction, 1, 'second_user_steam', 'second_user_faceit'))?.at(0)?.param
 
-    if (!player1 || !player2) return errorCard('There is a user missing.')
-    else if (player1 === player2) return errorCard('Both users are the same !')
+    if (!player1 || !player2) return errorCard(getTranslation('error.user.missing', interaction.locale), interaction.locale)
+    else if (player1 === player2) return errorCard(getTranslation('error.user.compareSame', interaction.locale), interaction.locale)
 
     return sendCardWithInfo(interaction, player1, player2)
   }

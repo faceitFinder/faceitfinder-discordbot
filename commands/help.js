@@ -3,6 +3,7 @@ const Discord = require('discord.js')
 const fs = require('fs')
 const errorCard = require('../templates/errorCard')
 const { getInteractionOption } = require('../functions/commands')
+const { getTranslations, getTranslation } = require('../languages/setup')
 
 const getCommandsList = () => {
   return fs.readdirSync('./commands')
@@ -23,9 +24,9 @@ const getCommands = (card) => {
   return { embeds: [card] }
 }
 
-const getCommandsHelp = (commandName, card) => {
+const getCommandsHelp = (commandName, card, lang) => {
   try { command = require(`./${commandName}.js`) }
-  catch { return errorCard('Command not found') }
+  catch { return errorCard(getTranslation('error.command.notFound', lang), lang) }
 
   let optionsDesc = ''
 
@@ -46,7 +47,8 @@ module.exports = {
   options: [
     {
       name: 'command',
-      description: 'The name of one command.',
+      description: getTranslation('options.commandeName', 'en-US'),
+      descriptionLocalizations: getTranslations('options.commandeName'),
       required: false,
       type: Discord.ApplicationCommandOptionType.String,
       slash: true,
@@ -57,10 +59,12 @@ module.exports = {
       ]
     }
   ],
-  description: 'Display the command list.',
+  description: getTranslation('command.help.description', 'en-US'),
+  descriptionLocalizations: getTranslations('command.help.description'),
   usage: '<command>',
   type: 'system',
   async execute(interaction) {
+    // log the user language
     const command = getInteractionOption(interaction, 'command')?.trim().split(' ')[0]
 
     const helpCard = new Discord.EmbedBuilder()
@@ -69,7 +73,7 @@ module.exports = {
       .setDescription('`/help <command>` for more info on a specific command')
       .setFooter({ text: `${name} Help` })
 
-    if (command) return getCommandsHelp(command, helpCard)
+    if (command) return getCommandsHelp(command, helpCard, interaction.locale)
     else return getCommands(helpCard)
   }
 }

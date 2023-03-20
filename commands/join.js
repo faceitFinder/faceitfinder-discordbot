@@ -1,10 +1,12 @@
 const { name, join, color } = require('../config.json')
 const Discord = require('discord.js')
+const { getTranslations, getTranslation } = require('../languages/setup')
 
 module.exports = {
   name: 'join',
   options: [],
-  description: 'Get the link to join the community server of the bot .',
+  description: getTranslation('command.join.description', 'en-US'),
+  descriptionLocalizations: getTranslations('command.join.description'),
   usage: '',
   type: 'system',
   async execute(interaction) {

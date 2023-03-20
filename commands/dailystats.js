@@ -6,6 +6,7 @@ const { getCardsConditions } = require('../functions/commands')
 const CustomType = require('../templates/customType')
 const Options = require('../templates/options')
 const { getPageSlice, getMaxPage } = require('../functions/pagination')
+const { getTranslations, getTranslation } = require('../languages/setup')
 
 const getDay = date => {
   date = new Date(date)
@@ -40,7 +41,7 @@ const sendCardWithInfo = async (interaction, playerId, page = 0) => {
   const pages = getPageSlice(page)
   const pagination = options.slice(pages.start, pages.end)
 
-  if (pagination.length === 0) return errorCard(`Couldn't get matches of ${playerDatas.nickname}`)
+  if (pagination.length === 0) return errorCard(`Couldn't get matches of ${playerDatas.nickname}`,  interaction.locale)
 
   pagination[0] = DateStats.setOptionDefault(pagination.at(0))
 
@@ -63,7 +64,8 @@ const sendCardWithInfo = async (interaction, playerId, page = 0) => {
 module.exports = {
   name: 'dailystats',
   options: Options.stats,
-  description: 'Displays the stats of the choosen day. With elo graph of the day.',
+  description: getTranslation('command.dailystats.description', 'en-US'),
+  descriptionLocalizations: getTranslations('command.dailystats.description'),
   usage: Options.usage,
   example: 'steam_parameters: justdams',
   type: 'stats',

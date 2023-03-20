@@ -1,5 +1,6 @@
 const Discord = require('discord.js')
 const { color, name } = require('../config.json')
+const { getTranslation } = require('../languages/setup')
 
 module.exports = (interaction) => {
   if (!interaction.channel.permissionsFor(interaction.client.user).has('ViewChannel')) return
@@ -9,7 +10,7 @@ module.exports = (interaction) => {
       new Discord.EmbedBuilder()
         .setColor(color.primary)
         .setAuthor({ name: name, iconURL: 'attachment://logo.png' })
-        .setDescription('Your request is currently processing..')
+        .setDescription(getTranslation('strings.messageProcessing', interaction.locale))
         .setFooter({ text: 'FaceitFinder Loader' })
     ],
     attachments: [],

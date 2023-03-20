@@ -5,6 +5,7 @@ const errorCard = require('../templates/errorCard')
 const GuildRoles = require('../database/guildRoles')
 const successCard = require('../templates/successCard')
 const { updateRoles } = require('../functions/roles')
+const { getTranslations, getTranslation } = require('../languages/setup')
 
 const SETUP = 'setup'
 const GENERATE = 'generate'
@@ -110,58 +111,65 @@ module.exports = {
   options: [
     {
       name: SETUP,
-      description: 'Setup the roles that you want for each ranks on the server.',
+      description: getTranslation('options.setupRoles', 'en-US'),
+      descriptionLocalization: getTranslations('options.setupRoles'),
       type: Discord.ApplicationCommandOptionType.Subcommand,
       slash: true,
       options: [
         ...Array(10).fill('').map((k, i) => {
           return {
             name: `level_${i + 1}`,
-            description: `The role for the level ${i + 1}`,
+            description: getTranslation(`options.levelRoles.${i + 1}`, 'en-US'),
+            descriptionLocalization: getTranslations(`options.levelRoles.${i + 1}`),
             type: Discord.ApplicationCommandOptionType.Role,
             required: true
           }
         }),
         {
           name: 'remove_old',
-          description: 'Remove the old roles if they exist.',
+          description: getTranslation('options.removeOldRoles', 'en-US'),
+          descriptionLocalization: getTranslations('options.removeOldRoles'),
           type: Discord.ApplicationCommandOptionType.Boolean,
         }
       ]
     },
     {
       name: GENERATE,
-      description: 'Generates the rank roles on the server.',
+      description: getTranslation('options.generateRoles', 'en-US'),
+      descriptionLocalization: getTranslations('options.generateRoles'),
       type: Discord.ApplicationCommandOptionType.Subcommand,
       slash: true,
       options: [
         {
           name: 'remove_old',
-          description: 'Remove the old roles if they exist.',
+          description: getTranslation('options.removeOldRoles', 'en-US'),
+          descriptionLocalization: getTranslations('options.removeOldRoles'),
           type: Discord.ApplicationCommandOptionType.Boolean,
         }
       ]
     },
     {
       name: REMOVE,
-      description: 'Removes the rank roles on the server.',
+      description: getTranslation('options.removeRoles', 'en-US'),
+      descriptionLocalization: getTranslations('options.removeRoles'),
       type: Discord.ApplicationCommandOptionType.Subcommand,
       slash: true
     }
   ],
-  description: 'Ranks are updated every hour and when you get your personnal stats.',
+  description: getTranslation('command.roles.description', 'en-US'),
+  descriptionLocalization: getTranslations('command.roles.description'),
   usage: `\n - ${GENERATE}\n - ${SETUP}\n - ${REMOVE}`,
   type: 'utility',
   async execute(interaction) {
     if (!interaction.member.permissions.has('ManageRoles'))
-      return errorCard('You don\'t have the permission to manage roles')
+      return errorCard(getTranslation('error.user.permissions.manageRoles', interaction.locale))
 
     if (!interaction.channel.permissionsFor(interaction.client.user).has('ManageRoles'))
-      return errorCard('I don\'t have the permission to manage roles')
+      return errorCard(getTranslation('error.bot.manageRoles', interaction.locale))
 
     if (isInteractionSubcommandEqual(interaction, SETUP)) return await setupRoles(interaction)
     if (isInteractionSubcommandEqual(interaction, GENERATE)) return await generateRoles(interaction)
     if (isInteractionSubcommandEqual(interaction, REMOVE)) return await removeRoles(interaction)
-      .then(() => successCard('The roles have been removed'))
+      .then(() => successCard(getTranslation('success.command.removeRoles', interaction.locale), interaction.locale))
   }
 }
