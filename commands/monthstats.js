@@ -25,7 +25,7 @@ const sendCardWithInfo = async (interaction, playerId, page = 0) => {
     const from = new Date(date.date)
     const to = new Date(date.date).setMonth(new Date(date.date).getMonth() + 1)
 
-    let option = new Discord.SelectMenuOptionBuilder()
+    let option = new Discord.StringSelectMenuOptionBuilder()
       .setLabel(`${from.toLocaleDateString('en-EN', { month: 'short', year: 'numeric' })}`)
       .setDescription(`${date.number} match played`)
       .setValue(JSON.stringify({
@@ -47,7 +47,7 @@ const sendCardWithInfo = async (interaction, playerId, page = 0) => {
 
   const row = new Discord.ActionRowBuilder()
     .addComponents(
-      new Discord.SelectMenuBuilder()
+      new Discord.StringSelectMenuBuilder()
         .setCustomId('dateStatsSelector')
         .setPlaceholder('Select a month')
         .addOptions(pagination))

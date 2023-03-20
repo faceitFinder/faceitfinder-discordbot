@@ -2,7 +2,7 @@ const { color } = require('../config.json')
 const path = require('path')
 const Canvas = require('canvas')
 const CustomType = require('../templates/customType')
-const Chart = require('chart.js')
+const Chart = require('chart.js/auto')
 
 const generateChart = (matchHistory, playerElo, maxMatch = 20, type = CustomType.TYPES.ELO, check) => {
   const datas = []
@@ -28,9 +28,11 @@ const getChart = (datasets, labels, datasetFunc, displayY1) => {
 
   const color = '#c9d1d9', gridColor = '#3c3c3c'
   const yAxisBase = {
+    border: {
+      width: 1,
+    },
     grid: {
       color: gridColor,
-      borderWidth: 1,
     },
     ticks: {
       beginAtZero: false,
@@ -187,15 +189,29 @@ const roundRect = (ctx, x, y, w, h, r) => {
   return ctx
 }
 
-const getElo = (maxMatch, matchHistory, playerElo, checkElo = true) => {
+const eloVerification = (matchHistory, playerElo, checkElo = true) => {
   if (matchHistory.length <= 0) throw 'Couldn\'t get matches'
-  else if (checkElo && matchHistory[0].elo === undefined) matchHistory[0].elo = playerElo
-  return matchHistory.map(e => e.elo).slice(0, maxMatch)
+  else if (checkElo) {
+    const match = matchHistory.at(0)
+    if (isNaN(match.elo)) match.elo = playerElo
+    if (isNaN(match.eloGain)) match.eloGain = match.elo - matchHistory.at(1)?.elo
+  }
+  return matchHistory
+}
+
+const getElo = (maxMatch, matchHistory, playerElo, checkElo = true) => {
+  matchHistory = eloVerification(matchHistory, playerElo, checkElo)
+  return matchHistory.map(e => e?.elo).slice(0, maxMatch)
+}
+
+const getEloGain = (maxMatch, matchHistory, playerElo, checkElo) => {
+  matchHistory = eloVerification(matchHistory, playerElo, checkElo)
+  return matchHistory.map(e => e?.eloGain).slice(0, maxMatch)
 }
 
 const getKD = (matchHistory, maxMatch) => {
   if (matchHistory.length === 0) throw 'Couldn\'t get matches'
-  return matchHistory.map(e => e.c2).slice(0, maxMatch)
+  return matchHistory.map(e => e?.c2).slice(0, maxMatch)
 }
 
 const getGradient = (prev, current, ctx, type) => {
@@ -212,9 +228,9 @@ const colorFilter = (colors, value) => Object.entries(colors)
 
 const getGraph = (type, matchHistory, faceitElo, maxMatch, check = true) => {
   switch (type) {
-    case CustomType.TYPES.ELO: return getElo(maxMatch, matchHistory, faceitElo, check)
-    case CustomType.TYPES.KD: return getKD(matchHistory, maxMatch)
-    default: break
+  case CustomType.TYPES.ELO: return getElo(maxMatch, matchHistory, faceitElo, check)
+  case CustomType.TYPES.KD: return getKD(matchHistory, maxMatch)
+  default: break
   }
 }
 
@@ -225,5 +241,6 @@ module.exports = {
   getKD,
   getChart,
   getGraph,
-  getCompareDatasets
+  getCompareDatasets,
+  getEloGain
 }

@@ -22,7 +22,7 @@ const sendCardWithInfo = async (interaction, playerId) => {
     }
 
     if (!options.filter(e => e.data.label === label).length > 0) {
-      const option = new Discord.SelectMenuOptionBuilder()
+      const option = new Discord.StringSelectMenuOptionBuilder()
         .setLabel(label)
         .setDescription(`Games ${e.stats.Matches} (${e.stats['Win Rate %']}%)`)
         .setValue(JSON.stringify(values))
@@ -37,7 +37,7 @@ const sendCardWithInfo = async (interaction, playerId) => {
 
   const row = new Discord.ActionRowBuilder()
     .addComponents(
-      new Discord.SelectMenuBuilder()
+      new Discord.StringSelectMenuBuilder()
         .setCustomId('mapSelector')
         .setPlaceholder('Select a map')
         .addOptions(options.slice(0, 25)),
@@ -68,7 +68,8 @@ module.exports = {
   name: 'map',
   options: getOptions(),
   description: 'Displays the stats of the choosen map.',
-  usage: `map:choose a map name AND ${Options.usage}`,
+  usage: `${Options.usage} <map>`,
+  example: 'steam_parameters: justdams map: Vertigo',
   type: 'stats',
   async execute(interaction) {
     return getCardsConditions(interaction, sendCardWithInfo)

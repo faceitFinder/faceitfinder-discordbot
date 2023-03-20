@@ -27,11 +27,12 @@ const getPlayerDatas = async (interaction, param, steam, discord = false) => {
   return { param, discord }
 }
 
-const getDefaultInteractionOption = (interaction, index = 0) => {
-  return interaction.message.components.at(index).components
-    .filter(e => e instanceof Discord.SelectMenuComponent).at(0)
-    .options
-    .filter(e => e.default).at(0)
+const getDefaultInteractionOption = (interaction, componentIndex = 0, selectMenuIndex = 0, optionIndex = 0, defaultValue = true) => {
+  let res = interaction.message.components.at(componentIndex).components
+    .filter(e => e instanceof Discord.StringSelectMenuComponent).at(selectMenuIndex).options
+  if (defaultValue) res = res.filter(e => e.default)
+
+  return res.at(optionIndex)
 }
 
 const getCards = async (interaction, array, fn) => {
@@ -57,7 +58,7 @@ const getUsers = async (
   searchTeam = true
 ) => {
   let team = getInteractionOption(interaction, 'team')?.toLowerCase().trim().split(' ')[0]
-  const faceitParameters = getInteractionOption(interaction, faceit)?.trim().split(' ')
+  const faceitParameters = getInteractionOption(interaction, faceit)?.replace(/\s+/g, ' ').split(' ')
   const steamParameters = getInteractionOption(interaction, steam)
 
   const parameters = []
@@ -82,11 +83,14 @@ const getUsers = async (
   }
   if (faceitParameters) {
     await Promise.all(faceitParameters
-      .map(async nickname => await Player.getDatasFromNickname(nickname)
-        .catch(async () => {
-          const player = await Player.searchPlayer(nickname)
-          return player.items?.at(0) || nickname
-        }))
+      .map(async nickname => {
+        nickname = nickname.split('/').filter(e => e).pop()
+        return await Player.getDatasFromNickname(nickname)
+          .catch(async () => {
+            const player = await Player.searchPlayer(nickname).catch(e => e)
+            return player.items?.at(0) || nickname
+          })
+      })
     ).then(params => {
       parameters.push(...params.map(e => {
         return {
@@ -103,7 +107,7 @@ const getUsers = async (
       .map(e => { return { param: e, steam: true, discord: false } })
 
     if (steamIds.length > 0) parameters.push(...steamIds)
-    else parameters.push(...steamParameters?.trim().split(' ').filter(e => e !== '').map(e => {
+    else parameters.push(...steamParameters?.replace(/\s+/g, ' ').split(' ').map(e => {
       return {
         param: e,
         steam: true,

@@ -29,7 +29,7 @@ services:
     volumes:
       - ~/mongo-volume:/data/db
     env_file:
-      - .env
+      - .env.mongodb
     networks:
       - app
 

@@ -1,6 +1,8 @@
 const noMention = require('../templates/noMention')
 const errorCard = require('../templates/errorCard')
 const { InteractionType } = require('discord.js')
+const CommandsStats = require('../database/commandsStats')
+const { TYPES } = require('../templates/customType')
 
 const editInteraction = (interaction, resp) => {
   if (!resp) return
@@ -44,10 +46,11 @@ module.exports = {
     /**
      * Check if the interaction is a selectmenu
      */
-    else if (interaction.isSelectMenu())
+    else if (interaction.isStringSelectMenu())
       interaction
         .deferUpdate()
         .then(() => {
+          CommandsStats.create(interaction.customId, 'selectmenu', interaction.createdAt)
           interaction.client.selectmenus?.get(interaction.customId)?.execute(interaction)
             .then(e => editInteraction(interaction, e))
             .catch(err => errorInteraction(interaction, err, 'An error occured while executing the select menu.'))
@@ -73,6 +76,7 @@ module.exports = {
       interaction
         .deferReply()
         .then(() => {
+          CommandsStats.create(interaction.commandName, 'contextmenu', interaction.createdAt)
           interaction.client.contextmenus.get(interaction.commandName)?.execute(interaction)
             .then(resp => interaction
               .followUp(resp)
@@ -87,6 +91,7 @@ module.exports = {
       interaction
         .deferReply()
         .then(() => {
+          CommandsStats.create(interaction.commandName, 'command', interaction.createdAt)
           interaction.client.commands.get(interaction.commandName)?.execute(interaction)
             .then(resp => {
               if (Array.isArray(resp))

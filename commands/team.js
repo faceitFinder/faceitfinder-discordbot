@@ -56,7 +56,7 @@ const infoTeam = async (interaction, currentTeam, user) => {
 
   const row = new Discord.ActionRowBuilder()
     .addComponents(
-      new Discord.SelectMenuBuilder()
+      new Discord.StringSelectMenuBuilder()
         .setCustomId('teamInfoSelector')
         .setPlaceholder('Select a team')
         .addOptions(options.slice(0, 25)))
@@ -98,7 +98,7 @@ const addUser = async (interaction, playerId) => {
 
   UserTeam.create(currentTeam.slug, playerId)
 
-  return successCard(`**${playerDatas.nickname}** has been added to the team **${currentTeam.name}**, [Steam](https://steamcommunity.com/profiles/${playerDatas.games.csgo.game_player_id}) - [Faceit](https://www.faceit.com/fr/players/${playerDatas.nickname})`)
+  return successCard(`**${playerDatas.nickname}** has been added to the team **${currentTeam.name}**, [Steam](https://steamcommunity.com/profiles/${playerDatas.games.csgo.game_player_id}) - [Faceit](https://www.faceit.com/en/players/${playerDatas.nickname})`)
 }
 
 const removeUser = async (interaction, playerId) => {
@@ -211,7 +211,13 @@ module.exports = {
     }
   ],
   description: 'Create a team and link up to 5 users to it (limited to 1 team by discord account).',
-  usage: `\n- \`${CREATE}\` [team name]\n- \`${DELETE}\`\n- \`${UPDATE}\` [access] {name}\n- \`${INFO}\`\n- \`${ADD_USER}\` [steamID / steam custom ID / url of one steam profile / @user / CSGO status OR faceit nicknames]\n- \`${REMOVE_USER}\` [steamID / steam custom ID / url of one steam profile / @user / CSGO status OR faceit nicknames]`,
+  usage: `
+  - ${CREATE} [team name]
+  - ${DELETE}
+  - ${UPDATE} [access] <name>
+  - ${INFO}
+  - ${ADD_USER} [<steam_parameters> <faceit_parameters>]
+  - ${REMOVE_USER} [<steam_parameters> <faceit_parameters>]`,
   type: 'utility',
   async execute(interaction) {
     const user = interaction.user.id

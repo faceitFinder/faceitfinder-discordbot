@@ -1,22 +1,24 @@
-const CommandsStats = require('../../database/commandsStats')
 const { sendCardWithInfo } = require('../../commands/last')
-const { getTypePage } = require('../../functions/commandStats')
+const CommandsStats = require('../../database/commandsStats')
 const loadingCard = require('../../templates/loadingCard')
 
+/**
+ * Find user stats graph.
+ */
 module.exports = {
-  name: 'pageLast',
+  name: 'fUSG',
   async execute(interaction, json) {
     const value = JSON.parse(interaction.message.components.at(0).components.at(0).options.at(0).value)
-    json = { ...json, ...value }
 
-    if (interaction.user.id !== json.u) return
+    if (interaction.user.id !== value.u) return
+
+    CommandsStats.create('find', 'button - player', interaction.createdAt)
 
     const players = interaction.message.components.at(3)?.components.map(p => JSON.parse(p.customId).s) || []
     const excludedPlayers = interaction.message.components.at(4)?.components.map(p => p.customId) || []
-    CommandsStats.create('last', `button - ${getTypePage(json)}`, interaction.createdAt)
 
     loadingCard(interaction)
 
-    return sendCardWithInfo(interaction, json.s, null, json.page, players, json.m, excludedPlayers)
+    return sendCardWithInfo(interaction, json.s, null, json.page, players, value.m, excludedPlayers)
   }
 }

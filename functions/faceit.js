@@ -1,4 +1,4 @@
-const { default: fetch } = require('node-fetch')
+const axios = require('axios')
 
 require('dotenv').config()
 
@@ -6,18 +6,15 @@ const headerFaceit = {
   Authorization: `Bearer ${process.env.FACEIT_TOKEN}`
 }
 
-const fetchData = async (url, error) => fetch(url, {
-  method: 'GET',
+const fetchData = async (url, error) => axios.get(url, {
   headers: headerFaceit
 })
-  .then(res => {
-    if (res.status == 200) return res.json()
-    else {
-      console.error(res.statusText, res.url)
-      throw error
-    }
+  .then(res => res.data)
+  .catch(e => {
+    console.error(e.response.status, e.response.statusText, url)
+    if (e.response.status === 500) throw 'Faceit: internal server error.'
+    throw error
   })
-  .then(data => data)
 
 module.exports = {
   fetchData

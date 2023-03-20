@@ -24,7 +24,7 @@ const sendCardWithInfo = async (interaction, playerId, type = CustomType.TYPES.E
   }
 
   const row = new Discord.ActionRowBuilder()
-    .addComponents(new Discord.SelectMenuBuilder()
+    .addComponents(new Discord.StringSelectMenuBuilder()
       .setCustomId('lastStatsSelector')
       .addOptions([option])
       .setDisabled(true))
@@ -62,7 +62,8 @@ module.exports = {
   name: 'laststats',
   options: getOptions(),
   description: 'Displays the stats of the x last match. With elo graph of the x last match.',
-  usage: `match_number:number of matches to display AND ${Options.usage}`,
+  usage: `${Options.usage} <match_number> <map> ${Options.dateRangeUsage}`,
+  example: 'steam_parameters: justdams match_number: 1000 from_date: 01/01/2022 to_date: 01/01/2023',
   type: 'stats',
   async execute(interaction) {
     return getCardsConditions(interaction, sendCardWithInfo)

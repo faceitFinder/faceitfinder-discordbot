@@ -1,10 +1,10 @@
-const fetch = require('node-fetch')
+const axios = require('axios')
 
 require('dotenv').config()
 
-const getId = (arg) => fetch(`http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?key=${process.env.STEAM_TOKEN}&vanityurl=${arg}`)
+const getId = (arg) => axios.get(`http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?key=${process.env.STEAM_TOKEN}&vanityurl=${arg}`)
   .then(res => {
-    if (res.status == 200) return res.json()
+    if (res.status == 200) return res.data
     else throw res
   })
   .then(data => {
@@ -12,9 +12,9 @@ const getId = (arg) => fetch(`http://api.steampowered.com/ISteamUser/ResolveVani
     else return arg
   })
 
-const getDatas = (steamId) => fetch(`http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=${process.env.STEAM_TOKEN}&steamids=${steamId}`)
+const getDatas = (steamId) => axios.get(`http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=${process.env.STEAM_TOKEN}&steamids=${steamId}`)
   .then(res => {
-    if (res.status == 200) return res.json()
+    if (res.status == 200) return res.data
     else throw res
   })
   .then(data => {

@@ -9,6 +9,7 @@ const errorCard = require('../templates/errorCard')
 const sendCardWithInfo = async (interaction, playerId) => {
   const discordId = interaction.user.id
   const discordUserId = getInteractionOption(interaction, 'discord_user')
+  const nickname = getInteractionOption(interaction, 'nickname')
 
   if (discordUserId) {
     const guild = await interaction.guild.fetch()
@@ -24,24 +25,27 @@ const sendCardWithInfo = async (interaction, playerId) => {
         if (exists)
           return errorCard(`<@${discordUserId}> already has a global link.`)
 
-        return link(interaction, playerId, discordUserId, guild.id, exists)
+        return link(interaction, playerId, discordUserId, guild.id, nickname)
       })
       .catch(() => errorCard('The requested user is not on this server.'))
   }
 
-  return link(interaction, playerId, discordId, null)
+  return link(interaction, playerId, discordId, null, nickname)
 }
 
-const link = async (interaction, playerId, discordId, guildId = null) => {
-  const playerDatas = await Player.getDatas(playerId)
+const link = async (interaction, playerId, discordId, guildId = null, nickname) => {
+  let playerDatas
+  try { playerDatas = await Player.getDatas(playerId) }
+  catch (error) { return errorCard(error) }
 
   if (!guildId) await User.remove(discordId)
+  const user = await User.exists(discordId, guildId)
 
-  await User.exists(discordId, guildId) ?
-    User.update(discordId, playerId, guildId) :
-    User.create(discordId, playerId, guildId)
+  user ?
+    User.update(discordId, playerId, guildId, nickname || user.nickname) :
+    User.create(discordId, playerId, guildId, nickname || false)
 
-  updateRoles(interaction.client, discordId)
+  if (await User.get(discordId)) updateRoles(interaction.client, discordId, guildId)
 
   return successCard(`<@${discordId}> has been linked to ${playerDatas.nickname}`)
 }
@@ -65,16 +69,24 @@ module.exports = {
     },
     {
       name: 'discord_user',
-      description: 'If specified the link will only work on this server (you need role manage permission)',
+      description: 'If specified the link will only work on this server (manage permission to link others).',
       required: false,
       type: Discord.ApplicationCommandOptionType.User,
+      slash: true
+    },
+    {
+      name: 'nickname',
+      description: 'Make your discord nickname the same as your faceit nickname. (Only works with non admin users)',
+      required: false,
+      type: Discord.ApplicationCommandOptionType.Boolean,
       slash: true
     }
   ],
   description: 'Link a steam profile to the discord user, to get your stats directly (no parameters needed).',
-  usage: 'steam_parameter:steam param or @user or CSGO status (max 1 user) OR faceit_parameter:faceit nickname (max 1) AND discord_user: @user',
+  usage: '[<steam_parameter> <faceit_parameter>] <discord_user> <nickname>',
+  example: 'steam_parameter: justdams',
   type: 'utility',
   async execute(interaction) {
-    return getCardsConditions(interaction, sendCardWithInfo, 1, 'steam_parameter')
+    return getCardsConditions(interaction, sendCardWithInfo, 1, 'steam_parameter', 'faceit_parameter')
   }
 }

@@ -8,6 +8,13 @@ const CustomType = require('../templates/customType')
 const CustomTypeFunc = require('../functions/customType')
 const { getPagination } = require('./pagination')
 const { getInteractionOption } = require('./commands')
+const { caching } = require('cache-manager')
+
+const ttl = 60 * 1000 * 5 // 5 minutes
+const cachingMemory = caching('memory', {
+  max: 100,
+  ttl: ttl,
+})
 
 const generatePlayerStats = playerHistory => {
   const playerStats = {
@@ -26,6 +33,8 @@ const generatePlayerStats = playerHistory => {
     'Red K/D': 0,
     'Orange K/D': 0,
     'Green K/D': 0,
+    'Highest elo': 0,
+    'Lowest elo': 0,
   }
 
   for (const e of playerHistory) {
@@ -59,24 +68,53 @@ const generatePlayerStats = playerHistory => {
   playerStats['Average Assists'] = getAverage(playerStats['Average Assists'], playerStats.games)
   playerStats.kd = getAverage(playerStats.kills, playerStats.deaths)
 
+  const elo = playerHistory.filter(e => e.elo).map(e => e.elo)
+
+  playerStats['Highest Elo'] = Math.max(...elo).toString()
+  playerStats['Lowest Elo'] = Math.min(...elo).toString()
+
   return playerStats
 }
 
 const getAverage = (q, d, fixe = 2, percent = 1) => ((parseFloat(q) / parseFloat(d)) * percent).toFixed(fixe)
 
 const getPlayerHistory = async (playerId, maxMatch, eloMatches = true) => {
-  const playerHistory = []
   const playerStats = await Player.getStats(playerId)
+  const cacheHistory = await cachingMemory
+  const limit = 100
+  let playerHistory = []
+  const cacheName = `${playerId}-${eloMatches ? 'elo' : 'match'}`
+
   if (maxMatch === null || maxMatch > playerStats.lifetime.Matches) maxMatch = playerStats.lifetime.Matches
-  if (eloMatches) for (let page = 0; page < Math.ceil(maxMatch / 2000); page++)
-    playerHistory.push(...await Match.getMatchElo(playerId, maxMatch, page))
-  else {
-    limit = 100
+
+  const cache = await cacheHistory.get(cacheName)
+  if (cache && cache.length == playerStats.lifetime.Matches) return cache.slice(0, maxMatch)
+
+  if (eloMatches) {
+    for (let page = 0; page < Math.ceil(maxMatch / limit); page++) playerHistory.push(...await Match.getMatchElo(playerId, maxMatch, page))
+
+    playerEloGain = playerHistory.filter(e => e?.elo).map((e, i, a) => {
+      e.eloGain = e.elo - a[i + 1]?.elo || undefined
+      return e
+    })
+
+    playerHistory = playerHistory.map(e => {
+      const match = playerEloGain.find(m => m.matchId === e.matchId)
+      if (match) e.eloGain = match.eloGain
+      return e
+    })
+  } else {
     let max = Math.ceil(maxMatch / limit)
     max = max > 10 ? 10 : max
     for (let page = 0; page < max; page++)
       playerHistory.push(...(await Player.getHistory(playerId, limit, page * limit)).items)
   }
+
+  if (maxMatch == playerStats.lifetime.Matches) {
+    if (cache) await cacheHistory.del(cacheName)
+    await cacheHistory.set(cacheName, playerHistory, ttl)
+  }
+
   return playerHistory
 }
 
@@ -113,7 +151,6 @@ const getCardWithInfo = async (actionRow, values, type, id, maxMatch, maxPage = 
   const size = 40
 
   let playerHistory = await getPlayerHistory(playerId, pStats.lifetime.Matches)
-
   let from = values.f * 1000 || playerHistory.at(-1).date
   const to = values.t * 1000 || new Date().setHours(+24)
 
@@ -125,8 +162,8 @@ const getCardWithInfo = async (actionRow, values, type, id, maxMatch, maxPage = 
 
   const checkElo = today >= from && today <= to
   const playerHistoryTo = playerHistory.filter(e => e.date < to)
-  const elo = await Graph.getElo(playerStats.games + 1, playerHistoryTo, faceitElo, checkElo)
-  const eloDiff = elo.at(0) - elo.at(-1)
+  const elo = Graph.getEloGain(playerStats.games, playerHistoryTo, faceitElo, checkElo)
+  const eloDiff = elo.filter(e => e).reduce((a, b) => a + b, 0)
 
   if (!map) playerHistory = filteredHistory
   if (!playerHistory.length > 0) throw `${playerDatas.nickname} played 0 match on that period.`
@@ -151,10 +188,13 @@ const getCardWithInfo = async (actionRow, values, type, id, maxMatch, maxPage = 
   if (map) head.push({ name: 'Map', value: map, inline: true }, { name: '\u200b', value: '\u200b', inline: true })
 
   const card = new Discord.EmbedBuilder()
-    .setAuthor({ name: playerDatas.nickname, iconURL: playerDatas.avatar || null, url: `https://www.faceit.com/fr/players/${playerDatas.nickname}` })
-    .setDescription(`[Steam](https://steamcommunity.com/profiles/${playerDatas.games.csgo.game_player_id}), [Faceit](https://www.faceit.com/fr/players/${playerDatas.nickname})`)
+    .setAuthor({ name: playerDatas.nickname, iconURL: playerDatas.avatar || null, url: `https://www.faceit.com/en/players/${playerDatas.nickname}` })
+    .setDescription(`[Steam](https://steamcommunity.com/profiles/${playerDatas.games.csgo.game_player_id}), [Faceit](https://www.faceit.com/en/players/${playerDatas.nickname})`)
     .setThumbnail(`attachment://${faceitLevel}level.png`)
     .addFields(...head,
+      { name: 'Highest Elo', value: playerStats['Highest Elo'], inline: true },
+      { name: 'Lowest Elo', value: playerStats['Lowest Elo'], inline: true },
+      { name: '\u200b', value: '\u200b', inline: true },
       { name: 'Games', value: `${playerStats.games} (${playerStats.winrate}% Win)`, inline: true },
       { name: 'Elo', value: isNaN(eloDiff) ? '0' : eloDiff > 0 ? `+${eloDiff}` : eloDiff.toString(), inline: true },
       { name: 'Average MVPs', value: playerStats['Average MVPs'], inline: true },
@@ -206,7 +246,7 @@ const getCardWithInfo = async (actionRow, values, type, id, maxMatch, maxPage = 
 }
 
 const updateOptions = (components, values, updateEmoji = true) => {
-  return components.filter(e => e instanceof Discord.SelectMenuComponent)
+  return components.filter(e => e instanceof Discord.StringSelectMenuComponent)
     .map(msm => msm.options.map(o => {
       // Do not reset if a button is clicked
       try { if (JSON.parse(values).id.normalize() === 'uDSG') return o }

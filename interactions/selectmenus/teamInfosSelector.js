@@ -15,7 +15,7 @@ module.exports = {
     if (values.u !== interaction.user.id) return
 
     const options = interaction.message.components.at(0).components
-      .filter(e => e instanceof Discord.SelectMenuComponent)
+      .filter(e => e instanceof Discord.StringSelectMenuComponent)
       .map(msm => {
         return msm.options.map(o => {
           const active = JSON.stringify(JSON.parse(o.value)) === JSON.stringify(values)
@@ -27,7 +27,7 @@ module.exports = {
 
     const components = new Discord.ActionRowBuilder()
       .addComponents(
-        new Discord.SelectMenuBuilder()
+        new Discord.StringSelectMenuBuilder()
           .setCustomId('teamInfoSelector')
           .addOptions(options))
 
@@ -66,7 +66,7 @@ module.exports = {
     if (usersInfo.length > 0) usersInfo.forEach(user => {
       embed.addFields({
         name: `${user.faceit.nickname}`,
-        value: `[Steam](https://steamcommunity.com/profiles/${user.faceit.games.csgo.game_player_id})\n[Faceit](https://www.faceit.com/fr/players/${user.faceit.nickname})`,
+        value: `[Steam](https://steamcommunity.com/profiles/${user.faceit.games.csgo.game_player_id})\n[Faceit](https://www.faceit.com/en/players/${user.faceit.nickname})`,
         inline: true,
       })
     })

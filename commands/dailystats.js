@@ -24,7 +24,7 @@ const sendCardWithInfo = async (interaction, playerId, page = 0) => {
     const from = new Date(date.date)
     const to = new Date(date.date).setHours(24)
 
-    let option = new Discord.SelectMenuOptionBuilder()
+    let option = new Discord.StringSelectMenuOptionBuilder()
       .setLabel(from.toDateString())
       .setDescription(`${date.number} match played`)
       .setValue(JSON.stringify({
@@ -46,7 +46,7 @@ const sendCardWithInfo = async (interaction, playerId, page = 0) => {
 
   const row = new Discord.ActionRowBuilder()
     .addComponents(
-      new Discord.SelectMenuBuilder()
+      new Discord.StringSelectMenuBuilder()
         .setCustomId('dateStatsSelector')
         .setPlaceholder('Select a day')
         .addOptions(pagination))
@@ -65,6 +65,7 @@ module.exports = {
   options: Options.stats,
   description: 'Displays the stats of the choosen day. With elo graph of the day.',
   usage: Options.usage,
+  example: 'steam_parameters: justdams',
   type: 'stats',
   async execute(interaction) {
     return getCardsConditions(interaction, sendCardWithInfo)
