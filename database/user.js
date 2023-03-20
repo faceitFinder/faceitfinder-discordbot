@@ -8,9 +8,7 @@ const create = (discordId, faceitId, guildId, nickname) => {
     nickname: nickname,
   })
 
-  newUser.save((err) => {
-    if (err) console.error(err)
-  })
+  newUser.save()
 }
 
 const get = (discordId) => User.find({ discordId: discordId }).exec()

@@ -8,9 +8,7 @@ const create = (name, slug, discordId, access) => {
     access: access
   })
 
-  newTeam.save((err) => {
-    if (err) console.error(err)
-  })
+  newTeam.save()
 }
 
 const getTeamSlug = (slug) => Team.findOne({ slug: slug }).exec()
