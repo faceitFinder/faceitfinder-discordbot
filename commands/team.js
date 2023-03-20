@@ -25,7 +25,9 @@ const createTeam = async (interaction, currentTeam, user) => {
   const access = getInteractionOption(interaction, 'access')
   Team.create(teamName, teamSlug, user, access)
 
-  return successCard(getTranslation('success.command.createTeam', interaction.locale).replace('{teamName}', teamName), interaction.locale)
+  return successCard(getTranslation('success.command.createTeam', interaction.locale, {
+    teamName: teamName
+  }), interaction.locale)
 }
 
 const infoTeam = async (interaction, currentTeam, user) => {
@@ -46,7 +48,9 @@ const infoTeam = async (interaction, currentTeam, user) => {
     .map(userteam => {
       if (userteam) return {
         label: userteam.name,
-        description: getTranslation('strings.infoTeam', interaction.locale).replace('{teamName}', userteam.name),
+        description: getTranslation('strings.infoTeam', interaction.locale, {
+          teamName: userteam.name,
+        }),
         value: JSON.stringify({
           tn: userteam.slug,
           u: user,
@@ -76,7 +80,9 @@ const updateTeam = async (interaction, currentTeam) => {
   else if (teamName) await UserTeam.updateMany(currentTeam.slug, teamSlug)
   const access = getInteractionOption(interaction, 'access')
   Team.update(currentTeam.slug, teamName || currentTeam.name, teamSlug || currentTeam.slug, access)
-  return successCard(getTranslation('success.command.updateTeam', interaction.locale).replace('{teamName}', teamName || currentTeam.name), interaction.locale)
+  return successCard(getTranslation('success.command.updateTeam', interaction.locale, {
+    teamName: teamName || currentTeam.name
+  }), interaction.locale)
 }
 
 const deleteTeam = async (interaction, currentTeam, user) => {
@@ -86,7 +92,9 @@ const deleteTeam = async (interaction, currentTeam, user) => {
       users.forEach(user => UserTeam.remove(user.faceitId, currentTeam.slug))
     })
 
-  return successCard(getTranslation('success.command.removeTeam', interaction.locale).replace('{teamName}', currentTeam.name), interaction.locale)
+  return successCard(getTranslation('success.command.removeTeam', interaction.locale, {
+    teamName: currentTeam.name
+  }), interaction.locale)
 }
 
 const addUser = async (interaction, playerId) => {
@@ -95,15 +103,17 @@ const addUser = async (interaction, playerId) => {
   const playerDatas = await Player.getDatas(playerId)
 
   if (await UserTeam.getUserTeam(playerId, currentTeam.slug))
-    return errorCard(getTranslation('error.user.alreadyInTeam', interaction.locale)
-      .replace('{playerName}', playerDatas.nickname)
-      .replace('{teamName}', currentTeam.name))
+    return errorCard(getTranslation('error.user.alreadyInTeam', interaction.locale, {
+      playerName: playerDatas.nickname,
+      teamName: currentTeam.name
+    }))
 
   UserTeam.create(currentTeam.slug, playerId)
 
-  const successMessage = getTranslation('success.command.addUser', interaction.locale)
-    .replace('{playerName}', playerDatas.nickname)
-    .replace('{teamName}', currentTeam.name)
+  const successMessage = getTranslation('success.command.addUser', interaction.locale, {
+    playerName: playerDatas.nickname,
+    teamName: currentTeam.name
+  })
 
   return successCard(`${successMessage} [Steam](https://steamcommunity.com/profiles/${playerDatas.games.csgo.game_player_id}) - [Faceit](https://www.faceit.com/en/players/${playerDatas.nickname})`, interaction.locale)
 }
@@ -114,15 +124,17 @@ const removeUser = async (interaction, playerId) => {
   const playerDatas = await Player.getDatas(playerId)
 
   if (!await UserTeam.getUserTeam(playerId, currentTeam.slug))
-    return errorCard(getTranslation('error.user.notInTeam', interaction.locale)
-      .replace('{playerName}', playerDatas.nickname)
-      .replace('{teamName}', currentTeam.name), interaction.locale)
+    return errorCard(getTranslation('error.user.notInTeam', interaction.locale, {
+      playerName: playerDatas.nickname,
+      teamName: currentTeam.name
+    }), interaction.locale)
 
   UserTeam.remove(playerId, currentTeam.slug)
 
-  return successCard(getTranslation('success.command.removeUser', interaction.locale)
-    .replace('{playerName}', playerDatas.nickname)
-    .replace('{teamName}', currentTeam.name), interaction.locale)
+  return successCard(getTranslation('success.command.removeUser', interaction.locale, {
+    playerName: playerDatas.nickname,
+    teamName: currentTeam.name
+  }), interaction.locale)
 }
 
 module.exports = {

@@ -11,8 +11,9 @@ module.exports = {
   usage: '',
   type: 'system',
   async execute(interaction) {
-    const description = getTranslation('strings.voteDescription', interaction.locale)
-      .replace('{user}', `<@${interaction.user.id}>`)
+    const description = getTranslation('strings.voteDescription', interaction.locale, {
+      discord: `<@${interaction.user.id}>`
+    })
 
     return {
       embeds: [

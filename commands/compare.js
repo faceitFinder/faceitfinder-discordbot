@@ -78,7 +78,10 @@ const sendCardWithInfo = async (interaction, player1Id, player2Id, type = Custom
       name: firstUserDatas.playerDatas.nickname,
       iconURL: firstUserDatas.playerDatas.avatar || null
     })
-    .setDescription(`Comparison between [${firstUserDatas.playerDatas.nickname}](https://www.faceit.com/en/players/${firstUserDatas.playerDatas.nickname}) and [${secondUserDatas.playerDatas.nickname}](https://www.faceit.com/en/players/${secondUserDatas.playerDatas.nickname})`)
+    .setDescription(getTranslation('strings.compare', interaction.locale, {
+      player1: `[${firstUserDatas.playerDatas.nickname}](https://www.faceit.com/en/players/${firstUserDatas.playerDatas.nickname})`,
+      player2: `[${secondUserDatas.playerDatas.nickname}](https://www.faceit.com/en/players/${secondUserDatas.playerDatas.nickname})`
+    }))
     .setColor(color.primary)
     .addFields(
       ...head,
@@ -175,7 +178,10 @@ const sendCardWithInfo = async (interaction, player1Id, player2Id, type = Custom
     .setImage('attachment://graph.png')
 
   const options = [{
-    label: `Compare ${firstUserDatas.playerDatas.nickname} and ${secondUserDatas.playerDatas.nickname}`,
+    label: getTranslation('strings.compare', interaction.locale, {
+      player1: firstUserDatas.playerDatas.nickname,
+      player2: secondUserDatas.playerDatas.nickname
+    }),
     value: JSON.stringify({
       p1: firstUserDatas.playerId,
       p2: secondUserDatas.playerId,

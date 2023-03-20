@@ -27,7 +27,7 @@ const sendCardWithInfo = async (interaction, playerId, page = 0) => {
 
     let option = new Discord.StringSelectMenuOptionBuilder()
       .setLabel(from.toDateString())
-      .setDescription(`${date.number} match played`)
+      .setDescription(getTranslation('strings.matchPlayed', interaction.locale, { matchNumber: date.matches }))
       .setValue(JSON.stringify({
         s: playerId,
         f: from.getTime() / 1000,

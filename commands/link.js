@@ -48,9 +48,10 @@ const link = async (interaction, playerId, discordId, guildId = null, nickname) 
 
   if (await User.get(discordId)) updateRoles(interaction.client, discordId, guildId)
 
-  return successCard(getTranslation('success.command.link', interaction.locale)
-    .replace('{playerName}', playerDatas.nickname)
-    .replace('{discord}', `<@${discordId}>`), interaction.locale)
+  return successCard(getTranslation('success.command.link', interaction.locale, {
+    playerName: playerDatas.nickname,
+    discord: `<@${discordId}>`
+  }, interaction.locale))
 }
 
 module.exports = {

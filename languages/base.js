@@ -107,10 +107,12 @@ module.exports = {
   strings: {
     selectTeam: 'Select a team',
     infoTeam: 'Get info about the team {teamName}.',
-    voteDescription: 'Hey {user} you can vote on top.gg to help me grow.',
+    voteDescription: 'Hey {discord} you can vote on top.gg to help me grow.',
     messageProcessing: 'Your request is currently processing..',
     error: 'Error',
     info: 'Info',
+    compare: 'Comparison between {playerName1} and {playerName2}',
+    matchPlayed: '{matchNumber} matches played',
   },
   error: {
     user: {
@@ -138,7 +140,7 @@ module.exports = {
     },
     bot: {
       channelNotAccessible: 'I do not have the permission to send messages in this channel.',
-      messageEvent: 'Please use the slash commands.',
+      messageEvent: 'Please use the slash commands. (/)',
       manageRoles: 'I don\'t have the permission to manage roles',
     },
     command: {
@@ -151,7 +153,7 @@ module.exports = {
   success: {
     command: {
       removeRoles: 'The roles have been removed successfully.',
-      removeTeam: 'Your team (**{teamName}**) has been removed successfully.',
+      removeTeam: 'Your team **{teamName}** has been removed successfully.',
       updateTeam: 'Your team **{teamName}** has been updated.',
       createTeam: 'Your team **{teamName}** has been created.',
       removeUser: '**${playerName}** has been removed from the team **${teamName}**',
