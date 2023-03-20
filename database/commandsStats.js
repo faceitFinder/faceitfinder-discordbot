@@ -7,9 +7,7 @@ const create = (commandName, commandType, date) => {
     date: date
   })
 
-  newCommandStats.save((err) => {
-    if (err) console.error(err)
-  })
+  newCommandStats.save()
 }
 
 module.exports = {

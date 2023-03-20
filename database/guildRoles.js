@@ -15,9 +15,7 @@ const create = (id, level1, level2, level3, level4, level5, level6, level7, leve
     level10: level10
   })
 
-  newGuildRoles.save((err) => {
-    if (err) console.error(err)
-  })
+  newGuildRoles.save()
 }
 
 const remove = (id) => GuildRoles.deleteOne({ id: id }).exec()
