@@ -6,9 +6,7 @@ const create = (slug, faceitId) => {
     faceitId: faceitId
   })
 
-  newUserTeam.save((err) => {
-    if (err) console.error(err)
-  })
+  newUserTeam.save()
 }
 
 const getUserTeams = (faceitId) => UserTeam.find({ faceitId: faceitId }).exec()
