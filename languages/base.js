@@ -122,6 +122,15 @@ module.exports = {
     stats: 'Stats',
     system: 'System',
     utility: 'Utility',
+    description: 'Description',
+    options: 'Options',
+    usage: 'Usage',
+    example: 'Example',
+    creator: 'Creator',
+    invitationLink: 'Invitation link',
+    voteLink: 'Vote link',
+    serverLink: 'Server link',
+    accountLinked: 'Account linked',
   },
   error: {
     user: {

@@ -42,11 +42,11 @@ const getCommandsHelp = (commandName, card, lang) => {
   card.setDescription(getTranslation('strings.helpInfo', lang, {
     command: command.name
   }))
-    .addFields({ name: 'Description', value: command.descriptionLocalizations[lang] || command.description },
-      { name: 'Options', value: optionsDesc.length > 0 ? optionsDesc : getTranslation('strings.noOptions', lang) },
-      { name: 'Usage', value: `\`/${command.name} ${command.usage}\`` })
+    .addFields({ name: getTranslation('strings.description', lang), value: command.descriptionLocalizations[lang] || command.description },
+      { name: getTranslation('strings.options', lang), value: optionsDesc.length > 0 ? optionsDesc : getTranslation('strings.noOptions', lang) },
+      { name: getTranslation('strings.usage', lang), value: `\`/${command.name} ${command.usage}\`` })
 
-  if (command?.example) card.addFields({ name: 'Example', value: `\`/${command.name} ${command.example}\`` })
+  if (command?.example) card.addFields({ name: getTranslation('strings.example', lang), value: `\`/${command.name} ${command.example}\`` })
 
   return { embeds: [card] }
 }
