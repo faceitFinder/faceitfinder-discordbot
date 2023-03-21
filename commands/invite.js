@@ -1,4 +1,4 @@
-const { name, invite, color } = require('../config.json')
+const { name, color } = require('../config.json')
 const Discord = require('discord.js')
 const { getTranslations, getTranslation } = require('../languages/setup')
 
@@ -15,8 +15,8 @@ module.exports = {
         new Discord.EmbedBuilder()
           .setColor(color.primary)
           .setAuthor({ name: name, iconURL: 'attachment://logo.png' })
-          .setDescription(`Hey <@${interaction.user.id}> you can invite me by clicking on the following link\n${invite}`)
-          .setFooter({ text: `${name} Invite` })
+          .setDescription(getTranslation('strings.inviteDescription', interaction.locale, { discord: `<@${interaction.user.id}>` }))
+          .setFooter({ text: `${name} ${getTranslation('strings.invite', interaction.locale)}` })
       ],
       files: [
         new Discord.AttachmentBuilder('./images/logo.png', { name: 'logo.png' })

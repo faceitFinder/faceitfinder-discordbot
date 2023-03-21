@@ -1,4 +1,4 @@
-const { maxLengthTeamName } = require('../config.json')
+const { maxLengthTeamName, invite } = require('../config.json')
 
 module.exports = {
   command: {
@@ -131,6 +131,8 @@ module.exports = {
     voteLink: 'Vote link',
     serverLink: 'Server link',
     accountLinked: 'Account linked',
+    invite: 'Invite',
+    inviteDescription: `Hey {discord} you can invite me by clicking on the following link!\n${invite}`,
   },
   error: {
     user: {
