@@ -91,6 +91,10 @@ base.strings.invite = 'Invitation'
 base.strings.inviteDescription = `Hey {discord} tu peux m\'inviter sur ton serveur en cliquant sur le lien ci-dessous !\n ${invite}`
 base.strings.join = 'Rejoindre'
 base.strings.joinDescription = `Hey {discord} tu peux rejoindre le serveur de support en cliquant sur le lien ci-dessous !\n ${join}`
+base.strings.selectMatchBellow = 'Selectionner l\'une des parties ci-dessous.'
+base.strings.lastMatchLabel = 'Statistiques de la dernière partie.'
+base.strings.lastMatchDescription = 'Informations sur la dernière partie.'
+base.strings.selectAnotherMatch = 'Selectionner une autre partie.'
 
 base.error.user.missing = 'Il semblerait qu\'un des utilisateurs soit introuvable.'
 base.error.user.compareSame = 'Vous ne pouvez pas comparer le même utilisateur.'
@@ -107,6 +111,8 @@ base.error.user.noParametersNoLink = 'Merci de renseigner un utilisateur ou une 
 Vous pouvez également lier votre compte discord à votre compte faceit afin d\'obtenir vos statistiques directement.\n\
 Pour plus d\'informations, tapez la commande `/help command: link`.'
 base.error.user.noMatches = 'Aucune partie n\'a été trouvée pour le joueur {playerName}.'
+base.error.user.lastMatchNoStats = 'Impossible de récupérer les statistiques de la dernière partie de **{playerName}**.'
+base.error.user.noMatchFoundWithOthers = 'Aucune partie n\'a été trouvée où **{playerName}** est présent avec les joueurs demandés.'
 
 base.error.execution.command = 'Une erreur est survenue lors de l\'exécution de la commande.'
 base.error.execution.selectmenu = 'Une erreur est survenue lors de l\'exécution du menu déroulant.'

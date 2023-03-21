@@ -135,6 +135,10 @@ module.exports = {
     inviteDescription: `Hey {discord} you can invite me by clicking on the following link!\n${invite}`,
     join: 'Join',
     joinDescription: `Hey {discord} you can join the support server by clicking on the following link!\n${join}`,
+    selectMatchBellow: 'Select one of the matches bellow',
+    lastMatchLabel: 'Last match stats info.',
+    lastMatchDescription: 'Info about the last match.',
+    selectAnotherMatch: 'Select another match',
   },
   error: {
     user: {
@@ -154,6 +158,8 @@ module.exports = {
       You can also link your discord account with your faceit account to get your stats directly.\n\
       To know how to do it, type `/help command: link`.',
       noMatches: 'Couldn\'t find any matches for the player **{playerName}**',
+      lastMatchNoStats: 'Couldn\'t find any stats for the last match of the player **{playerName}**',
+      noMatchFoundWithOthers: 'Couldn\'t find any matches where **{playerName}** played with the requested players.',
     },
     execution: {
       command: 'An error occured while executing the command.',

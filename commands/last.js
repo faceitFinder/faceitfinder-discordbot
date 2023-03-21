@@ -51,7 +51,9 @@ const getMatchItems = (interaction, playerDatas, steamDatas, playerHistory, maxM
         filesAtt.push(new Discord.AttachmentBuilder(rankImageCanvas, { name: `${faceitElo}${i}.png` }))
       }
       if (roundStats === undefined)
-        cards.push(errorCard(`Couldn\'t get the stats of ${steamDatas?.personaname || steamDatas} from his last match`, interaction.locale).embeds.at(0))
+        cards.push(errorCard(getTranslation('error.user.lastMatchNoStats', interaction.locale, {
+          playerName: playerDatas.nickname,
+        }), interaction.locale).embeds.at(0))
       if (matchStats.length > 1)
         card.addFields({ name: 'round', value: `${i + 1}/${matchStats.length}` })
 
@@ -109,10 +111,15 @@ const sendCardWithInfo = async (interaction, playerId, matchId = null, page = 0,
 
   if (mapName) playerHistory = playerHistory.filter(e => e.i1 === mapName)
 
-  if (!playerHistory.length > 0)
-    return errorCard(`Couldn\'t get the last matches of ${steamDatas?.personaname || steamDatas} ${players.length > 0 ?
-      'with the requested users.' :
-      ''}`, interaction.locale)
+  if (!playerHistory.length > 0) {
+    if (players.length > 0) return errorCard(getTranslation('error.user.noMatchFoundWithOthers', interaction.locale, {
+      playerName: playerDatas.nickname,
+    }), interaction.locale)
+
+    return errorCard(getTranslation('error.user.lastMatchNoStats', interaction.locale, {
+      playerName: playerDatas.nickname,
+    }), interaction.locale)
+  }
 
   // Removing multiple ids
   const filteredHistory = playerHistory.map(e => e.matchId).filter((e, i, a) => a.indexOf(e) === i)
@@ -204,11 +211,11 @@ const sendCardWithInfo = async (interaction, playerId, matchId = null, page = 0,
       .addComponents(
         new Discord.StringSelectMenuBuilder()
           .setCustomId('lastSelectorInfo')
-          .setPlaceholder('Select one of the match bellow.')
+          .setPlaceholder(getTranslation('strings.selectMatchBellow', interaction.locale))
           .setDisabled(true)
           .setOptions([{
-            label: 'Last match stats info.',
-            description: 'Info about the last match.',
+            label: getTranslation('strings.lastMatchLabel', interaction.locale),
+            description: getTranslation('strings.lastMatchDescription', interaction.locale),
             value: JSON.stringify({
               u: interaction.user.id,
               s: playerId,
@@ -219,7 +226,7 @@ const sendCardWithInfo = async (interaction, playerId, matchId = null, page = 0,
       .addComponents(
         new Discord.StringSelectMenuBuilder()
           .setCustomId('lastSelector')
-          .setPlaceholder('Select another match')
+          .setPlaceholder(getTranslation('strings.selectAnotherMatch', interaction.locale))
           .addOptions(options.slice(pagination.start, pagination.end))),
     getPagination(page, maxPage, 'pageLast')
   ]
