@@ -56,8 +56,8 @@ module.exports = {
   options: [
     {
       name: 'command',
-      description: getTranslation('options.commandeName', 'en-US'),
-      descriptionLocalizations: getTranslations('options.commandeName'),
+      description: getTranslation('options.commandName', 'en-US'),
+      descriptionLocalizations: getTranslations('options.commandName'),
       required: false,
       type: Discord.ApplicationCommandOptionType.String,
       slash: true,

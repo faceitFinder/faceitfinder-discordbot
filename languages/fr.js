@@ -31,7 +31,7 @@ base.options.fromDate = 'INCLUS. Date de début au format MM/JJ/AAAA.'
 base.options.toDate = 'EXCLUS. Date de fin au format MM/JJ/AAAA, par défaut la date du jour, 1 jour d\'écart minimum.'
 base.options.playerAimed = 'steam_parameter / faceit_parameter / @user / vide (pour vous-même si lié).'
 base.options.globalUnlink = 'Supprimer l\'ensemble des associations faites avec votre compte discord.'
-base.options.commandeName = 'Nom de la commande à afficher.'
+base.options.commandName = 'Nom de la commande à afficher.'
 base.options.mapName = 'Selectionner une map pour obtenir les statistiques associées.'
 base.options.levelRoles = {
   1: 'Role associé au niveau 1.',

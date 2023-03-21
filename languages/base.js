@@ -73,7 +73,7 @@ module.exports = {
     toDate: 'EXCLUDED. End date (at least 1 day interval), if empty gets the current day. Format MM/DD/YYYY',
     playerAimed: 'steam_parameters / faceit_parameters / @user / empty if linked.',
     globalUnlink: 'This will unlink your account on all servers (False by default)',
-    commandeName: 'The name of one command.',
+    commandName: 'The name of one command.',
     mapName: 'Specify a map to get the stats related.',
     levelRoles: {
       1: 'The role for the level 1',
