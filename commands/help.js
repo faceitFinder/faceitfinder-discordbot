@@ -11,14 +11,14 @@ const getCommandsList = () => {
     .map(cf => require(`./${cf}`))
 }
 
-const getCommands = (card) => {
+const getCommands = (card, lang) => {
   const commands = getCommandsList()
   const types = [...new Set(commands.map(c => c.type))]
 
   types.forEach(t => {
     let value = ''
     commands.forEach(c => { if (c.type === t) value += `\`${c.name}\` ` })
-    card.addFields({ name: t, value: value })
+    card.addFields({ name: getTranslation(`strings.${t}`, lang), value: value })
   })
 
   return { embeds: [card] }
@@ -26,15 +26,24 @@ const getCommands = (card) => {
 
 const getCommandsHelp = (commandName, card, lang) => {
   try { command = require(`./${commandName}.js`) }
-  catch { return errorCard(getTranslation('error.command.notFound', lang), lang) }
+  catch {
+    return errorCard(getTranslation('error.command.notFound', lang, {
+      command: commandName
+    }), lang)
+  }
 
   let optionsDesc = ''
 
-  command.options.forEach(o => { if (o.description) optionsDesc += `\`${o.name}\`: ${o.description}\n` })
+  command.options.forEach(o => {
+    let desc = o.descriptionLocalizations[lang] || o.description
+    if (desc) optionsDesc += `\`${o.name}\`: ${desc}\n`
+  })
 
-  card.setDescription(`Information about the ${command.name} command \n \`<>\`: optional, \`[]\`: required, \`{}\`: required if not linked`)
-    .addFields({ name: 'Description', value: command.description },
-      { name: 'Options', value: optionsDesc.length > 0 ? optionsDesc : 'This command does not require any options' },
+  card.setDescription(getTranslation('strings.helpInfo', lang, {
+    command: command.name
+  }))
+    .addFields({ name: 'Description', value: command.descriptionLocalizations[lang] || command.description },
+      { name: 'Options', value: optionsDesc.length > 0 ? optionsDesc : getTranslation('strings.noOptions', lang) },
       { name: 'Usage', value: `\`/${command.name} ${command.usage}\`` })
 
   if (command?.example) card.addFields({ name: 'Example', value: `\`/${command.name} ${command.example}\`` })
@@ -64,16 +73,15 @@ module.exports = {
   usage: '<command>',
   type: 'system',
   async execute(interaction) {
-    // log the user language
     const command = getInteractionOption(interaction, 'command')?.trim().split(' ')[0]
 
     const helpCard = new Discord.EmbedBuilder()
       .setColor(color.primary)
-      .setTitle('Commands')
-      .setDescription('`/help <command>` for more info on a specific command')
-      .setFooter({ text: `${name} Help` })
+      .setTitle(getTranslation('strings.help', interaction.locale))
+      .setDescription(getTranslation('strings.helpDescription', interaction.locale))
+      .setFooter({ text: `${name} ${getTranslation('strings.help', interaction.locale)}` })
 
     if (command) return getCommandsHelp(command, helpCard, interaction.locale)
-    else return getCommands(helpCard)
+    else return getCommands(helpCard, interaction.locale)
   }
 }

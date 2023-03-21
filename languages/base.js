@@ -113,6 +113,15 @@ module.exports = {
     info: 'Info',
     compare: 'Comparison between {playerName1} and {playerName2}',
     matchPlayed: '{matchNumber} matches played',
+    selectDate: 'Select a date',
+    helpInfo: 'Information about the **{command}** command \n \`<>\`: Optional, \`[]\`: Required, \`{}\`: Required if not linked',
+    noOptions: 'This command does not require any options',
+    commands: 'Commands',
+    help: 'Help',
+    helpDescription: '`/help <command>` for more info on a specific command',
+    stats: 'Stats',
+    system: 'System',
+    utility: 'Utility',
   },
   error: {
     user: {
@@ -131,6 +140,7 @@ module.exports = {
       noParametersNoLink: 'Please specify a user or a team.\n\
       You can also link your discord account with your faceit account to get your stats directly.\n\
       To know how to do it, type `/help command: link`.',
+      noMatches: 'Couldn\'t find any matches for the player **{playerName}**',
     },
     execution: {
       command: 'An error occured while executing the command.',

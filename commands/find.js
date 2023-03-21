@@ -54,7 +54,7 @@ module.exports = {
     const excludedFaceit = getInteractionOption(interaction, 'excluded_faceit_parameters')
 
     if (!excludedSteam && !excludedFaceit) excludedUsers = excludedUsers.filter(e => e.normalize() !== playerAimed.normalize())
-    if (excludedUsers.some(e => users.includes(e)) || excludedUsers.includes(playerAimed)) throw getTranslation('error.user.excluded', 'en-US')
+    if (excludedUsers.some(e => users.includes(e)) || excludedUsers.includes(playerAimed)) throw getTranslation('error.user.excluded', interaction.locale)
 
     return sendCardWithInfo(interaction, playerAimed, null, 0, users.filter(e => e.normalize() !== playerAimed.normalize()), null, excludedUsers)
   }

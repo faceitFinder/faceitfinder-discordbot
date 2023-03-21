@@ -69,6 +69,15 @@ base.strings.error = 'Erreur'
 base.strings.info = 'Info'
 base.strings.compare = 'Comparaison entre {player1} et {player2}.'
 base.strings.matchPlayed = '{matchNumber} parties jouées.'
+base.strings.selectDate = 'Selectionner une date.'
+base.strings.helpInfo = 'Informations sur la commande **{command}** \n \`<>\` = Optionnel, \`[]\` = Obligatoire, \`{}\` = Requis si compte discord non associé'
+base.strings.noOptions = 'Cette commande ne nécessite pas d\'options.'
+base.strings.commands = 'Commandes'
+base.strings.help = 'Aide'
+base.strings.helpDescription = '`/help <command>` pour plus d\'informations sur une commande.'
+base.strings.stats = 'Statistiques'
+base.strings.system = 'Système'
+base.strings.utility = 'Utilitaire'
 
 base.error.user.missing = 'Il semblerait qu\'un des utilisateurs soit introuvable.'
 base.error.user.compareSame = 'Vous ne pouvez pas comparer le même utilisateur.'
@@ -84,6 +93,7 @@ base.error.user.notLinked = 'Aucun compte faceit n\'est lié à votre compte dis
 base.error.user.noParametersNoLink = 'Merci de renseigner un utilisateur ou une équipe.\n\
 Vous pouvez également lier votre compte discord à votre compte faceit afin d\'obtenir vos statistiques directement.\n\
 Pour plus d\'informations, tapez la commande `/help command: link`.'
+base.error.user.noMatches = 'Aucune partie n\'a été trouvée pour le joueur {playerName}.'
 
 base.error.execution.command = 'Une erreur est survenue lors de l\'exécution de la commande.'
 base.error.execution.selectmenu = 'Une erreur est survenue lors de l\'exécution du menu déroulant.'
