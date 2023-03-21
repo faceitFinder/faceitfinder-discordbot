@@ -1,4 +1,4 @@
-const { maxLengthTeamName, invite } = require('../config.json')
+const { maxLengthTeamName, invite, join } = require('../config.json')
 const base = structuredClone(require('./base'))
 
 base.command.compare.description = 'Comparer les statistiques des 2 joueurs.'
@@ -89,6 +89,8 @@ base.strings.serverLink = 'Lien du serveur'
 base.strings.accountLinked = 'Compte discord associé'
 base.strings.invite = 'Invitation'
 base.strings.inviteDescription = `Hey {discord} tu peux m\'inviter sur ton serveur en cliquant sur le lien ci-dessous !\n ${invite}`
+base.strings.join = 'Rejoindre'
+base.strings.joinDescription = `Hey {discord} tu peux rejoindre le serveur de support en cliquant sur le lien ci-dessous !\n ${join}`
 
 base.error.user.missing = 'Il semblerait qu\'un des utilisateurs soit introuvable.'
 base.error.user.compareSame = 'Vous ne pouvez pas comparer le même utilisateur.'

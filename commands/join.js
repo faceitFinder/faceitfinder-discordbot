@@ -1,4 +1,4 @@
-const { name, join, color } = require('../config.json')
+const { name, color } = require('../config.json')
 const Discord = require('discord.js')
 const { getTranslations, getTranslation } = require('../languages/setup')
 
@@ -15,8 +15,8 @@ module.exports = {
         new Discord.EmbedBuilder()
           .setColor(color.primary)
           .setAuthor({ name: name, iconURL: 'attachment://logo.png' })
-          .setDescription(`Hey <@${interaction.user.id}> you can join my server by clicking on the following link\n${join}`)
-          .setFooter({ text: `${name} Join` })
+          .setDescription(getTranslation('strings.joinDescription', interaction.locale, { discord: `<@${interaction.user.id}>` }))
+          .setFooter({ text: `${name} ${getTranslation('strings.join', interaction.locale)}` })
       ],
       files: [
         new Discord.AttachmentBuilder('./images/logo.png', { name: 'logo.png' })
