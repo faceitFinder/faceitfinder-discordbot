@@ -79,8 +79,8 @@ const sendCardWithInfo = async (interaction, player1Id, player2Id, type = Custom
       iconURL: firstUserDatas.playerDatas.avatar || null
     })
     .setDescription(getTranslation('strings.compare', interaction.locale, {
-      player1: `[${firstUserDatas.playerDatas.nickname}](https://www.faceit.com/en/players/${firstUserDatas.playerDatas.nickname})`,
-      player2: `[${secondUserDatas.playerDatas.nickname}](https://www.faceit.com/en/players/${secondUserDatas.playerDatas.nickname})`
+      playerName1: `[${firstUserDatas.playerDatas.nickname}](https://www.faceit.com/en/players/${firstUserDatas.playerDatas.nickname})`,
+      playerName2: `[${secondUserDatas.playerDatas.nickname}](https://www.faceit.com/en/players/${secondUserDatas.playerDatas.nickname})`
     }))
     .setColor(color.primary)
     .addFields(
