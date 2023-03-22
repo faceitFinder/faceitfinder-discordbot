@@ -139,6 +139,7 @@ module.exports = {
     lastMatchLabel: 'Last match stats info.',
     lastMatchDescription: 'Info about the last match.',
     selectAnotherMatch: 'Select another match',
+    lastStatsLabel: 'Statistics of the last matches.',
   },
   error: {
     user: {
@@ -185,13 +186,13 @@ module.exports = {
       removeTeam: 'Your team **{teamName}** has been removed successfully.',
       updateTeam: 'Your team **{teamName}** has been updated.',
       createTeam: 'Your team **{teamName}** has been created.',
-      removeUser: '**${playerName}** has been removed from the team **${teamName}**',
-      addUser: '**${playerName}** has been added to the team **${teamName}**',
+      removeUser: '**{playerName}** has been removed from the team **{teamName}**',
+      addUser: '**{playerName}** has been added to the team **{teamName}**',
       unlink: {
         global: 'Your account has been unlinked successfully.',
         server: 'Your account has been unlinked successfully on this server.',
       },
-      link: '<@{discord}> has been linked to ${playerName}'
+      link: '{discord} has been linked to **{playerName}**'
     }
   }
 }

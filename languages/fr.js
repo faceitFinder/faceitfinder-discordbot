@@ -67,7 +67,7 @@ base.strings.voteDescription = 'Hey {discord} tu peux m\'aider à grandir en vot
 base.strings.messageProcessing = 'Votre demande est en cours de traitement...'
 base.strings.error = 'Erreur'
 base.strings.info = 'Info'
-base.strings.compare = 'Comparaison entre {player1} et {player2}.'
+base.strings.compare = 'Comparaison entre {playerName1} et {playerName2}.'
 base.strings.matchPlayed = '{matchNumber} parties jouées.'
 base.strings.selectDate = 'Selectionner une date.'
 base.strings.helpInfo = 'Informations sur la commande **{command}** \n \`<>\` = Optionnel, \`[]\` = Obligatoire, \`{}\` = Requis si compte discord non associé'
@@ -95,6 +95,7 @@ base.strings.selectMatchBellow = 'Selectionner l\'une des parties ci-dessous.'
 base.strings.lastMatchLabel = 'Statistiques de la dernière partie.'
 base.strings.lastMatchDescription = 'Informations sur la dernière partie.'
 base.strings.selectAnotherMatch = 'Selectionner une autre partie.'
+base.strings.lastStatsLabel = 'Statistiques des dernières parties.'
 
 base.error.user.missing = 'Il semblerait qu\'un des utilisateurs soit introuvable.'
 base.error.user.compareSame = 'Vous ne pouvez pas comparer le même utilisateur.'
@@ -110,7 +111,7 @@ base.error.user.notLinked = 'Aucun compte faceit n\'est lié à votre compte dis
 base.error.user.noParametersNoLink = 'Merci de renseigner un utilisateur ou une équipe.\n\
 Vous pouvez également lier votre compte discord à votre compte faceit afin d\'obtenir vos statistiques directement.\n\
 Pour plus d\'informations, tapez la commande `/help command: link`.'
-base.error.user.noMatches = 'Aucune partie n\'a été trouvée pour le joueur {playerName}.'
+base.error.user.noMatches = 'Aucune partie n\'a été trouvée pour le joueur **{playerName}**.'
 base.error.user.lastMatchNoStats = 'Impossible de récupérer les statistiques de la dernière partie de **{playerName}**.'
 base.error.user.noMatchFoundWithOthers = 'Aucune partie n\'a été trouvée où **{playerName}** est présent avec les joueurs demandés.'
 
@@ -138,6 +139,6 @@ base.success.command.unlink = {
   global: 'Toutes les associations ont été supprimées.',
   server: 'L\'association faites sur ce serveur a été supprimée.',
 }
-base.success.command.link = '{discord} a été associé à {playerName}.'
+base.success.command.link = '{discord} a été associé à **{playerName}**.'
 
 module.exports = base

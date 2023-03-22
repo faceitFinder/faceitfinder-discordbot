@@ -11,10 +11,11 @@ const sendCardWithInfo = async (interaction, playerId, type = CustomType.TYPES.E
 
   const map = getInteractionOption(interaction, 'map')
   const maxMatch = getInteractionOption(interaction, 'match_number') || 20
+  const lastMatchString = getTranslation('strings.lastStatsLabel', interaction.locale)
 
   const option = {
-    label: 'Last stats',
-    description: 'Last stats',
+    label: lastMatchString,
+    description: lastMatchString,
     value: JSON.stringify({
       s: playerId,
       c: map,
@@ -35,7 +36,7 @@ const sendCardWithInfo = async (interaction, playerId, type = CustomType.TYPES.E
   if (from.toString() !== 'Invalid Date') values.f = from.getTime() / 1000
   if (to.toString() !== 'Invalid Date') values.t = to.getTime() / 1000
 
-  return DateStats.getCardWithInfo(row, values, type, 'uLSG', maxMatch, null, null, map, true)
+  return DateStats.getCardWithInfo(interaction, row, values, type, 'uLSG', maxMatch, null, null, map, true)
 }
 
 const getOptions = () => {

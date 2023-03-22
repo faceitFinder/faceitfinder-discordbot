@@ -16,7 +16,8 @@ const sendCardWithInfo = async (interaction, values, type = CustomType.TYPES.ELO
 
   loadingCard(interaction)
 
-  return DateStats.getCardWithInfo(actionRow,
+  return DateStats.getCardWithInfo(interaction,
+    actionRow,
     values,
     type,
     'uDSG',

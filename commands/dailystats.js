@@ -54,7 +54,8 @@ const sendCardWithInfo = async (interaction, playerId, page = 0) => {
         .setPlaceholder(getTranslation('strings.selectDate', interaction.locale))
         .addOptions(pagination))
 
-  return DateStats.getCardWithInfo(row,
+  return DateStats.getCardWithInfo(interaction,
+    row,
     JSON.parse(pagination[0].data.value),
     CustomType.TYPES.ELO,
     'uDSG',

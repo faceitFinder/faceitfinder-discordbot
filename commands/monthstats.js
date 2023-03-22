@@ -53,7 +53,8 @@ const sendCardWithInfo = async (interaction, playerId, page = 0) => {
         .setPlaceholder('Select a month')
         .addOptions(pagination))
 
-  return DateStats.getCardWithInfo(row,
+  return DateStats.getCardWithInfo(interaction,
+    row,
     JSON.parse(pagination[0].data.value),
     CustomType.TYPES.ELO,
     'uDSG',

@@ -9,6 +9,7 @@ const CustomTypeFunc = require('../functions/customType')
 const { getPagination } = require('./pagination')
 const { getInteractionOption } = require('./commands')
 const { caching } = require('cache-manager')
+const { getTranslation } = require('../languages/setup')
 
 const ttl = 60 * 1000 * 5 // 5 minutes
 const cachingMemory = caching('memory', {
@@ -138,7 +139,7 @@ const setOptionDefault = option => {
   return option
 }
 
-const getCardWithInfo = async (actionRow, values, type, id, maxMatch, maxPage = null, page = null, map = null, updateFrom = false) => {
+const getCardWithInfo = async (interaction, actionRow, values, type, id, maxMatch, maxPage = null, page = null, map = null, updateFrom = false) => {
   const playerId = values.s
   const playerDatas = await Player.getDatas(playerId)
   const steamDatas = await Steam.getDatas(playerDatas.steam_id_64).catch(err => err.statusText)
@@ -166,7 +167,9 @@ const getCardWithInfo = async (actionRow, values, type, id, maxMatch, maxPage = 
   const eloDiff = elo.filter(e => e).reduce((a, b) => a + b, 0)
 
   if (!map) playerHistory = filteredHistory
-  if (!playerHistory.length > 0) throw `${playerDatas.nickname} played 0 match on that period.`
+  if (!playerHistory.length > 0) throw getTranslation('error.user.noMatches', interaction.locale, {
+    playerName: playerDatas.nickname,
+  })
   if (updateFrom) from = playerHistory.at(-1).date
 
   const graphBuffer = Graph.generateChart(playerHistoryTo,

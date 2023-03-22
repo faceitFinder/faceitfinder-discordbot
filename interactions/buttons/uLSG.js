@@ -26,8 +26,9 @@ module.exports = {
     json.f = from.getTime() / 1000
     json.t = to.setHours(+24) / 1000
 
-    return getCardWithInfo(
-      actionRow, json,
+    return getCardWithInfo(interaction,
+      actionRow,
+      json,
       CustomType.getType(interaction.component.label),
       'uLSG',
       json.m,
