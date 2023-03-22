@@ -1,5 +1,9 @@
 const { maxLengthTeamName, invite, join } = require('../config.json')
 
+/**
+ * Command description and options has to be max 100 characters
+ */
+
 module.exports = {
   command: {
     compare: {
