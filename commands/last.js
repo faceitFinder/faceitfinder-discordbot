@@ -28,8 +28,8 @@ const getMatchItems = (interaction, playerDatas, steamDatas, playerHistory, maxM
   const faceitElo = playerDatas.games.csgo.faceit_elo
 
   const matchStats = playerHistory.filter(e => e.matchId === matchId)
-  const lastMatchesElo = Graph.getElo(interaction, maxMatch + 1, structuredClone(playerHistory), faceitElo, page === 0)
-  const eloDiff = Graph.getEloGain(interaction, maxMatch, structuredClone(matchStats), faceitElo, page === 0)
+  const lastMatchesElo = Graph.getElo(interaction, playerDatas.nickname, maxMatch + 1, structuredClone(playerHistory), faceitElo, page === 0)
+  const eloDiff = Graph.getEloGain(interaction, playerDatas.nickname, maxMatch, structuredClone(matchStats), faceitElo, page === 0)
   const levelDiff = playerHistory.map(e => e.matchId === matchId)
     .map((e, i) => e ? lastMatchesElo.at(i) : null)
     .filter(e => e !== null)
@@ -155,10 +155,11 @@ const sendCardWithInfo = async (interaction, playerId, matchId = null, page = 0,
     const to = playerHistory.at(0).date
     const playerStats = generatePlayerStats(playerHistory)
 
-    const elo = Graph.getEloGain(playerHistory.length, playerHistory, faceitElo, false)
+    const elo = Graph.getEloGain(playerHistory.length, playerDatas.nickname, playerHistory, faceitElo, false)
     const eloDiff = elo.filter(e => e).reduce((a, b) => a + b, 0)
 
     const graphBuffer = Graph.generateChart(interaction,
+      playerDatas.nickname,
       playerHistory,
       faceitElo,
       playerStats.games,
