@@ -83,7 +83,7 @@
         "color": "#F8961E"
       },
       "3": {
-        "min": 1.00,
+        "min": 1.0,
         "max": 10000,
         "color": "#6B9B46"
       }
@@ -180,8 +180,36 @@
     }
   },
   "languages": [
+    "en-US",
+    "en-GB",
+    "bg",
+    "zh-CN",
+    "zh-TW",
+    "hr",
+    "cs",
+    "da",
+    "nl",
+    "fi",
     "fr",
-    "en-US"
+    "de",
+    "el",
+    "hi",
+    "hu",
+    "it",
+    "ja",
+    "ko",
+    "lt",
+    "no",
+    "pl",
+    "pt-BR",
+    "ro",
+    "ru",
+    "es-ES",
+    "sv-SE",
+    "th",
+    "tr",
+    "uk",
+    "vi"
   ],
   "maxLengthTeamName": 14
 }
