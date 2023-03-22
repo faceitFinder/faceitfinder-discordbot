@@ -1,5 +1,5 @@
-const { maxLengthTeamName, invite, join } = require('../config.json')
-const base = structuredClone(require('./base'))
+const { maxLengthTeamName, invite, join } = require('../../config.json')
+const base = structuredClone(require('../base'))
 
 base.command.compare.description = 'Сравнить статистику обоих пользователей'
 base.command.dailystats.description = 'Отобразить статистику с графиком эло за указанный день'
@@ -117,6 +117,7 @@ base.error.user.compareSame = 'Вы не можете сравнить одно�
 base.error.user.excluded = 'Вы не можете исключить игрока, которого ищете'
 base.error.user.teamOwn = 'У вас нет команды'
 base.error.user.noTeam = 'У вас нет команды и вы не являетесь членом какой-либо команды'
+base.error.user.teamFull = 'Вы не можете добавить в свою команду больше 5 игроков.'
 base.error.user.alreadyInTeam = '**{playerName}** уже является членом команды **{teamName}**'
 base.error.user.notInTeam = '**{playerName}** не является членом команды **{teamName}**'
 base.error.user.permissions = {
