@@ -11,6 +11,7 @@ const sendCardWithInfo = async (interaction, playerId) => {
   const discordId = interaction.user.id
   const discordUserId = getInteractionOption(interaction, 'discord_user')
   const nickname = getInteractionOption(interaction, 'nickname')
+  const lang = interaction.locale
 
   if (discordUserId) {
     const guild = await interaction.guild.fetch()
@@ -19,16 +20,18 @@ const sendCardWithInfo = async (interaction, playerId) => {
         const discordUserId = member.user.id
 
         if (!interaction.member.permissions.has('ManageRoles') && discordUserId !== discordId)
-          return errorCard('You don\'t have the permission to manage roles', interaction.locale)
-        else if (member.user.bot) return errorCard('Sorry, but bots aren\'t really my type..', interaction.locale)
+          return errorCard(getTranslation('error.user.permissions.manageRoles', lang), lang)
+        else if (member.user.bot) return errorCard(getTranslation('error.user.noBotLink', lang), lang)
 
         const exists = await User.getWithGuild(discordUserId, null)
         if (exists)
-          return errorCard(`<@${discordUserId}> already has a global link.`, interaction.locale)
+          return errorCard(getTranslation('error.user.globalLink', lang, {
+            discord: `<@${discordUserId}>`
+          }), lang)
 
         return link(interaction, playerId, discordUserId, guild.id, nickname)
       })
-      .catch(() => errorCard('The requested user is not on this server.', interaction.locale))
+      .catch(() => errorCard(getTranslation('error.user.notFound', lang), lang))
   }
 
   return link(interaction, playerId, discordId, null, nickname)

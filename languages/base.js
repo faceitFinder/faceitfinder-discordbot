@@ -161,6 +161,9 @@ module.exports = {
       noMatches: 'Couldn\'t find any matches for the player **{playerName}**',
       lastMatchNoStats: 'Couldn\'t find any stats for the last match of the player **{playerName}**',
       noMatchFoundWithOthers: 'Couldn\'t find any matches where **{playerName}** played with the requested players.',
+      noBotLink: 'Sorry, but bots aren\'t really my type...',
+      globalLink: '{discord} already has a global link.',
+      notFound: 'The requested user is not on this server.',
     },
     execution: {
       command: 'An error occured while executing the command.',
