@@ -227,10 +227,12 @@ const sendCardWithInfo = async (interaction, player1Id, player2Id, type = Custom
       new Discord.ActionRowBuilder()
         .addComponents([
           CustomTypeFunc.generateButtons(
+            interaction,
             { ...buttonValues, n: 1 },
             CustomType.TYPES.KD,
             type === CustomType.TYPES.KD),
           CustomTypeFunc.generateButtons(
+            interaction,
             { ...buttonValues, n: 2 },
             CustomType.TYPES.ELO,
             type === CustomType.TYPES.ELO)

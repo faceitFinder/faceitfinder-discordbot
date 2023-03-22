@@ -223,20 +223,23 @@ const getCardWithInfo = async (interaction, actionRow, values, type, id, maxMatc
     new Discord.ActionRowBuilder()
       .addComponents([
         CustomTypeFunc.generateButtons(
+          interaction,
           { id: id, n: 1 },
           CustomType.TYPES.KD,
           type === CustomType.TYPES.KD),
         CustomTypeFunc.generateButtons(
+          interaction,
           { id: id, n: 2 },
           CustomType.TYPES.ELO,
           type === CustomType.TYPES.ELO),
         CustomTypeFunc.generateButtons(
+          interaction,
           { id: id, n: 3 },
           CustomType.TYPES.ELO_KD,
           type === CustomType.TYPES.ELO_KD)
       ])]
 
-  if (page !== null) components.push(getPagination(page, maxPage, 'pageDS'))
+  if (page !== null) components.push(getPagination(interaction, page, maxPage, 'pageDS'))
 
   return {
     embeds: [card],

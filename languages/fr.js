@@ -101,6 +101,13 @@ base.strings.selectMapDescription = 'Selectionner l\'une des maps ci-dessous pou
 base.strings.selectWeek = 'Selectionner une semaine.'
 base.strings.year = 'Année'
 base.strings.selectYear = 'Selectionner une année.'
+base.strings.loading = 'Chargement'
+base.strings.pagination = {
+  prev: 'Page Précédente',
+  next: 'Page Suivante',
+  first: 'Première Page',
+  last: 'Dernière Page',
+}
 
 base.error.user.missing = 'Il semblerait qu\'un des utilisateurs soit introuvable.'
 base.error.user.compareSame = 'Vous ne pouvez pas comparer le même utilisateur.'

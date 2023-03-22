@@ -229,7 +229,7 @@ const sendCardWithInfo = async (interaction, playerId, matchId = null, page = 0,
           .setCustomId('lastSelector')
           .setPlaceholder(getTranslation('strings.selectAnotherMatch', interaction.locale))
           .addOptions(options.slice(pagination.start, pagination.end))),
-    getPagination(page, maxPage, 'pageLast')
+    getPagination(interaction, page, maxPage, 'pageLast')
   ]
 
   if (players.length > 0)

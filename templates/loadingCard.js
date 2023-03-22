@@ -11,7 +11,7 @@ module.exports = (interaction) => {
         .setColor(color.primary)
         .setAuthor({ name: name, iconURL: 'attachment://logo.png' })
         .setDescription(getTranslation('strings.messageProcessing', interaction.locale))
-        .setFooter({ text: 'FaceitFinder Loader' })
+        .setFooter({ text: `${name} ${getTranslation('strings.loading', interaction.locale)}` })
     ],
     attachments: [],
     components: [],

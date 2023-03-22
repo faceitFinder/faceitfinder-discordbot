@@ -145,6 +145,13 @@ module.exports = {
     selectWeek: 'Select a week',
     year: 'Year',
     selectYear: 'Select a year',
+    loading: 'Loading',
+    pagination: {
+      prev: 'Previous Page',
+      next: 'Next Page',
+      last: 'Last Page',
+      first: 'First Page',
+    }
   },
   error: {
     user: {
