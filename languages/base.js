@@ -85,7 +85,7 @@ module.exports = {
       7: 'Level 7.',
       8: 'Level 8.',
       9: 'Level 9.',
-      10: 'Level 10.'
+      10: 'Level 10.',
     },
     removeOldRoles: 'Remove the old roles if they exist.',
     generateRoles: 'Generates the rank roles on the server.',
@@ -207,7 +207,7 @@ module.exports = {
         global: 'Your account has been unlinked successfully.',
         server: 'Your account has been unlinked successfully on this server.',
       },
-      link: '{discord} has been linked to **{playerName}**'
+      link: '{discord} has been linked to **{playerName}**',
     }
   }
 }
