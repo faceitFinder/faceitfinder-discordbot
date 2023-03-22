@@ -53,6 +53,7 @@ base.options.infoTeam = 'Afficher les informations des équipes dans lesquelles 
 base.options.createTeam = 'Créer votre équipe.'
 base.options.deleteTeam = 'Supprimer votre équipe.'
 base.options.addUserTeam = 'Ajouter un joueur à votre équipe.'
+base.options.updateTeam = 'Modifier votre équipe.',
 base.options.removeUserTeam = 'Retirer un joueur de votre équipe.'
 base.options.nameTeam = `Nom de l'équipe, ${maxLengthTeamName} caractères maximum.`
 base.options.accessTeam = 'Autoriser l\'ensemble des utilisateurs discord à afficher les statistiques de votre équipe.'
