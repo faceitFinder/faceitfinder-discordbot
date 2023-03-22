@@ -1,5 +1,5 @@
 files:
   - source: /languages/en-US/translations.js
     translation: /languages/%two_letters_code%/translations.js
-  - source: /languages/en-US/*js
+  - source: /languages/en-US/translations.js
     translation: /languages/%locale%/translations.js
