@@ -155,7 +155,7 @@ const sendCardWithInfo = async (interaction, playerId, matchId = null, page = 0,
     const to = playerHistory.at(0).date
     const playerStats = generatePlayerStats(playerHistory)
 
-    const elo = Graph.getEloGain(playerHistory.length, playerDatas.nickname, playerHistory, faceitElo, false)
+    const elo = Graph.getEloGain(interaction, playerDatas.nickname, playerHistory.length, playerHistory, faceitElo, false)
     const eloDiff = elo.filter(e => e).reduce((a, b) => a + b, 0)
 
     const graphBuffer = Graph.generateChart(interaction,
