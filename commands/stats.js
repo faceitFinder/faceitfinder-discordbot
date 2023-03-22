@@ -24,7 +24,7 @@ const sendCardWithInfo = async (interaction, playerId, type = CustomType.TYPES.E
     u: interaction.user.id
   }
 
-  const graphBuffer = Graph.generateChart(interaction, playerHistory, faceitElo, maxMatch, type)
+  const graphBuffer = Graph.generateChart(interaction, playerDatas.nickname, playerHistory, faceitElo, maxMatch, type)
 
   const playerCountry = playerDatas.country
   const playerRegion = playerDatas.games.csgo.region

@@ -203,7 +203,7 @@ const sendCardWithInfo = async (interaction, player1Id, player2Id, type = Custom
       user.playerDatas.nickname,
       type,
       playerColor[i],
-      Graph.getGraph(interaction, type, user.playerHistory, user.playerDatas.games.csgo.faceit_elo, maxMatch, true).reverse()
+      Graph.getGraph(interaction, user.playerDatas.nickname, type, user.playerHistory, user.playerDatas.games.csgo.faceit_elo, maxMatch, true).reverse()
     ])
 
   const graphBuffer = Graph.getChart(
