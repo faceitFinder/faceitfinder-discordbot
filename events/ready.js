@@ -29,6 +29,8 @@ module.exports = {
             let option = {
               name: c.name,
               description: c.description || c.slashDescription,
+              // eslint-disable-next-line camelcase
+              description_localizations: c.descriptionLocalizations || {},
               type: c.type
             }
             if (c.choices) option.choices = c.choices
