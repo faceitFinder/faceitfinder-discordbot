@@ -1,5 +1,5 @@
-const { maxLengthTeamName, invite, join } = require('../config.json')
-const base = structuredClone(require('./base'))
+const { maxLengthTeamName, invite, join } = require('../../config.json')
+const base = structuredClone(require('../base'))
 
 base.command.compare.description = 'Comparer les statistiques des 2 joueurs.'
 base.command.dailystats.description = 'Obtenir les statistiques du jour selectionné, accompagné d\'un graphique de l\'évolution de l\'elo.'
