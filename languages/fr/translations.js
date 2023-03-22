@@ -117,6 +117,7 @@ base.error.user.compareSame = 'Vous ne pouvez pas comparer le même utilisateur.
 base.error.user.excluded = 'Vous ne pouvez pas exclure un utilisateur que vous avez déjà inclus.'
 base.error.user.teamOwn = 'Vous ne possédez pas d\'équipe.'
 base.error.user.noTeam = 'Vous ne possédez et ne faites partie d\'aucune équipe.'
+base.error.user.teamFull = 'Vous ne pouvez pas ajouter plus de 5 joueurs à votre équipe.'
 base.error.user.alreadyInTeam = '**{playerName}** fait déjà parti de l\'équipe **{teamName}**.'
 base.error.user.notInTeam = '**{playerName}** n\'est pas dans l\'équipe **{teamName}**.'
 base.error.user.permissions = {

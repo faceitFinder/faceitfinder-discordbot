@@ -12,8 +12,8 @@ const getTranslations = (key) => {
 
 const getTranslation = (key, language, replace) => {
   let languageConf
-  try { languageConf = require(`./${language}/translations.js`) }
-  catch (error) { languageConf = require('./base.js') }
+  try { languageConf = require(`./${language}/translations`) }
+  catch (error) { languageConf = require('./en-US/translations') }
 
   let string = languageConf[key]
 
