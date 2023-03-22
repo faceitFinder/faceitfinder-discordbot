@@ -13,4 +13,5 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: 19
+      - run: npm i
       - run: npm run lint
