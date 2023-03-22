@@ -34,16 +34,16 @@ base.options.globalUnlink = 'Supprimer l\'ensemble des associations faites avec 
 base.options.commandName = 'Nom de la commande à afficher.'
 base.options.mapName = 'Selectionner une map pour obtenir les statistiques associées.'
 base.options.levelRoles = {
-  1: 'Role associé au niveau 1.',
-  2: 'Role associé au niveau 2.',
-  3: 'Role associé au niveau 3.',
-  4: 'Role associé au niveau 4.',
-  5: 'Role associé au niveau 5.',
-  6: 'Role associé au niveau 6.',
-  7: 'Role associé au niveau 7.',
-  8: 'Role associé au niveau 8.',
-  9: 'Role associé au niveau 9.',
-  10: 'Role associé au niveau 10.',
+  1: 'Niveau 1.',
+  2: 'Niveau 2.',
+  3: 'Niveau 3.',
+  4: 'Niveau 4.',
+  5: 'Niveau 5.',
+  6: 'Niveau 6.',
+  7: 'Niveau 7.',
+  8: 'Niveau 8.',
+  9: 'Niveau 9.',
+  10: 'Niveau 10.',
 }
 base.options.removeOldRoles = 'Supprimer les anciens roles, si existants.'
 base.options.generateRoles = 'Générer les roles.'
@@ -91,7 +91,7 @@ base.strings.invite = 'Invitation'
 base.strings.inviteDescription = `Hey {discord} tu peux m\'inviter sur ton serveur en cliquant sur le lien ci-dessous !\n ${invite}`
 base.strings.join = 'Rejoindre'
 base.strings.joinDescription = `Hey {discord} tu peux rejoindre le serveur de support en cliquant sur le lien ci-dessous !\n ${join}`
-base.strings.selectMatchBellow = 'Selectionner l\'une des parties ci-dessous.'
+base.strings.selectMatchBelow = 'Selectionner l\'une des parties ci-dessous.'
 base.strings.lastMatchLabel = 'Statistiques de la dernière partie.'
 base.strings.lastMatchDescription = 'Informations sur la dernière partie.'
 base.strings.selectAnotherMatch = 'Selectionner une autre partie.'
@@ -133,8 +133,12 @@ base.error.command.notFound = 'Commande introuvable.'
 base.error.command.teamNameAlreadyExist = 'Une équipe avec ce nom existe déjà.'
 base.error.command.teamNameTooLong = `Le nom de l'équipe ne peut pas dépasser ${maxLengthTeamName} caractères.`
 base.error.command.alreadyOwnTeam = 'Vous possédez déjà l\'équipe **{teamName}**.'
+base.error.command.invalidRoles = 'Un ou plusieurs rôles sont invalides.'
+base.error.command.roleTooHigh = 'Ce rôle est plus élevé que celui du bot, merci de le déplacer plus bas.'
 
 base.success.command.removeRoles = 'Les rôles ont été supprimés avec succès.'
+base.success.command.generateRoles = 'Les rôles ont été générés avec succès.'
+base.success.command.setupRoles = 'Les rôles ont été configurés avec succès.'
 base.success.command.removeTeam = 'Votre équipe **{teamName}** a été supprimée avec succès.'
 base.success.command.updateTeam = 'Votre équipe **{teamName}** a été mise à jour.'
 base.success.command.createTeam = 'Votre équipe **{teamName}** a été créée.'

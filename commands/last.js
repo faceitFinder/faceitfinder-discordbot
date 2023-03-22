@@ -211,7 +211,7 @@ const sendCardWithInfo = async (interaction, playerId, matchId = null, page = 0,
       .addComponents(
         new Discord.StringSelectMenuBuilder()
           .setCustomId('lastSelectorInfo')
-          .setPlaceholder(getTranslation('strings.selectMatchBellow', interaction.locale))
+          .setPlaceholder(getTranslation('strings.selectMatchBelow', interaction.locale))
           .setDisabled(true)
           .setOptions([{
             label: getTranslation('strings.lastMatchLabel', interaction.locale),

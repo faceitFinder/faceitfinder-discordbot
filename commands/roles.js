@@ -26,7 +26,7 @@ const setupRoles = async (interaction) => {
     const comparaison = interaction.guild.roles.comparePositions(botRole, role)
     if (comparaison < 0) {
       error++
-      rolesFields.push('This role is higher than the bot role, please place it below the bot role.')
+      rolesFields.push(getTranslation('error.command.roleTooHigh', interaction.locale))
     } else {
       rolesFields.push(`<@&${roleId}>`)
       roles.push(roleId)
@@ -35,7 +35,7 @@ const setupRoles = async (interaction) => {
 
   const card = new Discord.EmbedBuilder()
     .setAuthor({ name: name, iconURL: 'attachment://logo.png' })
-    .setFooter({ text: `${name} Info` })
+    .setFooter({ text: `${name} ${getTranslation('strings.info', interaction.locale)}` })
 
 
   rolesFields.reverse().forEach((v, i) => card.addFields({ name: `Level ${10 - i}`, value: v, inline: true }))
@@ -47,10 +47,10 @@ const setupRoles = async (interaction) => {
     await updateRoles(interaction.client, null, interaction.guild.id)
 
     card.setColor(color.primary)
-      .setDescription('The roles have been setup successfully')
+      .setDescription(getTranslation('success.command.setupRoles', interaction.locale))
   } else {
     card.setColor(color.error)
-      .setDescription('One or more roles are invalid')
+      .setDescription(getTranslation('error.command.invalidRoles', interaction.locale))
       .setFooter({ text: `${name} Error` })
   }
 
@@ -82,11 +82,14 @@ const generateRoles = async (interaction) => {
 
   const card = new Discord.EmbedBuilder()
     .setAuthor({ name: name, iconURL: 'attachment://logo.png' })
-    .setDescription('The roles have been generated successfully')
+    .setDescription(getTranslation('success.command.generateRoles', interaction.locale))
     .setColor(color.primary)
-    .setFooter({ text: `${name} Info` })
+    .setFooter({ text: `${name} ${getTranslation('strings.info', interaction.locale)}` })
 
-  roles.forEach(e => card.addFields({ name: `Level ${10 - roles.indexOf(e)}`, value: `<@&${e}>`, inline: true }))
+  roles.forEach(e => card.addFields({
+    name: getTranslation(`options.levelRoles.${10 - roles.indexOf(e)}`, interaction.locale),
+    value: `<@&${e}>`, inline: true
+  }))
 
   return {
     embeds: [card],
@@ -112,7 +115,7 @@ module.exports = {
     {
       name: SETUP,
       description: getTranslation('options.setupRoles', 'en-US'),
-      descriptionLocalization: getTranslations('options.setupRoles'),
+      descriptionLocalizations: getTranslations('options.setupRoles'),
       type: Discord.ApplicationCommandOptionType.Subcommand,
       slash: true,
       options: [
@@ -120,7 +123,8 @@ module.exports = {
           return {
             name: `level_${i + 1}`,
             description: getTranslation(`options.levelRoles.${i + 1}`, 'en-US'),
-            descriptionLocalization: getTranslations(`options.levelRoles.${i + 1}`),
+            // eslint-disable-next-line camelcase
+            description_localizations: getTranslations(`options.levelRoles.${i + 1}`),
             type: Discord.ApplicationCommandOptionType.Role,
             required: true
           }
@@ -128,7 +132,8 @@ module.exports = {
         {
           name: 'remove_old',
           description: getTranslation('options.removeOldRoles', 'en-US'),
-          descriptionLocalization: getTranslations('options.removeOldRoles'),
+          // eslint-disable-next-line camelcase
+          description_localizations: getTranslations('options.removeOldRoles'),
           type: Discord.ApplicationCommandOptionType.Boolean,
         }
       ]
@@ -136,14 +141,15 @@ module.exports = {
     {
       name: GENERATE,
       description: getTranslation('options.generateRoles', 'en-US'),
-      descriptionLocalization: getTranslations('options.generateRoles'),
+      descriptionLocalizations: getTranslations('options.generateRoles'),
       type: Discord.ApplicationCommandOptionType.Subcommand,
       slash: true,
       options: [
         {
           name: 'remove_old',
           description: getTranslation('options.removeOldRoles', 'en-US'),
-          descriptionLocalization: getTranslations('options.removeOldRoles'),
+          // eslint-disable-next-line camelcase
+          description_localizations: getTranslations('options.removeOldRoles'),
           type: Discord.ApplicationCommandOptionType.Boolean,
         }
       ]
@@ -151,13 +157,13 @@ module.exports = {
     {
       name: REMOVE,
       description: getTranslation('options.removeRoles', 'en-US'),
-      descriptionLocalization: getTranslations('options.removeRoles'),
+      descriptionLocalizations: getTranslations('options.removeRoles'),
       type: Discord.ApplicationCommandOptionType.Subcommand,
       slash: true
     }
   ],
   description: getTranslation('command.roles.description', 'en-US'),
-  descriptionLocalization: getTranslations('command.roles.description'),
+  descriptionLocalizations: getTranslations('command.roles.description'),
   usage: `\n - ${GENERATE}\n - ${SETUP}\n - ${REMOVE}`,
   type: 'utility',
   async execute(interaction) {
