@@ -112,7 +112,7 @@ base.error.user.notInTeam = '**{playerName}** n\'est pas dans l\'équipe **{team
 base.error.user.permissions = {
   manageRoles: 'Vous n\'avez pas la permission de gérer les rôles.',
 }
-base.error.user.notLinked = 'Aucun compte faceit n\'est lié à votre compte discord.'
+base.error.user.notLinked = '{discord} n\'est pas associé à un compte faceit.'
 base.error.user.noParametersNoLink = 'Merci de renseigner un utilisateur ou une équipe.\n\
 Vous pouvez également lier votre compte discord à votre compte faceit afin d\'obtenir vos statistiques directement.\n\
 Pour plus d\'informations, tapez la commande `/help command: link`.'
@@ -138,6 +138,9 @@ base.error.command.teamNameTooLong = `Le nom de l'équipe ne peut pas dépasser 
 base.error.command.alreadyOwnTeam = 'Vous possédez déjà l\'équipe **{teamName}**.'
 base.error.command.invalidRoles = 'Un ou plusieurs rôles sont invalides.'
 base.error.command.roleTooHigh = 'Ce rôle est plus élevé que celui du bot, merci de le déplacer plus bas.'
+base.error.command.teamNotFound = 'Cette équipe n\'existe pas.'
+base.error.command.teamEmpty = 'Cette équipe ne possède aucun membre.'
+base.error.command.teamNoAccess = 'Vous n\'avez pas accès à cette équipe.'
 
 base.success.command.removeRoles = 'Les rôles ont été supprimés avec succès.'
 base.success.command.generateRoles = 'Les rôles ont été générés avec succès.'

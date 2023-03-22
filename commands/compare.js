@@ -179,8 +179,8 @@ const sendCardWithInfo = async (interaction, player1Id, player2Id, type = Custom
 
   const options = [{
     label: getTranslation('strings.compare', interaction.locale, {
-      player1: firstUserDatas.playerDatas.nickname,
-      player2: secondUserDatas.playerDatas.nickname
+      playerName1: firstUserDatas.playerDatas.nickname,
+      playerName2: secondUserDatas.playerDatas.nickname
     }),
     value: JSON.stringify({
       p1: firstUserDatas.playerId,
@@ -203,7 +203,7 @@ const sendCardWithInfo = async (interaction, player1Id, player2Id, type = Custom
       user.playerDatas.nickname,
       type,
       playerColor[i],
-      Graph.getGraph(type, user.playerHistory, user.playerDatas.games.csgo.faceit_elo, maxMatch, true).reverse()
+      Graph.getGraph(interaction, type, user.playerHistory, user.playerDatas.games.csgo.faceit_elo, maxMatch, true).reverse()
     ])
 
   const graphBuffer = Graph.getChart(

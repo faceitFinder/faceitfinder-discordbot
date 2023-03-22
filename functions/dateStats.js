@@ -163,7 +163,7 @@ const getCardWithInfo = async (interaction, actionRow, values, type, id, maxMatc
 
   const checkElo = today >= from && today <= to
   const playerHistoryTo = playerHistory.filter(e => e.date < to)
-  const elo = Graph.getEloGain(playerStats.games, playerHistoryTo, faceitElo, checkElo)
+  const elo = Graph.getEloGain(interaction, playerStats.games, playerHistoryTo, faceitElo, checkElo)
   const eloDiff = elo.filter(e => e).reduce((a, b) => a + b, 0)
 
   if (!map) playerHistory = filteredHistory
@@ -172,7 +172,8 @@ const getCardWithInfo = async (interaction, actionRow, values, type, id, maxMatc
   })
   if (updateFrom) from = playerHistory.at(-1).date
 
-  const graphBuffer = Graph.generateChart(playerHistoryTo,
+  const graphBuffer = Graph.generateChart(interaction,
+    playerHistoryTo,
     faceitElo,
     playerStats.games + (type === CustomType.TYPES.ELO),
     type,

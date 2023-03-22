@@ -22,7 +22,7 @@ const sendCardWithInfo = async (playerId, map, mode) => {
 
   let playerHistory = await DateStats.getPlayerHistory(playerId, maxMatch)
   playerHistory = playerHistory.filter(e => e.i1.indexOf(map) !== -1 && e.gameMode === mode)
-  const elo = Graph.getEloGain(maxMatch, playerHistory, faceitElo, true).filter(e => e).reduce((a, b) => a + b, 0)
+  const elo = Graph.getEloGain(interaction, maxMatch, playerHistory, faceitElo, true).filter(e => e).reduce((a, b) => a + b, 0)
 
   const rankImageCanvas = await Graph.getRankImage(faceitLevel, faceitElo, size)
   filesAtt.push(new Discord.AttachmentBuilder(rankImageCanvas, { name: 'level.png' }))

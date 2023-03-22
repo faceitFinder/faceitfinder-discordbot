@@ -159,7 +159,7 @@ module.exports = {
       permissions: {
         manageRoles: 'You don\'t have the permission to manage roles',
       },
-      notLinked: 'You are not linked to a faceit account.',
+      notLinked: '{discord} is not linked to any faceit account.',
       noParametersNoLink: 'Please specify a user or a team.\n\
       You can also link your discord account with your faceit account to get your stats directly.\n\
       To know how to do it, type `/help command: link`.',
@@ -188,6 +188,9 @@ module.exports = {
       alreadyOwnTeam: 'You already own the team **{teamName}**',
       invalidRoles: 'One or more roles are invalid',
       roleTooHigh: 'This role is higher than the bot role, please place it below the bot role.',
+      teamNotFound: 'This team doesn\'t exist.',
+      teamEmpty: 'This team doesn\'t have any members.',
+      teamNoAccess: 'You don\'t have access to this team.',
     }
   },
   success: {

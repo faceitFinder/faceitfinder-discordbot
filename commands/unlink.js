@@ -17,7 +17,9 @@ const sendCardWithInfo = async (interaction) => {
     return successCard(getTranslation('success.command.unlink.server', interaction.locale), interaction.locale)
   }
 
-  else return errorCard(getTranslation('error.user.notLinked', interaction.locale))
+  else return errorCard(getTranslation('error.user.notLinked', interaction.locale, {
+    discord: `<@${discordId}>`
+  }))
 }
 
 module.exports = {
