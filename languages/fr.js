@@ -53,11 +53,12 @@ base.options.infoTeam = 'Afficher les informations des équipes dans lesquelles 
 base.options.createTeam = 'Créer votre équipe.';
 base.options.deleteTeam = 'Supprimer votre équipe.';
 base.options.addUserTeam = 'Ajouter un joueur à votre équipe.';
-base.options.updateTeam = 'Modifier votre équipe.', base.options.removeUserTeam = 'Retirer un joueur de votre équipe.';
+base.options.updateTeam = 'Изменить команду';
+base.options.removeUserTeam = 'Удалить пользователя со своей команды';
 base.options.nameTeam = `Nom de l'équipe, ${ maxLengthTeamName } caractères maximum.`;
 base.options.accessTeam = 'Autoriser l\'ensemble des utilisateurs discord à afficher les statistiques de votre équipe.';
-base.options.excludedFaceitParameters = 'Exclure des joueurs de la recherche. (faceit_parameters)';
 base.options.excludedSteamParameters = 'Exclure des joueurs de la recherche. (steam_parameters)';
+base.options.excludedFaceitParameters = 'Exclure des joueurs de la recherche. (faceit_parameters)';
 base.options.discordUserLink = 'Associer uniquement sur ce serveur. (Gestion des rôles requise pour associer un autre utilisateur).';
 base.options.nicknameLink = 'Mettre à jour le pseudo discord avec le pseudo faceit. (Fonctionne uniquement si non admin)';
 base.strings.selectTeam = 'Selectionner une équipe.';
@@ -102,8 +103,8 @@ base.strings.year = 'Année';
 base.strings.selectYear = 'Selectionner une année.';
 base.strings.loading = 'Chargement';
 base.strings.pagination = {
-  prev: 'Page Précédente',
   next: 'Page Suivante',
+  prev: 'Page Précédente',
   first: 'Première Page',
   last: 'Dernière Page'
 };
