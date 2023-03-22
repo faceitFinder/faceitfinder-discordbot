@@ -1,6 +1,3 @@
 files:
   - source: /languages/base.js
-    ignore:
-      - /languages/en-US.js
-      - /languages/setup.js
-    translation: /languages/%two_letters_code%.js
+    translation: /languages/%two_letters_code%/translations.js
