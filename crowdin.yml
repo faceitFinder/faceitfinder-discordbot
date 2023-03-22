@@ -1,3 +1,5 @@
 files:
-  - source: /languages/base.js
-    translation: /languages/%osx_locale%/%original_file_name%
+  - source: /languages/**/*.js
+    ignore:
+      - setup.js
+    translation: /languages/%two_letters_code%/translations.js
