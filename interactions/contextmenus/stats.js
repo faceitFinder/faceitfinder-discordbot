@@ -10,7 +10,7 @@ module.exports = {
     let user = await User.exists(interaction.targetId)
     if (!user) {
       user = await User.exists(interaction.targetId, interaction.guildId)
-      if (!user) return errorCard('This user has not linked his profile')
+      if (!user) return errorCard('This user has not linked his profile', interaction.locale)
     }
     await GuildRoles.updateRoles(interaction.client, user.discordId)
     return Stats.sendCardWithInfo(interaction, user.faceitId)

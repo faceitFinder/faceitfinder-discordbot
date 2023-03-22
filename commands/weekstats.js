@@ -6,6 +6,7 @@ const { getCardsConditions } = require('../functions/commands')
 const CustomType = require('../templates/customType')
 const Options = require('../templates/options')
 const { getPageSlice, getMaxPage } = require('../functions/pagination')
+const { getTranslation, getTranslations } = require('../languages/setup')
 
 const getMonday = date => {
   const week = [6, 0, 1, 2, 3, 4, 5]
@@ -28,7 +29,7 @@ const sendCardWithInfo = async (interaction, playerId, page = 0) => {
 
     let option = new Discord.StringSelectMenuOptionBuilder()
       .setLabel([new Date(date.date).toDateString(), '-', new Date(new Date(to).setHours(-24)).toDateString()].join(' '))
-      .setDescription(`${date.number} match played`)
+      .setDescription(getTranslation('strings.matchPlayed', interaction.locale, { matchNumber: date.number }))
       .setValue(JSON.stringify({
         s: playerId,
         f: date.date / 1000,
@@ -42,7 +43,9 @@ const sendCardWithInfo = async (interaction, playerId, page = 0) => {
   const pages = getPageSlice(page)
   const pagination = options.slice(pages.start, pages.end)
 
-  if (pagination.length === 0) return errorCard(`Couldn't get matches of ${playerDatas.nickname}`)
+  if (pagination.length === 0) return errorCard(getTranslation('error.user.noMatches', interaction.locale, {
+    playerName: playerDatas.nickname
+  }), interaction.locale)
 
   pagination[0] = DateStats.setOptionDefault(pagination.at(0))
 
@@ -50,10 +53,11 @@ const sendCardWithInfo = async (interaction, playerId, page = 0) => {
     .addComponents(
       new Discord.StringSelectMenuBuilder()
         .setCustomId('dateStatsSelector')
-        .setPlaceholder('Select a week')
+        .setPlaceholder(getTranslation('strings.selectWeek', interaction.locale))
         .addOptions(pagination))
 
-  return DateStats.getCardWithInfo(row,
+  return DateStats.getCardWithInfo(interaction,
+    row,
     JSON.parse(pagination[0].data.value),
     CustomType.TYPES.ELO,
     'uDSG',
@@ -65,7 +69,8 @@ const sendCardWithInfo = async (interaction, playerId, page = 0) => {
 module.exports = {
   name: 'weekstats',
   options: Options.stats,
-  description: 'Displays the stats of the choosen week. With elo graph of the week.',
+  description: getTranslation('command.weekstats.description', 'en-US'),
+  descriptionLocalizations: getTranslations('command.weekstats.description'),
   usage: Options.usage,
   example: 'steam_parameters: justdams',
   type: 'stats',

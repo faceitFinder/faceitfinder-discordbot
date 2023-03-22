@@ -4,7 +4,8 @@ const Player = require('../functions/player')
 const Options = require('../templates/options')
 const { getCardsConditions, getInteractionOption } = require('../functions/commands')
 const mapSelector = require('../interactions/selectmenus/mapSelector')
-const { getMapChoice } = require('../functions/map')
+const { getMapOption } = require('../functions/map')
+const { getTranslations, getTranslation } = require('../languages/setup')
 
 const sendCardWithInfo = async (interaction, playerId) => {
   const playerStats = await Player.getStats(playerId)
@@ -39,27 +40,20 @@ const sendCardWithInfo = async (interaction, playerId) => {
     .addComponents(
       new Discord.StringSelectMenuBuilder()
         .setCustomId('mapSelector')
-        .setPlaceholder('Select a map')
+        .setPlaceholder(getTranslation('strings.selectMap', interaction.locale))
         .addOptions(options.slice(0, 25)),
     )
 
   return {
     ...await mapSelector.sendCardWithInfo(playerId, map, '5v5'),
-    content: map ? ' ' : `Select one of the following maps to get the stats related (${playerDatas.nickname})`,
+    content: map ? ' ' : getTranslation('strings.selectMapDescription', interaction.locale, { playerName: playerDatas.nickname }),
     components: [row]
   }
 }
 
 const getOptions = () => {
-  const options = [...Options.stats]
-  options.push({
-    name: 'map',
-    description: 'Map name',
-    required: false,
-    type: Discord.ApplicationCommandOptionType.String,
-    slash: true,
-    choices: getMapChoice()
-  })
+  const options = structuredClone(Options.stats)
+  options.push(getMapOption())
 
   return options
 }
@@ -67,7 +61,8 @@ const getOptions = () => {
 module.exports = {
   name: 'map',
   options: getOptions(),
-  description: 'Displays the stats of the choosen map.',
+  description: getTranslation('command.map.description', 'en-US'),
+  descriptionLocalizations: getTranslations('command.map.description'),
   usage: `${Options.usage} <map>`,
   example: 'steam_parameters: justdams map: Vertigo',
   type: 'stats',

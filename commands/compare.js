@@ -7,7 +7,8 @@ const CustomTypeFunc = require('../functions/customType')
 const CustomType = require('../templates/customType')
 const Graph = require('../functions/graph')
 const errorCard = require('../templates/errorCard')
-const { getMapChoice } = require('../functions/map')
+const { getTranslations, getTranslation } = require('../languages/setup')
+const { getMapOption } = require('../functions/map')
 
 const compareStats = (stats1, stats2, positive = true) => {
   if (positive) {
@@ -77,7 +78,10 @@ const sendCardWithInfo = async (interaction, player1Id, player2Id, type = Custom
       name: firstUserDatas.playerDatas.nickname,
       iconURL: firstUserDatas.playerDatas.avatar || null
     })
-    .setDescription(`Comparison between [${firstUserDatas.playerDatas.nickname}](https://www.faceit.com/en/players/${firstUserDatas.playerDatas.nickname}) and [${secondUserDatas.playerDatas.nickname}](https://www.faceit.com/en/players/${secondUserDatas.playerDatas.nickname})`)
+    .setDescription(getTranslation('strings.compare', interaction.locale, {
+      playerName1: `[${firstUserDatas.playerDatas.nickname}](https://www.faceit.com/en/players/${firstUserDatas.playerDatas.nickname})`,
+      playerName2: `[${secondUserDatas.playerDatas.nickname}](https://www.faceit.com/en/players/${secondUserDatas.playerDatas.nickname})`
+    }))
     .setColor(color.primary)
     .addFields(
       ...head,
@@ -96,99 +100,88 @@ const sendCardWithInfo = async (interaction, player1Id, player2Id, type = Custom
       {
         name: 'Elo',
         value: `**${firstUserDatas.playerDatas.games.csgo.faceit_elo}** - \
-        ${secondUserDatas.playerDatas.games.csgo.faceit_elo} ${compareStats(firstUserDatas.playerDatas.games.csgo.faceit_elo,
-  secondUserDatas.playerDatas.games.csgo.faceit_elo)}`,
+        ${secondUserDatas.playerDatas.games.csgo.faceit_elo} ${compareStats(firstUserDatas.playerDatas.games.csgo.faceit_elo, secondUserDatas.playerDatas.games.csgo.faceit_elo)}`,
         inline: true
       },
       {
         name: 'Average MVPs',
         value: `**${dateStatsDatas.at(0)['Average MVPs']}** - \
-        ${dateStatsDatas.at(1)['Average MVPs']} ${compareStats(dateStatsDatas.at(0)['Average MVPs'],
-  dateStatsDatas.at(1)['Average MVPs'])}`,
+        ${dateStatsDatas.at(1)['Average MVPs']} ${compareStats(dateStatsDatas.at(0)['Average MVPs'], dateStatsDatas.at(1)['Average MVPs'])}`,
         inline: true
       },
       {
         name: 'K/D', value: `**${dateStatsDatas.at(0).kd}** - \
-      ${dateStatsDatas.at(1).kd} ${compareStats(dateStatsDatas.at(0).kd,
-  dateStatsDatas.at(1).kd)}`, inline: true
+      ${dateStatsDatas.at(1).kd} ${compareStats(dateStatsDatas.at(0).kd, dateStatsDatas.at(1).kd)}`, inline: true
       },
       {
         name: 'Kills', value: `**${dateStatsDatas.at(0).kills}** - \
-      ${dateStatsDatas.at(1).kills} ${compareStats(dateStatsDatas.at(0).kills,
-  dateStatsDatas.at(1).kills)}`, inline: true
+      ${dateStatsDatas.at(1).kills} ${compareStats(dateStatsDatas.at(0).kills, dateStatsDatas.at(1).kills)}`, inline: true
       },
       {
         name: 'Deaths', value: `**${dateStatsDatas.at(0).deaths}** - \
-      ${dateStatsDatas.at(1).deaths} ${compareStats(dateStatsDatas.at(0).deaths,
-  dateStatsDatas.at(1).deaths, false)}`, inline: true
+      ${dateStatsDatas.at(1).deaths} ${compareStats(dateStatsDatas.at(0).deaths, dateStatsDatas.at(1).deaths, false)}`, inline: true
       },
       {
         name: 'Average K/D',
         value: `**${dateStatsDatas.at(0)['Average K/D']}** - \
-        ${dateStatsDatas.at(1)['Average K/D']} ${compareStats(dateStatsDatas.at(0)['Average K/D'],
-  dateStatsDatas.at(1)['Average K/D'])}`,
+        ${dateStatsDatas.at(1)['Average K/D']} ${compareStats(dateStatsDatas.at(0)['Average K/D'], dateStatsDatas.at(1)['Average K/D'])}`,
         inline: true
       },
       {
         name: 'Average K/R',
         value: `**${dateStatsDatas.at(0)['Average K/R']}** - \
-        ${dateStatsDatas.at(1)['Average K/R']} ${compareStats(dateStatsDatas.at(0)['Average K/R'],
-  dateStatsDatas.at(1)['Average K/R'])}`,
+        ${dateStatsDatas.at(1)['Average K/R']} ${compareStats(dateStatsDatas.at(0)['Average K/R'], dateStatsDatas.at(1)['Average K/R'])}`,
         inline: true
       },
       {
         name: 'Average HS',
         value: `**${dateStatsDatas.at(0)['Average HS']}%** - \
-        ${dateStatsDatas.at(1)['Average HS']}% ${compareStats(dateStatsDatas.at(0)['Average HS'],
-  dateStatsDatas.at(1)['Average HS'])}`,
+        ${dateStatsDatas.at(1)['Average HS']}% ${compareStats(dateStatsDatas.at(0)['Average HS'], dateStatsDatas.at(1)['Average HS'])}`,
         inline: true
       },
       {
         name: 'Average Kills',
         value: `**${dateStatsDatas.at(0)['Average Kills']}** - \
-        ${dateStatsDatas.at(1)['Average Kills']} ${compareStats(dateStatsDatas.at(0)['Average Kills'],
-  dateStatsDatas.at(1)['Average Kills'])}`,
+        ${dateStatsDatas.at(1)['Average Kills']} ${compareStats(dateStatsDatas.at(0)['Average Kills'], dateStatsDatas.at(1)['Average Kills'])}`,
         inline: true
       },
       {
         name: 'Average Deaths',
         value: `**${dateStatsDatas.at(0)['Average Deaths']}** - \
-        ${dateStatsDatas.at(1)['Average Deaths']} ${compareStats(dateStatsDatas.at(0)['Average Deaths'],
-  dateStatsDatas.at(1)['Average Deaths'], false)}`,
+        ${dateStatsDatas.at(1)['Average Deaths']} ${compareStats(dateStatsDatas.at(0)['Average Deaths'], dateStatsDatas.at(1)['Average Deaths'], false)}`,
         inline: true
       },
       {
         name: 'Average Assists',
         value: `**${dateStatsDatas.at(0)['Average Assists']}** - \
-        ${dateStatsDatas.at(1)['Average Assists']} ${compareStats(dateStatsDatas.at(0)['Average Assists'],
-  dateStatsDatas.at(1)['Average Assists'])}`,
+        ${dateStatsDatas.at(1)['Average Assists']} ${compareStats(dateStatsDatas.at(0)['Average Assists'], dateStatsDatas.at(1)['Average Assists'])}`,
         inline: true
       },
       {
         name: 'Red K/D',
         value: `**${dateStatsDatas.at(0)['Red K/D']}** - \
-        ${dateStatsDatas.at(1)['Red K/D']} ${compareStats(dateStatsDatas.at(0)['Red K/D'],
-  dateStatsDatas.at(1)['Red K/D'], false)}`,
+        ${dateStatsDatas.at(1)['Red K/D']} ${compareStats(dateStatsDatas.at(0)['Red K/D'], dateStatsDatas.at(1)['Red K/D'], false)}`,
         inline: true
       },
       {
         name: 'Orange K/D',
         value: `**${dateStatsDatas.at(0)['Orange K/D']}** - \
-        ${dateStatsDatas.at(1)['Orange K/D']} ${compareStats(dateStatsDatas.at(0)['Orange K/D'],
-  dateStatsDatas.at(1)['Orange K/D'], false)}`,
+        ${dateStatsDatas.at(1)['Orange K/D']} ${compareStats(dateStatsDatas.at(0)['Orange K/D'], dateStatsDatas.at(1)['Orange K/D'], false)}`,
         inline: true
       },
       {
         name: 'Green K/D',
         value: `**${dateStatsDatas.at(0)['Green K/D']}** - \
-        ${dateStatsDatas.at(1)['Green K/D']} ${compareStats(dateStatsDatas.at(0)['Green K/D'],
-  dateStatsDatas.at(1)['Green K/D'])}`,
+        ${dateStatsDatas.at(1)['Green K/D']} ${compareStats(dateStatsDatas.at(0)['Green K/D'], dateStatsDatas.at(1)['Green K/D'])}`,
         inline: true
       })
     .setImage('attachment://graph.png')
 
   const options = [{
-    label: `Compare ${firstUserDatas.playerDatas.nickname} and ${secondUserDatas.playerDatas.nickname}`,
+    label: getTranslation('strings.compare', interaction.locale, {
+      playerName1: firstUserDatas.playerDatas.nickname,
+      playerName2: secondUserDatas.playerDatas.nickname
+    }),
     value: JSON.stringify({
       p1: firstUserDatas.playerId,
       p2: secondUserDatas.playerId,
@@ -210,7 +203,7 @@ const sendCardWithInfo = async (interaction, player1Id, player2Id, type = Custom
       user.playerDatas.nickname,
       type,
       playerColor[i],
-      Graph.getGraph(type, user.playerHistory, user.playerDatas.games.csgo.faceit_elo, maxMatch, true).reverse()
+      Graph.getGraph(interaction, user.playerDatas.nickname, type, user.playerHistory, user.playerDatas.games.csgo.faceit_elo, maxMatch, true).reverse()
     ])
 
   const graphBuffer = Graph.getChart(
@@ -234,10 +227,12 @@ const sendCardWithInfo = async (interaction, player1Id, player2Id, type = Custom
       new Discord.ActionRowBuilder()
         .addComponents([
           CustomTypeFunc.generateButtons(
+            interaction,
             { ...buttonValues, n: 1 },
             CustomType.TYPES.KD,
             type === CustomType.TYPES.KD),
           CustomTypeFunc.generateButtons(
+            interaction,
             { ...buttonValues, n: 2 },
             CustomType.TYPES.ELO,
             type === CustomType.TYPES.ELO)
@@ -250,48 +245,47 @@ module.exports = {
   name: 'compare',
   options: [{
     name: 'match_number',
-    description: 'Number of matches to display. Default: 20',
+    description: getTranslation('options.matchNumber', 'en-US'),
+    descriptionLocalizations: getTranslations('options.matchNumber'),
     required: false,
     type: Discord.ApplicationCommandOptionType.Integer,
     slash: true,
   },
   {
     name: 'first_user_steam',
-    description: 'steam parameter / @user / empty to match your linked account',
+    description: getTranslation('options.steamParameter', 'en-US'),
+    descriptionLocalizations: getTranslations('options.steamParameter'),
     required: false,
     type: Discord.ApplicationCommandOptionType.String,
     slash: true
   },
   {
     name: 'first_user_faceit',
-    description: 'faceit nickname / @user / empty to match your linked account',
+    description: getTranslation('options.faceitParameter', 'en-US'),
+    descriptionLocalizations: getTranslations('options.faceitParameter'),
     required: false,
     type: Discord.ApplicationCommandOptionType.String,
     slash: true
   },
   {
     name: 'second_user_steam',
-    description: 'steam parameter / @user / empty to match your linked account',
+    description: getTranslation('options.steamParameter', 'en-US'),
+    descriptionLocalizations: getTranslations('options.steamParameter'),
     required: false,
     type: Discord.ApplicationCommandOptionType.String,
     slash: true
   },
   {
     name: 'second_user_faceit',
-    description: 'faceit nickname / @user / empty to match your linked account',
+    description: getTranslation('options.faceitParameter', 'en-US'),
+    descriptionLocalizations: getTranslations('options.faceitParameter'),
     required: false,
     type: Discord.ApplicationCommandOptionType.String,
     slash: true
   },
-  {
-    name: 'map',
-    description: 'Map name',
-    required: false,
-    type: Discord.ApplicationCommandOptionType.String,
-    slash: true,
-    choices: getMapChoice()
-  },],
-  description: 'Compare both user stats.',
+  getMapOption(),],
+  description: getTranslation('command.compare.description', 'en-US'),
+  descriptionLocalizations: getTranslations('command.compare.description'),
   usage: '<match_number> {<first_user_steam> <first_user_faceit>} [<second_user_steam> <second_user_faceit>] <map>',
   example: 'match_number: 100 first_user_steam: justdams second_user_steam: sheraw map: Vertigo',
   type: 'stats',
@@ -299,8 +293,8 @@ module.exports = {
     const player1 = (await getUsers(interaction, 1, 'first_user_steam', 'first_user_faceit'))?.at(0)?.param
     const player2 = (await getUsers(interaction, 1, 'second_user_steam', 'second_user_faceit'))?.at(0)?.param
 
-    if (!player1 || !player2) return errorCard('There is a user missing.')
-    else if (player1 === player2) return errorCard('Both users are the same !')
+    if (!player1 || !player2) return errorCard(getTranslation('error.user.missing', interaction.locale), interaction.locale)
+    else if (player1 === player2) return errorCard(getTranslation('error.user.compareSame', interaction.locale), interaction.locale)
 
     return sendCardWithInfo(interaction, player1, player2)
   }

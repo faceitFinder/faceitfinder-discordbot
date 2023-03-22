@@ -42,7 +42,7 @@ module.exports = {
     if (currentTeam.creator !== interaction.user.id && currentUser) {
       const userIsPartOfTeam = teamUsers.find(user => user.faceitId === currentUser.faceitId)
       if (!userIsPartOfTeam) return {
-        ...errorCard('You are not part of this team'),
+        ...errorCard('You are not part of this team', interaction.locale),
         components: [
           components
         ]

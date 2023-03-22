@@ -1,19 +1,26 @@
 const { name, vote, color } = require('../config.json')
 const Discord = require('discord.js')
+const { getTranslation, getTranslations } = require('../languages/setup')
+const successCard = require('../templates/successCard')
 
 module.exports = {
   name: 'vote',
   options: [],
-  description: 'Get the link to vote for the bot on top.gg',
+  description: getTranslation('command.vote.description', 'en-US'),
+  descriptionLocalizations: getTranslations('command.vote.description'),
   usage: '',
   type: 'system',
   async execute(interaction) {
+    const description = getTranslation('strings.voteDescription', interaction.locale, {
+      discord: `<@${interaction.user.id}>`
+    })
+
     return {
       embeds: [
         new Discord.EmbedBuilder()
           .setColor(color.primary)
           .setAuthor({ name: name, iconURL: 'attachment://logo.png' })
-          .setDescription(`Hey <@${interaction.user.id}> you can vote for me on the following link\n${vote}`)
+          .setDescription(`${description}\n${vote}`)
           .setFooter({ text: `${name} Vote` })
       ],
       files: [

@@ -1,23 +1,27 @@
 const { ApplicationCommandOptionType } = require('discord.js')
+const { getTranslations, getTranslation } = require('../languages/setup')
 
 const stats = [
   {
     name: 'steam_parameters',
-    description: 'steamIDs / steam custom IDs / steam profile urls / @users / CSGO status.',
+    description: getTranslation('options.steamParameters', 'en-US'),
+    descriptionLocalizations: getTranslations('options.steamParameters'),
     required: false,
     type: ApplicationCommandOptionType.String,
     slash: true
   },
   {
     name: 'team',
-    description: 'team slug (you need to be a part of it, the creator, or it has to be public)',
+    description: getTranslation('options.teamParameter', 'en-US'),
+    descriptionLocalizations: getTranslations('options.teamParameter'),
     required: false,
     type: ApplicationCommandOptionType.String,
     slash: true
   },
   {
     name: 'faceit_parameters',
-    description: 'faceit nicknames / faceit urls / @users',
+    description: getTranslation('options.faceitParameters', 'en-US'),
+    descriptionLocalizations: getTranslations('options.faceitParameters'),
     required: false,
     type: ApplicationCommandOptionType.String,
     slash: true
@@ -27,14 +31,16 @@ const stats = [
 const dateRange = [
   {
     name: 'from_date',
-    description: 'INCLUDED. Start date, format MM/DD/YYYY',
+    description: getTranslation('options.fromDate', 'en-US'),
+    descriptionLocalizations: getTranslations('options.fromDate'),
     required: false,
     type: ApplicationCommandOptionType.String,
     slash: true
   },
   {
     name: 'to_date',
-    description: 'EXCLUDED. End date (at least 1 day interval), if empty gets the current day. Format MM/DD/YYYY',
+    description: getTranslation('options.toDate', 'en-US'),
+    descriptionLocalizations: getTranslations('options.toDate'),
     required: false,
     type: ApplicationCommandOptionType.String,
     slash: true

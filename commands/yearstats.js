@@ -6,6 +6,7 @@ const { getCardsConditions } = require('../functions/commands')
 const CustomType = require('../templates/customType')
 const Options = require('../templates/options')
 const { getPageSlice, getMaxPage } = require('../functions/pagination')
+const { getTranslation, getTranslations } = require('../languages/setup')
 
 const getYear = date => {
   date = new Date(date)
@@ -30,8 +31,8 @@ const sendCardWithInfo = async (interaction, playerId, page = 0) => {
     to.setDate(1)
 
     let option = new Discord.StringSelectMenuOptionBuilder()
-      .setLabel(`Year ${from.getFullYear()}`)
-      .setDescription(`${date.number} match played`)
+      .setLabel(`${getTranslation('strings.year', interaction.locale)} ${from.getFullYear()}`)
+      .setDescription(getTranslation('strings.matchPlayed', interaction.locale, { matchNumber: date.number }))
       .setValue(JSON.stringify({
         s: playerId,
         f: from.getTime() / 1000,
@@ -45,7 +46,9 @@ const sendCardWithInfo = async (interaction, playerId, page = 0) => {
   const pages = getPageSlice(page)
   const pagination = options.slice(pages.start, pages.end)
 
-  if (pagination.length === 0) return errorCard(`Couldn't get matches of ${playerDatas.nickname}`)
+  if (pagination.length === 0) return errorCard(getTranslation('error.user.noMatches', interaction.locale, {
+    playerName: playerDatas.nickname
+  }), interaction.locale)
 
   pagination[0] = DateStats.setOptionDefault(pagination.at(0))
 
@@ -53,10 +56,11 @@ const sendCardWithInfo = async (interaction, playerId, page = 0) => {
     .addComponents(
       new Discord.StringSelectMenuBuilder()
         .setCustomId('dateStatsSelector')
-        .setPlaceholder('Select a year')
+        .setPlaceholder(getTranslation('strings.selectYear', interaction.locale))
         .addOptions(pagination))
 
-  return DateStats.getCardWithInfo(row,
+  return DateStats.getCardWithInfo(interaction,
+    row,
     JSON.parse(pagination[0].data.value),
     CustomType.TYPES.ELO,
     'uDSG',
@@ -68,7 +72,8 @@ const sendCardWithInfo = async (interaction, playerId, page = 0) => {
 module.exports = {
   name: 'yearstats',
   options: Options.stats,
-  description: 'Displays the stats of the choosen year. With elo graph of the year.',
+  description: getTranslation('command.yearstats.description', 'en-US'),
+  descriptionLocalizations: getTranslations('command.yearstats.description'),
   usage: Options.usage,
   example: 'steam_parameters: justdams',
   type: 'stats',

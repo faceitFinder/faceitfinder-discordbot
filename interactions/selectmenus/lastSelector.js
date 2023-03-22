@@ -5,12 +5,12 @@ const Player = require('../../functions/player')
 const Steam = require('../../functions/steam')
 const { getMatchItems } = require('../../commands/last')
 
-const updateEmbedMessage = async (playerId, matchId, page) => {
+const updateEmbedMessage = async (interaction, playerId, matchId, page) => {
   const playerDatas = await Player.getDatas(playerId)
   const steamDatas = await Steam.getDatas(playerId)
   const playerHistory = await getPlayerHistory(playerId, null)
 
-  return getMatchItems(playerDatas, steamDatas, playerHistory, playerHistory.length, page, matchId)
+  return getMatchItems(interaction, playerDatas, steamDatas, playerHistory, playerHistory.length, page, matchId)
 }
 
 module.exports = {
@@ -46,7 +46,7 @@ module.exports = {
     if (playerComponents !== undefined) components.push(playerComponents)
     if (excludedPlayerComponents !== undefined) components.push(excludedPlayerComponents)
 
-    const messageItems = await updateEmbedMessage(json.s, json.m, currentPage)
+    const messageItems = await updateEmbedMessage(interaction, json.s, json.m, currentPage)
     if (playerStatsCard) messageItems.embeds.unshift(playerStatsCard)
 
     return {

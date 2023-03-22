@@ -5,6 +5,7 @@ const errorCard = require('../templates/errorCard')
 const GuildRoles = require('../database/guildRoles')
 const successCard = require('../templates/successCard')
 const { updateRoles } = require('../functions/roles')
+const { getTranslations, getTranslation } = require('../languages/setup')
 
 const SETUP = 'setup'
 const GENERATE = 'generate'
@@ -25,7 +26,7 @@ const setupRoles = async (interaction) => {
     const comparaison = interaction.guild.roles.comparePositions(botRole, role)
     if (comparaison < 0) {
       error++
-      rolesFields.push('This role is higher than the bot role, please place it below the bot role.')
+      rolesFields.push(getTranslation('error.command.roleTooHigh', interaction.locale))
     } else {
       rolesFields.push(`<@&${roleId}>`)
       roles.push(roleId)
@@ -34,7 +35,7 @@ const setupRoles = async (interaction) => {
 
   const card = new Discord.EmbedBuilder()
     .setAuthor({ name: name, iconURL: 'attachment://logo.png' })
-    .setFooter({ text: `${name} Info` })
+    .setFooter({ text: `${name} ${getTranslation('strings.info', interaction.locale)}` })
 
 
   rolesFields.reverse().forEach((v, i) => card.addFields({ name: `Level ${10 - i}`, value: v, inline: true }))
@@ -46,10 +47,10 @@ const setupRoles = async (interaction) => {
     await updateRoles(interaction.client, null, interaction.guild.id)
 
     card.setColor(color.primary)
-      .setDescription('The roles have been setup successfully')
+      .setDescription(getTranslation('success.command.setupRoles', interaction.locale))
   } else {
     card.setColor(color.error)
-      .setDescription('One or more roles are invalid')
+      .setDescription(getTranslation('error.command.invalidRoles', interaction.locale))
       .setFooter({ text: `${name} Error` })
   }
 
@@ -81,11 +82,14 @@ const generateRoles = async (interaction) => {
 
   const card = new Discord.EmbedBuilder()
     .setAuthor({ name: name, iconURL: 'attachment://logo.png' })
-    .setDescription('The roles have been generated successfully')
+    .setDescription(getTranslation('success.command.generateRoles', interaction.locale))
     .setColor(color.primary)
-    .setFooter({ text: `${name} Info` })
+    .setFooter({ text: `${name} ${getTranslation('strings.info', interaction.locale)}` })
 
-  roles.forEach(e => card.addFields({ name: `Level ${10 - roles.indexOf(e)}`, value: `<@&${e}>`, inline: true }))
+  roles.forEach(e => card.addFields({
+    name: getTranslation(`options.levelRoles.${10 - roles.indexOf(e)}`, interaction.locale),
+    value: `<@&${e}>`, inline: true
+  }))
 
   return {
     embeds: [card],
@@ -110,58 +114,68 @@ module.exports = {
   options: [
     {
       name: SETUP,
-      description: 'Setup the roles that you want for each ranks on the server.',
+      description: getTranslation('options.setupRoles', 'en-US'),
+      descriptionLocalizations: getTranslations('options.setupRoles'),
       type: Discord.ApplicationCommandOptionType.Subcommand,
       slash: true,
       options: [
         ...Array(10).fill('').map((k, i) => {
           return {
             name: `level_${i + 1}`,
-            description: `The role for the level ${i + 1}`,
+            description: getTranslation(`options.levelRoles.${i + 1}`, 'en-US'),
+            // eslint-disable-next-line camelcase
+            description_localizations: getTranslations(`options.levelRoles.${i + 1}`),
             type: Discord.ApplicationCommandOptionType.Role,
             required: true
           }
         }),
         {
           name: 'remove_old',
-          description: 'Remove the old roles if they exist.',
+          description: getTranslation('options.removeOldRoles', 'en-US'),
+          // eslint-disable-next-line camelcase
+          description_localizations: getTranslations('options.removeOldRoles'),
           type: Discord.ApplicationCommandOptionType.Boolean,
         }
       ]
     },
     {
       name: GENERATE,
-      description: 'Generates the rank roles on the server.',
+      description: getTranslation('options.generateRoles', 'en-US'),
+      descriptionLocalizations: getTranslations('options.generateRoles'),
       type: Discord.ApplicationCommandOptionType.Subcommand,
       slash: true,
       options: [
         {
           name: 'remove_old',
-          description: 'Remove the old roles if they exist.',
+          description: getTranslation('options.removeOldRoles', 'en-US'),
+          // eslint-disable-next-line camelcase
+          description_localizations: getTranslations('options.removeOldRoles'),
           type: Discord.ApplicationCommandOptionType.Boolean,
         }
       ]
     },
     {
       name: REMOVE,
-      description: 'Removes the rank roles on the server.',
+      description: getTranslation('options.removeRoles', 'en-US'),
+      descriptionLocalizations: getTranslations('options.removeRoles'),
       type: Discord.ApplicationCommandOptionType.Subcommand,
       slash: true
     }
   ],
-  description: 'Ranks are updated every hour and when you get your personnal stats.',
+  description: getTranslation('command.roles.description', 'en-US'),
+  descriptionLocalizations: getTranslations('command.roles.description'),
   usage: `\n - ${GENERATE}\n - ${SETUP}\n - ${REMOVE}`,
   type: 'utility',
   async execute(interaction) {
     if (!interaction.member.permissions.has('ManageRoles'))
-      return errorCard('You don\'t have the permission to manage roles')
+      return errorCard(getTranslation('error.user.permissions.manageRoles', interaction.locale))
 
     if (!interaction.channel.permissionsFor(interaction.client.user).has('ManageRoles'))
-      return errorCard('I don\'t have the permission to manage roles')
+      return errorCard(getTranslation('error.bot.manageRoles', interaction.locale))
 
     if (isInteractionSubcommandEqual(interaction, SETUP)) return await setupRoles(interaction)
     if (isInteractionSubcommandEqual(interaction, GENERATE)) return await generateRoles(interaction)
     if (isInteractionSubcommandEqual(interaction, REMOVE)) return await removeRoles(interaction)
-      .then(() => successCard('The roles have been removed'))
+      .then(() => successCard(getTranslation('success.command.removeRoles', interaction.locale), interaction.locale))
   }
 }
