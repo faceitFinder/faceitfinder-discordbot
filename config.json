@@ -181,7 +181,8 @@
   },
   "languages": [
     "fr",
-    "en-US"
+    "en-US",
+    "ru"
   ],
   "maxLengthTeamName": 14
 }
