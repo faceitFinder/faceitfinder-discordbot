@@ -157,14 +157,16 @@ module.exports = {
         {
           name: 'name',
           description: getTranslation('options.nameTeam', 'en-US'),
-          descriptionLocalizations: getTranslations('options.nameTeam'),
+          // eslint-disable-next-line camelcase
+          description_localizations: getTranslations('options.nameTeam'),
           type: Discord.ApplicationCommandOptionType.String,
           required: true
         },
         {
           name: 'access',
           description: getTranslation('options.accessTeam', 'en-US'),
-          descriptionLocalizations: getTranslations('options.accessTeam'),
+          // eslint-disable-next-line camelcase
+          description_localizations: getTranslations('options.accessTeam'),
           type: Discord.ApplicationCommandOptionType.Boolean,
           required: true
         }
@@ -180,14 +182,16 @@ module.exports = {
         {
           name: 'access',
           description: getTranslation('options.accessTeam', 'en-US'),
-          descriptionLocalizations: getTranslations('options.accessTeam'),
+          // eslint-disable-next-line camelcase
+          description_localizations: getTranslations('options.accessTeam'),
           type: Discord.ApplicationCommandOptionType.Boolean,
           required: true
         },
         {
           name: 'name',
           description: getTranslation('options.nameTeam', 'en-US'),
-          descriptionLocalizations: getTranslations('options.nameTeam'),
+          // eslint-disable-next-line camelcase
+          description_localizations: getTranslations('options.nameTeam'),
           type: Discord.ApplicationCommandOptionType.String,
           required: false
         }
@@ -210,14 +214,16 @@ module.exports = {
         {
           name: 'steam_parameters',
           description: getTranslation('options.steamParametersTeam', 'en-US'),
-          descriptionLocalizations: getTranslations('options.steamParametersTeam'),
+          // eslint-disable-next-line camelcase
+          description_localizations: getTranslations('options.steamParametersTeam'),
           type: Discord.ApplicationCommandOptionType.String,
           required: false
         },
         {
           name: 'faceit_parameters',
           description: getTranslation('options.faceitParametersTeam', 'en-US'),
-          descriptionLocalizations: getTranslations('options.faceitParametersTeam'),
+          // eslint-disable-next-line camelcase
+          description_localizations: getTranslations('options.faceitParametersTeam'),
           type: Discord.ApplicationCommandOptionType.String,
           required: false
         }
@@ -233,14 +239,16 @@ module.exports = {
         {
           name: 'steam_parameters',
           description: getTranslation('options.steamParametersTeam', 'en-US'),
-          descriptionLocalizations: getTranslations('options.steamParametersTeam'),
+          // eslint-disable-next-line camelcase
+          description_localizations: getTranslations('options.steamParametersTeam'),
           type: Discord.ApplicationCommandOptionType.String,
           required: false
         },
         {
           name: 'faceit_parameters',
           description: getTranslation('options.faceitParametersTeam', 'en-US'),
-          descriptionLocalizations: getTranslations('options.faceitParametersTeam'),
+          // eslint-disable-next-line camelcase
+          description_localizations: getTranslations('options.faceitParametersTeam'),
           type: Discord.ApplicationCommandOptionType.String,
           required: false
         }
