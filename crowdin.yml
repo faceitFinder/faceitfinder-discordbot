@@ -1,0 +1,6 @@
+files:
+  - source: /languages/*.js
+    ignore:
+      - setup.js
+      - en-US.js
+    translation: /languages/%two_letters_code%.js
