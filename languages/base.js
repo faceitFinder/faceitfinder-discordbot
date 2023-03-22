@@ -61,7 +61,7 @@ module.exports = {
     }
   },
   options: {
-    matchNumber: 'Number of matches to display Default: 20',
+    matchNumber: 'Number of matches to display. Default: 20',
     steamParameter: 'steamID / steam custom ID / steam profile url / @user / CSGO status',
     faceitParameter: 'faceit nickname / @user / faceit profile url',
     steamParameters: 'steamIDs / steam custom IDs / steam profile urls / @users / CSGO status',
@@ -69,8 +69,8 @@ module.exports = {
     faceitParametersTeam: 'faceit nicknames / @users / faceit profile urls (Max 5)',
     steamParametersTeam: 'steamIDs / steam custom IDs / steam profile urls / @users / CSGO status (Max 5)',
     teamParameter: 'team slug (you need to be a part of it, the creator, or it has to be public)',
-    fromDate: 'INCLUDED Start date, format MM/DD/YYYY',
-    toDate: 'EXCLUDED End date (at least 1 day interval), if empty gets the current day Format MM/DD/YYYY',
+    fromDate: 'INCLUDED. Start date, format MM/DD/YYYY',
+    toDate: 'EXCLUDED. End date (at least 1 day interval), if empty gets the current day Format MM/DD/YYYY',
     playerAimed: 'steam_parameters / faceit_parameters / @user / empty if linked',
     globalUnlink: 'This will unlink your account on all servers (False by default)',
     commandName: 'The name of one command',
@@ -108,7 +108,7 @@ module.exports = {
     selectTeam: 'Select a team',
     infoTeam: 'Get info about the team {teamName}',
     voteDescription: 'Hey, {discord}! You can vote on top.gg to help me grow',
-    messageProcessing: 'Your request is currently processing',
+    messageProcessing: 'Your request is currently processing...',
     error: 'Error',
     info: 'Info',
     compare: 'Comparison between {playerName1} and {playerName2}',
