@@ -1,169 +1,180 @@
-const { maxLengthTeamName, invite, join } = require('../config.json')
-const base = structuredClone(require('./base'))
-
-base.command.compare.description = 'Comparer les statistiques des 2 joueurs.'
-base.command.dailystats.description = 'Obtenir les statistiques du jour selectionné, accompagné d\'un graphique de l\'évolution de l\'elo.'
-base.command.find.description = 'Trouver les parties qui contiennent les joueurs demandés (jusqu\'à 5).'
-base.command.help.description = 'Obtenir la liste des commandes.'
-base.command.info.description = 'Obtenir des informations sur le bot.'
-base.command.invite.description = 'Obtenir le lien pour inviter le bot sur votre serveur.'
-base.command.join.description = 'Obtenir le lien pour rejoindre le serveur communautaire du bot.'
-base.command.last.description = 'Obtenir les statistiques de la dernière partie.'
-base.command.laststats.description = 'Obtenir les statistiques des x dernières parties, accompagné d\'un graphique de l\'évolution de l\'elo.'
-base.command.link.description = 'Associer un profil faceit à un utilisateur discord, pour obtenir vos statistiques directement.'
-base.command.map.description = 'Obtenir les statistiques de la map selectionnée.'
-base.command.monthstats.description = 'Obtenir les statistiques du mois selectionné, accompagné d\'un graphique de l\'évolution de l\'elo.'
-base.command.roles.description = 'Les rangs sont mis à jour toutes les heures et quand vous obtenez vos statistiques.'
-base.command.stats.description = 'Obtenir les statistiques générales, accompagné d\'un graphique de l\'évolution de l\'elo.'
-base.command.team.description = 'Créer une équipe et lier jusqu\'à 5 utilisateurs à celle-ci (limite d\'une équipe par compte discord).'
-base.command.unlink.description = 'Supprimer l\'association entre votre compte discord et votre profil faceit.'
-base.command.vote.description = 'Obtenir le lien pour voter pour le bot sur top.gg.'
-base.command.weekstats.description = 'Obtenir les statistiques de la semaine selectionnée, accompagné d\'un graphique d\'évolution de l\'elo.'
-base.command.yearstats.description = 'Obtenir les statistiques de l\'année selectionnée, accompagné d\'un graphique d\'évolution de l\'elo.'
-
-base.options.matchNumber = 'Nombre de parties à afficher, par défaut 20.'
-base.options.steamParameter = 'steamID / steamID personnalisé / url profil steam / @utilisateur / status CSGO.'
-base.options.faceitParameter = 'pseudo faceit / @utilisateur / url profil faceit.'
-base.options.steamParameters = 'steamIDs / steamIDs personnalisés / url profils steam / @utilisateurs / status CSGO.'
-base.options.faceitParameters = 'pseudos faceit / @utilisateurs / url profils faceit.'
-base.options.faceitParametersTeam = 'pseudos faceit / @utilisateurs / url profils faceit (Max 5).'
-base.options.steamParametersTeam = 'steamIDs / steamIDs personnalisés / url profils steam / @utilisateurs / status CSGO (Max 5).'
-base.options.teamParameter = 'slug d\'une équipe (vous devez en faire partie, être le créateur, ou que l\'équipe soit publique).'
-base.options.fromDate = 'INCLUS. Date de début au format MM/JJ/AAAA.'
-base.options.toDate = 'EXCLUS. Date de fin au format MM/JJ/AAAA, par défaut la date du jour, 1 jour d\'écart minimum.'
-base.options.playerAimed = 'steam_parameter / faceit_parameter / @user / vide (pour vous-même si lié).'
-base.options.globalUnlink = 'Supprimer l\'ensemble des associations faites avec votre compte discord.'
-base.options.commandName = 'Nom de la commande à afficher.'
-base.options.mapName = 'Selectionner une map pour obtenir les statistiques associées.'
-base.options.levelRoles = {
-  1: 'Niveau 1.',
-  2: 'Niveau 2.',
-  3: 'Niveau 3.',
-  4: 'Niveau 4.',
-  5: 'Niveau 5.',
-  6: 'Niveau 6.',
-  7: 'Niveau 7.',
-  8: 'Niveau 8.',
-  9: 'Niveau 9.',
-  10: 'Niveau 10.',
-}
-base.options.removeOldRoles = 'Supprimer les anciens roles, si existants.'
-base.options.generateRoles = 'Générer les roles.'
-base.options.setupRoles = 'Configurer les roles.'
-base.options.removeRoles = 'Supprimer les roles.'
-base.options.infoTeam = 'Afficher les informations des équipes dans lesquelles vous êtes.'
-base.options.createTeam = 'Créer votre équipe.'
-base.options.deleteTeam = 'Supprimer votre équipe.'
-base.options.addUserTeam = 'Ajouter un joueur à votre équipe.'
-base.options.updateTeam = 'Modifier votre équipe.',
-base.options.removeUserTeam = 'Retirer un joueur de votre équipe.'
-base.options.nameTeam = `Nom de l'équipe, ${maxLengthTeamName} caractères maximum.`
-base.options.accessTeam = 'Autoriser l\'ensemble des utilisateurs discord à afficher les statistiques de votre équipe.'
-base.options.excludedFaceitParameters = 'Exclure des joueurs de la recherche. (faceit_parameters)'
-base.options.excludedSteamParameters = 'Exclure des joueurs de la recherche. (steam_parameters)'
-base.options.discordUserLink = 'Associer uniquement sur ce serveur. (Gestion des rôles requise pour associer un autre utilisateur).'
-base.options.nicknameLink = 'Mettre à jour le pseudo discord avec le pseudo faceit. (Fonctionne uniquement si non admin)'
-
-base.strings.selectTeam = 'Selectionner une équipe.'
-base.strings.infoTeam = 'Afficher les informations de l\'équipe {teamName}.'
-base.strings.voteDescription = 'Hey {discord} tu peux m\'aider à grandir en votant pour moi sur top.gg !'
-base.strings.messageProcessing = 'Votre demande est en cours de traitement...'
-base.strings.error = 'Erreur'
-base.strings.info = 'Info'
-base.strings.compare = 'Comparaison entre {playerName1} et {playerName2}.'
-base.strings.matchPlayed = '{matchNumber} parties jouées.'
-base.strings.selectDate = 'Selectionner une date.'
-base.strings.helpInfo = 'Informations sur la commande **{command}** \n \`<>\` = Optionnel, \`[]\` = Obligatoire, \`{}\` = Requis si compte discord non associé'
-base.strings.noOptions = 'Cette commande ne nécessite pas d\'options.'
-base.strings.commands = 'Commandes'
-base.strings.help = 'Aide'
-base.strings.helpDescription = '`/help <command>` pour plus d\'informations sur une commande.'
-base.strings.stats = 'Statistiques'
-base.strings.system = 'Système'
-base.strings.utility = 'Utilitaire'
-base.strings.description = 'Description'
-base.strings.options = 'Options'
-base.strings.usage = 'Utilisation'
-base.strings.example = 'Exemple'
-base.strings.creator = 'Créateur'
-base.strings.invitationLink = 'Lien d\'invitation'
-base.strings.voteLink = 'Lien de vote'
-base.strings.serverLink = 'Lien du serveur'
-base.strings.accountLinked = 'Compte discord associé'
-base.strings.invite = 'Invitation'
-base.strings.inviteDescription = `Hey {discord} tu peux m\'inviter sur ton serveur en cliquant sur le lien ci-dessous !\n ${invite}`
-base.strings.join = 'Rejoindre'
-base.strings.joinDescription = `Hey {discord} tu peux rejoindre le serveur de support en cliquant sur le lien ci-dessous !\n ${join}`
-base.strings.selectMatchBelow = 'Selectionner l\'une des parties ci-dessous.'
-base.strings.lastMatchLabel = 'Statistiques de la dernière partie.'
-base.strings.lastMatchDescription = 'Informations sur la dernière partie.'
-base.strings.selectAnotherMatch = 'Selectionner une autre partie.'
-base.strings.lastStatsLabel = 'Statistiques des dernières parties.'
-base.strings.selectMap = 'Selectionner une map.'
-base.strings.selectMapDescription = 'Selectionner l\'une des maps ci-dessous pour obtenir les statistiques associées (**{playerName}**).'
-base.strings.selectWeek = 'Selectionner une semaine.'
-base.strings.year = 'Année'
-base.strings.selectYear = 'Selectionner une année.'
-base.strings.loading = 'Chargement'
-base.strings.pagination = {
-  prev: 'Page Précédente',
-  next: 'Page Suivante',
-  first: 'Première Page',
-  last: 'Dernière Page',
-}
-
-base.error.user.missing = 'Il semblerait qu\'un des utilisateurs soit introuvable.'
-base.error.user.compareSame = 'Vous ne pouvez pas comparer le même utilisateur.'
-base.error.user.excluded = 'Vous ne pouvez pas exclure un utilisateur que vous avez déjà inclus.'
-base.error.user.teamOwn = 'Vous ne possédez pas d\'équipe.'
-base.error.user.noTeam = 'Vous ne possédez et ne faites partie d\'aucune équipe.'
-base.error.user.alreadyInTeam = '**{playerName}** fait déjà parti de l\'équipe **{teamName}**.'
-base.error.user.notInTeam = '**{playerName}** n\'est pas dans l\'équipe **{teamName}**.'
-base.error.user.permissions = {
-  manageRoles: 'Vous n\'avez pas la permission de gérer les rôles.',
-}
-base.error.user.notLinked = '{discord} n\'est pas associé à un compte faceit.'
-base.error.user.noParametersNoLink = 'Merci de renseigner un utilisateur ou une équipe.\n\
-Vous pouvez également lier votre compte discord à votre compte faceit afin d\'obtenir vos statistiques directement.\n\
-Pour plus d\'informations, tapez la commande `/help command: link`.'
-base.error.user.noMatches = 'Aucune partie n\'a été trouvée pour le joueur **{playerName}**.'
-base.error.user.lastMatchNoStats = 'Impossible de récupérer les statistiques de la dernière partie de **{playerName}**.'
-base.error.user.noMatchFoundWithOthers = 'Aucune partie n\'a été trouvée où **{playerName}** est présent avec les joueurs demandés.'
-base.error.user.noBotLink = 'Désolé, mais les bots ne sont pas vraiment mon type...'
-base.error.user.globalLink = '{discord} est déjà associé à un compte faceit de façon globale.'
-base.error.user.notFound = 'L\'utilisateur demandé n\'est pas présent sur ce serveur.'
-
-base.error.execution.command = 'Une erreur est survenue lors de l\'exécution de la commande.'
-base.error.execution.selectmenu = 'Une erreur est survenue lors de l\'exécution du menu déroulant.'
-base.error.execution.button = 'Une erreur est survenue lors de l\'exécution du bouton.'
-base.error.execution.contextmenu = 'Une erreur est survenue lors de l\'exécution du menu contextuel.'
-
-base.error.bot.channelNotAccessible = 'Je n\'ai pas la permission d\'envoyer des messages dans ce salon.'
-base.error.bot.messageEvent = 'Merci d\'utiliser les commandes slash (/).'
-base.error.bot.manageRoles = 'Je n\'ai pas la permission de gérer les rôles.'
-
-base.error.command.notFound = 'Commande introuvable.'
-base.error.command.teamNameAlreadyExist = 'Une équipe avec ce nom existe déjà.'
-base.error.command.teamNameTooLong = `Le nom de l'équipe ne peut pas dépasser ${maxLengthTeamName} caractères.`
-base.error.command.alreadyOwnTeam = 'Vous possédez déjà l\'équipe **{teamName}**.'
-base.error.command.invalidRoles = 'Un ou plusieurs rôles sont invalides.'
-base.error.command.roleTooHigh = 'Ce rôle est plus élevé que celui du bot, merci de le déplacer plus bas.'
-base.error.command.teamNotFound = 'Cette équipe n\'existe pas.'
-base.error.command.teamEmpty = 'Cette équipe ne possède aucun membre.'
-base.error.command.teamNoAccess = 'Vous n\'avez pas accès à cette équipe.'
-
-base.success.command.removeRoles = 'Les rôles ont été supprimés avec succès.'
-base.success.command.generateRoles = 'Les rôles ont été générés avec succès.'
-base.success.command.setupRoles = 'Les rôles ont été configurés avec succès.'
-base.success.command.removeTeam = 'Votre équipe **{teamName}** a été supprimée avec succès.'
-base.success.command.updateTeam = 'Votre équipe **{teamName}** a été mise à jour.'
-base.success.command.createTeam = 'Votre équipe **{teamName}** a été créée.'
-base.success.command.removeUser = 'Le joueur **{playerName}** a été retiré de l\'équipe **{teamName}**.'
-base.success.command.addUser = 'Le joueur **{playerName}** a été ajouté à l\'équipe **{teamName}**.'
-base.success.command.unlink = {
-  global: 'Toutes les associations ont été supprimées.',
-  server: 'L\'association faites sur ce serveur a été supprimée.',
-}
-base.success.command.link = '{discord} a été associé à **{playerName}**.'
-
-module.exports = base
+const {maxLengthTeamName, invite, join} = require('../config.json');
+/**
+ * Command description and options has to be max 100 characters
+ */
+module.exports = {
+  command: {
+    compare: { description: 'Compare both user stats' },
+    dailystats: { description: 'Displays the stats of the chosen day, with elo graph of the day' },
+    find: { description: 'Find the games that includes the players requested (up to 5)' },
+    help: { description: 'Display the command list' },
+    info: { description: 'Get the info about the bot' },
+    invite: { description: 'Get the link to invite the bot on your server' },
+    join: { description: 'Get the link to join the community server of the bot' },
+    last: { description: 'Get the stats of last game' },
+    laststats: { description: 'Displays the stats of the x last match, with elo graph of the X last match' },
+    link: { description: 'Link a faceit profile to the discord user, to get your stats directly (no parameters needed)' },
+    map: { description: 'Displays the stats of the chosen map' },
+    monthstats: { description: 'Displays the stats of the chosen month, with elo graph of the month' },
+    roles: { description: 'Ranks are updated every hour and when you get your stats' },
+    stats: { description: 'Displays general stats, with elo graph of the 20 last games' },
+    team: { description: 'Create a team and link up to 5 users to it (limited to 1 team by discord account)' },
+    unlink: { description: 'Unlink your faceit id from the discord bot' },
+    vote: { description: 'Get the link to vote for the bot on top.gg' },
+    weekstats: { description: 'Displays the stats of the chosen week, with elo graph of the week' },
+    yearstats: { description: 'Displays the stats of the chosen year, with elo graph of the year' }
+  },
+  options: {
+    matchNumber: 'Number of matches to display. Default: 20',
+    steamParameter: 'steamID / steam custom ID / steam profile url / @user / CSGO status',
+    faceitParameter: 'faceit nickname / @user / faceit profile url',
+    steamParameters: 'steamIDs / steam custom IDs / steam profile urls / @users / CSGO status',
+    faceitParameters: 'faceit nicknames / @users / faceit profile urls',
+    faceitParametersTeam: 'faceit nicknames / @users / faceit profile urls (Max 5)',
+    steamParametersTeam: 'steamIDs / steam custom IDs / steam profile urls / @users / CSGO status (Max 5)',
+    teamParameter: 'team slug (you need to be a part of it, the creator, or it has to be public)',
+    fromDate: 'INCLUDED. Start date, format MM/DD/YYYY',
+    toDate: 'EXCLUDED. End date (at least 1 day interval), if empty gets the current day Format MM/DD/YYYY',
+    playerAimed: 'steam_parameters / faceit_parameters / @user / empty if linked',
+    globalUnlink: 'This will unlink your account on all servers (False by default)',
+    commandName: 'The name of one command',
+    mapName: 'Specify a map to get the stats related',
+    levelRoles: {
+      1: 'Level 1',
+      2: 'Level 2',
+      3: 'Level 3',
+      4: 'Level 4',
+      5: 'Level 5',
+      6: 'Level 6',
+      7: 'Level 7',
+      8: 'Level 8',
+      9: 'Level 9',
+      10: 'Level 10'
+    },
+    removeOldRoles: 'Remove the old roles if they exist',
+    generateRoles: 'Generates the rank roles on the server',
+    setupRoles: 'Setup the roles that you want for each ranks on the server',
+    removeRoles: 'Removes the rank roles on the server',
+    infoTeam: 'Get information about your teams',
+    createTeam: 'Create your team',
+    deleteTeam: 'Delete your team',
+    updateTeam: 'Update your team',
+    addUserTeam: 'Add a user to your team',
+    removeUserTeam: 'Remove a user from your team',
+    nameTeam: `name of your team, up to ${ maxLengthTeamName } characters`,
+    accessTeam: 'Allow every discord users to show your team statistics',
+    excludedSteamParameters: 'Exclude steam parameters from the search',
+    excludedFaceitParameters: 'Exclude faceit parameters from the search',
+    discordUserLink: 'Link the user only for this server (Role management permissions to link someone else)',
+    nicknameLink: 'Makes your discord nickname the same as your faceit nickname (Only works with non admin users)'
+  },
+  strings: {
+    selectTeam: 'Select a team',
+    infoTeam: 'Get info about the team {teamName}',
+    voteDescription: 'Hey, {discord}! You can vote on top.gg to help me grow',
+    messageProcessing: 'Your request is currently processing...',
+    error: 'Error',
+    info: 'Info',
+    compare: 'Comparison between {playerName1} and {playerName2}',
+    matchPlayed: '{matchNumber} matches played',
+    selectDate: 'Select a date',
+    helpInfo: 'Information about the **{command}** command \n `<>`: Optional, `[]`: Required, `{}`: Required if not linked',
+    noOptions: 'This command does not require any options',
+    commands: 'Commands',
+    help: 'Help',
+    helpDescription: '`/help <command>` for more info on a specific command',
+    stats: 'Stats',
+    system: 'System',
+    utility: 'Utility',
+    description: 'Description',
+    options: 'Options',
+    usage: 'Usage',
+    example: 'Example',
+    creator: 'Creator',
+    invitationLink: 'Invitation link',
+    voteLink: 'Vote link',
+    serverLink: 'Server link',
+    accountLinked: 'Account linked',
+    invite: 'Invite',
+    inviteDescription: `Hey {discord} you can invite me by clicking on the following link!\n${ invite }`,
+    join: 'Join',
+    joinDescription: `Hey {discord} you can join the support server by clicking on the following link!\n${ join }`,
+    selectMatchBelow: 'Select one of the matches below',
+    lastMatchLabel: 'Last match stats info',
+    lastMatchDescription: 'Info about the last match',
+    selectAnotherMatch: 'Select another match',
+    lastStatsLabel: 'Statistics of the last matches',
+    selectMap: 'Select a map',
+    selectMapDescription: 'Select one of the following maps to get the statistics related (**{playerName}**)',
+    selectWeek: 'Select a week',
+    year: 'Year',
+    selectYear: 'Select a year',
+    loading: 'Loading',
+    pagination: {
+      next: 'Next Page',
+      prev: 'Previous Page',
+      first: 'First Page',
+      last: 'Last Page'
+    }
+  },
+  error: {
+    user: {
+      missing: 'It seems like there is a user missing',
+      compareSame: 'You can\'t compare the same user',
+      excluded: 'You can\'t exclude a player you are searching for',
+      teamOwn: 'You don\'t own a team',
+      noTeam: 'You don\'t own a team and you aren\'t part of any team',
+      teamFull: 'You can\'t add more than 5 users to your team',
+      alreadyInTeam: '**{playerName}** is already part of the team **{teamName}**',
+      notInTeam: '**{playerName}** is not part of the team **{teamName}**',
+      permissions: { manageRoles: 'You don\'t have the permission to manage roles' },
+      notLinked: '{discord} is not linked to any faceit account',
+      noParametersNoLink: 'Please specify a user or a team\n      You can also link your discord account with your faceit account to get your stats directly\n      To know how to do it, type `/help command: link`',
+      noMatches: 'Couldn\'t find any matches for the player **{playerName}**',
+      lastMatchNoStats: 'Couldn\'t find any stats for the last match of the player **{playerName}**',
+      noMatchFoundWithOthers: 'Couldn\'t find any matches where **{playerName}** played with the requested players',
+      noBotLink: 'Sorry, but bots aren\'t really my type',
+      globalLink: '{discord} already has a global link',
+      notFound: 'The requested user is not on this server'
+    },
+    execution: {
+      command: 'An error occurred while executing the command',
+      selectmenu: 'An error occurred while executing the select menu',
+      button: 'An error occurred while executing the button',
+      contextmenu: 'An error occurred while executing the context menu'
+    },
+    bot: {
+      channelNotAccessible: 'I do not have the permission to send messages in this channel',
+      messageEvent: 'Please use the slash commands (/)',
+      manageRoles: 'I don\'t have the permission to manage roles'
+    },
+    command: {
+      notFound: 'Command not found',
+      teamNameAlreadyExist: 'A team with this name already exists',
+      teamNameTooLong: `The team name is too long, it must be under ${ maxLengthTeamName } characters`,
+      alreadyOwnTeam: 'You already own the team **{teamName}**',
+      invalidRoles: 'One or more roles are invalid',
+      roleTooHigh: 'This role is higher than the bot role, please place it below the bot role',
+      teamNotFound: 'This team doesn\'t exist',
+      teamEmpty: 'This team doesn\'t have any members',
+      teamNoAccess: 'You don\'t have access to this team'
+    }
+  },
+  success: {
+    command: {
+      removeRoles: 'The roles have been removed successfully',
+      generateRoles: 'The roles have been generated successfully',
+      setupRoles: 'The roles have been setup successfully',
+      removeTeam: 'Your team **{teamName}** has been removed successfully',
+      updateTeam: 'Your team **{teamName}** has been updated',
+      createTeam: 'Your team **{teamName}** has been created',
+      removeUser: '**{playerName}** has been removed from the team **{teamName}**',
+      addUser: '**{playerName}** has been added to the team **{teamName}**',
+      unlink: {
+        global: 'Your account has been unlinked successfully',
+        server: 'Your account has been unlinked successfully on this server'
+      },
+      link: '{discord} has been linked to **{playerName}**'
+    }
+  }
+};
