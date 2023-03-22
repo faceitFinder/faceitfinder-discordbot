@@ -40,19 +40,19 @@ const sendCardWithInfo = async (interaction, playerId) => {
     .addComponents(
       new Discord.StringSelectMenuBuilder()
         .setCustomId('mapSelector')
-        .setPlaceholder('Select a map')
+        .setPlaceholder(getTranslation('strings.selectMap', interaction.locale))
         .addOptions(options.slice(0, 25)),
     )
 
   return {
     ...await mapSelector.sendCardWithInfo(playerId, map, '5v5'),
-    content: map ? ' ' : `Select one of the following maps to get the stats related (${playerDatas.nickname})`,
+    content: map ? ' ' : getTranslation('strings.selectMapDescription', interaction.locale, { playerName: playerDatas.nickname }),
     components: [row]
   }
 }
 
 const getOptions = () => {
-  const options = [...Options.stats]
+  const options = structuredClone(Options.stats)
   options.push(getMapOption())
 
   return options

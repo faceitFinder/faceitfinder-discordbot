@@ -96,6 +96,8 @@ base.strings.lastMatchLabel = 'Statistiques de la dernière partie.'
 base.strings.lastMatchDescription = 'Informations sur la dernière partie.'
 base.strings.selectAnotherMatch = 'Selectionner une autre partie.'
 base.strings.lastStatsLabel = 'Statistiques des dernières parties.'
+base.strings.selectMap = 'Selectionner une map.'
+base.strings.selectMapDescription = 'Selectionner l\'une des maps ci-dessous pour obtenir les statistiques associées (**{playerName}**).'
 
 base.error.user.missing = 'Il semblerait qu\'un des utilisateurs soit introuvable.'
 base.error.user.compareSame = 'Vous ne pouvez pas comparer le même utilisateur.'

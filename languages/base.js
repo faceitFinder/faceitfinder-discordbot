@@ -140,6 +140,8 @@ module.exports = {
     lastMatchDescription: 'Info about the last match.',
     selectAnotherMatch: 'Select another match',
     lastStatsLabel: 'Statistics of the last matches.',
+    selectMap: 'Select a map',
+    selectMapDescription: 'Select one of the following maps to get the statistics related (**{playerName}**)',
   },
   error: {
     user: {
