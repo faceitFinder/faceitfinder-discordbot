@@ -31,8 +31,8 @@ const sendCardWithInfo = async (interaction, playerId, page = 0) => {
     to.setDate(1)
 
     let option = new Discord.StringSelectMenuOptionBuilder()
-      .setLabel(`Year ${from.getFullYear()}`)
-      .setDescription(`${date.number} match played`)
+      .setLabel(`${getTranslation('strings.year', interaction.locale)} ${from.getFullYear()}`)
+      .setDescription(getTranslation('strings.matchPlayed', interaction.locale, { matchNumber: date.number }))
       .setValue(JSON.stringify({
         s: playerId,
         f: from.getTime() / 1000,
@@ -46,7 +46,9 @@ const sendCardWithInfo = async (interaction, playerId, page = 0) => {
   const pages = getPageSlice(page)
   const pagination = options.slice(pages.start, pages.end)
 
-  if (pagination.length === 0) return errorCard(`Couldn't get matches of ${playerDatas.nickname}`, interaction.locale)
+  if (pagination.length === 0) return errorCard(getTranslation('error.user.noMatches', interaction.locale, {
+    playerName: playerDatas.nickname
+  }), interaction.locale)
 
   pagination[0] = DateStats.setOptionDefault(pagination.at(0))
 
@@ -54,7 +56,7 @@ const sendCardWithInfo = async (interaction, playerId, page = 0) => {
     .addComponents(
       new Discord.StringSelectMenuBuilder()
         .setCustomId('dateStatsSelector')
-        .setPlaceholder('Select a year')
+        .setPlaceholder(getTranslation('strings.selectYear', interaction.locale))
         .addOptions(pagination))
 
   return DateStats.getCardWithInfo(interaction,
