@@ -6,7 +6,7 @@ const { getMapOption } = require('../functions/map')
 const { getTranslations, getTranslation } = require('../languages/setup')
 
 const getOptions = () => {
-  const options = [...Options.stats]
+  const options = structuredClone(Options.stats)
   options.unshift({
     name: 'player_aimed',
     description: getTranslation('options.playerAimed', 'en-US'),

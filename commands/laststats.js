@@ -40,7 +40,7 @@ const sendCardWithInfo = async (interaction, playerId, type = CustomType.TYPES.E
 }
 
 const getOptions = () => {
-  const options = [...Options.stats]
+  const options = structuredClone(Options.stats)
   options.unshift({
     name: 'match_number',
     description: getTranslation('options.matchNumber', 'en-US'),
