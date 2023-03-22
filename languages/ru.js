@@ -110,7 +110,7 @@ base.strings.pagination = {
     last: 'Последняя страница',
 }
 
-base.error.user.missing = 'Похоже, что этот пользователь отсутствует'
+base.error.user.missing = 'Похоже, что один или несколько пользователей отсутствуют'
 base.error.user.compareSame = 'Вы не можете сравнить одного и того же пользователя'
 base.error.user.excluded = 'Вы не можете исключить игрока, которого ищете'
 base.error.user.teamOwn = 'У вас нет команды'
