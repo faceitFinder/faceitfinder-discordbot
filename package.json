@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
     "dev": "nodemon --trace-warnings index.js",
-    "lint": "eslint --fix --ext .js .",
+    "lint": "eslint --ext .js .",
+    "lint-and-fix": "eslint --fix --ext .js .",
     "updatebdd": "node changeSteamIdsToFaceitIdsBdd.js"
   },
   "repository": {
