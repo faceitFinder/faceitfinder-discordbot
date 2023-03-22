@@ -11,7 +11,8 @@ const { getPagination, getPageSlice, getMaxPage } = require('../functions/pagina
 const { getPlayerHistory, generatePlayerStats } = require('../functions/dateStats')
 const { findPlayersStats } = require('../functions/find')
 const { TYPES } = require('../templates/customType')
-const { getMapChoice } = require('../functions/map')
+const { getMapOption } = require('../functions/map')
+const { getTranslations, getTranslation } = require('../languages/setup')
 
 const getLevelFromElo = (elo) => {
   const colorLevel = Object.entries(color.levels).filter(e => {
@@ -20,15 +21,15 @@ const getLevelFromElo = (elo) => {
   return colorLevel?.at(0)
 }
 
-const getMatchItems = (playerDatas, steamDatas, playerHistory, maxMatch, page, matchId) => {
+const getMatchItems = (interaction, playerDatas, steamDatas, playerHistory, maxMatch, page, matchId) => {
   const size = 40
   const filesAtt = []
   const cards = []
   const faceitElo = playerDatas.games.csgo.faceit_elo
 
   const matchStats = playerHistory.filter(e => e.matchId === matchId)
-  const lastMatchesElo = Graph.getElo(maxMatch + 1, [...playerHistory], faceitElo, page === 0)
-  const eloDiff = Graph.getEloGain(maxMatch, [...matchStats], faceitElo, page === 0)
+  const lastMatchesElo = Graph.getElo(interaction, maxMatch + 1, structuredClone(playerHistory), faceitElo, page === 0)
+  const eloDiff = Graph.getEloGain(interaction, maxMatch, structuredClone(matchStats), faceitElo, page === 0)
   const levelDiff = playerHistory.map(e => e.matchId === matchId)
     .map((e, i) => e ? lastMatchesElo.at(i) : null)
     .filter(e => e !== null)
@@ -50,7 +51,9 @@ const getMatchItems = (playerDatas, steamDatas, playerHistory, maxMatch, page, m
         filesAtt.push(new Discord.AttachmentBuilder(rankImageCanvas, { name: `${faceitElo}${i}.png` }))
       }
       if (roundStats === undefined)
-        cards.push(errorCard(`Couldn\'t get the stats of ${steamDatas?.personaname || steamDatas} from his last match`).embeds.at(0))
+        cards.push(errorCard(getTranslation('error.user.lastMatchNoStats', interaction.locale, {
+          playerName: playerDatas.nickname,
+        }), interaction.locale).embeds.at(0))
       if (matchStats.length > 1)
         card.addFields({ name: 'round', value: `${i + 1}/${matchStats.length}` })
 
@@ -108,8 +111,15 @@ const sendCardWithInfo = async (interaction, playerId, matchId = null, page = 0,
 
   if (mapName) playerHistory = playerHistory.filter(e => e.i1 === mapName)
 
-  if (!playerHistory.length > 0)
-    return errorCard(`Couldn\'t get the last matches of ${steamDatas?.personaname || steamDatas} ${players.length > 0 ? 'with the requested users.' : ''}`)
+  if (!playerHistory.length > 0) {
+    if (players.length > 0) return errorCard(getTranslation('error.user.noMatchFoundWithOthers', interaction.locale, {
+      playerName: playerDatas.nickname,
+    }), interaction.locale)
+
+    return errorCard(getTranslation('error.user.lastMatchNoStats', interaction.locale, {
+      playerName: playerDatas.nickname,
+    }), interaction.locale)
+  }
 
   // Removing multiple ids
   const filteredHistory = playerHistory.map(e => e.matchId).filter((e, i, a) => a.indexOf(e) === i)
@@ -117,7 +127,7 @@ const sendCardWithInfo = async (interaction, playerId, matchId = null, page = 0,
 
   if (!matchId) matchId = filteredHistory.slice(pagination.start, pagination.end).at(0)
 
-  const matchItems = getMatchItems(playerDatas, steamDatas, playerFullHistory, playerFullHistory.length, page, matchId)
+  const matchItems = getMatchItems(interaction, playerDatas, steamDatas, playerFullHistory, playerFullHistory.length, page, matchId)
   const options = filteredHistory.map(e => {
     const matchRounds = playerHistory.filter(matches => matches.matchId === e)
     const match = matchRounds.at(0)
@@ -148,7 +158,8 @@ const sendCardWithInfo = async (interaction, playerId, matchId = null, page = 0,
     const elo = Graph.getEloGain(playerHistory.length, playerHistory, faceitElo, false)
     const eloDiff = elo.filter(e => e).reduce((a, b) => a + b, 0)
 
-    const graphBuffer = Graph.generateChart(playerHistory,
+    const graphBuffer = Graph.generateChart(interaction,
+      playerHistory,
       faceitElo,
       playerStats.games,
       TYPES.ELO_KD,
@@ -201,11 +212,11 @@ const sendCardWithInfo = async (interaction, playerId, matchId = null, page = 0,
       .addComponents(
         new Discord.StringSelectMenuBuilder()
           .setCustomId('lastSelectorInfo')
-          .setPlaceholder('Select one of the match bellow.')
+          .setPlaceholder(getTranslation('strings.selectMatchBelow', interaction.locale))
           .setDisabled(true)
           .setOptions([{
-            label: 'Last match stats info.',
-            description: 'Info about the last match.',
+            label: getTranslation('strings.lastMatchLabel', interaction.locale),
+            description: getTranslation('strings.lastMatchDescription', interaction.locale),
             value: JSON.stringify({
               u: interaction.user.id,
               s: playerId,
@@ -216,9 +227,9 @@ const sendCardWithInfo = async (interaction, playerId, matchId = null, page = 0,
       .addComponents(
         new Discord.StringSelectMenuBuilder()
           .setCustomId('lastSelector')
-          .setPlaceholder('Select another match')
+          .setPlaceholder(getTranslation('strings.selectAnotherMatch', interaction.locale))
           .addOptions(options.slice(pagination.start, pagination.end))),
-    getPagination(page, maxPage, 'pageLast')
+    getPagination(interaction, page, maxPage, 'pageLast')
   ]
 
   if (players.length > 0)
@@ -256,16 +267,8 @@ const sendCardWithInfo = async (interaction, playerId, matchId = null, page = 0,
 }
 
 const getOptions = () => {
-  const options = [...Options.stats]
-
-  options.unshift({
-    name: 'map',
-    description: 'Specify a map to get the stats related',
-    required: false,
-    type: Discord.ApplicationCommandOptionType.String,
-    slash: true,
-    choices: getMapChoice()
-  })
+  const options = structuredClone(Options.stats)
+  options.unshift(getMapOption())
 
   return options
 }
@@ -273,7 +276,8 @@ const getOptions = () => {
 module.exports = {
   name: 'last',
   options: getOptions(),
-  description: 'Get the stats of last game.',
+  description: getTranslation('command.last.description', 'en-US'),
+  descriptionLocalizations: getTranslations('command.last.description'),
   usage: `${Options.usage} <map>`,
   example: 'steam_parameters: justdams',
   type: 'stats',

@@ -8,6 +8,7 @@ const errorCard = require('../templates/errorCard')
 const Discord = require('discord.js')
 const noMention = require('../templates/noMention')
 const { updateRoles } = require('./roles')
+const { getTranslation } = require('../languages/setup')
 
 const getPlayerDatas = async (interaction, param, steam, discord = false) => {
   if (steam) {
@@ -22,7 +23,9 @@ const getPlayerDatas = async (interaction, param, steam, discord = false) => {
       if (!user) user = userGuilds.find(e => e.guildId === interaction.guild.id)
       if (user) return { param: user.faceitId, discord }
     }
-    throw `<@${param}> hasn't linked his profile`
+    throw getTranslation('error.user.notLinked', interaction.locale, {
+      discord: `<@${param}>`
+    })
   }
   return { param, discord }
 }
@@ -36,7 +39,7 @@ const getDefaultInteractionOption = (interaction, componentIndex = 0, selectMenu
 }
 
 const getCards = async (interaction, array, fn) => {
-  return Promise.all(array.map(async obj => fn(interaction, obj.param).catch(err => noMention(errorCard(err)))))
+  return Promise.all(array.map(async obj => fn(interaction, obj.param).catch(err => noMention(errorCard(err, interaction.locale)))))
     .then(msgs => msgs.map(msg => {
       const data = {
         embeds: msg.embeds || [],
@@ -67,10 +70,10 @@ const getUsers = async (
 
   if (searchTeam && team) {
     team = await Team.getTeamSlug(team)
-    if (!team) throw 'This team doesn\'t exist'
+    if (!team) throw getTranslation('error.command.teamNotFound', interaction.locale)
     else {
       const teamUsers = await UserTeam.getTeamUsers(team.slug)
-      if (!teamUsers.length > 0) throw 'This team has no members'
+      if (!teamUsers.length > 0) throw getTranslation('error.command.teamEmpty', interaction.locale)
       else if (
         await Team.getCreatorTeam(interaction.user.id).slug === team.slug ||
         team.access ||
@@ -78,7 +81,7 @@ const getUsers = async (
       ) parameters.push(...teamUsers.map(e => {
         return { param: e.faceitId, steam: false, discord: false }
       }))
-      else throw 'You don\'t have access to this team'
+      else throw getTranslation('error.command.teamNoAccess', interaction.locale)
     }
   }
   if (faceitParameters) {
@@ -136,8 +139,7 @@ const getUsers = async (
     )
   })
 
-  if (params.length === 0) throw 'Please specify a user or a team. \n\
-    You can also link your profile with Faceit to use this command without parameters.'
+  if (params.length === 0) throw getTranslation('error.user.noParametersNoLink', interaction.locale)
 
   return Promise.all(params
     .slice(0, maxUser)

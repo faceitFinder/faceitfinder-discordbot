@@ -6,6 +6,7 @@ const { getCardsConditions } = require('../functions/commands')
 const CustomType = require('../templates/customType')
 const Options = require('../templates/options')
 const { getPageSlice, getMaxPage } = require('../functions/pagination')
+const { getTranslations, getTranslation } = require('../languages/setup')
 
 const getFirstDay = (x) => {
   const a = new Date(x)
@@ -41,7 +42,7 @@ const sendCardWithInfo = async (interaction, playerId, page = 0) => {
   const pages = getPageSlice(page)
   const pagination = options.slice(pages.start, pages.end)
 
-  if (pagination.length === 0) return errorCard(`Couldn't get matches of ${playerDatas.nickname}`)
+  if (pagination.length === 0) return errorCard(`Couldn't get matches of ${playerDatas.nickname}`, interaction.locale)
 
   pagination[0] = DateStats.setOptionDefault(pagination.at(0))
 
@@ -52,7 +53,8 @@ const sendCardWithInfo = async (interaction, playerId, page = 0) => {
         .setPlaceholder('Select a month')
         .addOptions(pagination))
 
-  return DateStats.getCardWithInfo(row,
+  return DateStats.getCardWithInfo(interaction,
+    row,
     JSON.parse(pagination[0].data.value),
     CustomType.TYPES.ELO,
     'uDSG',
@@ -64,7 +66,8 @@ const sendCardWithInfo = async (interaction, playerId, page = 0) => {
 module.exports = {
   name: 'monthstats',
   options: Options.stats,
-  description: 'Displays the stats of the choosen month. With elo graph of the month.',
+  description: getTranslation('command.monthstats.description', 'en-US'),
+  descriptionLocalizations: getTranslations('command.monthstats.description'),
   usage: Options.usage,
   type: 'stats',
   async execute(interaction) {

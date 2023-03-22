@@ -2,7 +2,7 @@ const noMention = require('../templates/noMention')
 const errorCard = require('../templates/errorCard')
 const { InteractionType } = require('discord.js')
 const CommandsStats = require('../database/commandsStats')
-const { TYPES } = require('../templates/customType')
+const { getTranslation } = require('../languages/setup')
 
 const editInteraction = (interaction, resp) => {
   if (!resp) return
@@ -16,7 +16,7 @@ const editInteraction = (interaction, resp) => {
 
 const errorInteraction = (interaction, error, message) => {
   console.error(error)
-  interaction.followUp(noMention(errorCard(typeof error !== 'string' ? message : error))).catch(console.error)
+  interaction.followUp(noMention(errorCard(typeof error !== 'string' ? message : error, interaction.locale))).catch(console.error)
 }
 
 module.exports = {
@@ -38,7 +38,7 @@ module.exports = {
           interaction
             .followUp({
               content: ' ',
-              ...errorCard('I do not have the permission to send messages in this channel.'),
+              ...errorCard(getTranslation('error.bot.channelNotAccessible', interaction.locale), interaction.locale),
             })
             .catch(console.error)
         })
@@ -53,7 +53,7 @@ module.exports = {
           CommandsStats.create(interaction.customId, 'selectmenu', interaction.createdAt)
           interaction.client.selectmenus?.get(interaction.customId)?.execute(interaction)
             .then(e => editInteraction(interaction, e))
-            .catch(err => errorInteraction(interaction, err, 'An error occured while executing the select menu.'))
+            .catch(err => errorInteraction(interaction, err, getTranslation('error.execution.selectmenu', interaction.locale)))
         })
         .catch(console.error)
     /**
@@ -66,7 +66,7 @@ module.exports = {
           const json = JSON.parse(interaction.customId)
           interaction.client.buttons?.get(json.id)?.execute(interaction, json)
             .then(e => editInteraction(interaction, e))
-            .catch(err => errorInteraction(interaction, err, 'An error occured while executing the button.'))
+            .catch(err => errorInteraction(interaction, err, getTranslation('error.execution.button', interaction.locale)))
         })
         .catch(console.error)
     /**
@@ -81,7 +81,7 @@ module.exports = {
             .then(resp => interaction
               .followUp(resp)
               .catch(console.error))
-            .catch(err => errorInteraction(interaction, err, 'An error occured while executing the contextmenu.'))
+            .catch(err => errorInteraction(interaction, err, getTranslation('error.execution.contextmenu', interaction.locale)))
         })
         .catch(console.error)
     /**
@@ -104,7 +104,7 @@ module.exports = {
                   .followUp(resp)
                   .catch(console.error)
             })
-            .catch(err => errorInteraction(interaction, err, 'An error occured while executing the command.'))
+            .catch(err => errorInteraction(interaction, err, getTranslation('error.execution.command', interaction.locale)))
         })
         .catch(console.error)
   }

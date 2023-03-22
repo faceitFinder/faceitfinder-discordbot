@@ -1,3 +1,6 @@
+const { ApplicationCommandOptionType } = require('discord.js')
+const { getTranslations, getTranslation } = require('../languages/setup')
+
 const getMapList = () => {
   return [
     {
@@ -53,7 +56,20 @@ const getMapChoice = () => [
   }).filter(c => c !== undefined)
 ]
 
+const getMapOption = () => {
+  return {
+    name: 'map',
+    description: getTranslation('options.mapName', 'en-US'),
+    descriptionLocalizations: getTranslations('options.mapName'),
+    required: false,
+    type: ApplicationCommandOptionType.String,
+    slash: true,
+    choices: getMapChoice()
+  }
+}
+
 module.exports = {
   getMapList,
-  getMapChoice
+  getMapChoice,
+  getMapOption
 }

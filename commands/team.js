@@ -1,3 +1,4 @@
+const { maxLengthTeamName } = require('../config.json')
 const Discord = require('discord.js')
 const Team = require('../database/team')
 const UserTeam = require('../database/userTeam')
@@ -6,6 +7,7 @@ const User = require('../database/user')
 const errorCard = require('../templates/errorCard')
 const { isInteractionSubcommandEqual, getInteractionOption, getCardsConditions } = require('../functions/commands')
 const successCard = require('../templates/successCard')
+const { getTranslation, getTranslations } = require('../languages/setup')
 
 const INFO = 'info'
 const CREATE = 'create'
@@ -13,18 +15,19 @@ const DELETE = 'delete'
 const UPDATE = 'update'
 const ADD_USER = 'add_user'
 const REMOVE_USER = 'remove_user'
-const maxLengthTeamName = 14
 
 const createTeam = async (interaction, currentTeam, user) => {
-  if (currentTeam) return errorCard(`You already own the team: **${currentTeam.name}**`)
+  if (currentTeam) return errorCard(getTranslation('error.command.alreadyOwnTeam', interaction.locale))
   const teamName = getInteractionOption(interaction, 'name')
   const teamSlug = teamName.toLowerCase().replace(/\s/g, '-')
-  if (teamName.length > maxLengthTeamName) return errorCard(`The team name must be less than ${maxLengthTeamName} characters`)
-  else if (await Team.getTeamSlug(teamSlug)) return errorCard('A team with this name already exists')
+  if (teamName.length > maxLengthTeamName) return errorCard(getTranslation('error.command.teamNameTooLong', interaction.locale))
+  else if (await Team.getTeamSlug(teamSlug)) return errorCard(getTranslation('error.command.teamNameAlreadyExist', interaction.locale))
   const access = getInteractionOption(interaction, 'access')
   Team.create(teamName, teamSlug, user, access)
 
-  return successCard(`Your team: **${teamName}** has been created.`)
+  return successCard(getTranslation('success.command.createTeam', interaction.locale, {
+    teamName: teamName
+  }), interaction.locale)
 }
 
 const infoTeam = async (interaction, currentTeam, user) => {
@@ -38,14 +41,16 @@ const infoTeam = async (interaction, currentTeam, user) => {
       userTeams.push(...await Promise.all(currentUserTeams.map(async (userTeam) => await Team.getTeamSlug(userTeam.slug))))
   }
   if (currentTeam) userTeams.push(currentTeam)
-  if (userTeams.length === 0) return errorCard('You don\'t own a team and you aren\'t part of any team')
+  if (userTeams.length === 0) return errorCard(getTranslation('error.user.noTeam', interaction.locale))
 
   const options = Array.from(new Set(userTeams.map(JSON.stringify)))
     .map(JSON.parse)
     .map(userteam => {
       if (userteam) return {
         label: userteam.name,
-        description: `Get info about the team ${userteam.name}`,
+        description: getTranslation('strings.infoTeam', interaction.locale, {
+          teamName: userteam.name,
+        }),
         value: JSON.stringify({
           tn: userteam.slug,
           u: user,
@@ -58,7 +63,7 @@ const infoTeam = async (interaction, currentTeam, user) => {
     .addComponents(
       new Discord.StringSelectMenuBuilder()
         .setCustomId('teamInfoSelector')
-        .setPlaceholder('Select a team')
+        .setPlaceholder(getTranslation('strings.selectTeam', interaction.locale))
         .addOptions(options.slice(0, 25)))
 
   return {
@@ -71,21 +76,25 @@ const infoTeam = async (interaction, currentTeam, user) => {
 const updateTeam = async (interaction, currentTeam) => {
   const teamName = getInteractionOption(interaction, 'name')
   const teamSlug = teamName?.toLowerCase().replace(/\s/g, '-')
-  if (teamName && await Team.getTeamSlug(teamSlug)) return errorCard('A team with this name already exists')
+  if (teamName && await Team.getTeamSlug(teamSlug)) return errorCard(getTranslation('error.command.teamNameAlreadyExists', interaction.locale))
   else if (teamName) await UserTeam.updateMany(currentTeam.slug, teamSlug)
   const access = getInteractionOption(interaction, 'access')
   Team.update(currentTeam.slug, teamName || currentTeam.name, teamSlug || currentTeam.slug, access)
-  return successCard(`Your team: **${teamName || currentTeam.name}** has been updated.`)
+  return successCard(getTranslation('success.command.updateTeam', interaction.locale, {
+    teamName: teamName || currentTeam.name
+  }), interaction.locale)
 }
 
-const deleteTeam = async (currentTeam, user) => {
+const deleteTeam = async (interaction, currentTeam, user) => {
   Team.remove(user)
   UserTeam.getTeamUsers(currentTeam.slug)
     .then(users => {
       users.forEach(user => UserTeam.remove(user.faceitId, currentTeam.slug))
     })
 
-  return successCard(`Your team (**${currentTeam.name}**) has been deleted.`)
+  return successCard(getTranslation('success.command.removeTeam', interaction.locale, {
+    teamName: currentTeam.name
+  }), interaction.locale)
 }
 
 const addUser = async (interaction, playerId) => {
@@ -94,11 +103,19 @@ const addUser = async (interaction, playerId) => {
   const playerDatas = await Player.getDatas(playerId)
 
   if (await UserTeam.getUserTeam(playerId, currentTeam.slug))
-    return errorCard(`**${playerDatas.nickname}** is already part of the team **${currentTeam.name}**`)
+    return errorCard(getTranslation('error.user.alreadyInTeam', interaction.locale, {
+      playerName: playerDatas.nickname,
+      teamName: currentTeam.name
+    }))
 
   UserTeam.create(currentTeam.slug, playerId)
 
-  return successCard(`**${playerDatas.nickname}** has been added to the team **${currentTeam.name}**, [Steam](https://steamcommunity.com/profiles/${playerDatas.games.csgo.game_player_id}) - [Faceit](https://www.faceit.com/en/players/${playerDatas.nickname})`)
+  const successMessage = getTranslation('success.command.addUser', interaction.locale, {
+    playerName: playerDatas.nickname,
+    teamName: currentTeam.name
+  })
+
+  return successCard(`${successMessage} [Steam](https://steamcommunity.com/profiles/${playerDatas.games.csgo.game_player_id}) - [Faceit](https://www.faceit.com/en/players/${playerDatas.nickname})`, interaction.locale)
 }
 
 const removeUser = async (interaction, playerId) => {
@@ -107,11 +124,17 @@ const removeUser = async (interaction, playerId) => {
   const playerDatas = await Player.getDatas(playerId)
 
   if (!await UserTeam.getUserTeam(playerId, currentTeam.slug))
-    return errorCard(`**${playerDatas.nickname}** is not part of the team **${currentTeam.name}**`)
+    return errorCard(getTranslation('error.user.notInTeam', interaction.locale, {
+      playerName: playerDatas.nickname,
+      teamName: currentTeam.name
+    }), interaction.locale)
 
   UserTeam.remove(playerId, currentTeam.slug)
 
-  return successCard(`**${playerDatas.nickname}** has been removed from the team **${currentTeam.name}**`)
+  return successCard(getTranslation('success.command.removeUser', interaction.locale, {
+    playerName: playerDatas.nickname,
+    teamName: currentTeam.name
+  }), interaction.locale)
 }
 
 module.exports = {
@@ -119,25 +142,29 @@ module.exports = {
   options: [
     {
       name: INFO,
-      description: 'Get information about your team.',
+      description: getTranslation('options.infoTeam', 'en-US'),
+      descriptionLocalizations: getTranslations('options.infoTeam'),
       type: Discord.ApplicationCommandOptionType.Subcommand,
       slash: true
     },
     {
       name: CREATE,
-      description: 'create your team',
+      description: getTranslation('options.createTeam', 'en-US'),
+      descriptionLocalizations: getTranslations('options.createTeam'),
       type: Discord.ApplicationCommandOptionType.Subcommand,
       slash: true,
       options: [
         {
           name: 'name',
-          description: `name of your team, up to ${maxLengthTeamName} characters`,
+          description: getTranslation('options.nameTeam', 'en-US'),
+          descriptionLocalizations: getTranslations('options.nameTeam'),
           type: Discord.ApplicationCommandOptionType.String,
           required: true
         },
         {
           name: 'access',
-          description: 'let others discord users access your team if they are not in the team',
+          description: getTranslation('options.accessTeam', 'en-US'),
+          descriptionLocalizations: getTranslations('options.accessTeam'),
           type: Discord.ApplicationCommandOptionType.Boolean,
           required: true
         }
@@ -145,19 +172,22 @@ module.exports = {
     },
     {
       name: UPDATE,
-      description: 'update your team',
+      description: getTranslation('options.updateTeam', 'en-US'),
+      descriptionLocalizations: getTranslations('options.updateTeam'),
       type: Discord.ApplicationCommandOptionType.Subcommand,
       slash: true,
       options: [
         {
           name: 'access',
-          description: 'let others discord users access your team if they are not in the team',
+          description: getTranslation('options.accessTeam', 'en-US'),
+          descriptionLocalizations: getTranslations('options.accessTeam'),
           type: Discord.ApplicationCommandOptionType.Boolean,
           required: true
         },
         {
           name: 'name',
-          description: 'name of your team',
+          description: getTranslation('options.nameTeam', 'en-US'),
+          descriptionLocalizations: getTranslations('options.nameTeam'),
           type: Discord.ApplicationCommandOptionType.String,
           required: false
         }
@@ -165,25 +195,29 @@ module.exports = {
     },
     {
       name: DELETE,
-      description: 'delete your team',
+      description: getTranslation('options.deleteTeam', 'en-US'),
+      descriptionLocalizations: getTranslations('options.deleteTeam'),
       type: Discord.ApplicationCommandOptionType.Subcommand,
       slash: true
     },
     {
       name: ADD_USER,
-      description: 'add a user to your team',
+      description: getTranslation('options.addUserTeam', 'en-US'),
+      descriptionLocalizations: getTranslations('options.addUserTeam'),
       type: Discord.ApplicationCommandOptionType.Subcommand,
       slash: true,
       options: [
         {
           name: 'steam_parameters',
-          description: 'steamIDs / steam custom IDs / url of one or more steam profiles / CSGO status. (Max 5)',
+          description: getTranslation('options.steamParametersTeam', 'en-US'),
+          descriptionLocalizations: getTranslations('options.steamParametersTeam'),
           type: Discord.ApplicationCommandOptionType.String,
           required: false
         },
         {
           name: 'faceit_parameters',
-          description: 'faceit nicknames / @users (Max 5)',
+          description: getTranslation('options.faceitParametersTeam', 'en-US'),
+          descriptionLocalizations: getTranslations('options.faceitParametersTeam'),
           type: Discord.ApplicationCommandOptionType.String,
           required: false
         }
@@ -191,26 +225,30 @@ module.exports = {
     },
     {
       name: REMOVE_USER,
-      description: 'remove a user from your team',
+      description: getTranslation('options.removeUserTeam', 'en-US'),
+      descriptionLocalizations: getTranslations('options.removeUserTeam'),
       type: Discord.ApplicationCommandOptionType.Subcommand,
       slash: true,
       options: [
         {
           name: 'steam_parameters',
-          description: 'steamID / steam custom ID / url of one steam profiles / CSGO status. (Max 1)',
+          description: getTranslation('options.steamParametersTeam', 'en-US'),
+          descriptionLocalizations: getTranslations('options.steamParametersTeam'),
           type: Discord.ApplicationCommandOptionType.String,
           required: false
         },
         {
           name: 'faceit_parameters',
-          description: 'faceit nicknames / @users (Max 5)',
+          description: getTranslation('options.faceitParametersTeam', 'en-US'),
+          descriptionLocalizations: getTranslations('options.faceitParametersTeam'),
           type: Discord.ApplicationCommandOptionType.String,
           required: false
         }
       ]
     }
   ],
-  description: 'Create a team and link up to 5 users to it (limited to 1 team by discord account).',
+  description: getTranslation('command.team.description', 'en-US'),
+  descriptionLocalizations: getTranslations('command.team.description'),
   usage: `
   - ${CREATE} [team name]
   - ${DELETE}
@@ -224,16 +262,16 @@ module.exports = {
     const currentTeam = await Team.getCreatorTeam(user)
 
     if (!currentTeam && !isInteractionSubcommandEqual(interaction, CREATE) &&
-      !isInteractionSubcommandEqual(interaction, INFO)) return errorCard('You don\'t own a team')
+      !isInteractionSubcommandEqual(interaction, INFO)) return errorCard(getTranslation('error.user.teamOwn', interaction.locale))
     else if (isInteractionSubcommandEqual(interaction, CREATE)) return createTeam(interaction, currentTeam, user)
     else if (isInteractionSubcommandEqual(interaction, INFO)) return infoTeam(interaction, currentTeam, user)
     else if (isInteractionSubcommandEqual(interaction, UPDATE)) return updateTeam(interaction, currentTeam, user)
-    else if (isInteractionSubcommandEqual(interaction, DELETE)) return deleteTeam(currentTeam, user)
+    else if (isInteractionSubcommandEqual(interaction, DELETE)) return deleteTeam(interaction, currentTeam, user)
     else if (isInteractionSubcommandEqual(interaction, ADD_USER)) {
       const teamUsers = await UserTeam.getTeamUsers(currentTeam.slug)
-      if (teamUsers.length >= 5) return errorCard('You can\'t add more than 5 users to your team')
+      if (teamUsers.length >= 5) return errorCard(getTranslation('error.user.teamFull', interaction.locale))
       return getCardsConditions(interaction, addUser, 5 - teamUsers.length)
     } else if (isInteractionSubcommandEqual(interaction, REMOVE_USER)) return getCardsConditions(interaction, removeUser, 5)
-    else return errorCard('Unknown subcommand')
+    else return errorCard(getTranslation('error.command.notFound', interaction.locale))
   }
 }

@@ -9,6 +9,7 @@ const CustomType = require('../templates/customType')
 const CustomTypeFunc = require('../functions/customType')
 const Options = require('../templates/options')
 const { getCardsConditions } = require('../functions/commands')
+const { getTranslation, getTranslations } = require('../languages/setup')
 
 const sendCardWithInfo = async (interaction, playerId, type = CustomType.TYPES.ELO) => {
   const playerDatas = await Player.getDatas(playerId)
@@ -23,7 +24,7 @@ const sendCardWithInfo = async (interaction, playerId, type = CustomType.TYPES.E
     u: interaction.user.id
   }
 
-  const graphBuffer = Graph.generateChart(playerHistory, faceitElo, maxMatch, type)
+  const graphBuffer = Graph.generateChart(interaction, playerHistory, faceitElo, maxMatch, type)
 
   const playerCountry = playerDatas.country
   const playerRegion = playerDatas.games.csgo.region
@@ -65,14 +66,17 @@ const sendCardWithInfo = async (interaction, playerId, type = CustomType.TYPES.E
       new Discord.ActionRowBuilder()
         .addComponents([
           CustomTypeFunc.generateButtons(
+            interaction,
             { ...buttonValues, n: 1 },
             CustomType.TYPES.KD,
             type === CustomType.TYPES.KD),
           CustomTypeFunc.generateButtons(
+            interaction,
             { ...buttonValues, n: 2 },
             CustomType.TYPES.ELO,
             type === CustomType.TYPES.ELO),
           CustomTypeFunc.generateButtons(
+            interaction,
             { ...buttonValues, n: 3 },
             CustomType.TYPES.ELO_KD,
             type === CustomType.TYPES.ELO_KD)
@@ -84,7 +88,8 @@ const sendCardWithInfo = async (interaction, playerId, type = CustomType.TYPES.E
 module.exports = {
   name: 'stats',
   options: Options.stats,
-  description: 'Displays general stats. With elo graph of the 20 last games.',
+  description: getTranslation('command.stats.description', 'en-US'),
+  descriptionLocalizations: getTranslations('command.stats.description'),
   usage: Options.usage,
   type: 'stats',
   async execute(interaction) {

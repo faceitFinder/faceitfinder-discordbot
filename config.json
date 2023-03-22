@@ -178,5 +178,10 @@
       "id": "918877215901483048",
       "balise": "<:select:918877215901483048>"
     }
-  }
+  },
+  "languages": [
+    "fr",
+    "en-US"
+  ],
+  "maxLengthTeamName": 14
 }

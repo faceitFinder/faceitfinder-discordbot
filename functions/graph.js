@@ -3,15 +3,16 @@ const path = require('path')
 const Canvas = require('canvas')
 const CustomType = require('../templates/customType')
 const Chart = require('chart.js/auto')
+const { getTranslation } = require('../languages/setup')
 
-const generateChart = (matchHistory, playerElo, maxMatch = 20, type = CustomType.TYPES.ELO, check) => {
+const generateChart = (interaction, matchHistory, playerElo, maxMatch = 20, type = CustomType.TYPES.ELO, check) => {
   const datas = []
   const types = type.name.split('-').map(e => {
     return CustomType.getType(e.trim())
   })
 
-  datas.push(...types.map(type => [type, getGraph(type, matchHistory, playerElo, maxMatch, check).reverse()]))
-  if (datas.length === 0) throw 'No match found on this date'
+  datas.push(...types.map(type => [type, getGraph(interaction, type, matchHistory, playerElo, maxMatch, check).reverse()]))
+  if (datas.length === 0) throw getTranslation('error.user.noMatches', interaction.locale)
 
   const labels = matchHistory.map(match => new Date(match.date).toLocaleString('en-US', {
     month: 'short',
@@ -189,8 +190,8 @@ const roundRect = (ctx, x, y, w, h, r) => {
   return ctx
 }
 
-const eloVerification = (matchHistory, playerElo, checkElo = true) => {
-  if (matchHistory.length <= 0) throw 'Couldn\'t get matches'
+const eloVerification = (interaction, matchHistory, playerElo, checkElo = true) => {
+  if (!matchHistory.length > 0) throw getTranslation('error.user.noMatches', interaction.locale)
   else if (checkElo) {
     const match = matchHistory.at(0)
     if (isNaN(match.elo)) match.elo = playerElo
@@ -199,18 +200,18 @@ const eloVerification = (matchHistory, playerElo, checkElo = true) => {
   return matchHistory
 }
 
-const getElo = (maxMatch, matchHistory, playerElo, checkElo = true) => {
-  matchHistory = eloVerification(matchHistory, playerElo, checkElo)
+const getElo = (interaction, maxMatch, matchHistory, playerElo, checkElo = true) => {
+  matchHistory = eloVerification(interaction, matchHistory, playerElo, checkElo)
   return matchHistory.map(e => e?.elo).slice(0, maxMatch)
 }
 
-const getEloGain = (maxMatch, matchHistory, playerElo, checkElo) => {
-  matchHistory = eloVerification(matchHistory, playerElo, checkElo)
+const getEloGain = (interaction, maxMatch, matchHistory, playerElo, checkElo) => {
+  matchHistory = eloVerification(interaction, matchHistory, playerElo, checkElo)
   return matchHistory.map(e => e?.eloGain).slice(0, maxMatch)
 }
 
-const getKD = (matchHistory, maxMatch) => {
-  if (matchHistory.length === 0) throw 'Couldn\'t get matches'
+const getKD = (interaction, matchHistory, maxMatch) => {
+  if (!matchHistory.length > 0) throw getTranslation('error.user.noMatches', interaction.locale)
   return matchHistory.map(e => e?.c2).slice(0, maxMatch)
 }
 
@@ -226,10 +227,10 @@ const colorFilter = (colors, value) => Object.entries(colors)
   .at(0)
   .at(1)
 
-const getGraph = (type, matchHistory, faceitElo, maxMatch, check = true) => {
+const getGraph = (interaction, type, matchHistory, faceitElo, maxMatch, check = true) => {
   switch (type) {
-  case CustomType.TYPES.ELO: return getElo(maxMatch, matchHistory, faceitElo, check)
-  case CustomType.TYPES.KD: return getKD(matchHistory, maxMatch)
+  case CustomType.TYPES.ELO: return getElo(interaction, maxMatch, matchHistory, faceitElo, check)
+  case CustomType.TYPES.KD: return getKD(interaction, matchHistory, maxMatch)
   default: break
   }
 }

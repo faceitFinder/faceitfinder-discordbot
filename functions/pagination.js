@@ -14,7 +14,7 @@ const getMaxPage = (array, items = itemByPage) => {
   return Math.floor(array.length / items) - !(array.length % items >= 1)
 }
 
-const getPagination = (page, maxPage, id) => {
+const getPagination = (interaction, page, maxPage, id) => {
   /**
    * id: button interaction id
    * page: target page
@@ -24,18 +24,22 @@ const getPagination = (page, maxPage, id) => {
   return new Discord.ActionRowBuilder()
     .addComponents([
       CustomTypeFunc.generateButtons(
+        interaction,
         { id: id, page: 0, c: page, n: 1 },
         CustomType.TYPES.FIRST,
         page === 0),
       CustomTypeFunc.generateButtons(
+        interaction,
         { id: id, page: page - 1, c: page, n: 3 },
         CustomType.TYPES.PREV,
         !(page - 1 >= 0)),
       CustomTypeFunc.generateButtons(
+        interaction,
         { id: id, page: page + 1, c: page, n: 2 },
         CustomType.TYPES.NEXT,
         !(page + 1 <= maxPage)),
       CustomTypeFunc.generateButtons(
+        interaction,
         { id: id, page: maxPage, c: page, n: 4 },
         CustomType.TYPES.LAST,
         page === maxPage),
