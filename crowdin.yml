@@ -1,3 +1,3 @@
 files:
-  - source: /languages/*.js
+  - source: /languages/base.js
     translation: /languages/%two_letters_code%.js
