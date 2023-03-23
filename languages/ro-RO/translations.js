@@ -1,22 +1,22 @@
-const {maxLengthTeamName, invite, join} = require('../../config.json')
+const { maxLengthTeamName, invite, join } = require('../../config.json')
 const base = structuredClone(require('../base'))
-base.command.compare.description = 'Compare both user stats'
-base.command.dailystats.description = 'Displays the stats of the chosen day, with elo graph of the day'
-base.command.find.description = 'Find the games that includes the players requested (up to 5)'
-base.command.help.description = 'Display the command list'
-base.command.info.description = 'Get the info about the bot'
-base.command.invite.description = 'Get the link to invite the bot on your server'
-base.command.join.description = 'Get the link to join the community server of the bot'
-base.command.last.description = 'Get the stats of last game'
-base.command.laststats.description = 'Displays the stats of the x last match, with elo graph of the X last match'
-base.command.link.description = 'Link a faceit profile to the discord user, to get your stats directly (no parameters needed)'
-base.command.map.description = 'Displays the stats of the chosen map'
-base.command.monthstats.description = 'Displays the stats of the chosen month, with elo graph of the month'
-base.command.roles.description = 'Ranks are updated every hour and when you get your stats'
-base.command.stats.description = 'Displays general stats, with elo graph of the 20 last games'
-base.command.team.description = 'Create a team and link up to 5 users to it (limited to 1 team by discord account)'
-base.command.unlink.description = 'Unlink your faceit id from the discord bot'
-base.command.vote.description = 'Get the link to vote for the bot on top.gg'
+base.command.compare.description = 'Comparați statisticile ambilor utilizatori'
+base.command.dailystats.description = 'Afișează statisticile zilei selectate, cu graficul elo al zilei'
+base.command.find.description = 'Găsiți jocurile care includ jucătorii solicitați (până la 5)'
+base.command.help.description = 'Afișați lista de comenzi'
+base.command.info.description = 'Obțineți informații despre bot'
+base.command.invite.description = 'Obțineți link-ul pentru invitația bot-ului pe serverul dvs.'
+base.command.join.description = 'Obțineți link-ul pentru a vă alătura serverului comunității bot-ului'
+base.command.last.description = 'Obțineți statisticile ultimului joc'
+base.command.laststats.description = 'Afișează statisticile ultimelor x meciuri, cu graficul elo al ultimelor X meciuri'
+base.command.link.description = 'Link un profil faceit la utilizatorul discord, pentru a obține statisticile direct (nu sunt necesare parametri)'
+base.command.map.description = 'Afișează statisticile hărții selectate'
+base.command.monthstats.description = 'Afișează statisticile lunii selectate, cu graficul elo al lunii'
+base.command.roles.description = 'Rangurile sunt actualizate la fiecare oră și când obțineți statisticile'
+base.command.stats.description = 'Afișează statisticile generale, cu graficul elo al ultimelor 20 de jocuri'
+base.command.team.description = 'Creați o echipă și asociați până la 5 utilizatori (limitat la 1 echipă pe cont discord)'
+base.command.unlink.description = 'Dezlink id-ul faceit de bot-ul discord'
+base.command.vote.description = 'Obțineți link-ul pentru a vota pentru bot pe top.gg'
 base.command.weekstats.description = 'Displays the stats of the chosen week, with elo graph of the week'
 base.command.yearstats.description = 'Displays the stats of the chosen year, with elo graph of the year'
 base.options.matchNumber = 'Number of matches to display. Default: 20'
@@ -43,7 +43,7 @@ base.options.levelRoles = {
   7: 'Level 7',
   8: 'Level 8',
   9: 'Level 9',
-  10: 'Level 10'
+  10: 'Level 10',
 }
 base.options.removeOldRoles = 'Remove the old roles if they exist'
 base.options.generateRoles = 'Generates the rank roles on the server'
@@ -55,7 +55,7 @@ base.options.deleteTeam = 'Delete your team'
 base.options.addUserTeam = 'Add a user to your team'
 base.options.updateTeam = 'Update your team'
 base.options.removeUserTeam = 'Remove a user from your team'
-base.options.nameTeam = `name of your team, up to ${ maxLengthTeamName } characters`
+base.options.nameTeam = `name of your team, up to ${maxLengthTeamName} characters`
 base.options.accessTeam = 'Allow every discord users to show your team statistics'
 base.options.excludedSteamParameters = 'Exclude steam parameters from the search'
 base.options.excludedFaceitParameters = 'Exclude faceit parameters from the search'
@@ -88,9 +88,9 @@ base.strings.voteLink = 'Vote link'
 base.strings.serverLink = 'Server link'
 base.strings.accountLinked = 'Account linked'
 base.strings.invite = 'Invite'
-base.strings.inviteDescription = `Hey {discord} you can invite me by clicking on the following link!\n${ invite }`
+base.strings.inviteDescription = `Hey {discord} you can invite me by clicking on the following link!\n${invite}`
 base.strings.join = 'Join'
-base.strings.joinDescription = `Hey {discord} you can join the support server by clicking on the following link!\n${ join }`
+base.strings.joinDescription = `Hey {discord} you can join the support server by clicking on the following link!\n${join}`
 base.strings.selectMatchBelow = 'Select one of the matches below'
 base.strings.lastMatchLabel = 'Last match stats info'
 base.strings.lastMatchDescription = 'Info about the last match'
@@ -116,9 +116,13 @@ base.error.user.noTeam = 'You don\'t own a team and you aren\'t part of any team
 base.error.user.teamFull = 'You can\'t add more than 5 users to your team'
 base.error.user.alreadyInTeam = '**{playerName}** is already part of the team **{teamName}**'
 base.error.user.notInTeam = '**{playerName}** is not part of the team **{teamName}**'
-base.error.user.permissions = { manageRoles: 'You don\'t have the permission to manage roles' }
+base.error.user.permissions = {
+  manageRoles: 'You don\'t have the permission to manage roles'
+}
 base.error.user.notLinked = '{discord} is not linked to any faceit account'
-base.error.user.noParametersNoLink = 'Please specify a user or a team\nYou can also link your discord account with your faceit account to get your stats directly\nTo know how to do it, type `/help command: link`'
+base.error.user.noParametersNoLink = 'Please specify a user or a team\n\
+You can also link your discord account with your faceit account to get your stats directly\n\
+To know how to do it, type `/help command: link`'
 base.error.user.noMatches = 'Couldn\'t find any matches for the player **{playerName}**'
 base.error.user.lastMatchNoStats = 'Couldn\'t find any stats for the last match of the player **{playerName}**'
 base.error.user.noMatchFoundWithOthers = 'Couldn\'t find any matches where **{playerName}** played with the requested players'
@@ -134,7 +138,7 @@ base.error.bot.messageEvent = 'Please use the slash commands (/)'
 base.error.bot.manageRoles = 'I don\'t have the permission to manage roles'
 base.error.command.notFound = 'Command not found'
 base.error.command.teamNameAlreadyExist = 'A team with this name already exists'
-base.error.command.teamNameTooLong = `The team name is too long, it must be under ${ maxLengthTeamName } characters`
+base.error.command.teamNameTooLong = `The team name is too long, it must be under ${maxLengthTeamName} characters`
 base.error.command.alreadyOwnTeam = 'You already own the team **{teamName}**'
 base.error.command.invalidRoles = 'One or more roles are invalid'
 base.error.command.roleTooHigh = 'This role is higher than the bot role, please place it below the bot role'
