@@ -1,6 +1,5 @@
 const { maxLengthTeamName, invite, join } = require('../../config.json')
 const base = structuredClone(require('../base'))
-
 base.command.compare.description = 'Compare both user stats'
 base.command.dailystats.description = 'Displays the stats of the chosen day, with elo graph of the day'
 base.command.find.description = 'Find the games that includes the players requested (up to 5)'
@@ -20,7 +19,6 @@ base.command.unlink.description = 'Unlink your faceit id from the discord bot'
 base.command.vote.description = 'Get the link to vote for the bot on top.gg'
 base.command.weekstats.description = 'Displays the stats of the chosen week, with elo graph of the week'
 base.command.yearstats.description = 'Displays the stats of the chosen year, with elo graph of the year'
-
 base.options.matchNumber = 'Number of matches to display. Default: 20'
 base.options.steamParameter = 'steamID / steam custom ID / steam profile url / @user / CSGO status'
 base.options.faceitParameter = 'faceit nickname / @user / faceit profile url'
@@ -63,7 +61,6 @@ base.options.excludedSteamParameters = 'Exclude steam parameters from the search
 base.options.excludedFaceitParameters = 'Exclude faceit parameters from the search'
 base.options.discordUserLink = 'Link the user only for this server (Role management permissions to link someone else)'
 base.options.nicknameLink = 'Makes your discord nickname the same as your faceit nickname (Only works with non admin users)'
-
 base.strings.selectTeam = 'Select a team'
 base.strings.infoTeam = 'Get info about the team {teamName}'
 base.strings.voteDescription = 'Hey, {discord}! You can vote on top.gg to help me grow'
@@ -111,7 +108,6 @@ base.strings.pagination = {
   first: 'First Page',
   last: 'Last Page'
 }
-
 base.error.user.missing = 'It seems like there is a user missing'
 base.error.user.compareSame = 'You can\'t compare the same user'
 base.error.user.excluded = 'You can\'t exclude a player you are searching for'
@@ -133,16 +129,13 @@ base.error.user.noMatchFoundWithOthers = 'Couldn\'t find any matches where **{pl
 base.error.user.noBotLink = 'Sorry, but bots aren\'t really my type'
 base.error.user.globalLink = '{discord} already has a global link'
 base.error.user.notFound = 'The requested user is not on this server'
-
 base.error.execution.command = 'An error occurred while executing the command'
 base.error.execution.selectmenu = 'An error occurred while executing the select menu'
 base.error.execution.button = 'An error occurred while executing the button'
 base.error.execution.contextmenu = 'An error occurred while executing the context menu'
-
 base.error.bot.channelNotAccessible = 'I do not have the permission to send messages in this channel'
 base.error.bot.messageEvent = 'Please use the slash commands (/)'
 base.error.bot.manageRoles = 'I don\'t have the permission to manage roles'
-
 base.error.command.notFound = 'Command not found'
 base.error.command.teamNameAlreadyExist = 'A team with this name already exists'
 base.error.command.teamNameTooLong = `The team name is too long, it must be under ${maxLengthTeamName} characters`
@@ -152,7 +145,6 @@ base.error.command.roleTooHigh = 'This role is higher than the bot role, please 
 base.error.command.teamNotFound = 'This team doesn\'t exist'
 base.error.command.teamEmpty = 'This team doesn\'t have any members'
 base.error.command.teamNoAccess = 'You don\'t have access to this team'
-
 base.success.command.removeRoles = 'The roles have been removed successfully'
 base.success.command.generateRoles = 'The roles have been generated successfully'
 base.success.command.setupRoles = 'The roles have been setup successfully'
@@ -166,5 +158,4 @@ base.success.command.unlink = {
   server: 'Your account has been unlinked successfully on this server'
 }
 base.success.command.link = '{discord} has been linked to **{playerName}**'
-
 module.exports = base
