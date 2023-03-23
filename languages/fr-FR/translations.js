@@ -30,7 +30,7 @@ base.options.teamParameter = 'slug d\'une équipe (vous devez en faire partie, �
 base.options.fromDate = 'INCLUS. Date de début au format MM/JJ/AAAA.';
 base.options.toDate = 'EXCLUS. Date de fin au format MM/JJ/AAAA, par défaut la date du jour, 1 jour d\'écart minimum.';
 base.options.playerAimed = 'steam_parameter / faceit_parameter / @user / vide (pour vous-même si lié).';
-base.options.globalUnlink = 'Supprimer l\'ensemble des associations faites avec votre compte discord.';
+base.options.globalUnlink = 'Supprimer l\'ensemble des associations faites avec votre compte discord (faux par défaut)';
 base.options.commandName = 'Nom de la commande à afficher.';
 base.options.mapName = 'Sélectionner une map pour obtenir les statistiques associées.';
 base.options.levelRoles = {
@@ -45,8 +45,8 @@ base.options.levelRoles = {
   9: 'Niveau 9.',
   10: 'Niveau 10.'
 };
-base.options.removeOldRoles = 'Supprimer les anciens roles, si existants.';
-base.options.generateRoles = 'Générer les roles.';
+base.options.removeOldRoles = 'Supprimer les anciens rôles, si existants.';
+base.options.generateRoles = 'Générer les rôles.';
 base.options.setupRoles = 'Configurer les rôles.';
 base.options.removeRoles = 'Supprimer les rôles.';
 base.options.infoTeam = 'Afficher les informations des équipes dans lesquelles vous êtes.';
@@ -151,7 +151,7 @@ base.success.command.removeUser = 'Le joueur **{playerName}** a été retiré de
 base.success.command.addUser = 'Le joueur **{playerName}** a été ajouté à l\'équipe **{teamName}**.';
 base.success.command.unlink = {
   global: 'Toutes les associations ont été supprimées.',
-  server: 'L\'association faites sur ce serveur a été supprimée.'
+  server: 'L\'association faite sur ce serveur a été supprimée.'
 };
 base.success.command.link = '{discord} a été associé à **{playerName}**.';
 module.exports = base;
