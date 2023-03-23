@@ -1,10 +1,10 @@
 const {maxLengthTeamName, invite, join} = require('../../config.json');
 const base = structuredClone(require('../base'));
-base.command.compare.description = 'Compare both user stats';
-base.command.dailystats.description = 'Displays the stats of the chosen day, with elo graph of the day';
-base.command.find.description = 'Find the games that includes the players requested (up to 5)';
-base.command.help.description = 'Display the command list';
-base.command.info.description = 'Get the info about the bot';
+base.command.compare.description = 'Compara statisticile a doi jucători';
+base.command.dailystats.description = 'Vezi statisticile unei zile, cu graficul zilei';
+base.command.find.description = 'Găsește meciuri cu jucători cu care te-ai jucat (peste 5)';
+base.command.help.description = 'Afișează lista de comenzi';
+base.command.info.description = 'Vezi informații despre bot';
 base.command.invite.description = 'Get the link to invite the bot on your server';
 base.command.join.description = 'Get the link to join the community server of the bot';
 base.command.last.description = 'Get the stats of last game';
@@ -29,10 +29,10 @@ base.options.steamParametersTeam = 'steamIDs / steam custom IDs / steam profile 
 base.options.teamParameter = 'team slug (you need to be a part of it, the creator, or it has to be public)';
 base.options.fromDate = 'INCLUDED. Start date, format MM/DD/YYYY';
 base.options.toDate = 'EXCLUDED. End date (at least 1 day interval), if empty gets the current day Format MM/DD/YYYY';
-base.options.playerAimed = 'steam_parameters / faceit_parameters / @user / empty if linked';
-base.options.globalUnlink = 'This will unlink your account on all servers (False by default)';
-base.options.commandName = 'The name of one command';
-base.options.mapName = 'Specify a map to get the stats related';
+base.options.playerAimed = 'parametru_steam / parametru_faceit / @nume / nimic daca ești linkuit';
+base.options.globalUnlink = 'Vei primi unlink pe toate serverele (dezactivat ca default)';
+base.options.commandName = 'Numele comenzii';
+base.options.mapName = 'Specifica o mapa pentru a-ți vedea statisticile pe ea';
 base.options.levelRoles = {
   1: 'Level 1',
   2: 'Level 2',
@@ -45,16 +45,16 @@ base.options.levelRoles = {
   9: 'Level 9',
   10: 'Level 10'
 };
-base.options.removeOldRoles = 'Remove the old roles if they exist';
-base.options.generateRoles = 'Generates the rank roles on the server';
+base.options.removeOldRoles = 'Scoate rolul vechi daca exista';
+base.options.generateRoles = 'Genereaza rolurile pe server';
 base.options.setupRoles = 'Setup the roles that you want for each ranks on the server';
 base.options.removeRoles = 'Removes the rank roles on the server';
-base.options.infoTeam = 'Get information about your teams';
-base.options.createTeam = 'Create your team';
-base.options.deleteTeam = 'Delete your team';
+base.options.infoTeam = 'Vezi informații despre echipa ta';
+base.options.createTeam = 'Fa-ți o echipa';
+base.options.deleteTeam = 'Șterge-ți echipa';
 base.options.addUserTeam = 'Add a user to your team';
-base.options.updateTeam = 'Update your team';
-base.options.removeUserTeam = 'Remove a user from your team';
+base.options.updateTeam = 'Updatează-ți echipa';
+base.options.removeUserTeam = 'Scoate un membru din echipa ta';
 base.options.nameTeam = `name of your team, up to ${ maxLengthTeamName } characters`;
 base.options.accessTeam = 'Allow every discord users to show your team statistics';
 base.options.excludedSteamParameters = 'Exclude steam parameters from the search';
@@ -148,10 +148,10 @@ base.success.command.removeTeam = 'Your team **{teamName}** has been removed suc
 base.success.command.updateTeam = 'Your team **{teamName}** has been updated';
 base.success.command.createTeam = 'Your team **{teamName}** has been created';
 base.success.command.removeUser = '**{playerName}** has been removed from the team **{teamName}**';
-base.success.command.addUser = '**{playerName}** has been added to the team **{teamName}**';
+base.success.command.addUser = '**{playerName}** a fost adaugat in echipa **{teamName}**';
 base.success.command.unlink = {
-  global: 'Your account has been unlinked successfully',
-  server: 'Your account has been unlinked successfully on this server'
+  global: 'Ai primit unlink la cont cu succes',
+  server: 'Ai primit unlink la cont pe toate serverele cu succes'
 };
-base.success.command.link = '{discord} has been linked to **{playerName}**';
+base.success.command.link = '{discord} a fost linkuit cu **{playerName}**';
 module.exports = base;
