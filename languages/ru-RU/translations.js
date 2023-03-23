@@ -1,6 +1,5 @@
-const { maxLengthTeamName, invite, join } = require('../config.json')
-const base = structuredClone(require('./base'))
-
+const {maxLengthTeamName, invite, join} = require('../../config.json')
+const base = structuredClone(require('../base'))
 base.command.compare.description = 'Сравнить статистику обоих пользователей'
 base.command.dailystats.description = 'Отобразить статистику с графиком эло за указанный день'
 base.command.find.description = 'Найти матчи, в которых участвуют указанные игроки (до 5 игроков)'
@@ -20,7 +19,6 @@ base.command.unlink.description = 'Отвязать аккаунт Faceit от D
 base.command.vote.description = 'Получить ссылку на страницу для голосования за бота на top.gg'
 base.command.weekstats.description = 'Отобразить статистику с графиком эло за указанную неделю'
 base.command.yearstats.description = 'Отобразить статистику с графиком эло за указанный год'
-
 base.options.matchNumber = 'Количество отображаемых матчей. По умолчанию: 20'
 base.options.steamParameter = 'steamID / Персональный steamID / Ссылка на профиль Steam / @username / CSGO status'
 base.options.faceitParameter = 'Никнейм на Faceit / @username / Ссылка на профиль Faceit'
@@ -45,7 +43,7 @@ base.options.levelRoles = {
   7: 'Уровень 7',
   8: 'Уровень 8',
   9: 'Уровень 9',
-  10: 'Уровень 10',
+  10: 'Уровень 10'
 }
 base.options.removeOldRoles = 'Удалить старые роли рангов, если они существуют'
 base.options.generateRoles = 'Создать роли рангов, которые соответствуют уровням'
@@ -57,13 +55,12 @@ base.options.deleteTeam = 'Удалить команду'
 base.options.addUserTeam = 'Добавить пользователя в свою команду'
 base.options.updateTeam = 'Изменить команду'
 base.options.removeUserTeam = 'Удалить пользователя со своей команды'
-base.options.nameTeam = `Название вашей команды, максимум ${maxLengthTeamName} символов`
+base.options.nameTeam = `Название вашей команды, максимум ${ maxLengthTeamName } символов`
 base.options.accessTeam = 'Разрешить каждому пользователю Discord видеть статистику вашей команды'
 base.options.excludedSteamParameters = 'Исключить параметры Steam из поиска'
 base.options.excludedFaceitParameters = 'Исключить параметры Faceit из поиска'
 base.options.discordUserLink = 'Связать профиль пользователя только для этого сервера'
 base.options.nicknameLink = 'Сделать ваш Discord-никнейм таким же, как никнейм на Faceit (Нужно право редактирования никнеймов)'
-
 base.strings.selectTeam = 'Выбрать команду'
 base.strings.infoTeam = 'Получить информацию о команде {teamName}'
 base.strings.voteDescription = 'Эй, {discord}! Проголосуй за меня на top.gg, чтобы помочь мне развиться'
@@ -73,7 +70,7 @@ base.strings.info = 'Информация'
 base.strings.compare = 'Сравнение {playerName1} и {playerName2}'
 base.strings.matchPlayed = 'Сыграно {matchNumber} матчей'
 base.strings.selectDate = 'Выберите дату'
-base.strings.helpInfo = 'Информация о команде **{command}** \n \`<>\` = Необязательно, \`[]\` = Обязательно, \`{}\` = Обязательно, если не привязан профиль'
+base.strings.helpInfo = 'Информация о команде **{command}** \n `<>` = Необязательно, `[]` = Обязательно, `{}` = Обязательно, если не привязан профиль'
 base.strings.noOptions = 'Эта команда не требует параметров'
 base.strings.commands = 'Команды'
 base.strings.help = 'Помощь'
@@ -91,9 +88,9 @@ base.strings.voteLink = 'Ссылка для голосования'
 base.strings.serverLink = 'Ссылка на сервер'
 base.strings.accountLinked = 'Связанный Discord-аккаунт'
 base.strings.invite = 'Пригласить'
-base.strings.inviteDescription = `Эй, {discord}! Ты можешь пригласить меня на свой сервер, нажав на эту ссылку!\n ${invite}`
+base.strings.inviteDescription = `Эй, {discord}! Ты можешь пригласить меня на свой сервер, нажав на эту ссылку!\n ${ invite }`
 base.strings.join = 'Присоединиться'
-base.strings.joinDescription = `Эй, {discord}! Ты можешь присоединиться к серверу бота, нажав на эту ссылку!\n ${join}`
+base.strings.joinDescription = `Эй, {discord}! Ты можешь присоединиться к серверу бота, нажав на эту ссылку!\n ${ join }`
 base.strings.selectMatchBelow = 'Выберите один из нижеприведенных матчей'
 base.strings.lastMatchLabel = 'Информация о статистике последнего матча'
 base.strings.lastMatchDescription = 'Информация о последнем матче'
@@ -106,52 +103,44 @@ base.strings.year = 'Год'
 base.strings.selectYear = 'Выберите год'
 base.strings.loading = 'Загрузка'
 base.strings.pagination = {
-  next: 'Следующая страница',
   prev: 'Предыдущая страница',
+  next: 'Следующая страница',
   first: 'Первая страница',
-  last: 'Последняя страница',
+  last: 'Последняя страница'
 }
-
 base.error.user.missing = 'Похоже, что один или несколько пользователей отсутствуют'
 base.error.user.compareSame = 'Вы не можете сравнить одного и того же пользователя'
 base.error.user.excluded = 'Вы не можете исключить игрока, которого ищете'
 base.error.user.teamOwn = 'У вас нет команды'
 base.error.user.noTeam = 'У вас нет команды и вы не являетесь членом какой-либо команды'
+base.error.user.teamFull = 'Вы не можете добавить в свою команду больше 5 игроков.'
 base.error.user.alreadyInTeam = '**{playerName}** уже является членом команды **{teamName}**'
 base.error.user.notInTeam = '**{playerName}** не является членом команды **{teamName}**'
-base.error.user.permissions = {
-  manageRoles: 'У вас нет разрешения на управление ролями',
-}
+base.error.user.permissions = { manageRoles: 'У вас нет разрешения на управление ролями' }
 base.error.user.notLinked = 'Профиль {discord} не связан с какой-либо учетной записью Faceit'
-base.error.user.noParametersNoLink = 'Пожалуйста, укажите пользователя или команду\n\
-Вы также можете связать свою учетную запись Discord с вашей учетной записью Faceit, чтобы получать свою статистику напрямую.\n\
-Чтобы узнать, как это сделать, введите `/help command: link`'
+base.error.user.noParametersNoLink = 'Пожалуйста, укажите пользователя или команду\nВы также можете связать свою учетную запись Discord с вашей учетной записью Faceit, чтобы получать свою статистику напрямую.\nЧтобы узнать, как это сделать, введите `/help command: link`'
 base.error.user.noMatches = 'Не удалось найти матчи игрока **{playerName}**'
 base.error.user.lastMatchNoStats = 'Не удалось найти статистику для последнего матча игрока **{playerName}**'
 base.error.user.noMatchFoundWithOthers = 'Не удалось найти матчи, в которых {playerName} играл с указанными игроками'
 base.error.user.noBotLink = 'Извините, но вы не можете привязать аккаунт бота...'
 base.error.user.globalLink = '{discord} уже связал свой профиль'
 base.error.user.notFound = 'Запрашиваемый пользователь не является участником этого сервера'
-
 base.error.execution.command = 'При выполнении команды произошла ошибка'
 base.error.execution.selectmenu = 'Произошла ошибка при использовании меню выбора'
 base.error.execution.button = 'Произошла ошибка при использовании кнопки'
 base.error.execution.contextmenu = 'Произошла ошибка при использовании контекстного меню'
-
 base.error.bot.channelNotAccessible = 'У меня нет прав для отправки сообщений в этот канал'
 base.error.bot.messageEvent = 'Пожалуйста, используйте слэш-команды (/)'
 base.error.bot.manageRoles = 'У меня нет прав для управления ролями'
-
 base.error.command.notFound = 'Команда не найдена'
 base.error.command.teamNameAlreadyExist = 'Команда с таким именем уже существует'
-base.error.command.teamNameTooLong = `Слишком длинное имя команды. Оно должно быть не более ${maxLengthTeamName} символов`
+base.error.command.teamNameTooLong = `Слишком длинное имя команды. Оно должно быть не более ${ maxLengthTeamName } символов`
 base.error.command.alreadyOwnTeam = 'Вы уже являетесь владельцем команды **{teamName}**'
 base.error.command.invalidRoles = 'Одна или несколько ролей недействительны'
 base.error.command.roleTooHigh = 'Эта роль выше, чем у бота. Пожалуйста, переместите ее ниже роли бота'
 base.error.command.teamNotFound = 'Этой команды не существует'
 base.error.command.teamEmpty = 'В этой команде нет участников'
 base.error.command.teamNoAccess = 'У вас нет доступа к этой команде'
-
 base.success.command.removeRoles = 'Роли успешно удалены'
 base.success.command.generateRoles = 'Роли успешно созданы'
 base.success.command.setupRoles = 'Роли успешно настроены'
@@ -162,8 +151,7 @@ base.success.command.removeUser = '**{playerName}** успешно удален 
 base.success.command.addUser = '**{playerName}** успешно добавлен в команду **{teamName}**'
 base.success.command.unlink = {
   global: 'Ваша учетная запись успешно отвязана',
-  server: 'Ваша учетная запись успешно отвязана на этом сервере',
+  server: 'Ваша учетная запись успешно отвязана на этом сервере'
 }
 base.success.command.link = '{discord} был связан с **{playerName}**'
-
 module.exports = base

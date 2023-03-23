@@ -3,7 +3,7 @@ const { languages } = require('../config.json')
 const getTranslations = (key) => {
   let languageObject = {}
 
-  languages.forEach(language => {
+  Object.keys(languages).forEach(language => {
     languageObject[language] = getTranslation(key, language)
   })
 
@@ -12,8 +12,10 @@ const getTranslations = (key) => {
 
 const getTranslation = (key, language, replace) => {
   let languageConf
-  try { languageConf = require(`./${language}`) }
-  catch (error) { languageConf = require('./en-US') }
+  language = languages[language] || 'en-US'
+
+  try { languageConf = require(`./${language}/translations`) }
+  catch (error) { languageConf = require('./en-US/translations') }
 
   let string = languageConf[key]
 

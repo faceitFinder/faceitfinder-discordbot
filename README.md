@@ -37,7 +37,7 @@ docker-compose -f docker-compose.dev.yml up
 **To run the linter:**
 
 ```sh
-docker exec -it faceitfinder_dev npm run lint
+docker exec -it faceitfinder_dev npm run lint-and-fix
 ```
 
 ### Run docker on a prod environment
