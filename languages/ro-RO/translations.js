@@ -1,3 +1,4 @@
+/* eslint-disable semi */
 const { maxLengthTeamName, invite, join } = require('../../config.json')
 const base = structuredClone(require('../base'))
 base.command.compare.description = 'Comparați statisticile ambilor utilizatori'
