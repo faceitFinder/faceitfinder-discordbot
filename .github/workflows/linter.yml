@@ -2,7 +2,7 @@ name: Lint
 
 on:
   push:
-    branches-ignore: [main]
+    branches-ignore: [main, feat/crowdin_l10n_]
   pull_request:
     branches: [main]
 
