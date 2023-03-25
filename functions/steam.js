@@ -19,7 +19,7 @@ const getDatas = (steamId) => axios.get(`http://api.steampowered.com/ISteamUser/
   })
   .then(data => {
     if (data.response.players) return data.response.players[0]
-    else throw 'Invalid steamid'
+    else throw 'error.command.steamIdInvalid'
   })
 
 module.exports = {

@@ -186,6 +186,13 @@ module.exports = {
       teamNotFound: '',
       teamEmpty: '',
       teamNoAccess: '',
+      faceitProfileNotFound: '',
+      faceitDatasNotFound: '',
+      faceitCsgoStatsNotFound: '',
+      faceitHistoryNotFound: '',
+      faceitMatchStatsNotFound: '',
+      faceitLadderNotFound: '',
+      steamIdInvalid: '',
     }
   },
   success: {
