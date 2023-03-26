@@ -2,6 +2,7 @@ const User = require('../../database/user')
 const errorCard = require('../../templates/errorCard')
 const Stats = require('../../commands/stats')
 const GuildRoles = require('../../functions/roles')
+const { getTranslation } = require('../../languages/setup')
 
 module.exports = {
   name: 'stats',
@@ -10,9 +11,9 @@ module.exports = {
     let user = await User.exists(interaction.targetId)
     if (!user) {
       user = await User.exists(interaction.targetId, interaction.guildId)
-      if (!user) return errorCard(errorCard(getTranslation('error.user.notLinked', interaction.locale, {
+      if (!user) return errorCard(getTranslation('error.user.notLinked', interaction.locale, {
         discord: `<@${interaction.targetId}>`
-      }), interaction.locale))
+      }), interaction.locale)
     }
     await GuildRoles.updateRoles(interaction.client, user.discordId)
     return Stats.sendCardWithInfo(interaction, user.faceitId)
