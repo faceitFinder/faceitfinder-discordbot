@@ -9,7 +9,7 @@ base.command.invite.description = 'Obțineți link-ul pentru invitația bot-ului
 base.command.join.description = 'Obțineți link-ul pentru a vă alătura serverului comunității bot-ului'
 base.command.last.description = 'Obțineți statisticile ultimului joc'
 base.command.laststats.description = 'Afișează statisticile ultimelor x meciuri, cu graficul elo al ultimelor X meciuri'
-base.command.link.description = 'Link un profil faceit la utilizatorul discord, pentru a obține statisticile direct (nu sunt necesare parametri)'
+base.command.link.description = 'Leagă profil Faceit la Discord, pentru statistici directe (fără parametri)'
 base.command.map.description = 'Afișează statisticile hărții selectate'
 base.command.monthstats.description = 'Afișează statisticile lunii selectate, cu graficul elo al lunii'
 base.command.roles.description = 'Rangurile sunt actualizate la fiecare oră și când obțineți statisticile'
@@ -43,7 +43,7 @@ base.options.levelRoles = {
   7: 'Level 7',
   8: 'Level 8',
   9: 'Level 9',
-  10: 'Level 10',
+  10: 'Level 10'
 }
 base.options.removeOldRoles = 'Remove the old roles if they exist'
 base.options.generateRoles = 'Generates the rank roles on the server'
@@ -55,7 +55,7 @@ base.options.deleteTeam = 'Delete your team'
 base.options.addUserTeam = 'Add a user to your team'
 base.options.updateTeam = 'Update your team'
 base.options.removeUserTeam = 'Remove a user from your team'
-base.options.nameTeam = `name of your team, up to ${maxLengthTeamName} characters`
+base.options.nameTeam = `name of your team, up to ${ maxLengthTeamName } characters`
 base.options.accessTeam = 'Allow every discord users to show your team statistics'
 base.options.excludedSteamParameters = 'Exclude steam parameters from the search'
 base.options.excludedFaceitParameters = 'Exclude faceit parameters from the search'
@@ -88,9 +88,9 @@ base.strings.voteLink = 'Vote link'
 base.strings.serverLink = 'Server link'
 base.strings.accountLinked = 'Account linked'
 base.strings.invite = 'Invite'
-base.strings.inviteDescription = `Hey {discord} you can invite me by clicking on the following link!\n${invite}`
+base.strings.inviteDescription = `Hey {discord} you can invite me by clicking on the following link!\n${ invite }`
 base.strings.join = 'Join'
-base.strings.joinDescription = `Hey {discord} you can join the support server by clicking on the following link!\n${join}`
+base.strings.joinDescription = `Hey {discord} you can join the support server by clicking on the following link!\n${ join }`
 base.strings.selectMatchBelow = 'Select one of the matches below'
 base.strings.lastMatchLabel = 'Last match stats info'
 base.strings.lastMatchDescription = 'Info about the last match'
@@ -116,13 +116,9 @@ base.error.user.noTeam = 'You don\'t own a team and you aren\'t part of any team
 base.error.user.teamFull = 'You can\'t add more than 5 users to your team'
 base.error.user.alreadyInTeam = '**{playerName}** is already part of the team **{teamName}**'
 base.error.user.notInTeam = '**{playerName}** is not part of the team **{teamName}**'
-base.error.user.permissions = {
-  manageRoles: 'You don\'t have the permission to manage roles'
-}
+base.error.user.permissions = { manageRoles: 'You don\'t have the permission to manage roles' }
 base.error.user.notLinked = '{discord} is not linked to any faceit account'
-base.error.user.noParametersNoLink = 'Please specify a user or a team\n\
-You can also link your discord account with your faceit account to get your stats directly\n\
-To know how to do it, type `/help command: link`'
+base.error.user.noParametersNoLink = 'Please specify a user or a team\nYou can also link your discord account with your faceit account to get your stats directly\nTo know how to do it, type `/help command: link`'
 base.error.user.noMatches = 'Couldn\'t find any matches for the player **{playerName}**'
 base.error.user.lastMatchNoStats = 'Couldn\'t find any stats for the last match of the player **{playerName}**'
 base.error.user.noMatchFoundWithOthers = 'Couldn\'t find any matches where **{playerName}** played with the requested players'
@@ -138,13 +134,20 @@ base.error.bot.messageEvent = 'Please use the slash commands (/)'
 base.error.bot.manageRoles = 'I don\'t have the permission to manage roles'
 base.error.command.notFound = 'Command not found'
 base.error.command.teamNameAlreadyExist = 'A team with this name already exists'
-base.error.command.teamNameTooLong = `The team name is too long, it must be under ${maxLengthTeamName} characters`
+base.error.command.teamNameTooLong = `The team name is too long, it must be under ${ maxLengthTeamName } characters`
 base.error.command.alreadyOwnTeam = 'You already own the team **{teamName}**'
 base.error.command.invalidRoles = 'One or more roles are invalid'
 base.error.command.roleTooHigh = 'This role is higher than the bot role, please place it below the bot role'
 base.error.command.teamNotFound = 'This team doesn\'t exist'
 base.error.command.teamEmpty = 'This team doesn\'t have any members'
 base.error.command.teamNoAccess = 'You don\'t have access to this team'
+base.error.command.faceitProfileNotFound = 'Faceit profile not found'
+base.error.command.faceitDatasNotFound = 'Faceit datas not found'
+base.error.command.faceitCsgoStatsNotFound = 'Faceit csgo stats not found'
+base.error.command.faceitHistoryNotFound = 'Faceit history not found'
+base.error.command.faceitMatchStatsNotFound = 'Faceit match stats not found'
+base.error.command.faceitLadderNotFound = 'Faceit ladder not found'
+base.error.command.steamIdInvalid = 'Steam id invalid'
 base.success.command.removeRoles = 'The roles have been removed successfully'
 base.success.command.generateRoles = 'The roles have been generated successfully'
 base.success.command.setupRoles = 'The roles have been setup successfully'
