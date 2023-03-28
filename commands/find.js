@@ -4,6 +4,7 @@ const { getUsers, getInteractionOption } = require('../functions/commands')
 const { sendCardWithInfo } = require('./last')
 const { getMapOption } = require('../functions/map')
 const { getTranslations, getTranslation } = require('../languages/setup')
+const User = require('../database/user')
 
 const getOptions = () => {
   const options = structuredClone(Options.stats)
@@ -42,6 +43,7 @@ module.exports = {
   example: 'player_aimed: justdams steam_parameters: weder77 faceit_parameters: sheraw excluded_faceit_parameters: KanzakiR3D map: Vertigo',
   type: 'stats',
   async execute(interaction) {
+    const currentPlayer = await User.exists(interaction.user.id)
     const playerAimed = (await getUsers(interaction, 2, 'player_aimed', 'player_aimed', false))
       .find(e => e.param.match(/^[0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12}$/i))
       ?.param
@@ -53,7 +55,7 @@ module.exports = {
     const excludedSteam = getInteractionOption(interaction, 'excluded_steam_parameters')
     const excludedFaceit = getInteractionOption(interaction, 'excluded_faceit_parameters')
 
-    if (!excludedSteam && !excludedFaceit) excludedUsers = excludedUsers.filter(e => e.normalize() !== playerAimed.normalize())
+    if (!excludedSteam && !excludedFaceit && currentPlayer) excludedUsers = excludedUsers.filter(e => e.normalize() !== currentPlayer.faceitId)
     if (excludedUsers.some(e => users.includes(e)) || excludedUsers.includes(playerAimed)) throw getTranslation('error.user.excluded', interaction.locale)
 
     return sendCardWithInfo(interaction, playerAimed, null, 0, users.filter(e => e.normalize() !== playerAimed.normalize()), null, excludedUsers)
