@@ -17,7 +17,7 @@ module.exports = {
     if (interaction.user.id !== json.u) return
 
     const commandName = interaction.message.interaction.commandName
-    CommandsStats.create(commandName, `button - ${getTypeGraph(json)}`, interaction.createdAt)
+    CommandsStats.create(commandName, `button - ${getTypeGraph(json)}`, interaction)
 
     loadingCard(interaction)
 

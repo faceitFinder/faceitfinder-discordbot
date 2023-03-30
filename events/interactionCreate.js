@@ -50,7 +50,7 @@ module.exports = {
       interaction
         .deferUpdate()
         .then(() => {
-          CommandsStats.create(interaction.customId, 'selectmenu', interaction.createdAt)
+          CommandsStats.create(interaction.customId, 'selectmenu', interaction)
           interaction.client.selectmenus?.get(interaction.customId)?.execute(interaction)
             .then(e => editInteraction(interaction, e))
             .catch(err => errorInteraction(interaction, err, getTranslation('error.execution.selectmenu', interaction.locale)))
@@ -76,7 +76,7 @@ module.exports = {
       interaction
         .deferReply()
         .then(() => {
-          CommandsStats.create(interaction.commandName, 'contextmenu', interaction.createdAt)
+          CommandsStats.create(interaction.commandName, 'contextmenu', interaction)
           interaction.client.contextmenus.get(interaction.commandName)?.execute(interaction)
             .then(resp => interaction
               .followUp(resp)
@@ -91,7 +91,7 @@ module.exports = {
       interaction
         .deferReply()
         .then(() => {
-          CommandsStats.create(interaction.commandName, 'command', interaction.createdAt)
+          CommandsStats.create(interaction.commandName, 'command', interaction)
           interaction.client.commands.get(interaction.commandName)?.execute(interaction)
             .then(resp => {
               if (Array.isArray(resp))

@@ -1,10 +1,11 @@
 const CommandsStats = require('./models/commandsStatsModel')
 
-const create = (commandName, commandType, date) => {
+const create = (commandName, commandType, { createdAt, locale }) => {
   const newCommandStats = new CommandsStats({
     commandName: commandName,
     commandType: commandType,
-    date: date
+    locale: locale,
+    date: createdAt
   })
 
   newCommandStats.save()

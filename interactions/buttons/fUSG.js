@@ -12,7 +12,7 @@ module.exports = {
 
     if (interaction.user.id !== value.u) return
 
-    CommandsStats.create('find', 'button - player', interaction.createdAt)
+    CommandsStats.create('find', 'button - player', interaction)
 
     const players = interaction.message.components.at(3)?.components.map(p => JSON.parse(p.customId).s) || []
     const excludedPlayers = interaction.message.components.at(4)?.components.map(p => p.customId) || []
