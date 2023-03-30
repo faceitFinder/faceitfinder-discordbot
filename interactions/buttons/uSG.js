@@ -12,7 +12,7 @@ module.exports = {
   async execute(interaction, json) {
     if (interaction.user.id !== json.u) return
 
-    CommandsStats.create('stats', `button - ${getTypeGraph(json)}`, interaction.createdAt)
+    CommandsStats.create('stats', `button - ${getTypeGraph(json)}`, interaction)
 
     loadingCard(interaction)
 

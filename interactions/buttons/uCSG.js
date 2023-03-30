@@ -17,7 +17,7 @@ module.exports = {
 
     if (interaction.user.id !== json.u) return
 
-    CommandsStats.create('compare', `button - ${getTypeGraph(json)}`, interaction.createdAt)
+    CommandsStats.create('compare', `button - ${getTypeGraph(json)}`, interaction)
 
     loadingCard(interaction)
 
