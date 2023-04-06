@@ -3,6 +3,7 @@ const Discord = require('discord.js')
 const { getTranslation } = require('../languages/setup')
 
 module.exports = (description, lang) => {
+  console.log(description)
   if (!description.includes(' ') && description.includes('.')) description = getTranslation(description, lang)
 
   return {

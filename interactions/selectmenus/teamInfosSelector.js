@@ -43,7 +43,7 @@ module.exports = {
     if (currentTeam.creator !== interaction.user.id && currentUser) {
       const userIsPartOfTeam = teamUsers.find(user => user.faceitId === currentUser.faceitId)
       if (!userIsPartOfTeam) return {
-        ...errorCard(getTranslation('error.command.teamNoAccess', interaction.locale), interaction.locale),
+        ...errorCard('error.command.teamNoAccess', interaction.locale),
         components: [
           components
         ]

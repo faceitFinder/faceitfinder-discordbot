@@ -17,11 +17,11 @@ const ADD_USER = 'add_user'
 const REMOVE_USER = 'remove_user'
 
 const createTeam = async (interaction, currentTeam, user) => {
-  if (currentTeam) return errorCard(getTranslation('error.command.alreadyOwnTeam', interaction.locale))
+  if (currentTeam) return errorCard('error.command.alreadyOwnTeam', interaction.locale)
   const teamName = getInteractionOption(interaction, 'name')
   const teamSlug = teamName.toLowerCase().replace(/\s/g, '-')
-  if (teamName.length > maxLengthTeamName) return errorCard(getTranslation('error.command.teamNameTooLong', interaction.locale))
-  else if (await Team.getTeamSlug(teamSlug)) return errorCard(getTranslation('error.command.teamNameAlreadyExist', interaction.locale))
+  if (teamName.length > maxLengthTeamName) return errorCard('error.command.teamNameTooLong', interaction.locale)
+  else if (await Team.getTeamSlug(teamSlug)) return errorCard('error.command.teamNameAlreadyExist', interaction.locale)
   const access = getInteractionOption(interaction, 'access')
   Team.create(teamName, teamSlug, user, access)
 
@@ -41,7 +41,7 @@ const infoTeam = async (interaction, currentTeam, user) => {
       userTeams.push(...await Promise.all(currentUserTeams.map(async (userTeam) => await Team.getTeamSlug(userTeam.slug))))
   }
   if (currentTeam) userTeams.push(currentTeam)
-  if (userTeams.length === 0) return errorCard(getTranslation('error.user.noTeam', interaction.locale))
+  if (userTeams.length === 0) return errorCard('error.user.noTeam', interaction.locale)
 
   const options = Array.from(new Set(userTeams.map(JSON.stringify)))
     .map(JSON.parse)
@@ -76,7 +76,7 @@ const infoTeam = async (interaction, currentTeam, user) => {
 const updateTeam = async (interaction, currentTeam) => {
   const teamName = getInteractionOption(interaction, 'name')
   const teamSlug = teamName?.toLowerCase().replace(/\s/g, '-')
-  if (teamName && await Team.getTeamSlug(teamSlug)) return errorCard(getTranslation('error.command.teamNameAlreadyExists', interaction.locale))
+  if (teamName && await Team.getTeamSlug(teamSlug)) return errorCard('error.command.teamNameAlreadyExists', interaction.locale)
   else if (teamName) await UserTeam.updateMany(currentTeam.slug, teamSlug)
   const access = getInteractionOption(interaction, 'access')
   Team.update(currentTeam.slug, teamName || currentTeam.name, teamSlug || currentTeam.slug, access)
@@ -270,16 +270,16 @@ module.exports = {
     const currentTeam = await Team.getCreatorTeam(user)
 
     if (!currentTeam && !isInteractionSubcommandEqual(interaction, CREATE) &&
-      !isInteractionSubcommandEqual(interaction, INFO)) return errorCard(getTranslation('error.user.teamOwn', interaction.locale))
+      !isInteractionSubcommandEqual(interaction, INFO)) return errorCard('error.user.teamOwn', interaction.locale)
     else if (isInteractionSubcommandEqual(interaction, CREATE)) return createTeam(interaction, currentTeam, user)
     else if (isInteractionSubcommandEqual(interaction, INFO)) return infoTeam(interaction, currentTeam, user)
     else if (isInteractionSubcommandEqual(interaction, UPDATE)) return updateTeam(interaction, currentTeam, user)
     else if (isInteractionSubcommandEqual(interaction, DELETE)) return deleteTeam(interaction, currentTeam, user)
     else if (isInteractionSubcommandEqual(interaction, ADD_USER)) {
       const teamUsers = await UserTeam.getTeamUsers(currentTeam.slug)
-      if (teamUsers.length >= 5) return errorCard(getTranslation('error.user.teamFull', interaction.locale))
+      if (teamUsers.length >= 5) return errorCard('error.user.teamFull', interaction.locale)
       return getCardsConditions(interaction, addUser, 5 - teamUsers.length)
     } else if (isInteractionSubcommandEqual(interaction, REMOVE_USER)) return getCardsConditions(interaction, removeUser, 5)
-    else return errorCard(getTranslation('error.command.notFound', interaction.locale))
+    else return errorCard('error.command.notFound', interaction.locale)
   }
 }
