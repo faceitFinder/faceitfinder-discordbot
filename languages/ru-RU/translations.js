@@ -102,6 +102,7 @@ base.strings.selectMapDescription = 'Выберите одну из следую
 base.strings.selectWeek = 'Выберите неделю';
 base.strings.year = 'Год';
 base.strings.selectYear = 'Выберите год';
+base.strings.selectMonth = 'Select a month';
 base.strings.loading = 'Загрузка';
 base.strings.pagination = {
   prev: 'Предыдущая страница',
@@ -126,6 +127,7 @@ base.error.user.noMatchFoundWithOthers = 'Не удалось найти мат�
 base.error.user.noBotLink = 'Извините, но вы не можете привязать аккаунт бота...';
 base.error.user.globalLink = '{discord} уже связал свой профиль';
 base.error.user.notFound = 'Запрашиваемый пользователь не является участником этого сервера';
+base.error.user.mapNotPlayed = 'The player **{playerName}** hasn\'t played on this map';
 base.error.execution.command = 'При выполнении команды произошла ошибка';
 base.error.execution.selectmenu = 'Произошла ошибка при использовании меню выбора';
 base.error.execution.button = 'Произошла ошибка при использовании кнопки';
