@@ -102,6 +102,7 @@ base.strings.selectMapDescription = 'Select one of the following maps to get the
 base.strings.selectWeek = 'Select a week'
 base.strings.year = 'Year'
 base.strings.selectYear = 'Select a year'
+base.strings.selectMonth = 'Select a month'
 base.strings.loading = 'Loading'
 base.strings.pagination = {
   prev: 'Previous Page',
@@ -130,6 +131,7 @@ base.error.user.noMatchFoundWithOthers = 'Couldn\'t find any matches where **{pl
 base.error.user.noBotLink = 'Sorry, but bots aren\'t really my type'
 base.error.user.globalLink = '{discord} already has a global link'
 base.error.user.notFound = 'The requested user is not on this server'
+base.error.user.mapNotPlayed = 'The player **{playerName}** hasn\'t played on this map'
 base.error.execution.command = 'An error occurred while executing the command'
 base.error.execution.selectmenu = 'An error occurred while executing the select menu'
 base.error.execution.button = 'An error occurred while executing the button'

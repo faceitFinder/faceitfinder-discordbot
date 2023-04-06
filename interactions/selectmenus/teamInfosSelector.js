@@ -7,6 +7,7 @@ const User = require('../../database/user')
 const Player = require('../../functions/player')
 const Steam = require('../../functions/steam')
 const errorCard = require('../../templates/errorCard')
+const { getTranslation } = require('../../languages/setup')
 
 module.exports = {
   name: 'teamInfoSelector',
@@ -42,7 +43,7 @@ module.exports = {
     if (currentTeam.creator !== interaction.user.id && currentUser) {
       const userIsPartOfTeam = teamUsers.find(user => user.faceitId === currentUser.faceitId)
       if (!userIsPartOfTeam) return {
-        ...errorCard('You are not part of this team', interaction.locale),
+        ...errorCard('error.command.teamNoAccess', interaction.locale),
         components: [
           components
         ]

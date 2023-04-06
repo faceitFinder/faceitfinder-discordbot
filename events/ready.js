@@ -22,13 +22,13 @@ module.exports = {
 
         return {
           name: command.name,
-          description: command?.slashDescription || command.description,
+          description: command.description,
           // eslint-disable-next-line camelcase
           description_localizations: command.descriptionLocalizations || {},
           options: command.options.filter(c => c.slash !== undefined && c.slash === true).map(c => {
             let option = {
               name: c.name,
-              description: c.description || c.slashDescription,
+              description: c.description,
               // eslint-disable-next-line camelcase
               description_localizations: c.descriptionLocalizations || {},
               type: c.type
@@ -38,7 +38,9 @@ module.exports = {
             if (c.required) option.required = c.required
 
             return option
-          })
+          }),
+          // eslint-disable-next-line camelcase
+          dm_permission: false
         }
       })
 

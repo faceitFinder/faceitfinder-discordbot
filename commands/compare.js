@@ -293,8 +293,8 @@ module.exports = {
     const player1 = (await getUsers(interaction, 1, 'first_user_steam', 'first_user_faceit'))?.at(0)?.param
     const player2 = (await getUsers(interaction, 1, 'second_user_steam', 'second_user_faceit'))?.at(0)?.param
 
-    if (!player1 || !player2) return errorCard(getTranslation('error.user.missing', interaction.locale), interaction.locale)
-    else if (player1 === player2) return errorCard(getTranslation('error.user.compareSame', interaction.locale), interaction.locale)
+    if (!player1 || !player2) return errorCard('error.user.missing', interaction.locale)
+    else if (player1 === player2) return errorCard('error.user.compareSame', interaction.locale)
 
     return sendCardWithInfo(interaction, player1, player2)
   }

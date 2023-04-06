@@ -7,8 +7,9 @@ const Graph = require('../../functions/graph')
 const DateStats = require('../../functions/dateStats')
 const loadingCard = require('../../templates/loadingCard')
 const errorCard = require('../../templates/errorCard')
+const { getTranslation } = require('../../languages/setup')
 
-const sendCardWithInfo = async (playerId, map, mode) => {
+const sendCardWithInfo = async (interaction, playerId, map, mode) => {
   if (!map) return
   const playerDatas = await Player.getDatas(playerId)
   const playerStats = await Player.getStats(playerId)
@@ -30,7 +31,9 @@ const sendCardWithInfo = async (playerId, map, mode) => {
   const mapThumbnail = `./images/maps/${map}.jpg`
   const playerMapStats = playerStats.segments.filter(e => e.label === map && e.mode == mode)
 
-  if (playerMapStats.length === 0) return errorCard(`**${playerDatas.nickname}** has not played this map.`, interaction.locale)
+  if (playerMapStats.length === 0) return errorCard(getTranslation('error.user.mapNotPlayed', {
+    playerName: playerDatas.nickname,
+  }), interaction.locale)
 
   const cards = playerMapStats.map(m => {
     if (fs.existsSync(mapThumbnail)) filesAtt.push(new Discord.AttachmentBuilder(mapThumbnail, { name: `${map}.jpg` }))
@@ -88,7 +91,7 @@ module.exports = {
     loadingCard(interaction)
 
     return {
-      ...await sendCardWithInfo(values.s, values.m, values.v),
+      ...await sendCardWithInfo(interaction, values.s, values.m, values.v),
       content: null,
       components: [components]
     }

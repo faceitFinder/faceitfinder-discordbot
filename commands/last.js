@@ -29,11 +29,10 @@ const getMatchItems = (interaction, playerDatas, steamDatas, playerHistory, maxM
 
   const matchStats = playerHistory.filter(e => e.matchId === matchId)
   const lastMatchesElo = Graph.getElo(interaction, playerDatas.nickname, maxMatch + 1, structuredClone(playerHistory), faceitElo, page === 0)
-  const eloDiff = Graph.getEloGain(interaction, playerDatas.nickname, maxMatch, structuredClone(matchStats), faceitElo, page === 0)
+  const eloDiff = Graph.getEloGain(interaction, playerDatas.nickname, maxMatch, structuredClone(playerHistory), faceitElo, page === 0)
   const levelDiff = playerHistory.map(e => e.matchId === matchId)
     .map((e, i) => e ? lastMatchesElo.at(i) : null)
     .filter(e => e !== null)
-
   let mapThumbnail
   if (cards.length === 0)
     matchStats.forEach(async (roundStats, i) => {

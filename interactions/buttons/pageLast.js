@@ -13,7 +13,7 @@ module.exports = {
 
     const players = interaction.message.components.at(3)?.components.map(p => JSON.parse(p.customId).s) || []
     const excludedPlayers = interaction.message.components.at(4)?.components.map(p => p.customId) || []
-    CommandsStats.create('last', `button - ${getTypePage(json)}`, interaction.createdAt)
+    CommandsStats.create('last', `button - ${getTypePage(json)}`, interaction)
 
     loadingCard(interaction)
 

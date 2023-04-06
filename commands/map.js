@@ -25,7 +25,7 @@ const sendCardWithInfo = async (interaction, playerId) => {
     if (!options.filter(e => e.data.label === label).length > 0) {
       const option = new Discord.StringSelectMenuOptionBuilder()
         .setLabel(label)
-        .setDescription(`Games ${e.stats.Matches} (${e.stats['Win Rate %']}%)`)
+        .setDescription(getTranslation('strings.matchPlayed', interaction.locale, { matchNumber: `${e.stats.Matches} (${e.stats['Win Rate %']}%)` }))
         .setValue(JSON.stringify(values))
         .setDefault(`${map} 5v5` === label)
 
@@ -45,7 +45,7 @@ const sendCardWithInfo = async (interaction, playerId) => {
     )
 
   return {
-    ...await mapSelector.sendCardWithInfo(playerId, map, '5v5'),
+    ...await mapSelector.sendCardWithInfo(interaction, playerId, map, '5v5'),
     content: map ? ' ' : getTranslation('strings.selectMapDescription', interaction.locale, { playerName: playerDatas.nickname }),
     components: [row]
   }

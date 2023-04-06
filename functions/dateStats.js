@@ -69,7 +69,7 @@ const generatePlayerStats = playerHistory => {
   playerStats['Average Assists'] = getAverage(playerStats['Average Assists'], playerStats.games)
   playerStats.kd = getAverage(playerStats.kills, playerStats.deaths)
 
-  const elo = playerHistory.filter(e => e.elo).map(e => e.elo)
+  const elo = playerHistory.filter(e => e.elo).map(e => e.elo).filter(e => e !== undefined)
 
   playerStats['Highest Elo'] = Math.max(...elo).toString()
   playerStats['Lowest Elo'] = Math.min(...elo).toString()
