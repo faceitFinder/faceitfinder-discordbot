@@ -135,6 +135,7 @@ module.exports = {
     selectWeek: '',
     year: '',
     selectYear: '',
+    selectMonth: '',
     loading: '',
     pagination: {
       next: '',
@@ -164,6 +165,7 @@ module.exports = {
       noBotLink: '',
       globalLink: '',
       notFound: '',
+      mapNotPlayed: '',
     },
     execution: {
       command: '',

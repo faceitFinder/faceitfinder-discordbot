@@ -38,7 +38,7 @@ module.exports = {
           interaction
             .followUp({
               content: ' ',
-              ...errorCard(getTranslation('error.bot.channelNotAccessible', interaction.locale), interaction.locale),
+              ...errorCard('error.bot.channelNotAccessible', interaction.locale),
             })
             .catch(console.error)
         })

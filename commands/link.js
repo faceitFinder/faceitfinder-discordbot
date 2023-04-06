@@ -20,8 +20,8 @@ const sendCardWithInfo = async (interaction, playerId) => {
         const discordUserId = member.user.id
 
         if (!interaction.member.permissions.has('ManageRoles') && discordUserId !== discordId)
-          return errorCard(getTranslation('error.user.permissions.manageRoles', lang), lang)
-        else if (member.user.bot) return errorCard(getTranslation('error.user.noBotLink', lang), lang)
+          return errorCard('error.user.permissions.manageRoles', lang)
+        else if (member.user.bot) return errorCard('error.user.noBotLink', lang)
 
         const exists = await User.getWithGuild(discordUserId, null)
         if (exists)
@@ -31,7 +31,7 @@ const sendCardWithInfo = async (interaction, playerId) => {
 
         return link(interaction, playerId, discordUserId, guild.id, nickname)
       })
-      .catch(() => errorCard(getTranslation('error.user.notFound', lang), lang))
+      .catch(() => errorCard('error.user.notFound', lang))
   }
 
   return link(interaction, playerId, discordId, null, nickname)

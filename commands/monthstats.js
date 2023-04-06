@@ -28,7 +28,7 @@ const sendCardWithInfo = async (interaction, playerId, page = 0) => {
 
     let option = new Discord.StringSelectMenuOptionBuilder()
       .setLabel(`${from.toLocaleDateString('en-EN', { month: 'short', year: 'numeric' })}`)
-      .setDescription(`${date.number} match played`)
+      .setDescription(getTranslation('strings.matchPlayed', interaction.locale, { matchNumber: date.number }))
       .setValue(JSON.stringify({
         s: playerId,
         f: from.getTime() / 1000,
@@ -42,7 +42,9 @@ const sendCardWithInfo = async (interaction, playerId, page = 0) => {
   const pages = getPageSlice(page)
   const pagination = options.slice(pages.start, pages.end)
 
-  if (pagination.length === 0) return errorCard(`Couldn't get matches of ${playerDatas.nickname}`, interaction.locale)
+  if (pagination.length === 0) return errorCard(getTranslation('error.user.noMatches', interaction.locale, {
+    playerName: playerDatas.nickname
+  }), interaction.locale)
 
   pagination[0] = DateStats.setOptionDefault(pagination.at(0))
 
@@ -50,7 +52,7 @@ const sendCardWithInfo = async (interaction, playerId, page = 0) => {
     .addComponents(
       new Discord.StringSelectMenuBuilder()
         .setCustomId('dateStatsSelector')
-        .setPlaceholder('Select a month')
+        .setPlaceholder(getTranslation('strings.selectMonth', interaction.locale))
         .addOptions(pagination))
 
   return DateStats.getCardWithInfo(interaction,

@@ -168,14 +168,14 @@ module.exports = {
   type: 'utility',
   async execute(interaction) {
     if (!interaction.member.permissions.has('ManageRoles'))
-      return errorCard(getTranslation('error.user.permissions.manageRoles', interaction.locale))
+      return errorCard('error.user.permissions.manageRoles', interaction.locale)
 
     if (!interaction.channel.permissionsFor(interaction.client.user).has('ManageRoles'))
-      return errorCard(getTranslation('error.bot.manageRoles', interaction.locale))
+      return errorCard('error.bot.manageRoles', interaction.locale)
 
     if (isInteractionSubcommandEqual(interaction, SETUP)) return await setupRoles(interaction)
     if (isInteractionSubcommandEqual(interaction, GENERATE)) return await generateRoles(interaction)
     if (isInteractionSubcommandEqual(interaction, REMOVE)) return await removeRoles(interaction)
-      .then(() => successCard(getTranslation('success.command.removeRoles', interaction.locale), interaction.locale))
+      .then(() => successCard('success.command.removeRoles', interaction.locale))
   }
 }
