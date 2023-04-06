@@ -102,7 +102,7 @@ base.strings.selectMapDescription = 'Sélectionner l\'une des maps ci-dessous po
 base.strings.selectWeek = 'Sélectionner une semaine.';
 base.strings.year = 'Année';
 base.strings.selectYear = 'Sélectionner une année.';
-base.strings.selectMonth = 'Select a month';
+base.strings.selectMonth = 'Sélectionner un mois.';
 base.strings.loading = 'Chargement';
 base.strings.pagination = {
   prev: 'Page Précédente',
@@ -127,7 +127,7 @@ base.error.user.noMatchFoundWithOthers = 'Aucune partie n\'a été trouvée où 
 base.error.user.noBotLink = 'Désolé, mais les bots ne sont pas vraiment mon type...';
 base.error.user.globalLink = '{discord} est déjà associé à un compte faceit de façon globale.';
 base.error.user.notFound = 'L\'utilisateur demandé n\'est pas présent sur ce serveur.';
-base.error.user.mapNotPlayed = 'The player **{playerName}** hasn\'t played on this map';
+base.error.user.mapNotPlayed = 'Le joueur **{playerName}** n\'a pas joué cette carte.';
 base.error.execution.command = 'Une erreur est survenue lors de l\'exécution de la commande.';
 base.error.execution.selectmenu = 'Une erreur est survenue lors de l\'exécution du menu déroulant.';
 base.error.execution.button = 'Une erreur est survenue lors de l\'exécution du bouton.';
