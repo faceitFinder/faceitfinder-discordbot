@@ -176,6 +176,6 @@ module.exports = {
     if (isInteractionSubcommandEqual(interaction, SETUP)) return await setupRoles(interaction)
     if (isInteractionSubcommandEqual(interaction, GENERATE)) return await generateRoles(interaction)
     if (isInteractionSubcommandEqual(interaction, REMOVE)) return await removeRoles(interaction)
-      .then(() => successCard('success.command.removeRoles', interaction.locale))
+      .then(() => successCard(getTranslation('success.command.removeRoles', interaction.locale), interaction.locale))
   }
 }
