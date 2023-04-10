@@ -67,7 +67,7 @@ base.strings.infoTeam = 'Afficher les informations de l\'équipe {teamName}.';
 base.strings.voteDescription = 'Hey {discord} tu peux m\'aider à grandir en votant pour moi sur top.gg !';
 base.strings.messageProcessing = 'Votre demande est en cours de traitement...';
 base.strings.error = 'Erreur';
-base.strings.info = 'Info';
+base.strings.info = 'Infos';
 base.strings.compare = 'Comparaison entre {playerName1} et {playerName2}.';
 base.strings.matchPlayed = '{matchNumber} parties jouées.';
 base.strings.selectDate = 'Sélectionner une date.';
@@ -84,9 +84,9 @@ base.strings.options = 'Options';
 base.strings.usage = 'Utilisation';
 base.strings.example = 'Exemple';
 base.strings.creator = 'Créateur';
-base.strings.invitationLink = 'Invite the bot on your server';
-base.strings.voteLink = 'Vote for the bot';
-base.strings.serverLink = 'Official support server';
+base.strings.invitationLink = 'Inviter le bot sur ton serveur';
+base.strings.voteLink = 'Voter pour le bot';
+base.strings.serverLink = 'Rejoindre le serveur de support';
 base.strings.accountLinked = 'Compte discord associé';
 base.strings.invite = 'Invitation';
 base.strings.inviteDescription = `Hey {discord} tu peux m\'inviter sur ton serveur en cliquant sur le lien ci-dessous !\n ${ invite }`;
@@ -110,8 +110,8 @@ base.strings.pagination = {
   first: 'Première Page',
   last: 'Dernière Page'
 };
-base.strings.donate = 'Support the project';
-base.strings.translation = 'Help with the translation';
+base.strings.donate = 'Soutenir le projet';
+base.strings.translation = 'Participer à la traduction';
 base.error.user.missing = 'Il semblerait qu\'un des utilisateurs soit introuvable.';
 base.error.user.compareSame = 'Vous ne pouvez pas comparer le même utilisateur.';
 base.error.user.excluded = 'Vous ne pouvez pas exclure un utilisateur que vous avez déjà inclus.';
