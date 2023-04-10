@@ -142,7 +142,8 @@ module.exports = {
       prev: '',
       first: '',
       last: '',
-    }
+    },
+    donate: '',
   },
   error: {
     user: {

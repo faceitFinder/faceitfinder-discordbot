@@ -83,9 +83,9 @@ base.strings.options = 'Options'
 base.strings.usage = 'Utilisation'
 base.strings.example = 'Exemple'
 base.strings.creator = 'Créateur'
-base.strings.invitationLink = 'Lien d\'invitation'
-base.strings.voteLink = 'Lien de vote'
-base.strings.serverLink = 'Lien du serveur'
+base.strings.invitationLink = 'Invite le bot sur ton serveur'
+base.strings.voteLink = 'Vote pour le bot'
+base.strings.serverLink = 'Rejoins le serveur de support'
 base.strings.accountLinked = 'Compte discord associé'
 base.strings.invite = 'Invitation'
 base.strings.inviteDescription = `Hey {discord} tu peux m\'inviter sur ton serveur en cliquant sur le lien ci-dessous !\n ${ invite }`
@@ -108,6 +108,7 @@ base.strings.pagination = {
   first: 'Première Page',
   last: 'Dernière Page'
 }
+base.strings.donate = 'Soutenir le projet'
 base.error.user.missing = 'Il semblerait qu\'un des utilisateurs soit introuvable.'
 base.error.user.compareSame = 'Vous ne pouvez pas comparer le même utilisateur.'
 base.error.user.excluded = 'Vous ne pouvez pas exclure un utilisateur que vous avez déjà inclus.'
