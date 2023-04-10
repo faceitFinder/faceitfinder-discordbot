@@ -109,6 +109,7 @@ base.strings.pagination = {
   last: 'Dernière Page'
 }
 base.strings.donate = 'Soutenir le projet'
+base.strings.translation = 'Participer à la traduction'
 base.error.user.missing = 'Il semblerait qu\'un des utilisateurs soit introuvable.'
 base.error.user.compareSame = 'Vous ne pouvez pas comparer le même utilisateur.'
 base.error.user.excluded = 'Vous ne pouvez pas exclure un utilisateur que vous avez déjà inclus.'
