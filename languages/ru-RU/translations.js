@@ -84,9 +84,9 @@ base.strings.options = 'Параметры';
 base.strings.usage = 'Использование';
 base.strings.example = 'Пример';
 base.strings.creator = 'Создатель';
-base.strings.invitationLink = 'Ссылка для приглашения';
-base.strings.voteLink = 'Ссылка для голосования';
-base.strings.serverLink = 'Ссылка на сервер';
+base.strings.invitationLink = 'Пригласите бота на свой сервер';
+base.strings.voteLink = 'Проголосуйте за бота';
+base.strings.serverLink = 'Официальный сервер поддержки';
 base.strings.accountLinked = 'Связанный Discord-аккаунт';
 base.strings.invite = 'Пригласить';
 base.strings.inviteDescription = `Эй, {discord}! Ты можешь пригласить меня на свой сервер, нажав на эту ссылку!\n ${ invite }`;
@@ -110,6 +110,8 @@ base.strings.pagination = {
   first: 'Первая страница',
   last: 'Последняя страница'
 };
+base.strings.donate = 'Поддержать проект';
+base.strings.translation = 'Помочь с переводом';
 base.error.user.missing = 'Похоже, что один или несколько пользователей отсутствуют';
 base.error.user.compareSame = 'Вы не можете сравнить одного и того же пользователя';
 base.error.user.excluded = 'Вы не можете исключить игрока, которого ищете';

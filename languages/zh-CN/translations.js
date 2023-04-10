@@ -84,9 +84,9 @@ base.strings.options = 'Options';
 base.strings.usage = 'Usage';
 base.strings.example = 'Example';
 base.strings.creator = 'Creator';
-base.strings.invitationLink = 'Invitation link';
-base.strings.voteLink = 'Vote link';
-base.strings.serverLink = 'Server link';
+base.strings.invitationLink = 'Invite the bot on your server';
+base.strings.voteLink = 'Vote for the bot';
+base.strings.serverLink = 'Official support server';
 base.strings.accountLinked = 'Account linked';
 base.strings.invite = 'Invite';
 base.strings.inviteDescription = `Hey {discord} you can invite me by clicking on the following link!\n${ invite }`;
@@ -110,6 +110,8 @@ base.strings.pagination = {
   first: 'First Page',
   last: 'Last Page'
 };
+base.strings.donate = 'Support the project';
+base.strings.translation = 'Help with the translation';
 base.error.user.missing = 'It seems like there is a user missing';
 base.error.user.compareSame = 'You can\'t compare the same user';
 base.error.user.excluded = 'You can\'t exclude a player you are searching for';
