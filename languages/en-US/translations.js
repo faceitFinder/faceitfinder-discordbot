@@ -111,6 +111,7 @@ base.strings.pagination = {
   last: 'Last Page'
 }
 base.strings.donate = 'Support the project'
+base.strings.translation = 'Help with the translation'
 base.error.user.missing = 'It seems like there is a user missing'
 base.error.user.compareSame = 'You can\'t compare the same user'
 base.error.user.excluded = 'You can\'t exclude a player you are searching for'

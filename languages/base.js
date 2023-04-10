@@ -144,6 +144,7 @@ module.exports = {
       last: '',
     },
     donate: '',
+    translation: '',
   },
   error: {
     user: {

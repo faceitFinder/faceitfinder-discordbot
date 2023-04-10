@@ -3,6 +3,7 @@
   "creator": "275395358316560384",
   "webapp": "https://faceitfinder.app/",
   "donate": "https://www.buymeacoffee.com/IDams",
+  "translate": "https://crowdin.com/project/faceitfinder",
   "github": "https://github.com/JustDams/faceitFinder",
   "prefix": ".ff",
   "invite": "https://discord.com/oauth2/authorize?client_id=838088031222235197&permissions=275280873472&scope=bot%20applications.commands",

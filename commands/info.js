@@ -1,4 +1,4 @@
-const { name, invite, color, creator, vote, github, join, donate } = require('../config.json')
+const { name, invite, color, creator, vote, github, join, donate, translate } = require('../config.json')
 const Discord = require('discord.js')
 const User = require('../database/user')
 const { getTranslations, getTranslation } = require('../languages/setup')
@@ -24,6 +24,7 @@ module.exports = {
             { name: getTranslation('strings.voteLink', interaction.locale), value: vote },
             { name: getTranslation('strings.serverLink', interaction.locale), value: join },
             { name: getTranslation('strings.donate', interaction.locale), value: donate },
+            { name: getTranslation('strings.translation', interaction.locale), value: translate },
             { name: getTranslation('strings.accountLinked', interaction.locale), value: (await User.count()).toString() },)
           .setFooter({ text: `${name} ${info}` })
       ],
