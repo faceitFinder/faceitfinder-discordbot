@@ -29,7 +29,6 @@ const getMatchItems = (interaction, playerDatas, steamDatas, playerHistory, maxM
 
   const matchStats = playerHistory.filter(e => e.matchId === matchId)
   const lastMatchesElo = Graph.getElo(interaction, playerDatas.nickname, maxMatch + 1, structuredClone(playerHistory), faceitElo, page === 0)
-  const eloDiff = Graph.getEloGain(interaction, playerDatas.nickname, maxMatch, structuredClone(playerHistory), faceitElo, page === 0)
   const levelDiff = playerHistory.map(e => e.matchId === matchId)
     .map((e, i) => e ? lastMatchesElo.at(i) : null)
     .filter(e => e !== null)
@@ -39,7 +38,7 @@ const getMatchItems = (interaction, playerDatas, steamDatas, playerHistory, maxM
       const card = new Discord.EmbedBuilder()
       const mapName = roundStats.i1
       const result = Math.max(...roundStats.i18.split('/').map(Number)) === parseInt(roundStats.c5)
-      const eloGain = isNaN(eloDiff.at(i)) ? '0' : eloDiff.at(i) > 0 ? `+${eloDiff.at(i)}` : eloDiff.at(i).toString()
+      const eloGain = roundStats.eloGain
 
       const level = getLevelFromElo(levelDiff.at(i))
       if (level !== undefined) {
@@ -69,7 +68,7 @@ const getMatchItems = (interaction, playerDatas, steamDatas, playerHistory, maxM
           { name: 'Kills', value: roundStats.i6, inline: true },
           { name: 'Deaths', value: roundStats.i8, inline: true },
           { name: 'Assists', value: roundStats.i7, inline: true },
-          { name: 'Elo', value: eloGain, inline: true },
+          { name: 'Elo', value: isNaN(eloGain) ? '0' : eloGain > 0 ? `+${eloGain}` : eloGain.toString(), inline: true },
           { name: 'Date', value: new Date(roundStats.date).toDateString(), inline: true })
         .setThumbnail(`attachment://${faceitElo}${i}.png`)
         .setImage(`attachment://${mapName}.jpg`)
