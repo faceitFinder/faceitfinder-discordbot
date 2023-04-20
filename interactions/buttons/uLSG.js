@@ -1,4 +1,5 @@
 const CommandsStats = require('../../database/commandsStats')
+const { updateMessage } = require('../../events/interactionCreate')
 const { getDefaultInteractionOption } = require('../../functions/commands')
 const { getTypeGraph } = require('../../functions/commandStats')
 const { getCardWithInfo } = require('../../functions/dateStats')
@@ -13,8 +14,6 @@ module.exports = {
   async execute(interaction, json) {
     const values = getDefaultInteractionOption(interaction).value
     json = { ...json, ...JSON.parse(values) }
-
-    if (interaction.user.id !== json.u) return
 
     CommandsStats.create('laststats', `button - ${getTypeGraph(json)}`, interaction)
 

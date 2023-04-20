@@ -12,8 +12,6 @@ module.exports = {
     const values = getDefaultInteractionOption(interaction).value
     json = { ...json, ...JSON.parse(values) }
 
-    if (interaction.user.id !== json.u) return
-
     const commandName = interaction.message.interaction.commandName
     CommandsStats.create(commandName, `button - ${getTypePage(json)}`, interaction)
 

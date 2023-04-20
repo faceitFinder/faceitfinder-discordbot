@@ -59,16 +59,25 @@ module.exports = {
     /**
      * Check if the interaction is a button
      */
-    else if (interaction.isButton())
-      interaction
-        .deferUpdate()
-        .then(() => {
-          const json = JSON.parse(interaction.customId)
+    else if (interaction.isButton()) {
+      const json = JSON.parse(interaction.customId)
+
+      if (interaction.user.id === json.u)
+        interaction.deferUpdate().then(() => {
           interaction.client.buttons?.get(json.id)?.execute(interaction, json)
             .then(e => editInteraction(interaction, e))
             .catch(err => errorInteraction(interaction, err, getTranslation('error.execution.button', interaction.locale)))
-        })
-        .catch(console.error)
+        }).catch(console.error)
+      else
+        interaction.deferReply({ ephemeral: true }).then(() => {
+          interaction.client.buttons?.get(json.id)?.execute(interaction, json)
+            .then(e => {
+              
+              interaction.editReply(noMention(e)).catch(console.error)
+            })
+            .catch(err => errorInteraction(interaction, err, getTranslation('error.execution.button', interaction.locale)))
+        }).catch(console.error)
+    }
     /**
      * Check if the interaction is a contextmenu
      */

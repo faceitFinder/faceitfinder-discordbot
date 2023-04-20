@@ -15,8 +15,6 @@ module.exports = {
     const matchDatas = getDefaultInteractionOption(interaction, 0, 0, 1, false).value
     json = { ...json, ...JSON.parse(values), ...JSON.parse(matchDatas) }
 
-    if (interaction.user.id !== json.u) return
-
     CommandsStats.create('compare', `button - ${getTypeGraph(json)}`, interaction)
 
     loadingCard(interaction)

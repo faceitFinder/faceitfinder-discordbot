@@ -43,7 +43,8 @@ module.exports = {
   example: 'player_aimed: justdams steam_parameters: weder77 faceit_parameters: sheraw excluded_faceit_parameters: KanzakiR3D map: Vertigo',
   type: 'stats',
   async execute(interaction) {
-    const currentPlayer = await User.exists(interaction.user.id)
+    let currentPlayer = await User.getWithGuild(interaction.user.id, null)
+    if (!currentPlayer) currentPlayer = await User.getWithGuild(interaction.user.id, interaction.guild.id)
     const playerAimed = (await getUsers(interaction, 2, 'player_aimed', 'player_aimed', false))
       .find(e => e.param.match(/^[0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12}$/i))
       ?.param
