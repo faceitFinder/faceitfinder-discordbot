@@ -9,9 +9,9 @@ const setupRoles = async (client, user, guildRoles, remove) => {
   const guildDatas = await client.guilds.fetch(guildRoles.id)
   let members
 
-  if (user.length > 0) members = [await guildDatas.members.fetch(user.at(0).discordId)]
+  if (user.length > 0) members = [await guildDatas.members.fetch(user.at(0).discordId).catch(() => null)]
   else members = await guildDatas.members.fetch({ cache: false })
-
+  
   members?.forEach(async (member) => {
     if (!member) return
     let user = await User.get(member.user.id)
