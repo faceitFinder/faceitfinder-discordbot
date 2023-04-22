@@ -257,8 +257,15 @@ const updateOptions = (components, values, updateEmoji = true) => {
   return components.filter(e => e instanceof Discord.StringSelectMenuComponent)
     .map(msm => msm.options.map(o => {
       // Do not reset if a button is clicked
-      try { if (JSON.parse(values).id.normalize() === 'uDSG') return o }
-      catch (error) { }
+      try {
+        const json = JSON.parse(values)
+        const oValue = JSON.parse(o.value)
+
+        oValue.u = json.u
+        o.value = JSON.stringify(oValue)
+
+        if (json.id.normalize() === 'uDSG') return o
+      } catch (error) { }
 
       const active = o.value.normalize() === values.normalize()
       if (updateEmoji) o.emoji = active ? emojis.select.balise : undefined

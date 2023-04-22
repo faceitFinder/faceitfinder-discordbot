@@ -14,6 +14,18 @@ const errorInteraction = (interaction, error, message) => {
   interaction.followUp(noMention(errorCard(typeof error !== 'string' ? message : error, interaction.locale))).catch(console.error)
 }
 
+const updateUser = (interaction, interactionEl, json = null) => {
+  let values
+  try {
+    values = interactionEl.updateUser(interaction, json)
+  } catch (error) {
+    values = interactionEl.getJSON(interaction, json)
+    values.u = interaction.user.id
+  }
+
+  return values
+}
+
 module.exports = {
   name: 'interactionCreate',
   async execute(interaction) {
@@ -41,16 +53,33 @@ module.exports = {
     /**
      * Check if the interaction is a selectmenu
      */
-    else if (interaction.isStringSelectMenu())
-      interaction
-        .deferUpdate()
-        .then(() => {
-          CommandsStats.create(interaction.customId, 'selectmenu', interaction)
-          interaction.client.selectmenus?.get(interaction.customId)?.execute(interaction)
-            .then(e => editInteraction(interaction, e))
-            .catch(err => errorInteraction(interaction, err, getTranslation('error.execution.selectmenu', interaction.locale)))
-        })
-        .catch(console.error)
+    else if (interaction.isStringSelectMenu()) {
+      const interactionSelectMenu = interaction.client.selectmenus?.get(interaction.customId)
+      if (!interactionSelectMenu) return
+
+      const values = interactionSelectMenu.getJSON(interaction)
+
+      if (interaction.user.id === values.u)
+        interaction
+          .deferUpdate()
+          .then(() => {
+            CommandsStats.create(interaction.customId, 'selectmenu', interaction)
+            interactionSelectMenu?.execute(interaction, values)
+              .then(e => editInteraction(interaction, e))
+              .catch(err => errorInteraction(interaction, err, getTranslation('error.execution.selectmenu', interaction.locale)))
+          })
+          .catch(console.error)
+      else
+        interaction
+          .deferReply({ ephemeral: true })
+          .then(() => {
+            CommandsStats.create(interaction.customId, 'selectmenu', interaction)
+            interactionSelectMenu?.execute(interaction, updateUser(interaction, interactionSelectMenu))
+              .then(e => interaction.editReply(noMention(e)).catch(console.error))
+              .catch(err => errorInteraction(interaction, err, getTranslation('error.execution.selectmenu', interaction.locale)))
+          })
+          .catch(console.error)
+    }
     /**
      * Check if the interaction is a button
      */
@@ -63,17 +92,14 @@ module.exports = {
 
       if (interaction.user.id === json.u)
         interaction.deferUpdate().then(() => {
-          interaction.client.buttons?.get(json.id)?.execute(interaction, json)
+          interactionButton?.execute(interaction, json)
             .then(e => editInteraction(interaction, e))
             .catch(err => errorInteraction(interaction, err, getTranslation('error.execution.button', interaction.locale)))
         }).catch(console.error)
       else
         interaction.deferReply({ ephemeral: true }).then(() => {
-          interaction.client.buttons?.get(json.id)?.execute(interaction, json)
-            .then(e => {
-
-              interaction.editReply(noMention(e)).catch(console.error)
-            })
+          interactionButton?.execute(interaction, updateUser(interaction, interactionButton, json))
+            .then(e => interaction.editReply(noMention(e)).catch(console.error))
             .catch(err => errorInteraction(interaction, err, getTranslation('error.execution.button', interaction.locale)))
         }).catch(console.error)
     }

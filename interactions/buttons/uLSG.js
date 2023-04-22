@@ -37,5 +37,5 @@ module.exports = {
   getJSON(interaction, json) {
     const values = getDefaultInteractionOption(interaction).value
     return { ...json, ...JSON.parse(values) }
-  },
+  }
 }

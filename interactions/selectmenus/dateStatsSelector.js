@@ -4,7 +4,6 @@ const CustomType = require('../../templates/customType')
 const DateStats = require('../../functions/dateStats')
 
 const sendCardWithInfo = async (interaction, values, type = CustomType.TYPES.ELO) => {
-  if (values.u !== interaction.user.id) return
   const lastItemPaginationValues = JSON.parse(interaction.message.components.at(2).components.at(3).customId)
   const options = DateStats.updateOptions(interaction.message.components.at(0).components, JSON.stringify(values))
 
@@ -29,8 +28,11 @@ const sendCardWithInfo = async (interaction, values, type = CustomType.TYPES.ELO
 
 module.exports = {
   name: 'dateStatsSelector',
-  async execute(interaction) {
-    return sendCardWithInfo(interaction, JSON.parse(interaction.values.at(0)))
+  async execute(interaction, json) {
+    return sendCardWithInfo(interaction, json)
   },
-  sendCardWithInfo
+  sendCardWithInfo,
+  getJSON(interaction, json) {
+    return JSON.parse(interaction.values.at(0))
+  }
 }

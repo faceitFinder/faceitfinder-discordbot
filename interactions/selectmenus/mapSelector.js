@@ -67,9 +67,7 @@ const sendCardWithInfo = async (interaction, playerId, map, mode) => {
 
 module.exports = {
   name: 'mapSelector',
-  async execute(interaction) {
-    const values = JSON.parse(interaction.values)
-    if (values.u !== interaction.user.id) return
+  async execute(interaction, values) {
     [values.m, values.v] = values.l.split(' ')
 
     const options = interaction.message.components.at(0).components
@@ -95,7 +93,9 @@ module.exports = {
       content: null,
       components: [components]
     }
+  },
+  sendCardWithInfo,
+  getJSON(interaction, json) {
+    return JSON.parse(interaction.values)
   }
 }
-
-module.exports.sendCardWithInfo = sendCardWithInfo

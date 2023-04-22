@@ -5,16 +5,11 @@ const UserTeam = require('../../database/userTeam')
 const Team = require('../../database/team')
 const User = require('../../database/user')
 const Player = require('../../functions/player')
-const Steam = require('../../functions/steam')
 const errorCard = require('../../templates/errorCard')
-const { getTranslation } = require('../../languages/setup')
 
 module.exports = {
   name: 'teamInfoSelector',
-  async execute(interaction) {
-    const values = JSON.parse(interaction.values)
-    if (values.u !== interaction.user.id) return
-
+  async execute(interaction, values) {
     const options = interaction.message.components.at(0).components
       .filter(e => e instanceof Discord.StringSelectMenuComponent)
       .map(msm => {
@@ -81,5 +76,8 @@ module.exports = {
         components
       ]
     }
+  },
+  getJSON(interaction, json) {
+    return JSON.parse(interaction.values)
   }
 }

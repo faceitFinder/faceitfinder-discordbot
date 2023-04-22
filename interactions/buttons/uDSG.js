@@ -11,7 +11,9 @@ const { getTypeGraph } = require('../../functions/commandStats')
 module.exports = {
   name: 'uDSG',
   async execute(interaction, json) {
-    const commandName = interaction.message.interaction.commandName
+    const commandName = await interaction.message.fetchReference()
+      .then((message) => message.interaction.commandName)
+      .catch(() => interaction.message.interaction.commandName)
     CommandsStats.create(commandName, `button - ${getTypeGraph(json)}`, interaction)
 
     loadingCard(interaction)
@@ -21,5 +23,5 @@ module.exports = {
   getJSON(interaction, json) {
     const values = getDefaultInteractionOption(interaction).value
     return { ...json, ...JSON.parse(values) }
-  },
+  }
 }
