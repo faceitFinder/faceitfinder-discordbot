@@ -28,7 +28,6 @@ const getMatchItems = (interaction, playerDatas, steamDatas, playerHistory, maxM
   const faceitElo = playerDatas.games.csgo.faceit_elo
   Graph.getEloGain(interaction, playerDatas.nickname, maxMatch, playerHistory, faceitElo, page === 0)
   const matchStats = playerHistory.filter(e => e.matchId === matchId)
-
   if (cards.length === 0)
     matchStats.forEach(async (roundStats, i) => {
       const card = new Discord.EmbedBuilder()

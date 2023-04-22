@@ -257,8 +257,12 @@ const updateOptions = (components, values, updateEmoji = true) => {
   return components.filter(e => e instanceof Discord.StringSelectMenuComponent)
     .map(msm => msm.options.map(o => {
       // Do not reset if a button is clicked
-      try { if (JSON.parse(values).id.normalize() === 'uDSG') return o }
-      catch (error) { }
+      try {
+        const json = JSON.parse(values)
+        setOptionValues(o, json)
+
+        if (json.id.normalize() === 'uDSG') return o
+      } catch (error) { }
 
       const active = o.value.normalize() === values.normalize()
       if (updateEmoji) o.emoji = active ? emojis.select.balise : undefined
@@ -266,6 +270,13 @@ const updateOptions = (components, values, updateEmoji = true) => {
 
       return o
     })).at(0)
+}
+
+const setOptionValues = (option, values) => {
+  const oValue = JSON.parse(option.value)
+  oValue.u = values.u
+  option.value = JSON.stringify(oValue)
+  return option
 }
 
 const getFromTo = (interaction, nameFrom = 'from_date', nameTo = 'to_date') => {
@@ -283,4 +294,5 @@ module.exports = {
   generatePlayerStats,
   updateOptions,
   getFromTo,
+  setOptionValues
 }

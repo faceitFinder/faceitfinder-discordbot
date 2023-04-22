@@ -10,12 +10,13 @@ const loadingCard = require('../../templates/loadingCard')
 module.exports = {
   name: 'uSG',
   async execute(interaction, json) {
-    if (interaction.user.id !== json.u) return
-
     CommandsStats.create('stats', `button - ${getTypeGraph(json)}`, interaction)
 
     loadingCard(interaction)
 
     return Stats.sendCardWithInfo(interaction, json.s, CustomType.getType(interaction.component.label))
+  },
+  getJSON(interaction, json) {
+    return json
   }
 }

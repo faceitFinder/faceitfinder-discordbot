@@ -67,20 +67,19 @@ const sendCardWithInfo = async (interaction, playerId, map, mode) => {
 
 module.exports = {
   name: 'mapSelector',
-  async execute(interaction) {
-    const values = JSON.parse(interaction.values)
-    if (values.u !== interaction.user.id) return
+  async execute(interaction, values) {
     [values.m, values.v] = values.l.split(' ')
 
     const options = interaction.message.components.at(0).components
       .filter(e => e instanceof Discord.StringSelectMenuComponent)
-      .map(msm => {
-        return msm.options.map(o => {
-          const active = o.value === interaction.values.at(0)
-          o.default = active
-          return o
-        })
-      }).at(0)
+      .map(msm => msm.options.map(o => {
+        const active = o.value === interaction.values.at(0)
+        o.default = active
+
+        DateStats.setOptionValues(o, values)
+
+        return o
+      })).at(0)
 
     const components = new Discord.ActionRowBuilder()
       .addComponents(
@@ -95,7 +94,9 @@ module.exports = {
       content: null,
       components: [components]
     }
+  },
+  sendCardWithInfo,
+  getJSON(interaction, json) {
+    return JSON.parse(interaction.values)
   }
 }
-
-module.exports.sendCardWithInfo = sendCardWithInfo
