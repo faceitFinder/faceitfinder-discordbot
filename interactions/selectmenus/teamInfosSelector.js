@@ -6,6 +6,7 @@ const Team = require('../../database/team')
 const User = require('../../database/user')
 const Player = require('../../functions/player')
 const errorCard = require('../../templates/errorCard')
+const { setOptionValues } = require('../../functions/dateStats')
 
 module.exports = {
   name: 'teamInfoSelector',
@@ -14,9 +15,12 @@ module.exports = {
       .filter(e => e instanceof Discord.StringSelectMenuComponent)
       .map(msm => {
         return msm.options.map(o => {
-          const active = JSON.stringify(JSON.parse(o.value)) === JSON.stringify(values)
+          const active = JSON.parse(o.value).tn.normalize() === values.tn.normalize()
           o.emoji = active ? emojis.select.balise : undefined
           o.default = active
+
+          setOptionValues(o, values)
+
           return o
         })
       }).at(0)

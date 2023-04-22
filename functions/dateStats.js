@@ -259,10 +259,7 @@ const updateOptions = (components, values, updateEmoji = true) => {
       // Do not reset if a button is clicked
       try {
         const json = JSON.parse(values)
-        const oValue = JSON.parse(o.value)
-
-        oValue.u = json.u
-        o.value = JSON.stringify(oValue)
+        setOptionValues(o, json)
 
         if (json.id.normalize() === 'uDSG') return o
       } catch (error) { }
@@ -273,6 +270,13 @@ const updateOptions = (components, values, updateEmoji = true) => {
 
       return o
     })).at(0)
+}
+
+const setOptionValues = (option, values) => {
+  const oValue = JSON.parse(option.value)
+  oValue.u = values.u
+  option.value = JSON.stringify(oValue)
+  return option
 }
 
 const getFromTo = (interaction, nameFrom = 'from_date', nameTo = 'to_date') => {
@@ -290,4 +294,5 @@ module.exports = {
   generatePlayerStats,
   updateOptions,
   getFromTo,
+  setOptionValues
 }

@@ -72,13 +72,14 @@ module.exports = {
 
     const options = interaction.message.components.at(0).components
       .filter(e => e instanceof Discord.StringSelectMenuComponent)
-      .map(msm => {
-        return msm.options.map(o => {
-          const active = o.value === interaction.values.at(0)
-          o.default = active
-          return o
-        })
-      }).at(0)
+      .map(msm => msm.options.map(o => {
+        const active = o.value === interaction.values.at(0)
+        o.default = active
+
+        DateStats.setOptionValues(o, values)
+
+        return o
+      })).at(0)
 
     const components = new Discord.ActionRowBuilder()
       .addComponents(
