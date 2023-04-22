@@ -3,10 +3,8 @@ const fs = require('fs')
 const AntiSpam = require('./templates/antispam')
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildMessages] })
 const { updateRoles } = require('./functions/roles')
-const mongo = require('./database/mongo')
 
 require('dotenv').config()
-mongo().then(() => { console.info('🧱 Connected to mongo') }).catch(console.error)
 
 client.antispam = new AntiSpam()
 
