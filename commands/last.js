@@ -26,13 +26,8 @@ const getMatchItems = (interaction, playerDatas, steamDatas, playerHistory, maxM
   const filesAtt = []
   const cards = []
   const faceitElo = playerDatas.games.csgo.faceit_elo
-
+  Graph.getEloGain(interaction, playerDatas.nickname, maxMatch, playerHistory, faceitElo, page === 0)
   const matchStats = playerHistory.filter(e => e.matchId === matchId)
-  const lastMatchesElo = Graph.getElo(interaction, playerDatas.nickname, maxMatch + 1, structuredClone(playerHistory), faceitElo, page === 0)
-  const levelDiff = playerHistory.map(e => e.matchId === matchId)
-    .map((e, i) => e ? lastMatchesElo.at(i) : null)
-    .filter(e => e !== null)
-  let mapThumbnail
   if (cards.length === 0)
     matchStats.forEach(async (roundStats, i) => {
       const card = new Discord.EmbedBuilder()
@@ -40,11 +35,11 @@ const getMatchItems = (interaction, playerDatas, steamDatas, playerHistory, maxM
       const result = Math.max(...roundStats.i18.split('/').map(Number)) === parseInt(roundStats.c5)
       const eloGain = roundStats.eloGain
 
-      const level = getLevelFromElo(levelDiff.at(i))
+      const level = getLevelFromElo(roundStats.elo)
       if (level !== undefined) {
         const rankImageCanvas = await Graph.getRankImage(
           level,
-          levelDiff.at(i),
+          roundStats.elo,
           size)
         filesAtt.push(new Discord.AttachmentBuilder(rankImageCanvas, { name: `${faceitElo}${i}.png` }))
       }
