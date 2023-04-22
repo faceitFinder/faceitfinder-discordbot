@@ -6,12 +6,7 @@ const { getTranslation } = require('../languages/setup')
 
 const editInteraction = (interaction, resp) => {
   if (!resp) return
-  interaction.fetchReply()
-    .then(e => {
-      e.removeAttachments().catch(console.error)
-      e.edit(noMention(resp)).catch(console.error)
-    })
-    .catch(console.error)
+  interaction.editReply(noMention(resp)).catch(console.error)
 }
 
 const errorInteraction = (interaction, error, message) => {
@@ -60,7 +55,11 @@ module.exports = {
      * Check if the interaction is a button
      */
     else if (interaction.isButton()) {
-      const json = JSON.parse(interaction.customId)
+      const id = JSON.parse(interaction.customId)?.id
+      const interactionButton = interaction.client.buttons?.get(id)
+      if (!interactionButton) return
+
+      const json = interactionButton.getJSON(interaction, JSON.parse(interaction.customId))
 
       if (interaction.user.id === json.u)
         interaction.deferUpdate().then(() => {
@@ -72,7 +71,7 @@ module.exports = {
         interaction.deferReply({ ephemeral: true }).then(() => {
           interaction.client.buttons?.get(json.id)?.execute(interaction, json)
             .then(e => {
-              
+
               interaction.editReply(noMention(e)).catch(console.error)
             })
             .catch(err => errorInteraction(interaction, err, getTranslation('error.execution.button', interaction.locale)))

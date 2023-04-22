@@ -12,9 +12,6 @@ const loadingCard = require('../../templates/loadingCard')
 module.exports = {
   name: 'uLSG',
   async execute(interaction, json) {
-    const values = getDefaultInteractionOption(interaction).value
-    json = { ...json, ...JSON.parse(values) }
-
     CommandsStats.create('laststats', `button - ${getTypeGraph(json)}`, interaction)
 
     loadingCard(interaction)
@@ -36,5 +33,9 @@ module.exports = {
       json.c,
       true
     )
-  }
+  },
+  getJSON(interaction, json) {
+    const values = getDefaultInteractionOption(interaction).value
+    return { ...json, ...JSON.parse(values) }
+  },
 }

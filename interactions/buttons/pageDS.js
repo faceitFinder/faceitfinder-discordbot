@@ -9,9 +9,6 @@ const loadingCard = require('../../templates/loadingCard')
 module.exports = {
   name: 'pageDS',
   async execute(interaction, json) {
-    const values = getDefaultInteractionOption(interaction).value
-    json = { ...json, ...JSON.parse(values) }
-
     const commandName = interaction.message.interaction.commandName
     CommandsStats.create(commandName, `button - ${getTypePage(json)}`, interaction)
 
@@ -19,5 +16,9 @@ module.exports = {
 
     return await require(`../../commands/${commandName}.js`)
       .sendCardWithInfo(interaction, json.s, json.page)
+  },
+  getJSON(interaction, json) {
+    const values = getDefaultInteractionOption(interaction).value
+    return { ...json, ...JSON.parse(values) }
   }
 }
