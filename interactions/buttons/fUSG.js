@@ -19,7 +19,8 @@ module.exports = {
     return sendCardWithInfo(interaction, json.s, null, json.page, players, json.m, excludedPlayers)
   },
   getJSON(interaction, json) {
-    const values = interaction.message.components.at(0).components.at(0).options.at(0).value
-    return { ...json, ...JSON.parse(values) }
+    const values = JSON.parse(interaction.message.components.at(0).components.at(0).options.at(0).value)
+    values.s = json.s
+    return values
   },
 }
