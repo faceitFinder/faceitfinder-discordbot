@@ -43,8 +43,12 @@ const getOptions = () => {
   const options = structuredClone(Options.stats)
   options.unshift({
     name: 'match_number',
-    description: getTranslation('options.matchNumber', 'en-US'),
-    descriptionLocalizations: getTranslations('options.matchNumber'),
+    description: getTranslation('options.matchNumber', 'en-US', {
+      default: '20'
+    }),
+    descriptionLocalizations: getTranslations('options.matchNumber', {
+      default: '20'
+    }),
     required: false,
     type: Discord.ApplicationCommandOptionType.Integer,
     slash: true,
