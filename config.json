@@ -213,5 +213,10 @@
     "uk": "uk-UA",
     "vi": "vi-VN"
   },
+  "tests": {
+    "applicationId": "579233696603701258",
+    "guildId": "882210656328228895",
+    "channelId": "885455544842874900"
+  },
   "maxLengthTeamName": 14
 }

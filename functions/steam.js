@@ -1,7 +1,5 @@
 const axios = require('axios')
 
-require('dotenv').config()
-
 const getId = (arg) => axios.get(`http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?key=${process.env.STEAM_TOKEN}&vanityurl=${arg}`)
   .then(res => {
     if (res.status == 200) return res.data

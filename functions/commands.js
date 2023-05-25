@@ -123,6 +123,8 @@ const getUsers = async (
     updateRoles(interaction.client, interaction.user.id)
   }
 
+  console.log(parameters.map(e => e.param))
+
   let params = []
   parameters.forEach(e => {
     const res = RegexFun.findUserMentions(e.param)
