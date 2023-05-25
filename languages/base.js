@@ -145,6 +145,7 @@ module.exports = {
     },
     donate: '',
     translation: '',
+    fullHistory: '',
   },
   error: {
     user: {
