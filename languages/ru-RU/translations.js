@@ -20,7 +20,7 @@ base.command.unlink.description = 'Отвязать аккаунт Faceit от D
 base.command.vote.description = 'Получить ссылку на страницу для голосования за бота на top.gg';
 base.command.weekstats.description = 'Отобразить статистику с графиком эло за указанную неделю';
 base.command.yearstats.description = 'Отобразить статистику с графиком эло за указанный год';
-base.options.matchNumber = 'Количество отображаемых матчей. По умолчанию: 20';
+base.options.matchNumber = 'Number of matches to display. Default: {default}';
 base.options.steamParameter = 'steamID / Персональный steamID / Ссылка на профиль Steam / @username / CSGO status';
 base.options.faceitParameter = 'Никнейм на Faceit / @username / Ссылка на профиль Faceit';
 base.options.steamParameters = 'steamID / Персональный steamIDs / Ссылки на профиля Steam / @username / CSGO status';
@@ -112,6 +112,7 @@ base.strings.pagination = {
 };
 base.strings.donate = 'Поддержать проект';
 base.strings.translation = 'Помочь с переводом';
+base.strings.fullHistory = 'Full history';
 base.error.user.missing = 'Похоже, что один или несколько пользователей отсутствуют';
 base.error.user.compareSame = 'Вы не можете сравнить одного и того же пользователя';
 base.error.user.excluded = 'Вы не можете исключить игрока, которого ищете';
