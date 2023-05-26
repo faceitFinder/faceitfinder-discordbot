@@ -112,6 +112,7 @@ base.strings.pagination = {
 };
 base.strings.donate = 'Поддержать проект';
 base.strings.translation = 'Помочь с переводом';
+base.strings.fullHistory = 'Full history';
 base.error.user.missing = 'Похоже, что один или несколько пользователей отсутствуют';
 base.error.user.compareSame = 'Вы не можете сравнить одного и того же пользователя';
 base.error.user.excluded = 'Вы не можете исключить игрока, которого ищете';
