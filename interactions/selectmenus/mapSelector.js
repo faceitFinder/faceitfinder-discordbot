@@ -47,7 +47,7 @@ const sendCardWithInfo = async (interaction, playerId, map, mode) => {
         { name: '\u200b', value: '\u200b', inline: true },
         { name: 'Games', value: m.stats.Matches.toString(), inline: true },
         { name: 'Winrate', value: `${m.stats['Win Rate %']}%`, inline: true },
-        { name: 'Elo', value: isNaN(elo) ? '0' : elo > 0 ? `+${elo}` : elo.toString(), inline: true },
+        { name: 'Elo Gain', value: isNaN(elo) ? '0' : elo > 0 ? `+${elo}` : elo.toString(), inline: true },
         { name: 'Average K/D', value: m.stats['Average K/D Ratio'], inline: true },
         { name: 'Average HS', value: `${m.stats['Average Headshots %']}%`, inline: true },
         { name: 'Average MVPs', value: m.stats['Average MVPs'], inline: true },
