@@ -79,6 +79,11 @@ const generatePlayerStats = playerHistory => {
 
 const getAverage = (q, d, fixe = 2, percent = 1) => ((parseFloat(q) / parseFloat(d)) * percent).toFixed(fixe)
 
+const getCurrentEloString = (faceitLevel, faceitElo) => {
+  const eloToNext = color.levels[faceitLevel + 1].min - faceitElo
+  return faceitLevel == 10 ? faceitElo : `${faceitElo} (+${eloToNext})`
+}
+
 const getPlayerHistory = async (playerId, maxMatch, eloMatches = true) => {
   const playerStats = await Player.getStats(playerId)
   const cacheHistory = await cachingMemory
@@ -165,6 +170,7 @@ const getCardWithInfo = async (interaction, actionRow, values, type, id, maxMatc
   const playerHistoryTo = playerHistory.filter(e => e.date < to)
   const elo = Graph.getEloGain(interaction, playerDatas.nickname, playerStats.games, playerHistoryTo, faceitElo, checkElo)
   const eloDiff = elo.filter(e => e).reduce((a, b) => a + b, 0)
+  const currentElo = getCurrentEloString(faceitLevel, faceitElo)
 
   if (!map) playerHistory = filteredHistory
   if (!playerHistory.length > 0) throw getTranslation('error.user.noMatches', interaction.locale, {
@@ -199,9 +205,9 @@ const getCardWithInfo = async (interaction, actionRow, values, type, id, maxMatc
     .addFields(...head,
       { name: 'Highest Elo', value: playerStats['Highest Elo'], inline: true },
       { name: 'Lowest Elo', value: playerStats['Lowest Elo'], inline: true },
-      { name: '\u200b', value: '\u200b', inline: true },
+      { name: 'Current Elo', value: currentElo, inline: true },
       { name: 'Games', value: `${playerStats.games} (${playerStats.winrate}% Win)`, inline: true },
-      { name: 'Elo', value: isNaN(eloDiff) ? '0' : eloDiff > 0 ? `+${eloDiff}` : eloDiff.toString(), inline: true },
+      { name: 'Elo Gain', value: isNaN(eloDiff) ? '0' : eloDiff > 0 ? `+${eloDiff}` : eloDiff.toString(), inline: true },
       { name: 'Average MVPs', value: playerStats['Average MVPs'], inline: true },
       { name: 'K/D', value: playerStats.kd.toString(), inline: true },
       { name: 'Kills', value: playerStats.kills.toString(), inline: true },
@@ -294,5 +300,6 @@ module.exports = {
   generatePlayerStats,
   updateOptions,
   getFromTo,
-  setOptionValues
+  setOptionValues,
+  getCurrentEloString
 }

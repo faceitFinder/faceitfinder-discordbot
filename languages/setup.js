@@ -22,8 +22,8 @@ const getTranslation = (key, language, replace) => {
   if (key.includes('.')) string = getStrings(key, languageConf)
 
   if (replace) Object.keys(replace).forEach(key => {
-    let value = replace[key]
-    if (replace[key]?.includes('.')) value = getStrings(replace[key], languageConf)
+    let value = replace[key].toString()
+    if (value?.includes('.')) value = getStrings(value, languageConf)
     string = string.replace(`{${key}}`, value.toLowerCase())
   })
 
