@@ -9,17 +9,18 @@ const loadingCard = require('../../templates/loadingCard')
 module.exports = {
   name: 'pageDS',
   async execute(interaction, json) {
-    const values = getDefaultInteractionOption(interaction).value
-    json = { ...json, ...JSON.parse(values) }
-
-    if (interaction.user.id !== json.u) return
-
-    const commandName = interaction.message.interaction.commandName
+    const commandName = await interaction.message.fetchReference()
+      .then((message) => message.interaction.commandName)
+      .catch(() => interaction.message.interaction.commandName)
     CommandsStats.create(commandName, `button - ${getTypePage(json)}`, interaction)
 
     loadingCard(interaction)
 
     return await require(`../../commands/${commandName}.js`)
       .sendCardWithInfo(interaction, json.s, json.page)
+  },
+  getJSON(interaction, json) {
+    const values = getDefaultInteractionOption(interaction).value
+    return { ...json, ...JSON.parse(values) }
   }
 }

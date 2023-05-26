@@ -3,7 +3,7 @@ const Discord = require('discord.js')
 const { getTranslation } = require('../languages/setup')
 
 module.exports = (description, lang) => {
-  if (!description.includes(' ') && description.includes('.')) description = getTranslation(description, lang)
+  if (typeof description === 'string' && !description.includes(' ') && description.includes('.')) description = getTranslation(description, lang)
 
   return {
     embeds: [new Discord.EmbedBuilder()

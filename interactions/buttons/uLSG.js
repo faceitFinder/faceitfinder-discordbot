@@ -1,7 +1,7 @@
 const CommandsStats = require('../../database/commandsStats')
 const { getDefaultInteractionOption } = require('../../functions/commands')
 const { getTypeGraph } = require('../../functions/commandStats')
-const { getCardWithInfo } = require('../../functions/dateStats')
+const { getCardWithInfo, updateOptions } = require('../../functions/dateStats')
 const CustomType = require('../../templates/customType')
 const loadingCard = require('../../templates/loadingCard')
 
@@ -11,17 +11,16 @@ const loadingCard = require('../../templates/loadingCard')
 module.exports = {
   name: 'uLSG',
   async execute(interaction, json) {
-    const values = getDefaultInteractionOption(interaction).value
-    json = { ...json, ...JSON.parse(values) }
-
-    if (interaction.user.id !== json.u) return
-
     CommandsStats.create('laststats', `button - ${getTypeGraph(json)}`, interaction)
 
     loadingCard(interaction)
 
     const actionRow = interaction.message.components.at(0)
     const [from, to] = interaction.message.embeds.at(0).data.fields[0].value.split('\n').map(e => new Date(e.trim()))
+
+    const options = updateOptions(actionRow.components, JSON.stringify(json))
+    options.at(0).default = true
+    actionRow.components.at(0).options = options
 
     json.f = from.getTime() / 1000
     json.t = to.setHours(+24) / 1000
@@ -37,5 +36,9 @@ module.exports = {
       json.c,
       true
     )
+  },
+  getJSON(interaction, json) {
+    const values = getDefaultInteractionOption(interaction).value
+    return { ...json, ...JSON.parse(values) }
   }
 }
