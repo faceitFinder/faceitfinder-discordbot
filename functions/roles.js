@@ -2,17 +2,18 @@ const GuildRoles = require('../database/guildRoles')
 const User = require('../database/user')
 const Player = require('./player')
 
-const getGuildRoles = (guild, guilds) => guilds.filter(e => e).find(e => e.id === guild.id)
-
 const getRoleIds = (guildRoles) => Object.keys(Object.entries(guildRoles)[2][1])
   .filter(e => e.startsWith('level')).map(e => guildRoles[e])
 
-const setupRoles = async (users, data, remove) => {
-  const [guildRoles, guild] = [data.guildRoles, data.guild]
-  const guildDatas = await guild.fetch()
-  const members = await guildDatas.members.fetch({ user: users.filter(e => e.guildId === guildDatas.id || !e.guildId).map(e => e.discordId) })
+const setupRoles = async (client, user, guildRoles, remove) => {
+  const guildDatas = await client.guilds.fetch(guildRoles.id)
+  let members
 
-  members.forEach(async (member) => {
+  if (user) members = [await guildDatas.members.fetch(user.at(0).discordId).catch(() => null)]
+  else members = await guildDatas.members.fetch({ cache: false })
+  
+  members?.forEach(async (member) => {
+    if (!member) return
     let user = await User.get(member.user.id)
 
     if (!(user.length > 0)) return
@@ -21,9 +22,9 @@ const setupRoles = async (users, data, remove) => {
     user = user.flat().at(0)
 
     const playerDatas = await Player.getDatas(user.faceitId).catch(console.error)
-    
+
     if (!playerDatas?.games?.csgo) return
-    
+
     const playerLevel = playerDatas.games.csgo.skill_level
     const roleLevels = getRoleIds(guildRoles)
 
@@ -37,21 +38,15 @@ const setupRoles = async (users, data, remove) => {
 }
 
 const updateRoles = async (client, discordId, guildId, remove = false) => {
-  let users, guilds
+  let user, guilds
 
-  if (discordId) users = await User.get(discordId)
-  else users = await User.getAll()
+  if (discordId) user = await User.get(discordId)
 
   if (guildId) guilds = [await GuildRoles.getRolesOf(guildId)]
-  else guilds = await GuildRoles.getAll()
+  else guilds = [await GuildRoles.getAll()].flat()
 
-  const clientGuilds = client.guilds.cache
-  const datas = clientGuilds.map(guild => { return { guildRoles: getGuildRoles(guild, guilds), guild: guild } }).filter(e => e.guildRoles)
-
-  Promise.all(datas.map(data => setupRoles(users, data, remove)))
-    .then(() => {
-      if (remove) User.remove(discordId, guildId)
-    })
+  Promise.all(guilds.map(async guildRoles => await setupRoles(client, user, guildRoles, remove).catch(console.error)))
+    .then(() => { if (remove) User.remove(discordId, guildId) })
     .catch(console.error)
 }
 

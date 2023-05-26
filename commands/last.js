@@ -8,7 +8,7 @@ const errorCard = require('../templates/errorCard')
 const Options = require('../templates/options')
 const { getCardsConditions, getInteractionOption } = require('../functions/commands')
 const { getPagination, getPageSlice, getMaxPage } = require('../functions/pagination')
-const { getPlayerHistory, generatePlayerStats } = require('../functions/dateStats')
+const { getPlayerHistory, generatePlayerStats, getCurrentEloString } = require('../functions/dateStats')
 const { findPlayersStats } = require('../functions/find')
 const { TYPES } = require('../templates/customType')
 const { getMapOption } = require('../functions/map')
@@ -26,26 +26,20 @@ const getMatchItems = (interaction, playerDatas, steamDatas, playerHistory, maxM
   const filesAtt = []
   const cards = []
   const faceitElo = playerDatas.games.csgo.faceit_elo
-
+  Graph.getEloGain(interaction, playerDatas.nickname, maxMatch, playerHistory, faceitElo, page === 0)
   const matchStats = playerHistory.filter(e => e.matchId === matchId)
-  const lastMatchesElo = Graph.getElo(interaction, playerDatas.nickname, maxMatch + 1, structuredClone(playerHistory), faceitElo, page === 0)
-  const eloDiff = Graph.getEloGain(interaction, playerDatas.nickname, maxMatch, structuredClone(playerHistory), faceitElo, page === 0)
-  const levelDiff = playerHistory.map(e => e.matchId === matchId)
-    .map((e, i) => e ? lastMatchesElo.at(i) : null)
-    .filter(e => e !== null)
-  let mapThumbnail
   if (cards.length === 0)
     matchStats.forEach(async (roundStats, i) => {
       const card = new Discord.EmbedBuilder()
       const mapName = roundStats.i1
       const result = Math.max(...roundStats.i18.split('/').map(Number)) === parseInt(roundStats.c5)
-      const eloGain = isNaN(eloDiff.at(i)) ? '0' : eloDiff.at(i) > 0 ? `+${eloDiff.at(i)}` : eloDiff.at(i).toString()
+      const eloGain = roundStats.eloGain
 
-      const level = getLevelFromElo(levelDiff.at(i))
+      const level = getLevelFromElo(roundStats.elo)
       if (level !== undefined) {
         const rankImageCanvas = await Graph.getRankImage(
           level,
-          levelDiff.at(i),
+          roundStats.elo,
           size)
         filesAtt.push(new Discord.AttachmentBuilder(rankImageCanvas, { name: `${faceitElo}${i}.png` }))
       }
@@ -69,7 +63,7 @@ const getMatchItems = (interaction, playerDatas, steamDatas, playerHistory, maxM
           { name: 'Kills', value: roundStats.i6, inline: true },
           { name: 'Deaths', value: roundStats.i8, inline: true },
           { name: 'Assists', value: roundStats.i7, inline: true },
-          { name: 'Elo', value: eloGain, inline: true },
+          { name: 'Elo Gain', value: isNaN(eloGain) ? '0' : eloGain > 0 ? `+${eloGain}` : eloGain.toString(), inline: true },
           { name: 'Date', value: new Date(roundStats.date).toDateString(), inline: true })
         .setThumbnail(`attachment://${faceitElo}${i}.png`)
         .setImage(`attachment://${mapName}.jpg`)
@@ -88,7 +82,7 @@ const getMatchItems = (interaction, playerDatas, steamDatas, playerHistory, maxM
   }
 }
 
-const sendCardWithInfo = async (interaction, playerId, matchId = null, page = 0, players = [], mapName = null, excludedPlayers = []) => {
+const sendCardWithInfo = async (interaction, playerId, matchId = null, page = 0, players = [], mapName = null, excludedPlayers = [], maxMatch = null) => {
   const playerDatas = await Player.getDatas(playerId)
   const playerStats = await Player.getStats(playerId)
   const steamDatas = await Steam.getDatas(playerDatas.steam_id_64).catch(err => err.statusText)
@@ -100,6 +94,7 @@ const sendCardWithInfo = async (interaction, playerId, matchId = null, page = 0,
   const map = getInteractionOption(interaction, 'map')
 
   if (map) mapName = map
+  if (maxMatch < 1 || maxMatch === null || maxMatch > playerStats.lifetime.Matches) maxMatch = playerStats.lifetime.Matches
 
   playerHistory = playerFullHistory
 
@@ -121,7 +116,8 @@ const sendCardWithInfo = async (interaction, playerId, matchId = null, page = 0,
   }
 
   // Removing multiple ids
-  const filteredHistory = playerHistory.map(e => e.matchId).filter((e, i, a) => a.indexOf(e) === i)
+  const filteredHistory = playerHistory.map(e => e.matchId).filter((e, i, a) => a.indexOf(e) === i).slice(0, maxMatch)
+  playerHistory = playerHistory.filter(e => filteredHistory.includes(e.matchId))
   const maxPage = getMaxPage(filteredHistory)
 
   if (!matchId) matchId = filteredHistory.slice(pagination.start, pagination.end).at(0)
@@ -156,6 +152,7 @@ const sendCardWithInfo = async (interaction, playerId, matchId = null, page = 0,
 
     const elo = Graph.getEloGain(interaction, playerDatas.nickname, playerHistory.length, playerHistory, faceitElo, false)
     const eloDiff = elo.filter(e => e).reduce((a, b) => a + b, 0)
+    const currentElo = getCurrentEloString(faceitLevel, faceitElo)
 
     const graphBuffer = Graph.generateChart(interaction,
       playerDatas.nickname,
@@ -181,9 +178,9 @@ const sendCardWithInfo = async (interaction, playerId, matchId = null, page = 0,
       },
       { name: 'Highest Elo', value: playerStats['Highest Elo'], inline: true },
       { name: 'Lowest Elo', value: playerStats['Lowest Elo'], inline: true },
-      { name: '\u200b', value: '\u200b', inline: true },
+      { name: 'Current Elo', value: currentElo, inline: true },
       { name: 'Games', value: `${playerStats.games} (${playerStats.winrate}% Win)`, inline: true },
-      { name: 'Elo', value: isNaN(eloDiff) ? '0' : eloDiff > 0 ? `+${eloDiff}` : eloDiff.toString(), inline: true },
+      { name: 'Elo Gain', value: isNaN(eloDiff) ? '0' : eloDiff > 0 ? `+${eloDiff}` : eloDiff.toString(), inline: true },
       { name: 'Average MVPs', value: playerStats['Average MVPs'], inline: true },
       { name: 'K/D', value: playerStats.kd.toString(), inline: true },
       { name: 'Kills', value: playerStats.kills.toString(), inline: true },
@@ -241,7 +238,8 @@ const sendCardWithInfo = async (interaction, playerId, matchId = null, page = 0,
           return new Discord.ButtonBuilder()
             .setCustomId(JSON.stringify({
               id: 'fUSG',
-              s: p
+              s: p,
+              l: maxMatch
             }))
             .setLabel(playerDatas.nickname)
             .setStyle(Discord.ButtonStyle.Success)

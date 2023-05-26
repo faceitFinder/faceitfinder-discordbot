@@ -1,19 +1,7 @@
-const { Client, GatewayIntentBits } = require('discord.js')
-const fs = require('fs')
-const AntiSpam = require('./templates/antispam')
-const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages] })
-const { updateRoles } = require('./functions/roles')
+const { ShardingManager } = require('discord.js')
 
-require('dotenv').config()
+const manager = new ShardingManager('./bot.js', { token: process.env.TOKEN })
 
-client.antispam = new AntiSpam()
+manager.on('shardCreate', shard => console.info(`Launched shard ${shard.id}`))
 
-fs.readdirSync('./events').filter(file => file.endsWith('.js')).forEach(async (file) => {
-  const event = require(`./events/${file}`)
-  client.on(event.name, (...args) => { event.execute(...args) })
-})
-
-// Start the bot
-client.login(process.env.TOKEN)
-
-setInterval(() => { updateRoles(client) }, 3600000)
+manager.spawn()

@@ -1,10 +1,10 @@
 const { languages } = require('../config.json')
 
-const getTranslations = (key) => {
+const getTranslations = (key, replace) => {
   let languageObject = {}
 
   Object.keys(languages).forEach(language => {
-    languageObject[language] = getTranslation(key, language)
+    languageObject[language] = getTranslation(key, language, replace)
   })
 
   return languageObject
@@ -19,16 +19,18 @@ const getTranslation = (key, language, replace) => {
 
   let string = languageConf[key]
 
-  if (key.includes('.')) string = key.split('.').reduce((acc, cur) => {
-    return acc[cur]
-  }, languageConf)
+  if (key.includes('.')) string = getStrings(key, languageConf)
 
   if (replace) Object.keys(replace).forEach(key => {
-    string = string.replace(`{${key}}`, replace[key])
+    let value = replace[key].toString()
+    if (value?.includes('.')) value = getStrings(value, languageConf)
+    string = string.replace(`{${key}}`, value.toLowerCase())
   })
 
   return string
 }
+
+const getStrings = (key, languageConf) => key.split('.').reduce((acc, cur) => acc[cur], languageConf)
 
 module.exports = {
   getTranslations,

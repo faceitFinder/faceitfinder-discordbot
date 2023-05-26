@@ -47,7 +47,7 @@ const sendCardWithInfo = async (interaction, playerId, map, mode) => {
         { name: '\u200b', value: '\u200b', inline: true },
         { name: 'Games', value: m.stats.Matches.toString(), inline: true },
         { name: 'Winrate', value: `${m.stats['Win Rate %']}%`, inline: true },
-        { name: 'Elo', value: isNaN(elo) ? '0' : elo > 0 ? `+${elo}` : elo.toString(), inline: true },
+        { name: 'Elo Gain', value: isNaN(elo) ? '0' : elo > 0 ? `+${elo}` : elo.toString(), inline: true },
         { name: 'Average K/D', value: m.stats['Average K/D Ratio'], inline: true },
         { name: 'Average HS', value: `${m.stats['Average Headshots %']}%`, inline: true },
         { name: 'Average MVPs', value: m.stats['Average MVPs'], inline: true },
@@ -67,20 +67,19 @@ const sendCardWithInfo = async (interaction, playerId, map, mode) => {
 
 module.exports = {
   name: 'mapSelector',
-  async execute(interaction) {
-    const values = JSON.parse(interaction.values)
-    if (values.u !== interaction.user.id) return
+  async execute(interaction, values) {
     [values.m, values.v] = values.l.split(' ')
 
     const options = interaction.message.components.at(0).components
       .filter(e => e instanceof Discord.StringSelectMenuComponent)
-      .map(msm => {
-        return msm.options.map(o => {
-          const active = o.value === interaction.values.at(0)
-          o.default = active
-          return o
-        })
-      }).at(0)
+      .map(msm => msm.options.map(o => {
+        const active = o.value === interaction.values.at(0)
+        o.default = active
+
+        DateStats.setOptionValues(o, values)
+
+        return o
+      })).at(0)
 
     const components = new Discord.ActionRowBuilder()
       .addComponents(
@@ -95,7 +94,9 @@ module.exports = {
       content: null,
       components: [components]
     }
+  },
+  sendCardWithInfo,
+  getJSON(interaction, json) {
+    return JSON.parse(interaction.values)
   }
 }
-
-module.exports.sendCardWithInfo = sendCardWithInfo
