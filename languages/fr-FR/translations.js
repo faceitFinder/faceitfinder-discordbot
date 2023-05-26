@@ -20,7 +20,7 @@ base.command.unlink.description = 'Supprimer l\'association entre votre compte d
 base.command.vote.description = 'Obtenir le lien pour voter pour le bot sur top.gg.';
 base.command.weekstats.description = 'Obtenir les statistiques de la semaine sélectionnée, accompagné d\'un graphique d\'évolution de l\'elo.';
 base.command.yearstats.description = 'Obtenir les statistiques de l\'année sélectionnée, accompagné d\'un graphique d\'évolution de l\'elo.';
-base.options.matchNumber = 'Nombre de parties à afficher, par défaut 20.';
+base.options.matchNumber = 'Number of matches to display. Default: {default}';
 base.options.steamParameter = 'steamID / steamID personnalisé / url profil steam / @utilisateur / status CSGO.';
 base.options.faceitParameter = 'pseudo faceit / @utilisateur / url profil faceit.';
 base.options.steamParameters = 'steamIDs / steamIDs personnalisés / url profils steam / @utilisateurs / status CSGO.';
@@ -112,6 +112,7 @@ base.strings.pagination = {
 };
 base.strings.donate = 'Soutenir le projet';
 base.strings.translation = 'Participer à la traduction';
+base.strings.fullHistory = 'Full history';
 base.error.user.missing = 'Il semblerait qu\'un des utilisateurs soit introuvable.';
 base.error.user.compareSame = 'Vous ne pouvez pas comparer le même utilisateur.';
 base.error.user.excluded = 'Vous ne pouvez pas exclure un utilisateur que vous avez déjà inclus.';
