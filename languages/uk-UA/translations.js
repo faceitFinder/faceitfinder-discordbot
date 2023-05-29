@@ -35,80 +35,80 @@ base.options.globalUnlink = 'This will unlink your account on all servers (False
 base.options.commandName = 'The name of one command';
 base.options.mapName = 'Specify a map to get the stats related';
 base.options.levelRoles = {
-  1: 'Level 1',
-  2: 'Level 2',
-  3: 'Level 3',
-  4: 'Level 4',
-  5: 'Level 5',
-  6: 'Level 6',
-  7: 'Level 7',
-  8: 'Level 8',
-  9: 'Level 9',
-  10: 'Level 10'
+  1: '1-й рівень',
+  2: '2-й рівень',
+  3: '3-й рівень',
+  4: '4-й рівень',
+  5: '5-й рівень',
+  6: '6-й рівень',
+  7: '7-й рівень',
+  8: '8-й рівень',
+  9: '9-й рівень',
+  10: '10-й рівень'
 };
-base.options.removeOldRoles = 'Remove the old roles if they exist';
-base.options.generateRoles = 'Generates the rank roles on the server';
-base.options.setupRoles = 'Setup the roles that you want for each ranks on the server';
-base.options.removeRoles = 'Removes the rank roles on the server';
-base.options.infoTeam = 'Get information about your teams';
-base.options.createTeam = 'Create your team';
-base.options.deleteTeam = 'Delete your team';
-base.options.addUserTeam = 'Add a user to your team';
-base.options.updateTeam = 'Update your team';
-base.options.removeUserTeam = 'Remove a user from your team';
-base.options.nameTeam = `name of your team, up to ${ maxLengthTeamName } characters`;
-base.options.accessTeam = 'Allow every discord users to show your team statistics';
-base.options.excludedSteamParameters = 'Exclude steam parameters from the search';
-base.options.excludedFaceitParameters = 'Exclude faceit parameters from the search';
-base.options.discordUserLink = 'Link the user only for this server (Role management permissions to link someone else)';
-base.options.nicknameLink = 'Makes your discord nickname the same as your faceit nickname (Only works with non admin users)';
-base.strings.selectTeam = 'Select a team';
-base.strings.infoTeam = 'Get info about the team {teamName}';
-base.strings.voteDescription = 'Hey, {discord}! You can vote on top.gg to help me grow';
-base.strings.messageProcessing = 'Your request is currently processing...';
-base.strings.error = 'Error';
-base.strings.info = 'Info';
-base.strings.compare = 'Comparison between {playerName1} and {playerName2}';
-base.strings.matchPlayed = '{matchNumber} matches played';
-base.strings.selectDate = 'Select a date';
-base.strings.helpInfo = 'Information about the {command} command \n `<>`: Optional, `[]`: Required, `{}`: Required if not linked';
-base.strings.noOptions = 'This command does not require any options';
-base.strings.commands = 'Commands';
-base.strings.help = 'Help';
-base.strings.helpDescription = '/help <command> for more info on a specific command';
-base.strings.stats = 'Stats';
-base.strings.system = 'System';
-base.strings.utility = 'Utility';
-base.strings.description = 'Description';
-base.strings.options = 'Options';
-base.strings.usage = 'Usage';
-base.strings.example = 'Example';
-base.strings.creator = 'Creator';
-base.strings.invitationLink = 'Invite the bot on your server';
-base.strings.voteLink = 'Vote for the bot';
-base.strings.serverLink = 'Official support server';
-base.strings.accountLinked = 'Account linked';
-base.strings.invite = 'Invite';
-base.strings.inviteDescription = `Hey {discord} you can invite me by clicking on the following link!\n${ invite }`;
-base.strings.join = 'Join';
-base.strings.joinDescription = `Hey {discord} you can join the support server by clicking on the following link!\n${ join }`;
-base.strings.selectMatchBelow = 'Select one of the matches below';
-base.strings.lastMatchLabel = 'Last match stats info';
-base.strings.lastMatchDescription = 'Info about the last match';
-base.strings.selectAnotherMatch = 'Select another match';
-base.strings.lastStatsLabel = 'Statistics of the last matches';
-base.strings.selectMap = 'Select a map';
-base.strings.selectMapDescription = 'Select one of the following maps to get the statistics related ({playerName})';
-base.strings.selectWeek = 'Select a week';
-base.strings.year = 'Year';
-base.strings.selectYear = 'Select a year';
-base.strings.selectMonth = 'Select a month';
-base.strings.loading = 'Loading';
+base.options.removeOldRoles = 'Видалити старі ролі, якщо вони існують';
+base.options.generateRoles = 'Генерує ранги ролей на сервері';
+base.options.setupRoles = 'Налаштувати ролі, які ви бажаєте для кожного рангу на сервері';
+base.options.removeRoles = 'Видаляє рангові ролі на сервері';
+base.options.infoTeam = 'Отримати інформацію про свої команди';
+base.options.createTeam = 'Створити команду';
+base.options.deleteTeam = 'Видалити вашу команду';
+base.options.addUserTeam = 'Додати користувача до команди';
+base.options.updateTeam = 'Оновити вашу команду';
+base.options.removeUserTeam = 'Видаляє користувача з команди';
+base.options.nameTeam = `назва вашої команди, до ${ maxLengthTeamName } символів`;
+base.options.accessTeam = 'Дозволити кожному користувачеві Discord показувати статистику вашої команди';
+base.options.excludedSteamParameters = 'Виключити з пошуку параметри Steam';
+base.options.excludedFaceitParameters = 'Виключити параметри Faceit з пошуку';
+base.options.discordUserLink = 'Прив\'язати користувача лише до цього сервера (Права на керування ролями для прив\'язки іншої особи)';
+base.options.nicknameLink = 'Зробити нік Discord таким же, як у Faceit (тільки для неадміністраторів)';
+base.strings.selectTeam = 'Вибрати команду';
+base.strings.infoTeam = 'Отримати інформацію про команду {teamName}';
+base.strings.voteDescription = 'Агов, {discord}! Ви можете проголосувати на top.gg, щоб допомогти мені розвиватися';
+base.strings.messageProcessing = 'Ваш запит зараз обробляється...';
+base.strings.error = 'Помилка';
+base.strings.info = 'Інформація';
+base.strings.compare = 'Порівняння між {playerName1} та {playerName2}';
+base.strings.matchPlayed = 'Зіграно матчів: {matchNumber}';
+base.strings.selectDate = 'Виберіть дату';
+base.strings.helpInfo = 'Інформація про команду {command} \n `<>`: Необов’язково, `[]`: Обов’язково, `{}`: Обов’язково, якщо не пов’язано';
+base.strings.noOptions = 'Ця команда не потребує жодних параметрів';
+base.strings.commands = 'Команди';
+base.strings.help = 'Довідка';
+base.strings.helpDescription = '/help <command> для отримання додаткової інформації про конкретну команду';
+base.strings.stats = 'Статистика';
+base.strings.system = 'Система';
+base.strings.utility = 'Утиліта';
+base.strings.description = 'Опис';
+base.strings.options = 'Параметри';
+base.strings.usage = 'Використання';
+base.strings.example = 'Приклад';
+base.strings.creator = 'Творець';
+base.strings.invitationLink = 'Запросити бота на свій сервер';
+base.strings.voteLink = 'Проголосувати за бота';
+base.strings.serverLink = 'Офіційний сервер підтримки';
+base.strings.accountLinked = 'Обліковий запис прив’язано';
+base.strings.invite = 'Запросити';
+base.strings.inviteDescription = `Привіт {discord}, ти можеш запросити мене, натиснувши на наступне посилання!\n${ invite }`;
+base.strings.join = 'Приєднатися';
+base.strings.joinDescription = `Привіт {discord}, ти можеш приєднатися до сервера підтримки, натиснувши на наступне посилання!\n${ join }`;
+base.strings.selectMatchBelow = 'Будь ласка, оберіть один з матчів нижче.';
+base.strings.lastMatchLabel = 'Статистика останнього матчу';
+base.strings.lastMatchDescription = 'Інформація про останній матч';
+base.strings.selectAnotherMatch = 'Вибрати інший матч';
+base.strings.lastStatsLabel = 'Статистика останніх матчів';
+base.strings.selectMap = 'Вибрати мапу';
+base.strings.selectMapDescription = 'Виберіть одну з наступних мап, щоб отримати статистику, пов’язану з нею ({playerName})';
+base.strings.selectWeek = 'Виберіть тиждень';
+base.strings.year = 'Рік';
+base.strings.selectYear = 'Виберіть рік';
+base.strings.selectMonth = 'Виберіть місяць';
+base.strings.loading = 'Завантаження';
 base.strings.pagination = {
-  prev: 'Previous Page',
-  next: 'Next Page',
-  first: 'First Page',
-  last: 'Last Page'
+  prev: 'Попередня сторінка',
+  next: 'Наступна сторінка',
+  first: 'Перша сторінка',
+  last: 'Остання сторінка'
 };
 base.strings.donate = 'Support the project';
 base.strings.translation = 'Help with the translation';
@@ -163,8 +163,8 @@ base.success.command.createTeam = 'Your team **{teamName}** has been created';
 base.success.command.removeUser = '**{playerName}** has been removed from the team **{teamName}**';
 base.success.command.addUser = '**{playerName}** has been added to the team **{teamName}**';
 base.success.command.unlink = {
-  global: 'Your account has been unlinked successfully',
-  server: 'Your account has been unlinked successfully on this server'
+  global: 'Ваш обліковий запис успішно відв’язано',
+  server: 'Ваш обліковий запис успішно від’єднано на цьому сервері'
 };
-base.success.command.link = '{discord} has been linked to **{playerName}**';
+base.success.command.link = '{discord} було прив’язано з **{playerName}**';
 module.exports = base;
