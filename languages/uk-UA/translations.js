@@ -35,20 +35,20 @@ base.options.globalUnlink = 'This will unlink your account on all servers (False
 base.options.commandName = 'The name of one command';
 base.options.mapName = 'Specify a map to get the stats related';
 base.options.levelRoles = {
-  1: 'Level 1',
-  2: 'Level 2',
-  3: 'Level 3',
-  4: 'Level 4',
-  5: 'Level 5',
-  6: 'Level 6',
-  7: 'Level 7',
-  8: 'Level 8',
-  9: 'Level 9',
-  10: 'Level 10'
+  1: '1-й рівень',
+  2: '2-й рівень',
+  3: '3-й рівень',
+  4: '4-й рівень',
+  5: '5-й рівень',
+  6: '6-й рівень',
+  7: '7-й рівень',
+  8: '8-й рівень',
+  9: '9-й рівень',
+  10: '10-й рівень'
 };
-base.options.removeOldRoles = 'Remove the old roles if they exist';
-base.options.generateRoles = 'Generates the rank roles on the server';
-base.options.setupRoles = 'Setup the roles that you want for each ranks on the server';
+base.options.removeOldRoles = 'Видалити старі ролі, якщо вони існують';
+base.options.generateRoles = 'Генерує ранги ролей на сервері';
+base.options.setupRoles = 'Налаштувати ролі, які ви бажаєте для кожного рангу на сервері';
 base.options.removeRoles = 'Removes the rank roles on the server';
 base.options.infoTeam = 'Get information about your teams';
 base.options.createTeam = 'Create your team';
@@ -105,10 +105,10 @@ base.strings.selectYear = 'Select a year';
 base.strings.selectMonth = 'Select a month';
 base.strings.loading = 'Loading';
 base.strings.pagination = {
-  prev: 'Previous Page',
-  next: 'Next Page',
-  first: 'First Page',
-  last: 'Last Page'
+  prev: 'Попередня сторінка',
+  next: 'Наступна сторінка',
+  first: 'Перша сторінка',
+  last: 'Остання сторінка'
 };
 base.strings.donate = 'Support the project';
 base.strings.translation = 'Help with the translation';
@@ -163,8 +163,8 @@ base.success.command.createTeam = 'Your team **{teamName}** has been created';
 base.success.command.removeUser = '**{playerName}** has been removed from the team **{teamName}**';
 base.success.command.addUser = '**{playerName}** has been added to the team **{teamName}**';
 base.success.command.unlink = {
-  global: 'Your account has been unlinked successfully',
-  server: 'Your account has been unlinked successfully on this server'
+  global: 'Ваш обліковий запис успішно відв’язано',
+  server: 'Ваш обліковий запис успішно від’єднано на цьому сервері'
 };
-base.success.command.link = '{discord} has been linked to **{playerName}**';
+base.success.command.link = '{discord} було прив’язано з **{playerName}**';
 module.exports = base;
