@@ -80,7 +80,7 @@ const generatePlayerStats = playerHistory => {
 const getAverage = (q, d, fixe = 2, percent = 1) => ((parseFloat(q) / parseFloat(d)) * percent).toFixed(fixe)
 
 const getCurrentEloString = (faceitLevel, faceitElo) => {
-  if (faceitLevel == 10) return faceitElo
+  if (faceitLevel == 10) return faceitElo.toString()
  
   const eloToNext = color.levels[faceitLevel + 1].min - faceitElo
   return `${faceitElo} (+${eloToNext})`
