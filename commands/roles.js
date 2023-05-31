@@ -170,7 +170,7 @@ module.exports = {
     if (!interaction.member.permissions.has('ManageRoles'))
       return errorCard('error.user.permissions.manageRoles', interaction.locale)
 
-    if (!interaction.channel.permissionsFor(interaction.client.user).has('ManageRoles'))
+    if (!interaction.member.guild.members.me.permissions.has('ManageRoles'))
       return errorCard('error.bot.manageRoles', interaction.locale)
 
     if (isInteractionSubcommandEqual(interaction, SETUP)) return await setupRoles(interaction)
