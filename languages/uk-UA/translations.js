@@ -161,7 +161,7 @@ base.success.command.removeTeam = 'Вашу команду **{teamName}** усп
 base.success.command.updateTeam = 'Ваша команда **{teamName}** була успішно оновлена';
 base.success.command.createTeam = 'Ваша команда **{teamName}** була успішно створена';
 base.success.command.removeUser = '**{playerName}** було видалено з команди **{teamName}**';
-base.success.command.addUser = '**{playerName}** has been added to the team **{teamName}**';
+base.success.command.addUser = '**{playerName}** додано до команди **{teamName}**';
 base.success.command.unlink = {
   global: 'Ваш обліковий запис успішно відв’язано',
   server: 'Ваш обліковий запис успішно від’єднано на цьому сервері'
