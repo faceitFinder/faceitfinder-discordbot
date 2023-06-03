@@ -80,10 +80,14 @@ const generatePlayerStats = playerHistory => {
 const getAverage = (q, d, fixe = 2, percent = 1) => ((parseFloat(q) / parseFloat(d)) * percent).toFixed(fixe)
 
 const getCurrentEloString = (faceitLevel, faceitElo) => {
-  if (faceitLevel == 10) return faceitElo.toString()
- 
+  let eloToPrev = 0
+  
+  if (faceitLevel > 1) eloToPrev = faceitElo - color.levels[faceitLevel].min
+  if (faceitLevel == 10) return `${faceitElo} (-${eloToPrev}/+0)`
+
   const eloToNext = color.levels[faceitLevel + 1].min - faceitElo
-  return `${faceitElo} (+${eloToNext})`
+
+  return `${faceitElo} (-${eloToPrev}/+${eloToNext})`
 }
 
 const getPlayerHistory = async (playerId, maxMatch, eloMatches = true) => {
