@@ -11,6 +11,7 @@ const getTranslations = (key, replace) => {
 }
 
 const getTranslation = (key, language, replace) => {
+  const keyReg = new RegExp(/^[a-zA-Z0-9]+\.[a-zA-Z0-9]+(?:\.[a-zA-Z0-9]+)*$/gi)
   let languageConf
   language = languages[language] || 'en-US'
 
@@ -23,7 +24,7 @@ const getTranslation = (key, language, replace) => {
 
   if (replace) Object.keys(replace).forEach(key => {
     let value = replace[key].toString()
-    if (value?.includes('.')) value = getStrings(value, languageConf)
+    if (keyReg.test(value)) value = getStrings(value, languageConf)
     string = string.replace(`{${key}}`, value.toLowerCase())
   })
 
