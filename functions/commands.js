@@ -1,7 +1,5 @@
 const User = require('../database/user')
 const Team = require('../database/team')
-const Player = require('./player')
-const Steam = require('./steam')
 const RegexFun = require('./regex')
 const UserTeam = require('../database/userTeam')
 const errorCard = require('../templates/errorCard')
@@ -10,24 +8,22 @@ const noMention = require('../templates/noMention')
 const { updateRoles } = require('./roles')
 const { getTranslation } = require('../languages/setup')
 
-const getPlayerDatas = async (interaction, param, steam, discord = false) => {
-  if (steam) {
-    const steamId = await Steam.getId(param)
-    return { param: await Player.getId(steamId).catch(() => steamId), discord }
-  }
+const getPlayerDatas = async (interaction, param, steam, discord = false, faceitId = false) => {
   if (discord) {
     const userGuilds = await User.get(param)
 
     if (userGuilds.length > 0) {
       let user = userGuilds.find(e => !e.guildId)
       if (!user) user = userGuilds.find(e => e.guildId === interaction.guild.id)
-      if (user) return { param: user.faceitId, discord }
+      if (user) param = user.faceitId
     }
+
     throw getTranslation('error.user.notLinked', interaction.locale, {
       discord: `<@${param}>`
     })
   }
-  return { param, discord }
+
+  return { param: param, steam, discord, faceitId }
 }
 
 const getDefaultInteractionOption = (interaction, componentIndex = 0, selectMenuIndex = 0, optionIndex = 0, defaultValue = true) => {
@@ -39,7 +35,7 @@ const getDefaultInteractionOption = (interaction, componentIndex = 0, selectMenu
 }
 
 const getCards = async (interaction, array, fn) => {
-  return Promise.all(array.map(async obj => fn(interaction, obj.param).catch(err => noMention(errorCard(err, interaction.locale)))))
+  return Promise.all(array.map(async obj => fn(interaction, obj).catch(err => noMention(errorCard(err, interaction.locale)))))
     .then(msgs => msgs.map(msg => {
       const data = {
         embeds: msg.embeds || [],
@@ -79,47 +75,33 @@ const getUsers = async (
         team.access ||
         teamUsers?.find(user => user.faceitId === currentUser.faceitId)
       ) parameters.push(...teamUsers.map(e => {
-        return { param: e.faceitId, steam: false, discord: false }
+        return { param: e.faceitId, faceitId: true }
       }))
       else throw getTranslation('error.command.teamNoAccess', interaction.locale)
     }
   }
-  if (faceitParameters) {
-    await Promise.all(faceitParameters
-      .map(async nickname => {
-        nickname = nickname.split('/').filter(e => e).pop()
-        return await Player.getDatasFromNickname(nickname)
-          .catch(async () => {
-            const player = await Player.searchPlayer(nickname).catch(e => e)
-            return player.items?.at(0) || nickname
-          })
-      })
-    ).then(params => {
-      parameters.push(...params.map(e => {
-        return {
-          param: e?.player_id || e,
-          steam: false,
-          discord: false
-        }
-      }))
-    })
-  }
+
+  if (faceitParameters)
+    parameters.push(...faceitParameters.map(async nickname => nickname.split('/').filter(e => e).pop()).map(e => {
+      return { param: e }
+    }))
+
   if (steamParameters) {
     const steamIds = RegexFun.findSteamUIds(steamParameters)
       .slice(0, maxUser)
-      .map(e => { return { param: e, steam: true, discord: false } })
+      .map(e => { return { param: e, steam: true } })
 
     if (steamIds.length > 0) parameters.push(...steamIds)
     else parameters.push(...steamParameters?.replace(/\s+/g, ' ').split(' ').map(e => {
       return {
         param: e,
         steam: true,
-        discord: false
       }
     }))
   }
+
   if (parameters.length === 0 && currentUser) {
-    parameters.push({ param: currentUser.faceitId, steam: false, discord: false })
+    parameters.push({ param: currentUser.faceitId, faceitId: true })
     updateRoles(interaction.client, interaction.user.id)
   }
 
@@ -131,11 +113,9 @@ const getUsers = async (
         res.map(r => {
           return {
             param: r,
-            steam: false,
-            discord: true
+            discord: true,
           }
-        })
-        : { param: e.param.split('/').filter(e => e).pop(), steam: e.steam, discord: e.discord }
+        }) : { param: e.param.split('/').filter(e => e).pop(), steam: e.steam, discord: e.discord, faceitId: e.faceitId }
     )
   })
 
@@ -143,7 +123,7 @@ const getUsers = async (
 
   return Promise.all(params
     .slice(0, maxUser)
-    .map(e => getPlayerDatas(interaction, e.param, e.steam, e.discord)))
+    .map(e => getPlayerDatas(interaction, e.param, e.steam, e.discord, e.faceitId)))
 }
 
 const getCardsConditions = async (
