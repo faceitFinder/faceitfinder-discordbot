@@ -82,7 +82,7 @@ const getUsers = async (
   }
 
   if (faceitParameters)
-    parameters.push(...faceitParameters.map(async nickname => nickname.split('/').filter(e => e).pop()).map(e => {
+    parameters.push(...faceitParameters.map(nickname => nickname.split('/').filter(e => e).pop()).map(e => {
       return { param: e }
     }))
 
