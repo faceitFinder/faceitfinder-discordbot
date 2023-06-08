@@ -1,13 +1,13 @@
 const Discord = require('discord.js')
-const Player = require('../functions/player')
 const User = require('../database/user')
 const { getCardsConditions, getInteractionOption } = require('../functions/commands')
 const successCard = require('../templates/successCard')
 const { updateRoles } = require('../functions/roles')
 const errorCard = require('../templates/errorCard')
 const { getTranslations, getTranslation } = require('../languages/setup')
+const { getStats } = require('../functions/apiHandler')
 
-const sendCardWithInfo = async (interaction, playerId) => {
+const sendCardWithInfo = async (interaction, playerParam) => {
   const discordId = interaction.user.id
   const discordUserId = getInteractionOption(interaction, 'discord_user')
   const nickname = getInteractionOption(interaction, 'nickname')
@@ -29,18 +29,23 @@ const sendCardWithInfo = async (interaction, playerId) => {
             discord: `<@${discordUserId}>`
           }), lang)
 
-        return link(interaction, playerId, discordUserId, guild.id, nickname)
+        return link(interaction, playerParam, discordUserId, guild.id, nickname)
       })
       .catch(() => errorCard('error.user.notFound', lang))
   }
 
-  return link(interaction, playerId, discordId, null, nickname)
+  return link(interaction, playerParam, discordId, null, nickname)
 }
 
-const link = async (interaction, playerId, discordId, guildId = null, nickname) => {
-  let playerDatas
-  try { playerDatas = await Player.getDatas(playerId) }
-  catch (error) { return errorCard(error, interaction.locale) }
+const link = async (interaction, playerParam, discordId, guildId = null, nickname) => {
+  const {
+    playerDatas
+  } = await getStats({
+    playerParam,
+    matchNumber: 1
+  })
+
+  const playerId = playerDatas.player_id
 
   if (!guildId) await User.remove(discordId)
   const user = await User.exists(discordId, guildId)
