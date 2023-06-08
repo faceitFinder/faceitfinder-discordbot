@@ -4,7 +4,7 @@ const { getTypePage } = require('../../functions/commandStats')
 const loadingCard = require('../../templates/loadingCard')
 
 module.exports = {
-  name: 'pageLast',
+  name: 'pageFind',
   async execute(interaction, json) {
     const players = interaction.message.components.at(3)?.components.map(p => JSON.parse(p.customId).s) || []
     const excludedPlayers = interaction.message.components.at(4)?.components.map(p => p.customId) || []
