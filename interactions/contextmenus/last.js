@@ -16,6 +16,9 @@ module.exports = {
       }), interaction.locale)
     }
     await GuildRoles.updateRoles(interaction.client, user.discordId)
-    return Last.sendCardWithInfo(interaction, user.faceitId)
+    return Last.sendCardWithInfo(interaction, {
+      param: user.faceitId,
+      faceitId: true
+    })
   }
 }

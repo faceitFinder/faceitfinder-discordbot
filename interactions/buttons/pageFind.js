@@ -1,18 +1,22 @@
 const CommandsStats = require('../../database/commandsStats')
-const { sendCardWithInfo } = require('../../commands/last')
+const { sendCardWithInfo } = require('../../commands/find')
 const { getTypePage } = require('../../functions/commandStats')
 const loadingCard = require('../../templates/loadingCard')
 
 module.exports = {
   name: 'pageLast',
-  async execute(interaction, json) {   
-    CommandsStats.create('last', `button - ${getTypePage(json)}`, interaction)
+  async execute(interaction, json) {
+    const players = interaction.message.components.at(3)?.components.map(p => JSON.parse(p.customId).s) || []
+    const excludedPlayers = interaction.message.components.at(4)?.components.map(p => p.customId) || []
+
+    CommandsStats.create('find', `button - ${getTypePage(json)}`, interaction)
+
     loadingCard(interaction)
 
     return sendCardWithInfo(interaction, {
       param: json.s,
       faceitId: true
-    }, null, json.page, json.m, json.l)
+    }, null, json.page, json.m, json.l, players, excludedPlayers)
   },
   getJSON(interaction, json) {
     const values = interaction.message.components.at(0).components.at(0).options.at(0).value
