@@ -1,29 +1,35 @@
 const { color } = require('../../config.json')
 const Discord = require('discord.js')
 const fs = require('fs')
-const Player = require('../../functions/player')
-const Steam = require('../../functions/steam')
 const Graph = require('../../functions/graph')
 const DateStats = require('../../functions/dateStats')
 const loadingCard = require('../../templates/loadingCard')
 const errorCard = require('../../templates/errorCard')
 const { getTranslation } = require('../../languages/setup')
+const { getStats } = require('../../functions/apiHandler')
 
 const sendCardWithInfo = async (interaction, playerId, map, mode) => {
   if (!map) return
-  const playerDatas = await Player.getDatas(playerId)
-  const playerStats = await Player.getStats(playerId)
-  const steamDatas = await Steam.getDatas(playerDatas.steam_id_64).catch(err => err.statusText)
+
+  const {
+    playerDatas,
+    playerStats,
+    steamDatas,
+    playerLastStats,
+  } = await getStats({
+    playerParam: {
+      param: playerId,
+      faceitId: true,
+    },
+    matchNumber: 0,
+    checkElo: true,
+    map,
+  })
 
   const faceitLevel = playerDatas.games.csgo.skill_level
   const faceitElo = playerDatas.games.csgo.faceit_elo
-  const maxMatch = playerStats.lifetime.Matches
   const size = 40
   const filesAtt = []
-
-  let playerHistory = await DateStats.getPlayerHistory(playerId, maxMatch)
-  playerHistory = playerHistory.filter(e => e.i1.indexOf(map) !== -1 && e.gameMode === mode)
-  const elo = Graph.getEloGain(interaction, playerDatas.nickname, maxMatch, playerHistory, faceitElo, true).filter(e => e).reduce((a, b) => a + b, 0)
 
   const rankImageCanvas = await Graph.getRankImage(faceitLevel, faceitElo, size)
   filesAtt.push(new Discord.AttachmentBuilder(rankImageCanvas, { name: 'level.png' }))
@@ -46,8 +52,19 @@ const sendCardWithInfo = async (interaction, playerId, map, mode) => {
         { name: 'Mode', value: mode, inline: true },
         { name: '\u200b', value: '\u200b', inline: true },
         { name: 'Games', value: m.stats.Matches.toString(), inline: true },
-        { name: 'Winrate', value: `${m.stats['Win Rate %']}%`, inline: true },
-        { name: 'Elo Gain', value: isNaN(elo) ? '0' : elo > 0 ? `+${elo}` : elo.toString(), inline: true },
+        { name: 'Winrate', value: `${playerLastStats.winrate.toFixed(2)}%`, inline: true },
+        {
+          name: 'Elo Gain',
+          value: isNaN(playerLastStats.eloGain) ?
+            '0'
+            : playerLastStats.eloGain > 0 ?
+              `+${playerLastStats.eloGain}`
+              : playerLastStats.eloGain.toString(),
+          inline: true
+        },
+        { name: 'K/D', value: playerLastStats.kd.toFixed(2), inline: true },
+        { name: 'Kills', value: playerLastStats.kills.toString(), inline: true },
+        { name: 'Deaths', value: playerLastStats.deaths.toString(), inline: true },
         { name: 'Average K/D', value: m.stats['Average K/D Ratio'], inline: true },
         { name: 'Average HS', value: `${m.stats['Average Headshots %']}%`, inline: true },
         { name: 'Average MVPs', value: m.stats['Average MVPs'], inline: true },

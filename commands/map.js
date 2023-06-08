@@ -1,18 +1,25 @@
 const { emojis } = require('../config.json')
 const Discord = require('discord.js')
-const Player = require('../functions/player')
 const Options = require('../templates/options')
 const { getCardsConditions, getInteractionOption } = require('../functions/commands')
 const mapSelector = require('../interactions/selectmenus/mapSelector')
 const { getMapOption } = require('../functions/map')
 const { getTranslations, getTranslation } = require('../languages/setup')
+const { getStats } = require('../functions/apiHandler')
 
-const sendCardWithInfo = async (interaction, playerId) => {
-  const playerStats = await Player.getStats(playerId)
-  const playerDatas = await Player.getDatas(playerId)
-
+const sendCardWithInfo = async (interaction, playerParam) => {
   const options = []
   const map = getInteractionOption(interaction, 'map')
+
+  const {
+    playerDatas,
+    playerStats,
+  } = await getStats({
+    playerParam,
+    matchNumber: 1
+  })
+
+  const playerId = playerDatas.player_id
 
   playerStats.segments.forEach(e => {
     const label = `${e.label} ${e.mode}`
@@ -25,7 +32,12 @@ const sendCardWithInfo = async (interaction, playerId) => {
     if (!options.filter(e => e.data.label === label).length > 0) {
       const option = new Discord.StringSelectMenuOptionBuilder()
         .setLabel(label)
-        .setDescription(getTranslation('strings.matchPlayed', interaction.locale, { matchNumber: `${e.stats.Matches} (${e.stats['Win Rate %']}%)` }))
+        .setDescription(
+          getTranslation(
+            'strings.matchPlayed',
+            interaction.locale, { matchNumber: `${e.stats.Matches} (${e.stats['Win Rate %']}%)` }
+          )
+        )
         .setValue(JSON.stringify(values))
         .setDefault(`${map} 5v5` === label)
 
