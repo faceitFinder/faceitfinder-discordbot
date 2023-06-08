@@ -42,7 +42,7 @@ const sendCardWithInfo = async (interaction, playerParam, type = CustomType.TYPE
     u: interaction.user.id
   }
 
-  const graphBuffer = Graph.generateChart(interaction, playerDatas.nickname, playerHistory, faceitElo, maxMatch, type)
+  const graphBuffer = Graph.generateChart(interaction, playerDatas.nickname, playerHistory, maxMatch, type)
 
   const faceitLevel = playerDatas.games.csgo.skill_level
   const size = 40
@@ -57,12 +57,14 @@ const sendCardWithInfo = async (interaction, playerParam, type = CustomType.TYPE
     })
     .setDescription(`[Steam](https://steamcommunity.com/profiles/${playerDatas.games.csgo.game_player_id}), [Faceit](https://www.faceit.com/en/players/${playerDatas.nickname})`)
     .setThumbnail(`attachment://${faceitLevel}level.png`)
-    .addFields({ name: 'Games', value: `${playerStats.lifetime.Matches} (${playerStats.lifetime['Win Rate %']}% Win)`, inline: true },
+    .addFields(
+      { name: 'Games', value: `${playerStats.lifetime.Matches} (${playerStats.lifetime['Win Rate %']}% Win)`, inline: true },
       { name: 'K/D', value: playerStats.lifetime['Average K/D Ratio'], inline: true },
       { name: 'HS', value: `${playerStats.lifetime['Average Headshots %']}%`, inline: true },
-      { name: 'Elo', value: playerLastStats['Current elo'], inline: true },
+      { name: 'Elo', value: playerLastStats['Current Elo'], inline: true },
       { name: `:flag_${playerCountry.toLowerCase()}:`, value: ladderCountry.position.toString(), inline: true },
-      { name: `:flag_${playerRegion.toLowerCase()}:`, value: ladderRegion.position.toString(), inline: true })
+      { name: `:flag_${playerRegion.toLowerCase()}:`, value: ladderRegion.position.toString(), inline: true }
+    )
     .setImage('attachment://graph.png')
     .setColor(color.levels[faceitLevel].color)
     .setFooter({ text: `Steam: ${steamDatas?.personaname || steamDatas}` })
