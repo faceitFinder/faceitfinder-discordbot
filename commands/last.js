@@ -91,15 +91,17 @@ const sendCardWithInfo = async (
   maxMatch = null
 ) => {
   const map = getInteractionOption(interaction, 'map')
+  maxMatch = getInteractionOption(interaction, 'match_number') ?? maxMatch ?? 25
   if (map) mapName = map
 
   let {
     playerDatas,
     steamDatas,
-    playerHistory
+    playerHistory,
+    playerLastStats
   } = await getStats({
     playerParam,
-    matchNumber: 0,
+    matchNumber: maxMatch,
     map: mapName || '',
     startDate: '',
     endDate: '',
@@ -113,7 +115,7 @@ const sendCardWithInfo = async (
   return getLastCard({
     interaction,
     mapName,
-    maxMatch: maxMatch ?? playerHistory.length,
+    maxMatch: maxMatch ?? playerLastStats.games,
     playerDatas,
     matchId,
     steamDatas,
@@ -182,6 +184,7 @@ const getLastCard = async ({
               u: interaction.user.id,
               s: playerId,
               m: mapName,
+              l: maxMatch
             })
           }])),
     new Discord.ActionRowBuilder()
@@ -202,6 +205,18 @@ const getLastCard = async ({
 const getOptions = () => {
   const options = structuredClone(Options.stats)
   options.unshift(getMapOption())
+  options.push({
+    name: 'match_number',
+    description: getTranslation('options.matchNumber', 'en-US', {
+      default: '25'
+    }),
+    descriptionLocalizations: getTranslations('options.matchNumber', {
+      default: '25'
+    }),
+    required: false,
+    type: Discord.ApplicationCommandOptionType.Integer,
+    slash: true,
+  })
 
   return options
 }
@@ -211,7 +226,7 @@ module.exports = {
   options: getOptions(),
   description: getTranslation('command.last.description', 'en-US'),
   descriptionLocalizations: getTranslations('command.last.description'),
-  usage: `${Options.usage} <map>`,
+  usage: `${Options.usage} <map> <match_number>`,
   example: 'steam_parameters: justdams',
   type: 'stats',
   async execute(interaction) {

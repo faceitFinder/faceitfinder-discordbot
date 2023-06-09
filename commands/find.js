@@ -153,7 +153,7 @@ const sendCardWithInfo = async (
     .setColor(color.levels[faceitLevel].color)
     .setFooter({ text: `Steam: ${steamDatas?.personaname || steamDatas}` })
 
-  matchNumber = matchNumber < 1 ? playerHistory.length : matchNumber
+  matchNumber = matchNumber < 1 ? playerLastStats.games : matchNumber
 
   const {
     embeds,
