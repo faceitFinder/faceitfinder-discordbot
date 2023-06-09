@@ -4,9 +4,9 @@ const loadingCard = require('../../templates/loadingCard')
 const UserTeam = require('../../database/userTeam')
 const Team = require('../../database/team')
 const User = require('../../database/user')
-const Player = require('../../functions/player')
 const errorCard = require('../../templates/errorCard')
 const { setOptionValues } = require('../../functions/dateStats')
+const { getStats } = require('../../functions/apiHandler')
 
 module.exports = {
   name: 'teamInfoSelector',
@@ -50,7 +50,15 @@ module.exports = {
     }
 
     const usersInfo = await Promise.all(teamUsers.map(async user => {
-      const playerDatas = await Player.getDatas(user.faceitId)
+      const {
+        playerDatas,
+      } = await getStats({
+        playerParam: {
+          param: user.faceitId,
+          faceitId: true
+        },
+        matchNumber: 1
+      })
 
       return {
         user: user,
