@@ -63,12 +63,21 @@ const sendCardWithInfo = async (interaction, player1Param, player2Param, type = 
   let maxMatchLimit
   let limits
 
-  if (map) limits = getMaxMatchLimit(
-    player1,
-    player2,
-    (p) => parseInt(p.playerStats.segments.find(segment => segment.label === map && segment.mode === '5v5').stats.Matches)
-  )
-  else limits = getMaxMatchLimit(
+  if (map) {
+    [player1, player2].map(p => {
+      mapStats = p.playerStats.segments.filter(segment => segment.label === map && segment.mode === '5v5')
+
+      if (!mapStats?.stats) throw getTranslation('error.user.mapNotPlayed', interaction.locale, {
+        playerName: p.playerDatas.nickname,
+      })
+    })
+
+    limits = getMaxMatchLimit(
+      player1,
+      player2,
+      (p) => parseInt(p.playerStats.segments.find(segment => segment.label === map && segment.mode === '5v5').stats.Matches)
+    )
+  } else limits = getMaxMatchLimit(
     player1,
     player2,
     (p) => parseInt(p.playerStats.lifetime.Matches)
