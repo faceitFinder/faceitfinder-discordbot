@@ -1,4 +1,4 @@
-const { color, emojis } = require('../config.json')
+const { color, emojis, itemByPage } = require('../config.json')
 const Discord = require('discord.js')
 const fs = require('fs')
 const Graph = require('../functions/graph')
@@ -17,19 +17,19 @@ const getLevelFromElo = (elo) => {
   return colorLevel?.at(0)
 }
 
-const getMatchItems = (interaction, playerDatas, steamDatas, playerHistory, maxMatch, page, matchId) => {
+const getMatchItems = async (interaction, playerDatas, steamDatas, playerHistory, matchId) => {
   const size = 40
   const filesAtt = []
   const cards = []
   const faceitElo = playerDatas.games.csgo.faceit_elo
-
   const matchStats = playerHistory.filter(e => e.matchId === matchId)
+
   if (cards.length === 0)
     matchStats.forEach(async (roundStats, i) => {
       const card = new Discord.EmbedBuilder()
       const mapName = roundStats.i1
       const result = Math.max(...roundStats.i18.split('/').map(Number)) === parseInt(roundStats.c5)
-      const eloGain = roundStats.eloGain
+      const eloGain = roundStats?.eloGain || 0
       const level = getLevelFromElo(roundStats.elo)
 
       if (level !== undefined) {
@@ -86,10 +86,12 @@ const sendCardWithInfo = async (
   matchId = null,
   page = 0,
   mapName = null,
-  maxMatch = null
+  maxMatch = null,
+  lastSelectorId = 'lastSelector',
+  pageId = 'pageLast'
 ) => {
   const map = getInteractionOption(interaction, 'map')
-  maxMatch = maxMatch || 25 * (page + 1)
+  maxMatch = maxMatch || itemByPage * (page + 1)
   if (map) mapName = map
   if (mapName) maxMatch = 0
 
@@ -109,22 +111,50 @@ const sendCardWithInfo = async (
 
   if (mapName) maxMatch = playerHistory.length
 
-  const playerId = playerDatas.player_id
-  const files = []
-  const pagination = getPageSlice(page)
-
   if (!playerHistory.length > 0) return errorCard(getTranslation('error.user.lastMatchNoStats', interaction.locale, {
     playerName: playerDatas.nickname,
   }), interaction.locale)
 
+  return getLastCard({
+    interaction,
+    mapName,
+    maxMatch,
+    playerStats,
+    playerDatas,
+    matchId,
+    steamDatas,
+    playerHistory,
+    page,
+    lastSelectorId,
+    pageId
+  })
+}
+
+const getLastCard = async ({
+  interaction,
+  playerStats,
+  playerDatas,
+  steamDatas,
+  playerHistory,
+  maxMatch,
+  mapName = '',
+  matchId = null,
+  page = 0,
+  lastSelectorId = 'lastSelector',
+  pageId = 'pageLast'
+}) => {
+  const playerId = playerDatas.player_id
+  const files = []
+  const pagination = getPageSlice(page)
+  const maxPage = getMaxPage(Array(mapName ? maxMatch : +playerStats.lifetime.Matches))
+
   // Removing multiple ids
   const filteredHistory = playerHistory.map(e => e.matchId).filter((e, i, a) => a.indexOf(e) === i).slice(0, maxMatch)
   playerHistory = playerHistory.filter(e => filteredHistory.includes(e.matchId))
-  const maxPage = getMaxPage(Array(mapName ? maxMatch : +playerStats.lifetime.Matches))
 
   if (!matchId) matchId = filteredHistory.slice(pagination.start, pagination.end).at(0)
 
-  const matchItems = getMatchItems(interaction, playerDatas, steamDatas, playerHistory, playerHistory.length, page, matchId)
+  const matchItems = await getMatchItems(interaction, playerDatas, steamDatas, playerHistory, matchId)
   const options = filteredHistory.map(e => {
     const matchRounds = playerHistory.filter(matches => matches.matchId === e)
     const match = matchRounds.at(0)
@@ -164,10 +194,10 @@ const sendCardWithInfo = async (
     new Discord.ActionRowBuilder()
       .addComponents(
         new Discord.StringSelectMenuBuilder()
-          .setCustomId('lastSelector')
+          .setCustomId(lastSelectorId)
           .setPlaceholder(getTranslation('strings.selectAnotherMatch', interaction.locale))
           .addOptions(options.slice(pagination.start, pagination.end))),
-    getPagination(interaction, page, maxPage, 'pageLast')
+    getPagination(interaction, page, maxPage, pageId)
   ]
 
   return {
@@ -198,3 +228,4 @@ module.exports = {
 
 module.exports.sendCardWithInfo = sendCardWithInfo
 module.exports.getMatchItems = getMatchItems
+module.exports.getLastCard = getLastCard

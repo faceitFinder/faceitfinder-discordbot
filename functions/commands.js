@@ -54,7 +54,8 @@ const getUsers = async (
   maxUser = 10,
   steam = 'steam_parameters',
   faceit = 'faceit_parameters',
-  searchTeam = true
+  searchTeam = true,
+  searchCurrentUser = true
 ) => {
   let team = getInteractionOption(interaction, 'team')?.toLowerCase().trim().split(' ')[0]
   const faceitParameters = getInteractionOption(interaction, faceit)?.replace(/\s+/g, ' ').split(' ')
@@ -100,7 +101,7 @@ const getUsers = async (
     }))
   }
 
-  if (parameters.length === 0 && currentUser) {
+  if (parameters.length === 0 && currentUser && searchCurrentUser) {
     parameters.push({ param: currentUser.faceitId, faceitId: true })
     updateRoles(interaction.client, interaction.user.id)
   }
@@ -119,7 +120,7 @@ const getUsers = async (
     )
   })
 
-  if (params.length === 0) throw getTranslation('error.user.noParametersNoLink', interaction.locale)
+  if (params.length === 0 && searchCurrentUser) throw getTranslation('error.user.noParametersNoLink', interaction.locale)
 
   return Promise.all(params
     .slice(0, maxUser)

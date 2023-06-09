@@ -1,8 +1,9 @@
 const Discord = require('discord.js')
 const loadingCard = require('../../templates/loadingCard')
-const { updateOptions, getPlayerHistory } = require('../../functions/dateStats')
+const { updateOptions } = require('../../functions/dateStats')
 const { getMatchItems } = require('../../commands/last')
 const { getStats } = require('../../functions/apiHandler')
+const { itemByPage } = require('../../config.json')
 
 const updateEmbedMessage = async (interaction, playerId, matchId, page) => {
   const {
@@ -14,10 +15,10 @@ const updateEmbedMessage = async (interaction, playerId, matchId, page) => {
       param: playerId,
       faceitId: true
     },
-    matchNumber: 0
+    matchNumber: itemByPage * (page + 1)
   })
 
-  return getMatchItems(interaction, playerDatas, steamDatas, playerHistory, playerHistory.length, page, matchId)
+  return getMatchItems(interaction, playerDatas, steamDatas, playerHistory, matchId)
 }
 
 module.exports = {
@@ -53,7 +54,7 @@ module.exports = {
     const dataRow = interaction.message.components.at(0)
     const value = JSON.parse(dataRow.components.at(0).options.at(0).value)
     const m = interaction.values.at(0)
-    
+
     return { ...value, m, dataRow }
   },
   updateUser(interaction) {
