@@ -3,9 +3,8 @@ const loadingCard = require('../../templates/loadingCard')
 const { updateOptions } = require('../../functions/dateStats')
 const { getMatchItems } = require('../../commands/last')
 const { getStats } = require('../../functions/apiHandler')
-const { itemByPage } = require('../../config.json')
 
-const updateEmbedMessage = async (interaction, playerId, matchId, page, map) => {
+const updateEmbedMessage = async (interaction, playerId, matchId, map) => {
   const {
     playerDatas,
     steamDatas,
@@ -15,7 +14,8 @@ const updateEmbedMessage = async (interaction, playerId, matchId, page, map) => 
       param: playerId,
       faceitId: true
     },
-    matchNumber: map ? 0 : itemByPage * (page + 1)
+    matchNumber: 0,
+    map: map || '',
   })
 
   return getMatchItems(interaction, playerDatas, steamDatas, playerHistory, matchId)
@@ -27,8 +27,6 @@ module.exports = {
     const optionsComponents = interaction.message.components.at(1).components
     const paginationComponents = interaction.message.components.at(2)
     const playerStatsCard = interaction.message.embeds.filter(e => e.data.image.url.includes('graph'))?.at(0)
-
-    const currentPage = JSON.parse(paginationComponents.components.at(0).customId).c
 
     loadingCard(interaction)
 
@@ -42,7 +40,7 @@ module.exports = {
       paginationComponents
     ]
 
-    const messageItems = await updateEmbedMessage(interaction, values.s, values.l, currentPage, values.m)
+    const messageItems = await updateEmbedMessage(interaction, values.s, values.l, values.m)
     if (playerStatsCard) messageItems.embeds.unshift(playerStatsCard)
 
     return {
