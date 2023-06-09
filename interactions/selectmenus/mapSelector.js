@@ -37,7 +37,7 @@ const sendCardWithInfo = async (interaction, playerId, map, mode) => {
   const mapThumbnail = `./images/maps/${map}.jpg`
   const playerMapStats = playerStats.segments.filter(e => e.label === map && e.mode == mode)
 
-  if (playerMapStats.length === 0) return errorCard(getTranslation('error.user.mapNotPlayed', {
+  if (playerMapStats.length === 0) return errorCard(getTranslation('error.user.mapNotPlayed', interaction.locale, {
     playerName: playerDatas.nickname,
   }), interaction.locale)
 
