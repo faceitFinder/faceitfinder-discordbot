@@ -5,7 +5,7 @@ const { getMatchItems } = require('../../commands/last')
 const { getStats } = require('../../functions/apiHandler')
 const { itemByPage } = require('../../config.json')
 
-const updateEmbedMessage = async (interaction, playerId, matchId, page) => {
+const updateEmbedMessage = async (interaction, playerId, matchId, page, map) => {
   const {
     playerDatas,
     steamDatas,
@@ -15,7 +15,7 @@ const updateEmbedMessage = async (interaction, playerId, matchId, page) => {
       param: playerId,
       faceitId: true
     },
-    matchNumber: itemByPage * (page + 1)
+    matchNumber: map ? 0 : itemByPage * (page + 1)
   })
 
   return getMatchItems(interaction, playerDatas, steamDatas, playerHistory, matchId)
@@ -38,11 +38,13 @@ module.exports = {
         .addComponents(
           new Discord.StringSelectMenuBuilder()
             .setCustomId('lastSelector')
-            .addOptions(updateOptions(optionsComponents, values.m, false))),
+            .addOptions(updateOptions(optionsComponents, values.l, false))),
       paginationComponents
     ]
 
-    const messageItems = await updateEmbedMessage(interaction, values.s, values.m, currentPage)
+    console.log(values)
+
+    const messageItems = await updateEmbedMessage(interaction, values.s, values.l, currentPage, values.m)
     if (playerStatsCard) messageItems.embeds.unshift(playerStatsCard)
 
     return {
@@ -55,7 +57,7 @@ module.exports = {
     const value = JSON.parse(dataRow.components.at(0).options.at(0).value)
     const m = interaction.values.at(0)
 
-    return { ...value, m, dataRow }
+    return { ...value, l: m, dataRow }
   },
   updateUser(interaction) {
     const values = this.getJSON(interaction)
