@@ -42,8 +42,6 @@ module.exports = {
       paginationComponents
     ]
 
-    console.log(values)
-
     const messageItems = await updateEmbedMessage(interaction, values.s, values.l, currentPage, values.m)
     if (playerStatsCard) messageItems.embeds.unshift(playerStatsCard)
 
