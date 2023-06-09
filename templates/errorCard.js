@@ -1,9 +1,9 @@
 const { color, name } = require('../config.json')
 const Discord = require('discord.js')
-const { getTranslation } = require('../languages/setup')
+const { getTranslation, keyReg } = require('../languages/setup')
 
 module.exports = (description, lang) => {
-  if (typeof description === 'string' && !description.includes(' ') && description.includes('.')) description = getTranslation(description, lang)
+  if (typeof description === 'string' && keyReg.test(description)) description = getTranslation(description, lang)
 
   return {
     embeds: [new Discord.EmbedBuilder()
