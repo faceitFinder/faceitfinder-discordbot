@@ -11,7 +11,7 @@ const sendCardWithInfo = async (interaction, playerParam, type = CustomType.TYPE
   const { from, to } = DateStats.getFromTo(interaction)
 
   const map = getInteractionOption(interaction, 'map')
-  const maxMatch = getInteractionOption(interaction, 'match_number') || 20
+  const maxMatch = getInteractionOption(interaction, 'match_number') ?? 20
   const lastMatchString = getTranslation('strings.lastStatsLabel', interaction.locale)
   
   const {
