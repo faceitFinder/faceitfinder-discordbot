@@ -6,6 +6,7 @@ const CustomTypeFunc = require('../functions/customType')
 const { getPagination } = require('./pagination')
 const { getInteractionOption } = require('./commands')
 const { getStats } = require('./apiHandler')
+const { getTranslation } = require('../languages/setup')
 
 const getDates = async (playerHistory, getDay) => {
   const dates = new Map()
@@ -58,6 +59,10 @@ const getCardWithInfo = async (
     endDate,
     map: map || '',
     checkElo: +((startDate !== '' ? today >= startDate : true) && today <= endDate)
+  })
+
+  if (!playerLastStats.games) throw getTranslation('error.user.noMatches', interaction.locale, {
+    playerName: playerDatas.nickname
   })
 
   const faceitLevel = playerDatas.games.csgo.skill_level
