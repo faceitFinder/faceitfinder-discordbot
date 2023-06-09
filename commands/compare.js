@@ -112,11 +112,6 @@ const sendCardWithInfo = async (interaction, player1Param, player2Param, type = 
   if (map) fields.push({ name: 'Map', value: map, inline: true })
 
   fields.push({
-    name: 'From',
-    value: new Date(playerWithLessMatch.playerLastStats.from).toDateString(),
-    inline: false
-  },
-  {
     name: 'Winrate',
     value: `**${player1.playerLastStats.winrate.toFixed(2)}%** - \
     ${player2.playerLastStats.winrate.toFixed(2)}% \
