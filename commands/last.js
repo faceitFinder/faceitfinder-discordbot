@@ -86,30 +86,25 @@ const sendCardWithInfo = async (
   matchId = null,
   page = 0,
   mapName = null,
-  maxMatch = null,
   lastSelectorId = 'lastSelector',
-  pageId = 'pageLast'
+  pageId = 'pageLast',
+  maxMatch = null
 ) => {
   const map = getInteractionOption(interaction, 'map')
-  maxMatch = maxMatch || itemByPage * (page + 1)
   if (map) mapName = map
-  if (mapName) maxMatch = 0
 
   let {
     playerDatas,
-    playerStats,
     steamDatas,
     playerHistory
   } = await getStats({
     playerParam,
-    matchNumber: maxMatch,
+    matchNumber: 0,
     map: mapName || '',
     startDate: '',
     endDate: '',
     checkElo: +(page === 0),
   })
-
-  if (mapName) maxMatch = playerHistory.length
 
   if (!playerHistory.length > 0) return errorCard(getTranslation('error.user.lastMatchNoStats', interaction.locale, {
     playerName: playerDatas.nickname,
@@ -118,8 +113,7 @@ const sendCardWithInfo = async (
   return getLastCard({
     interaction,
     mapName,
-    maxMatch,
-    playerStats,
+    maxMatch: maxMatch ?? playerHistory.length,
     playerDatas,
     matchId,
     steamDatas,
@@ -132,7 +126,6 @@ const sendCardWithInfo = async (
 
 const getLastCard = async ({
   interaction,
-  playerStats,
   playerDatas,
   steamDatas,
   playerHistory,
@@ -146,11 +139,11 @@ const getLastCard = async ({
   const playerId = playerDatas.player_id
   const files = []
   const pagination = getPageSlice(page)
-  const maxPage = getMaxPage(Array(mapName ? maxMatch : +playerStats.lifetime.Matches))
 
   // Removing multiple ids
   const filteredHistory = playerHistory.map(e => e.matchId).filter((e, i, a) => a.indexOf(e) === i).slice(0, maxMatch)
   playerHistory = playerHistory.filter(e => filteredHistory.includes(e.matchId))
+  const maxPage = getMaxPage(filteredHistory)
 
   if (!matchId) matchId = filteredHistory.slice(pagination.start, pagination.end).at(0)
 

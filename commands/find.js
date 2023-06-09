@@ -72,7 +72,6 @@ const sendCardWithInfo = async (
 ) => {
   const {
     playerDatas,
-    playerStats,
     steamDatas,
     playerHistory,
     playerLastStats,
@@ -108,45 +107,53 @@ const sendCardWithInfo = async (
   includedPlayers.push(playerId)
 
   const rankImageCanvas = await Graph.getRankImage(faceitLevel, faceitElo, size)
+  const head = []
+
+  head.push({
+    name: 'From - To',
+    value: [new Date(playerLastStats.from).toDateString(), '\n', new Date(playerLastStats.to).toDateString()].join(' '),
+    inline: !!map
+  })
+
+  if (map) head.push({ name: 'Map', value: map, inline: true }, { name: '\u200b', value: '\u200b', inline: true })
 
   const selectedPlayerStats = new EmbedBuilder()
     .setAuthor({ name: playerDatas.nickname, iconURL: playerDatas.avatar || null, url: `https://www.faceit.com/en/players/${playerDatas.nickname}` })
     .setDescription(`[Steam](https://steamcommunity.com/profiles/${playerDatas.games.csgo.game_player_id}), [Faceit](https://www.faceit.com/en/players/${playerDatas.nickname})`)
     .setThumbnail(`attachment://${faceitLevel}level.png`)
-    .addFields({
-      name: 'From - To',
-      value: [new Date(playerLastStats.from).toDateString(), '\n', new Date(playerLastStats.to).toDateString()].join(' '),
-      inline: false
-    },
-    { name: 'Highest Elo', value: playerLastStats['Highest Elo'].toString(), inline: true },
-    { name: 'Lowest Elo', value: playerLastStats['Lowest Elo'].toString(), inline: true },
-    { name: 'Current Elo', value: playerLastStats['Current Elo'].toString(), inline: true },
-    { name: 'Games', value: `${playerLastStats.games} (${playerLastStats.winrate.toFixed(2)}% Win)`, inline: true },
-    {
-      name: 'Elo Gain',
-      value: isNaN(playerLastStats.eloGain) ?
-        '0'
-        : playerLastStats.eloGain > 0 ?
-          `+${playerLastStats.eloGain}`
-          : playerLastStats.eloGain.toString(),
-      inline: true
-    },
-    { name: 'Average MVPs', value: playerLastStats['Average MVPs'].toFixed(2), inline: true },
-    { name: 'K/D', value: playerLastStats.kd.toFixed(2), inline: true },
-    { name: 'Kills', value: playerLastStats.kills.toString(), inline: true },
-    { name: 'Deaths', value: playerLastStats.deaths.toString(), inline: true },
-    { name: 'Average K/D', value: playerLastStats['Average K/D'].toFixed(2), inline: true },
-    { name: 'Average K/R', value: playerLastStats['Average K/R'].toFixed(2), inline: true },
-    { name: 'Average HS', value: `${playerLastStats['Average HS'].toFixed(2)}%`, inline: true },
-    { name: 'Average Kills', value: playerLastStats['Average Kills'].toFixed(2), inline: true },
-    { name: 'Average Deaths', value: playerLastStats['Average Deaths'].toFixed(2), inline: true },
-    { name: 'Average Assists', value: playerLastStats['Average Assists'].toFixed(2), inline: true },
-    { name: 'Red K/D', value: playerLastStats['Red K/D'].toString(), inline: true },
-    { name: 'Orange K/D', value: playerLastStats['Orange K/D'].toString(), inline: true },
-    { name: 'Green K/D', value: playerLastStats['Green K/D'].toString(), inline: true })
+    .addFields(
+      ...head,
+      { name: 'Highest Elo', value: playerLastStats['Highest Elo'].toString(), inline: true },
+      { name: 'Lowest Elo', value: playerLastStats['Lowest Elo'].toString(), inline: true },
+      { name: 'Current Elo', value: playerLastStats['Current Elo'].toString(), inline: true },
+      { name: 'Games', value: `${playerLastStats.games} (${playerLastStats.winrate.toFixed(2)}% Win)`, inline: true },
+      {
+        name: 'Elo Gain',
+        value: isNaN(playerLastStats.eloGain) ?
+          '0'
+          : playerLastStats.eloGain > 0 ?
+            `+${playerLastStats.eloGain}`
+            : playerLastStats.eloGain.toString(),
+        inline: true
+      },
+      { name: 'Average MVPs', value: playerLastStats['Average MVPs'].toFixed(2), inline: true },
+      { name: 'K/D', value: playerLastStats.kd.toFixed(2), inline: true },
+      { name: 'Kills', value: playerLastStats.kills.toString(), inline: true },
+      { name: 'Deaths', value: playerLastStats.deaths.toString(), inline: true },
+      { name: 'Average K/D', value: playerLastStats['Average K/D'].toFixed(2), inline: true },
+      { name: 'Average K/R', value: playerLastStats['Average K/R'].toFixed(2), inline: true },
+      { name: 'Average HS', value: `${playerLastStats['Average HS'].toFixed(2)}%`, inline: true },
+      { name: 'Average Kills', value: playerLastStats['Average Kills'].toFixed(2), inline: true },
+      { name: 'Average Deaths', value: playerLastStats['Average Deaths'].toFixed(2), inline: true },
+      { name: 'Average Assists', value: playerLastStats['Average Assists'].toFixed(2), inline: true },
+      { name: 'Red K/D', value: playerLastStats['Red K/D'].toString(), inline: true },
+      { name: 'Orange K/D', value: playerLastStats['Orange K/D'].toString(), inline: true },
+      { name: 'Green K/D', value: playerLastStats['Green K/D'].toString(), inline: true })
     .setImage(`attachment://${playerId}graph.png`)
     .setColor(color.levels[faceitLevel].color)
     .setFooter({ text: `Steam: ${steamDatas?.personaname || steamDatas}` })
+
+  matchNumber = matchNumber < 1 ? playerHistory.length : matchNumber
 
   const {
     embeds,
@@ -154,12 +161,11 @@ const sendCardWithInfo = async (
     components
   } = await getLastCard({
     interaction,
-    playerStats,
     playerDatas,
     steamDatas,
     playerHistory,
     mapName: map,
-    maxMatch: playerHistory.length,
+    maxMatch: matchNumber,
     lastSelectorId: 'findSelector',
     pageId: 'pageFind'
   })

@@ -21,7 +21,7 @@ module.exports = {
     } = await Last.sendCardWithInfo(interaction, {
       param: json.s,
       faceitId: true
-    }, null, json.page, json.m, json.l, 'findSelector', 'pageFind')
+    }, null, json.page, json.m, 'findSelector', 'pageFind', json.l)
 
     if (playerStatsCard) embeds.unshift(playerStatsCard)
     if (players) components.push(players)
