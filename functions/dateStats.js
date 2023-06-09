@@ -5,7 +5,6 @@ const CustomType = require('../templates/customType')
 const CustomTypeFunc = require('../functions/customType')
 const { getPagination } = require('./pagination')
 const { getInteractionOption } = require('./commands')
-const { getTranslation } = require('../languages/setup')
 const { getStats } = require('./apiHandler')
 
 const getDates = async (playerHistory, getDay) => {
