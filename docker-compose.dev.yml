@@ -4,7 +4,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    restart: on-failure
+    restart: always
     container_name: faceitfinder_dev
     command: npm run dev
     links:
@@ -22,6 +22,7 @@ services:
   mongodb:
     image: mongo:latest
     container_name: faceitfinder_mongodb
+    restart: always
     hostname: mongodb
     ports:
       - '27017:27017'
@@ -30,6 +31,15 @@ services:
       - ~/mongo-volume:/data/db
     env_file:
       - .env.mongodb
+    networks:
+      - app
+
+  api:
+    image: justdams/faceitfinder-api:latest
+    restart: always
+    container_name: faceitfinder_api
+    env_file:
+      - .env
     networks:
       - app
 

@@ -4,8 +4,6 @@ const AntiSpam = require('./templates/antispam')
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildMessages] })
 const { updateRoles } = require('./functions/roles')
 
-require('dotenv').config()
-
 client.antispam = new AntiSpam()
 
 fs.readdirSync('./events').filter(file => file.endsWith('.js')).forEach(async (file) => {

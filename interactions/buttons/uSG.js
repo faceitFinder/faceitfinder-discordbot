@@ -14,7 +14,10 @@ module.exports = {
 
     loadingCard(interaction)
 
-    return Stats.sendCardWithInfo(interaction, json.s, CustomType.getType(interaction.component.label))
+    return Stats.sendCardWithInfo(interaction, {
+      param: json.s,
+      faceitId: true
+    }, CustomType.getType(interaction.component.label))
   },
   getJSON(interaction, json) {
     return json

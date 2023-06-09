@@ -2,12 +2,12 @@ const { maxLengthTeamName } = require('../config.json')
 const Discord = require('discord.js')
 const Team = require('../database/team')
 const UserTeam = require('../database/userTeam')
-const Player = require('../functions/player')
 const User = require('../database/user')
 const errorCard = require('../templates/errorCard')
 const { isInteractionSubcommandEqual, getInteractionOption, getCardsConditions } = require('../functions/commands')
 const successCard = require('../templates/successCard')
 const { getTranslation, getTranslations } = require('../languages/setup')
+const { getStats } = require('../functions/apiHandler')
 
 const INFO = 'info'
 const CREATE = 'create'
@@ -17,7 +17,9 @@ const ADD_USER = 'add_user'
 const REMOVE_USER = 'remove_user'
 
 const createTeam = async (interaction, currentTeam, user) => {
-  if (currentTeam) return errorCard('error.command.alreadyOwnTeam', interaction.locale)
+  if (currentTeam) return errorCard(getTranslation('error.command.alreadyOwnTeam', interaction.locale, {
+    teamName: currentTeam.name
+  }), interaction.locale)
   const teamName = getInteractionOption(interaction, 'name')
   const teamSlug = teamName.toLowerCase().replace(/\s/g, '-')
   if (teamName.length > maxLengthTeamName) return errorCard('error.command.teamNameTooLong', interaction.locale)
@@ -97,10 +99,16 @@ const deleteTeam = async (interaction, currentTeam, user) => {
   }), interaction.locale)
 }
 
-const addUser = async (interaction, playerId) => {
+const addUser = async (interaction, playerParam) => {
   const user = interaction.user.id
   const currentTeam = await Team.getCreatorTeam(user)
-  const playerDatas = await Player.getDatas(playerId)
+  const {
+    playerDatas
+  } = await getStats({
+    playerParam,
+    matchNumber: 1
+  })
+  const playerId = playerDatas.player_id
 
   if (await UserTeam.getUserTeam(playerId, currentTeam.slug))
     return errorCard(getTranslation('error.user.alreadyInTeam', interaction.locale, {
@@ -118,10 +126,16 @@ const addUser = async (interaction, playerId) => {
   return successCard(`${successMessage} [Steam](https://steamcommunity.com/profiles/${playerDatas.games.csgo.game_player_id}) - [Faceit](https://www.faceit.com/en/players/${playerDatas.nickname})`, interaction.locale)
 }
 
-const removeUser = async (interaction, playerId) => {
+const removeUser = async (interaction, playerParam) => {
   const user = interaction.user.id
   const currentTeam = await Team.getCreatorTeam(user)
-  const playerDatas = await Player.getDatas(playerId)
+  const {
+    playerDatas
+  } = await getStats({
+    playerParam,
+    matchNumber: 1
+  })
+  const playerId = playerDatas.player_id
 
   if (!await UserTeam.getUserTeam(playerId, currentTeam.slug))
     return errorCard(getTranslation('error.user.notInTeam', interaction.locale, {

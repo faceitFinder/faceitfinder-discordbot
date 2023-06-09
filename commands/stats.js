@@ -1,22 +1,40 @@
 const { color } = require('../config.json')
 const Discord = require('discord.js')
-const Steam = require('../functions/steam')
-const Player = require('../functions/player')
 const Graph = require('../functions/graph')
-const Match = require('../functions/match')
-const Ladder = require('../functions/ladder')
 const CustomType = require('../templates/customType')
 const CustomTypeFunc = require('../functions/customType')
 const Options = require('../templates/options')
 const { getCardsConditions } = require('../functions/commands')
 const { getTranslation, getTranslations } = require('../languages/setup')
+const { getStats, getLadder } = require('../functions/apiHandler')
 
-const sendCardWithInfo = async (interaction, playerId, type = CustomType.TYPES.ELO) => {
-  const playerDatas = await Player.getDatas(playerId)
-  const steamDatas = await Steam.getDatas(playerDatas.steam_id_64).catch(err => err.statusText)
-  const playerStats = await Player.getStats(playerId)
+const sendCardWithInfo = async (interaction, playerParam, type = CustomType.TYPES.ELO) => {
   const maxMatch = 20
-  const playerHistory = await Match.getMatchElo(playerId, maxMatch)
+
+  const {
+    playerDatas,
+    steamDatas,
+    playerStats,
+    playerHistory,
+    playerLastStats
+  } = await getStats({
+    playerParam,
+    matchNumber: maxMatch,
+    checkElo: 1
+  })
+
+  const playerId = playerDatas.player_id
+  const playerCountry = playerDatas.country
+  const playerRegion = playerDatas.games.csgo.region
+  const ladderCountry = await getLadder({
+    playerParam,
+    region: playerRegion,
+    country: playerCountry
+  })
+  const ladderRegion = await getLadder({
+    playerParam,
+    region: playerRegion,
+  })
   const faceitElo = playerDatas.games.csgo.faceit_elo
   const buttonValues = {
     id: 'uSG',
@@ -24,13 +42,7 @@ const sendCardWithInfo = async (interaction, playerId, type = CustomType.TYPES.E
     u: interaction.user.id
   }
 
-  const graphBuffer = Graph.generateChart(interaction, playerDatas.nickname, playerHistory, faceitElo, maxMatch, type)
-
-  const playerCountry = playerDatas.country
-  const playerRegion = playerDatas.games.csgo.region
-
-  const ladderCountry = await Ladder.getDatas(playerId, playerRegion, playerCountry)
-  const ladderRegion = await Ladder.getDatas(playerId, playerRegion)
+  const graphBuffer = Graph.generateChart(interaction, playerDatas.nickname, playerHistory, maxMatch, type)
 
   const faceitLevel = playerDatas.games.csgo.skill_level
   const size = 40
@@ -45,12 +57,14 @@ const sendCardWithInfo = async (interaction, playerId, type = CustomType.TYPES.E
     })
     .setDescription(`[Steam](https://steamcommunity.com/profiles/${playerDatas.games.csgo.game_player_id}), [Faceit](https://www.faceit.com/en/players/${playerDatas.nickname})`)
     .setThumbnail(`attachment://${faceitLevel}level.png`)
-    .addFields({ name: 'Games', value: `${playerStats.lifetime.Matches} (${playerStats.lifetime['Win Rate %']}% Win)`, inline: true },
+    .addFields(
+      { name: 'Games', value: `${playerStats.lifetime.Matches} (${playerStats.lifetime['Win Rate %']}% Win)`, inline: true },
       { name: 'K/D', value: playerStats.lifetime['Average K/D Ratio'], inline: true },
       { name: 'HS', value: `${playerStats.lifetime['Average Headshots %']}%`, inline: true },
-      { name: 'Elo', value: faceitElo.toString(), inline: true },
+      { name: 'Elo', value: playerLastStats['Current Elo'], inline: true },
       { name: `:flag_${playerCountry.toLowerCase()}:`, value: ladderCountry.position.toString(), inline: true },
-      { name: `:flag_${playerRegion.toLowerCase()}:`, value: ladderRegion.position.toString(), inline: true })
+      { name: `:flag_${playerRegion.toLowerCase()}:`, value: ladderRegion.position.toString(), inline: true }
+    )
     .setImage('attachment://graph.png')
     .setColor(color.levels[faceitLevel].color)
     .setFooter({ text: `Steam: ${steamDatas?.personaname || steamDatas}` })

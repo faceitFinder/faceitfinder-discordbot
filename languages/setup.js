@@ -1,5 +1,7 @@
 const { languages } = require('../config.json')
 
+const keyReg = new RegExp(/^[a-zA-Z0-9]+\.[a-zA-Z0-9]+(?:\.[a-zA-Z0-9]+)*$/i)
+
 const getTranslations = (key, replace) => {
   let languageObject = {}
 
@@ -11,7 +13,6 @@ const getTranslations = (key, replace) => {
 }
 
 const getTranslation = (key, language, replace) => {
-  const keyReg = new RegExp(/^[a-zA-Z0-9]+\.[a-zA-Z0-9]+(?:\.[a-zA-Z0-9]+)*$/gi)
   let languageConf
   language = languages[language] || 'en-US'
 
@@ -35,5 +36,6 @@ const getStrings = (key, languageConf) => key.split('.').reduce((acc, cur) => ac
 
 module.exports = {
   getTranslations,
-  getTranslation
+  getTranslation,
+  keyReg
 }

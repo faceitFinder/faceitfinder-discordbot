@@ -17,7 +17,10 @@ module.exports = {
     loadingCard(interaction)
 
     return await require(`../../commands/${commandName}.js`)
-      .sendCardWithInfo(interaction, json.s, json.page)
+      .sendCardWithInfo(interaction, {
+        param: json.s,
+        faceitId: true
+      }, json.page)
   },
   getJSON(interaction, json) {
     const values = getDefaultInteractionOption(interaction).value

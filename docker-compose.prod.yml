@@ -28,5 +28,17 @@ services:
     networks:
       - app
 
+  api:
+    image: justdams/faceitfinder-api:latest
+    restart: always
+    container_name: faceitfinder_api
+    command: npm start
+    environment:
+      - NODE_ENV=prod
+    env_file:
+      - .env
+    networks:
+      - app
+
 networks:
   app:

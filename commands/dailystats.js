@@ -1,5 +1,4 @@
-const Discord = require('discord.js')
-const Player = require('../functions/player')
+const { StringSelectMenuOptionBuilder, ActionRowBuilder, StringSelectMenuBuilder } = require('discord.js')
 const errorCard = require('../templates/errorCard')
 const DateStats = require('../functions/dateStats')
 const { getCardsConditions } = require('../functions/commands')
@@ -7,6 +6,7 @@ const CustomType = require('../templates/customType')
 const Options = require('../templates/options')
 const { getPageSlice, getMaxPage } = require('../functions/pagination')
 const { getTranslations, getTranslation } = require('../languages/setup')
+const { getStats } = require('../functions/apiHandler')
 
 const getDay = date => {
   date = new Date(date)
@@ -14,18 +14,24 @@ const getDay = date => {
   return date.getTime()
 }
 
-const sendCardWithInfo = async (interaction, playerId, page = 0) => {
-  const playerDatas = await Player.getDatas(playerId)
-  const playerStats = await Player.getStats(playerId)
+const sendCardWithInfo = async (interaction, playerParam, page = 0) => {
+  const {
+    playerDatas,
+    playerHistory
+  } = await getStats({
+    playerParam,
+    matchNumber: 0
+  })
 
+  const playerId = playerDatas.player_id
   const options = []
-  const dates = await DateStats.getDates(playerId, playerStats.lifetime.Matches, getDay)
+  const dates = await DateStats.getDates(playerHistory, getDay)
 
   dates.forEach(date => {
     const from = new Date(date.date)
     const to = new Date(date.date).setHours(24)
 
-    let option = new Discord.StringSelectMenuOptionBuilder()
+    let option = new StringSelectMenuOptionBuilder()
       .setLabel(from.toDateString())
       .setDescription(getTranslation('strings.matchPlayed', interaction.locale, { matchNumber: date.number }))
       .setValue(JSON.stringify({
@@ -47,21 +53,23 @@ const sendCardWithInfo = async (interaction, playerId, page = 0) => {
 
   pagination[0] = DateStats.setOptionDefault(pagination.at(0))
 
-  const row = new Discord.ActionRowBuilder()
+  const row = new ActionRowBuilder()
     .addComponents(
-      new Discord.StringSelectMenuBuilder()
+      new StringSelectMenuBuilder()
         .setCustomId('dateStatsSelector')
         .setPlaceholder(getTranslation('strings.selectDate', interaction.locale))
         .addOptions(pagination))
 
-  return DateStats.getCardWithInfo(interaction,
+  return DateStats.getCardWithInfo(
+    interaction,
     row,
     JSON.parse(pagination[0].data.value),
     CustomType.TYPES.ELO,
     'uDSG',
-    playerStats.lifetime.Matches,
+    0,
     getMaxPage(options),
-    page)
+    page
+  )
 }
 
 module.exports = {

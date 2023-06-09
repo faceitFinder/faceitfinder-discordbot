@@ -1,5 +1,4 @@
 const Discord = require('discord.js')
-const Player = require('../functions/player')
 const errorCard = require('../templates/errorCard')
 const DateStats = require('../functions/dateStats')
 const { getCardsConditions } = require('../functions/commands')
@@ -7,6 +6,7 @@ const CustomType = require('../templates/customType')
 const Options = require('../templates/options')
 const { getPageSlice, getMaxPage } = require('../functions/pagination')
 const { getTranslations, getTranslation } = require('../languages/setup')
+const { getStats } = require('../functions/apiHandler')
 
 const getFirstDay = (x) => {
   const a = new Date(x)
@@ -15,12 +15,18 @@ const getFirstDay = (x) => {
   return a.getTime()
 }
 
-const sendCardWithInfo = async (interaction, playerId, page = 0) => {
-  const playerStats = await Player.getStats(playerId)
-  const playerDatas = await Player.getDatas(playerId)
-
+const sendCardWithInfo = async (interaction, playerParam, page = 0) => {
+  const {
+    playerDatas,
+    playerHistory
+  } = await getStats({
+    playerParam,
+    matchNumber: 0
+  })
+  
+  const playerId = playerDatas.player_id
   const options = []
-  const dates = await DateStats.getDates(playerId, playerStats.lifetime.Matches, getFirstDay)
+  const dates = await DateStats.getDates(playerHistory, getFirstDay)
 
   dates.forEach(date => {
     const from = new Date(date.date)
@@ -55,14 +61,16 @@ const sendCardWithInfo = async (interaction, playerId, page = 0) => {
         .setPlaceholder(getTranslation('strings.selectMonth', interaction.locale))
         .addOptions(pagination))
 
-  return DateStats.getCardWithInfo(interaction,
+  return DateStats.getCardWithInfo(
+    interaction,
     row,
     JSON.parse(pagination[0].data.value),
     CustomType.TYPES.ELO,
     'uDSG',
-    playerStats.lifetime.Matches,
+    0,
     getMaxPage(options),
-    page)
+    page
+  )
 }
 
 module.exports = {
