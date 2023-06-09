@@ -1,7 +1,5 @@
 const axios = require('axios')
 
-require('dotenv').config()
-
 const headerFaceit = {
   Authorization: `Bearer ${process.env.FACEIT_TOKEN}`
 }
