@@ -70,11 +70,11 @@ const getUsers = async (
     if (!team) throw getTranslation('error.command.teamNotFound', interaction.locale)
     else {
       const teamUsers = await UserTeam.getTeamUsers(team.slug)
-
+      const teamCreator = await Team.getCreatorTeam(interaction.user.id)
 
       if (!teamUsers.length > 0) throw getTranslation('error.command.teamEmpty', interaction.locale)
-      else if (
-        (await Team.getCreatorTeam(interaction.user.id)).slug === team.slug ||
+      else if ((teamCreator && 
+        teamCreator.slug === team.slug) ||
         team.access ||
         teamUsers?.find(user => user.faceitId === currentUser.faceitId)
       ) parameters.push(...teamUsers.map(e => {
