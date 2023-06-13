@@ -238,12 +238,12 @@ module.exports = {
     const playerAimed = playerParam.playerDatas.player_id
     const searchCurrentUser = !(currentPlayer.faceitId === playerAimed)
 
-    const faceitIncluded = await Promise.all((await getUsers(interaction, 5, null, 'faceit_parameters', null, searchCurrentUser))
+    const faceitIncluded = await Promise.all((await getUsers(interaction, 5, null, 'faceit_parameters', true, searchCurrentUser))
       .map(async e => {
         if (e.faceitId) e.param = (await getFaceitPlayerDatas(e.param)).nickname
         return e.param
       }))
-    const steamIncluded = (await getUsers(interaction, 5 - faceitIncluded.length, 'steam_parameters', null, null, false))
+    const steamIncluded = (await getUsers(interaction, 5 - faceitIncluded.length, 'steam_parameters', null, true, false))
       .map(e => e.param)
     const faceitExcluded = (await getUsers(interaction, 5, null, 'excluded_faceit_parameters', null, false))
       .map(e => e.param)
