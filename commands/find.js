@@ -70,7 +70,7 @@ const sendCardWithInfo = async (
   steamExcluded,
   faceitExcluded
 ) => {
-  const {
+  let {
     playerDatas,
     steamDatas,
     playerHistory,
@@ -105,6 +105,8 @@ const sendCardWithInfo = async (
   )
 
   includedPlayers.push(playerId)
+  includedPlayers = includedPlayers.filter((v, i, a) => a.indexOf(v) === i)
+  excludedPlayers = excludedPlayers.filter((v, i, a) => a.indexOf(v) === i)
 
   const rankImageCanvas = await Graph.getRankImage(faceitLevel, faceitElo, size)
   const head = []
@@ -238,12 +240,14 @@ module.exports = {
     const playerAimed = playerParam.playerDatas.player_id
     const searchCurrentUser = !(currentPlayer.faceitId === playerAimed)
 
-    const faceitIncluded = await Promise.all((await getUsers(interaction, 5, null, 'faceit_parameters', null, searchCurrentUser))
+    const teamIncluded = (await getUsers(interaction, 5, null, null, true, null, searchCurrentUser))
+      .map(e => e.param)
+    const faceitIncluded = await Promise.all((await getUsers(interaction, 5 - teamIncluded.length, null, 'faceit_parameters', null, searchCurrentUser))
       .map(async e => {
         if (e.faceitId) e.param = (await getFaceitPlayerDatas(e.param)).nickname
         return e.param
       }))
-    const steamIncluded = (await getUsers(interaction, 5 - faceitIncluded.length, 'steam_parameters', null, null, false))
+    const steamIncluded = (await getUsers(interaction, 5 - faceitIncluded.length, 'steam_parameters', null, true, false))
       .map(e => e.param)
     const faceitExcluded = (await getUsers(interaction, 5, null, 'excluded_faceit_parameters', null, false))
       .map(e => e.param)
@@ -251,6 +255,8 @@ module.exports = {
       .map(e => e.param)
     const maxMatch = getInteractionOption(interaction, 'match_number')
     const map = getInteractionOption(interaction, 'map')
+
+    faceitIncluded.push(...teamIncluded)
 
     return sendCardWithInfo(
       interaction,

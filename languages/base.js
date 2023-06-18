@@ -93,6 +93,13 @@ module.exports = {
     excludedFaceitParameters: '',
     discordUserLink: '',
     nicknameLink: '',
+    eloRoleName: '',
+    eloRoleColor: '',
+    eloRoleMin: '',
+    eloRoleMax: '',
+    setupEloRoles: '',
+    removeEloRole: '',
+    eloRole: '',
   },
   strings: {
     selectTeam: '',
@@ -198,6 +205,9 @@ module.exports = {
       faceitMatchStatsNotFound: '',
       faceitLadderNotFound: '',
       steamIdInvalid: '',
+      invalidColor: '',
+      invalidElo: '',
+      invalidRole: '',
     }
   },
   success: {
@@ -215,6 +225,8 @@ module.exports = {
         server: '',
       },
       link: '',
+      setupEloRoles: '',
+      removeRole: '',
     }
   }
 }
