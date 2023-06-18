@@ -121,12 +121,14 @@ module.exports = {
     /**
      * Check if the interaction is a command
      */
-    else if (interaction.client.commands.has(interaction.commandName))
+    else if (interaction.client.commands.has(interaction.commandName)) {
+      const command = interaction.client.commands.get(interaction.commandName)
+
       interaction
-        .deferReply()
+        .deferReply({ ephemeral: command.ephemeral })
         .then(() => {
           CommandsStats.create(interaction.commandName, 'command', interaction)
-          interaction.client.commands.get(interaction.commandName)?.execute(interaction)
+          command?.execute(interaction)
             .then(resp => {
               if (Array.isArray(resp))
                 resp
@@ -141,5 +143,6 @@ module.exports = {
             .catch(err => errorInteraction(interaction, err, getTranslation('error.execution.command', interaction.locale)))
         })
         .catch(console.error)
+    }
   }
 }

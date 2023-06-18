@@ -3,6 +3,7 @@ const { color, name } = require('../config.json')
 const { isInteractionSubcommandEqual, getInteractionOption } = require('../functions/commands')
 const errorCard = require('../templates/errorCard')
 const GuildRoles = require('../database/guildRoles')
+const GuildCustomRole = require('../database/guildCustomRole')
 const successCard = require('../templates/successCard')
 const { updateRoles } = require('../functions/roles')
 const { getTranslations, getTranslation } = require('../languages/setup')
@@ -10,6 +11,8 @@ const { getTranslations, getTranslation } = require('../languages/setup')
 const SETUP = 'setup'
 const GENERATE = 'generate'
 const REMOVE = 'remove'
+const SETUP_ELO = 'setup_elo'
+const REMOVE_ELO = 'remove_elo'
 
 const setupRoles = async (interaction) => {
   if (getInteractionOption(interaction, 'remove_old')) await removeRoles(interaction)
@@ -109,6 +112,57 @@ const removeRoles = async (interaction) => {
   }
 }
 
+const setupEloRoles = async (interaction) => {
+  const hexaRegex = /^#([0-9a-f]{3}){2}$/i
+  const roleColor = getInteractionOption(interaction, 'role_color')
+  const eloMin = getInteractionOption(interaction, 'elo_min')
+  const eloMax = getInteractionOption(interaction, 'elo_max')
+
+  if (!hexaRegex.test(roleColor))
+    return errorCard('error.command.invalidColor', interaction.locale)
+
+  if (eloMin > eloMax)
+    return errorCard('error.command.invalidElo', interaction.locale)
+
+  const roleName = getInteractionOption(interaction, 'role_name')
+
+  const role = await interaction.guild.roles.create({
+    name: roleName.slice(0, 100),
+    color: roleColor,
+    permissions: []
+  })
+
+  GuildCustomRole.create(interaction.guild.id, role.id, eloMin, eloMax)
+
+  const card = new Discord.EmbedBuilder()
+    .setAuthor({ name: name, iconURL: 'attachment://logo.png' })
+    .setDescription(getTranslation('success.command.setupEloRoles', interaction.locale))
+    .setColor(color.primary)
+    .setFooter({ text: `${name} ${getTranslation('strings.info', interaction.locale)}` })
+
+  updateRoles(interaction.client, null, interaction.guild.id)
+
+  return {
+    embeds: [card],
+    files: [new Discord.AttachmentBuilder('./images/logo.png', { name: 'logo.png' })]
+  }
+}
+
+const removeEloRole = async (interaction) => {
+  const role = getInteractionOption(interaction, 'role')
+  const botRole = interaction.guild.roles.botRoleFor(interaction.client.user)
+  const comparaison = interaction.guild.roles.comparePositions(botRole, role)
+
+  if (!interaction.guild.roles.cache.has(role) || comparaison < 0) return errorCard('error.command.invalidRole', interaction.locale)
+
+  await interaction.guild.roles.delete(role)
+
+  const guildRole = await GuildCustomRole.getOne(interaction.guild.id, role)
+  if (guildRole) await GuildCustomRole.remove(interaction.guild.id, role)
+
+  return successCard(getTranslation('success.command.removeRole', interaction.locale), interaction.locale)
+}
+
 module.exports = {
   name: 'roles',
   options: [
@@ -160,11 +214,69 @@ module.exports = {
       descriptionLocalizations: getTranslations('options.removeRoles'),
       type: Discord.ApplicationCommandOptionType.Subcommand,
       slash: true
+    },
+    {
+      name: SETUP_ELO,
+      description: getTranslation('options.setupEloRoles', 'en-US'),
+      descriptionLocalizations: getTranslations('options.setupEloRoles'),
+      type: Discord.ApplicationCommandOptionType.Subcommand,
+      slash: true,
+      options: [
+        {
+          name: 'role_name',
+          description: getTranslation('options.eloRoleName', 'en-US'),
+          // eslint-disable-next-line camelcase
+          description_localizations: getTranslations('options.eloRoleName'),
+          type: Discord.ApplicationCommandOptionType.String,
+          required: true
+        },
+        {
+          name: 'role_color',
+          description: getTranslation('options.eloRoleColor', 'en-US'),
+          // eslint-disable-next-line camelcase
+          description_localizations: getTranslations('options.eloRoleColor'),
+          type: Discord.ApplicationCommandOptionType.String,
+          required: true
+        },
+        {
+          name: 'elo_min',
+          description: getTranslation('options.eloRoleMin', 'en-US'),
+          // eslint-disable-next-line camelcase
+          description_localizations: getTranslations('options.eloRoleMin'),
+          type: Discord.ApplicationCommandOptionType.Integer,
+          required: true
+        },
+        {
+          name: 'elo_max',
+          description: getTranslation('options.eloRoleMax', 'en-US'),
+          // eslint-disable-next-line camelcase
+          description_localizations: getTranslations('options.eloRoleMax'),
+          type: Discord.ApplicationCommandOptionType.Integer,
+          required: true
+        },
+      ]
+    },
+    {
+      name: REMOVE_ELO,
+      description: getTranslation('options.removeEloRole', 'en-US'),
+      descriptionLocalizations: getTranslations('options.removeEloRole'),
+      type: Discord.ApplicationCommandOptionType.Subcommand,
+      slash: true,
+      options: [
+        {
+          name: 'role',
+          description: getTranslation('options.eloRole', 'en-US'),
+          // eslint-disable-next-line camelcase
+          description_localizations: getTranslations('options.eloRole'),
+          type: Discord.ApplicationCommandOptionType.Role,
+          required: true
+        }
+      ]
     }
   ],
   description: getTranslation('command.roles.description', 'en-US'),
   descriptionLocalizations: getTranslations('command.roles.description'),
-  usage: `\n - ${GENERATE}\n - ${SETUP}\n - ${REMOVE}`,
+  usage: `\n - ${GENERATE}\n - ${SETUP}\n - ${REMOVE} \n - ${SETUP_ELO}`,
   type: 'utility',
   async execute(interaction) {
     if (!interaction.member.permissions.has('ManageRoles'))
@@ -177,5 +289,7 @@ module.exports = {
     if (isInteractionSubcommandEqual(interaction, GENERATE)) return await generateRoles(interaction)
     if (isInteractionSubcommandEqual(interaction, REMOVE)) return await removeRoles(interaction)
       .then(() => successCard(getTranslation('success.command.removeRoles', interaction.locale), interaction.locale))
+    if (isInteractionSubcommandEqual(interaction, SETUP_ELO)) return await setupEloRoles(interaction)
+    if (isInteractionSubcommandEqual(interaction, REMOVE_ELO)) return await removeEloRole(interaction)
   }
 }
