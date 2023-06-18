@@ -32,20 +32,30 @@ const setupRoles = async (client, user, guildRoles, remove) => {
     const rolesToAdd = []
 
     if (guildRoles?.guildId) {
-      if (playerElo >= guildRoles.eloMin && playerElo <= guildRoles.eloMax)
-        rolesToAdd.push(guildRoles.roleId)
+      rolesToAdd.push({
+        roleId: guildRoles.roleId,
+        remove: !(playerElo >= guildRoles.eloMin && playerElo <= guildRoles.eloMax && !remove)
+      })
     } else {
       const roleLevels = getRoleIds(guildRoles)
-      rolesToAdd.push(roleLevels[playerLevel - 1])
+      rolesToAdd.push({
+        roleId: roleLevels[playerLevel - 1],
+        remove
+      })
     }
 
     if (user.nickname) await member.edit({ nick: playerDatas.nickname }).catch(console.error)
 
     rolesToAdd.forEach(async (role) => {
-      const rolesFit = member.roles.resolve(role)
+      const {
+        roleId,
+        remove
+      } = role
 
-      if (remove || !rolesFit) await member.roles.remove(role).catch(console.error)
-      if (!remove && !rolesFit) await member.roles.add(role).catch(console.error)
+      const rolesFit = member.roles.resolve(roleId)
+
+      if (remove || !rolesFit) await member.roles.remove(roleId).catch(console.error)
+      if (!remove && !rolesFit) await member.roles.add(roleId).catch(console.error)
     })
   })
 }
