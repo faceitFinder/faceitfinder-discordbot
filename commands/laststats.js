@@ -5,19 +5,28 @@ const DateStats = require('../functions/dateStats')
 const CustomType = require('../templates/customType')
 const { getMapOption } = require('../functions/map')
 const { getTranslations, getTranslation } = require('../languages/setup')
+const { getStats } = require('../functions/apiHandler')
 
-const sendCardWithInfo = async (interaction, playerId, type = CustomType.TYPES.ELO) => {
+const sendCardWithInfo = async (interaction, playerParam, type = CustomType.TYPES.ELO) => {
   const { from, to } = DateStats.getFromTo(interaction)
 
   const map = getInteractionOption(interaction, 'map')
-  const maxMatch = getInteractionOption(interaction, 'match_number') || 20
+  const maxMatch = getInteractionOption(interaction, 'match_number') ?? 20
   const lastMatchString = getTranslation('strings.lastStatsLabel', interaction.locale)
+  
+  const {
+    playerDatas
+  } = await getStats({
+    playerParam,
+    matchNumber: maxMatch,
+    map: map
+  })
 
   const option = {
     label: lastMatchString,
     description: lastMatchString,
     value: JSON.stringify({
-      s: playerId,
+      s: playerDatas.player_id,
       c: map,
       m: maxMatch,
       u: interaction.user.id
@@ -36,7 +45,18 @@ const sendCardWithInfo = async (interaction, playerId, type = CustomType.TYPES.E
   if (from.toString() !== 'Invalid Date') values.f = from.getTime() / 1000
   if (to.toString() !== 'Invalid Date') values.t = to.getTime() / 1000
 
-  return DateStats.getCardWithInfo(interaction, row, values, type, 'uLSG', maxMatch, null, null, map, true)
+  return DateStats.getCardWithInfo(
+    interaction,
+    row,
+    values,
+    type,
+    'uLSG',
+    maxMatch,
+    null,
+    null,
+    map,
+    true
+  )
 }
 
 const getOptions = () => {

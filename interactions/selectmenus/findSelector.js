@@ -4,7 +4,7 @@ const { updateOptions } = require('../../functions/dateStats')
 const { getMatchItems } = require('../../commands/last')
 const { getStats } = require('../../functions/apiHandler')
 
-const updateEmbedMessage = async (interaction, playerId, matchId, map) => {
+const updateEmbedMessage = async (interaction, playerId, matchId) => {
   const {
     playerDatas,
     steamDatas,
@@ -14,18 +14,19 @@ const updateEmbedMessage = async (interaction, playerId, matchId, map) => {
       param: playerId,
       faceitId: true
     },
-    matchNumber: 0,
-    map: map || '',
+    matchNumber: 0
   })
 
   return getMatchItems(interaction, playerDatas, steamDatas, playerHistory, matchId)
 }
 
 module.exports = {
-  name: 'lastSelector',
+  name: 'findSelector',
   async execute(interaction, values) {
     const optionsComponents = interaction.message.components.at(1).components
     const paginationComponents = interaction.message.components.at(2)
+    const playerComponents = interaction.message.components.at(3)
+    const excludedPlayerComponents = interaction.message.components.at(4)
     const playerStatsCard = interaction.message.embeds.filter(e => e.data.image.url.includes('graph'))?.at(0)
 
     loadingCard(interaction)
@@ -35,12 +36,15 @@ module.exports = {
       new Discord.ActionRowBuilder()
         .addComponents(
           new Discord.StringSelectMenuBuilder()
-            .setCustomId('lastSelector')
-            .addOptions(updateOptions(optionsComponents, values.l, false))),
+            .setCustomId('findSelector')
+            .addOptions(updateOptions(optionsComponents, values.m, false))),
       paginationComponents
     ]
 
-    const messageItems = await updateEmbedMessage(interaction, values.s, values.l, values.m)
+    if (playerComponents) components.push(playerComponents)
+    if (excludedPlayerComponents) components.push(excludedPlayerComponents)
+
+    const messageItems = await updateEmbedMessage(interaction, values.s, values.m)
     if (playerStatsCard) messageItems.embeds.unshift(playerStatsCard)
 
     return {
@@ -53,7 +57,7 @@ module.exports = {
     const value = JSON.parse(dataRow.components.at(0).options.at(0).value)
     const m = interaction.values.at(0)
 
-    return { ...value, l: m, dataRow }
+    return { ...value, m, dataRow }
   },
   updateUser(interaction) {
     const values = this.getJSON(interaction)

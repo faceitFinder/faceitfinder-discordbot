@@ -15,7 +15,13 @@ module.exports = {
 
     loadingCard(interaction)
 
-    return sendCardWithInfo(interaction, json.p1, json.p2, CustomType.getType(interaction.component.label), json.m, json.c)
+    return sendCardWithInfo(interaction, {
+      param: json.p1,
+      faceitId: true
+    }, {
+      param: json.p2,
+      faceitId: true
+    }, CustomType.getType(interaction.component.label), json.m, json.c)
   },
   getJSON(interaction, json) {
     const values = getDefaultInteractionOption(interaction).value

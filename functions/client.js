@@ -1,8 +1,6 @@
 const { Api } = require('@top-gg/sdk')
 const { ActivityType } = require('discord.js')
 
-require('dotenv').config()
-
 const guildCount = (client) => {
   const Guilds = client.guilds.cache.map(guild => guild.id)
   client.user.setActivity(`/help | ${Guilds.length} servers`, { type: ActivityType.Playing })

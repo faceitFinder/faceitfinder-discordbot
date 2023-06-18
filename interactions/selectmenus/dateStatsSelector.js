@@ -15,12 +15,13 @@ const sendCardWithInfo = async (interaction, values, type = CustomType.TYPES.ELO
 
   loadingCard(interaction)
 
-  return DateStats.getCardWithInfo(interaction,
+  return DateStats.getCardWithInfo(
+    interaction,
     actionRow,
     values,
     type,
     'uDSG',
-    null,
+    0,
     lastItemPaginationValues.page,
     lastItemPaginationValues.c
   )

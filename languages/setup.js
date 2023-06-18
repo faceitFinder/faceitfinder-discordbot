@@ -1,5 +1,7 @@
 const { languages } = require('../config.json')
 
+const keyReg = new RegExp(/^[a-zA-Z0-9]+\.[a-zA-Z0-9]+(?:\.[a-zA-Z0-9]+)*$/i)
+
 const getTranslations = (key, replace) => {
   let languageObject = {}
 
@@ -11,14 +13,18 @@ const getTranslations = (key, replace) => {
 }
 
 const getTranslation = (key, language, replace) => {
-  const keyReg = new RegExp(/^[a-zA-Z0-9]+\.[a-zA-Z0-9]+(?:\.[a-zA-Z0-9]+)*$/gi)
   let languageConf
   language = languages[language] || 'en-US'
+  let string
 
-  try { languageConf = require(`./${language}/translations`) }
-  catch (error) { languageConf = require('./en-US/translations') }
-
-  let string = languageConf[key]
+  try {
+    languageConf = require(`./${language}/translations`)
+    string = languageConf[key]
+    if (!string) throw new Error('Key not found')
+  } catch (error) {
+    languageConf = require('./en-US/translations')
+    string = languageConf[key]
+  }
 
   if (key.includes('.')) string = getStrings(key, languageConf)
 
@@ -35,5 +41,6 @@ const getStrings = (key, languageConf) => key.split('.').reduce((acc, cur) => ac
 
 module.exports = {
   getTranslations,
-  getTranslation
+  getTranslation,
+  keyReg
 }

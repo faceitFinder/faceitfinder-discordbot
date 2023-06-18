@@ -70,6 +70,7 @@ module.exports = {
   ],
   description: getTranslation('command.help.description', 'en-US'),
   descriptionLocalizations: getTranslations('command.help.description'),
+  ephemeral: true,
   usage: '<command>',
   type: 'system',
   async execute(interaction) {
