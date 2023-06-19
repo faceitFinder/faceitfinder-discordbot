@@ -5,7 +5,7 @@ const errorCard = require('../templates/errorCard')
 const GuildRoles = require('../database/guildRoles')
 const GuildCustomRole = require('../database/guildCustomRole')
 const successCard = require('../templates/successCard')
-const { updateRoles } = require('../functions/roles')
+const { updateRoles, getRoleIds } = require('../functions/roles')
 const { getTranslations, getTranslation } = require('../languages/setup')
 
 const SETUP = 'setup'
@@ -44,8 +44,26 @@ const setupRoles = async (interaction) => {
   rolesFields.reverse().forEach((v, i) => card.addFields({ name: `Level ${10 - i}`, value: v, inline: true }))
 
   if (error === 0) {
-    await GuildRoles.remove(interaction.guild.id)
-    GuildRoles.create(interaction.guild.id, roles[0], roles[1], roles[2], roles[3], roles[4], roles[5], roles[6], roles[7], roles[8], roles[9])
+    GuildRoles.create(
+      interaction.guild.id,
+      roles[0],
+      roles[1],
+      roles[2],
+      roles[3],
+      roles[4],
+      roles[5],
+      roles[6],
+      roles[7],
+      roles[8],
+      roles[9]
+    )
+
+    roles.forEach((roleId, i) => GuildCustomRole.create(
+      interaction.guild.id,
+      roleId,
+      color.levels[1 + i].min,
+      color.levels[1 + i].max
+    ))
 
     await updateRoles(interaction.client, null, interaction.guild.id)
 
@@ -78,8 +96,33 @@ const generateRoles = async (interaction) => {
       .catch(console.error)
   }
 
+  roles.reverse()
+
   await GuildRoles.remove(interaction.guild.id)
-  GuildRoles.create(interaction.guild.id, roles[9], roles[8], roles[7], roles[6], roles[5], roles[4], roles[3], roles[2], roles[1], roles[0])
+  GuildRoles.create(
+    interaction.guild.id,
+    roles[0],
+    roles[1],
+    roles[2],
+    roles[3],
+    roles[4],
+    roles[5],
+    roles[6],
+    roles[7],
+    roles[8],
+    roles[9]
+  )
+
+  roles.forEach((roleId, i) => {
+    i++
+
+    GuildCustomRole.create(
+      interaction.guild.id,
+      roleId,
+      color.levels[i].min,
+      color.levels[i].max
+    )
+  })
 
   await updateRoles(interaction.client, null, interaction.guild.id)
 
@@ -88,6 +131,8 @@ const generateRoles = async (interaction) => {
     .setDescription(getTranslation('success.command.generateRoles', interaction.locale))
     .setColor(color.primary)
     .setFooter({ text: `${name} ${getTranslation('strings.info', interaction.locale)}` })
+
+  roles.reverse()
 
   roles.forEach(e => card.addFields({
     name: getTranslation(`options.levelRoles.${10 - roles.indexOf(e)}`, interaction.locale),
@@ -102,13 +147,21 @@ const generateRoles = async (interaction) => {
 
 const removeRoles = async (interaction) => {
   const guildRoles = await GuildRoles.getRolesOf(interaction.guild.id)
+  if (!guildRoles) return
+
+  const roles = getRoleIds(guildRoles)
 
   if (guildRoles) {
     for (let i = 1; i <= 10; i++) {
       if (guildRoles[`level${i}`] && interaction.guild.roles.cache.has(guildRoles[`level${i}`]))
         await interaction.guild.roles.delete(guildRoles[`level${i}`]).catch(console.error)
     }
+
     await GuildRoles.remove(interaction.guild.id)
+
+    roles.forEach(async e => {
+      await GuildCustomRole.remove(interaction.guild.id, e)
+    })
   }
 }
 
@@ -276,7 +329,7 @@ module.exports = {
   ],
   description: getTranslation('command.roles.description', 'en-US'),
   descriptionLocalizations: getTranslations('command.roles.description'),
-  usage: `\n - ${GENERATE}\n - ${SETUP}\n - ${REMOVE} \n - ${SETUP_ELO}`,
+  usage: `\n - ${GENERATE}\n - ${SETUP}\n - ${REMOVE} \n - ${SETUP_ELO} \n - ${REMOVE_ELO}`,
   type: 'utility',
   async execute(interaction) {
     if (!interaction.member.permissions.has('ManageRoles'))
