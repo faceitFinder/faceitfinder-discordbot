@@ -20,13 +20,12 @@ const getTranslation = (key, language, replace) => {
   try {
     languageConf = require(`./${language}/translations`)
     string = languageConf[key]
-    if (!string) throw new Error('Key not found')
   } catch (error) {
     languageConf = require('./en-US/translations')
     string = languageConf[key]
   }
 
-  if (key.includes('.')) string = getStrings(key, languageConf)
+  if (keyReg.test(key)) string = getStrings(key, languageConf)
 
   if (replace) Object.keys(replace).forEach(key => {
     let value = replace[key].toString()
