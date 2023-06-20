@@ -1,6 +1,7 @@
 const Discord = require('discord.js')
 const { color, name } = require('../config.json')
 const { getTranslation } = require('../languages/setup')
+const errorHandler = require('../functions/error')
 
 module.exports = (interaction) => {
   if (!interaction.channel.permissionsFor(interaction.client.user).has('ViewChannel')) return
@@ -15,5 +16,5 @@ module.exports = (interaction) => {
     ],
     attachments: [],
     components: [],
-  }).catch(console.error)
+  }).catch((error) => errorHandler(interaction, error))
 }

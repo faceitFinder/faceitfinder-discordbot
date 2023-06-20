@@ -3,15 +3,18 @@ const errorCard = require('../templates/errorCard')
 const { InteractionType } = require('discord.js')
 const CommandsStats = require('../database/commandsStats')
 const { getTranslation } = require('../languages/setup')
+const errorHandler = require('../functions/error')
 
 const editInteraction = (interaction, resp) => {
   if (!resp) return
-  interaction.editReply(noMention(resp)).catch(console.error)
+  interaction.editReply(noMention(resp)).catch((error) => errorHandler(interaction, error))
 }
 
 const errorInteraction = (interaction, error, message) => {
-  console.error(error)
-  interaction.followUp(noMention(errorCard(typeof error !== 'string' ? message : error, interaction.locale))).catch(console.error)
+  errorHandler(interaction, error)
+
+  interaction.followUp(noMention(errorCard(typeof error !== 'string' ? message : error, interaction.locale)))
+    .catch((error) => errorHandler(interaction, error))
 }
 
 const updateUser = (interaction, interactionEl, json = null) => {
@@ -47,9 +50,9 @@ module.exports = {
               content: ' ',
               ...errorCard('error.bot.channelNotAccessible', interaction.locale),
             })
-            .catch(console.error)
+            .catch((error) => errorHandler(interaction, error))
         })
-        .catch(console.error)
+        .catch((error) => errorHandler(interaction, error))
     /**
      * Check if the interaction is a selectmenu
      */
@@ -68,17 +71,17 @@ module.exports = {
               .then(e => editInteraction(interaction, e))
               .catch(err => errorInteraction(interaction, err, getTranslation('error.execution.selectmenu', interaction.locale)))
           })
-          .catch(console.error)
+          .catch((error) => errorHandler(interaction, error))
       else
         interaction
           .deferReply({ ephemeral: true })
           .then(() => {
             CommandsStats.create(interaction.customId, 'selectmenu', interaction)
             interactionSelectMenu?.execute(interaction, updateUser(interaction, interactionSelectMenu))
-              .then(e => interaction.editReply(noMention(e)).catch(console.error))
+              .then(e => interaction.editReply(noMention(e)).catch((error) => errorHandler(interaction, error)))
               .catch(err => errorInteraction(interaction, err, getTranslation('error.execution.selectmenu', interaction.locale)))
           })
-          .catch(console.error)
+          .catch((error) => errorHandler(interaction, error))
     }
     /**
      * Check if the interaction is a button
@@ -95,13 +98,13 @@ module.exports = {
           interactionButton?.execute(interaction, json)
             .then(e => editInteraction(interaction, e))
             .catch(err => errorInteraction(interaction, err, getTranslation('error.execution.button', interaction.locale)))
-        }).catch(console.error)
+        }).catch((error) => errorHandler(interaction, error))
       else
         interaction.deferReply({ ephemeral: true }).then(() => {
           interactionButton?.execute(interaction, updateUser(interaction, interactionButton, json))
-            .then(e => interaction.editReply(noMention(e)).catch(console.error))
+            .then(e => interaction.editReply(noMention(e)).catch((error) => errorHandler(interaction, error)))
             .catch(err => errorInteraction(interaction, err, getTranslation('error.execution.button', interaction.locale)))
-        }).catch(console.error)
+        }).catch((error) => errorHandler(interaction, error))
     }
     /**
      * Check if the interaction is a contextmenu
@@ -114,10 +117,10 @@ module.exports = {
           interaction.client.contextmenus.get(interaction.commandName)?.execute(interaction)
             .then(resp => interaction
               .followUp(resp)
-              .catch(console.error))
+              .catch((error) => errorHandler(interaction, error)))
             .catch(err => errorInteraction(interaction, err, getTranslation('error.execution.contextmenu', interaction.locale)))
         })
-        .catch(console.error)
+        .catch((error) => errorHandler(interaction, error))
     /**
      * Check if the interaction is a command
      */
@@ -134,15 +137,15 @@ module.exports = {
                 resp
                   .forEach(r => interaction
                     .followUp(r)
-                    .catch(console.error))
+                    .catch((error) => errorHandler(interaction, error)))
               else
                 interaction
                   .followUp(resp)
-                  .catch(console.error)
+                  .catch((error) => errorHandler(interaction, error))
             })
             .catch(err => errorInteraction(interaction, err, getTranslation('error.execution.command', interaction.locale)))
         })
-        .catch(console.error)
+        .catch((error) => errorHandler(interaction, error))
     }
   }
 }
