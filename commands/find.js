@@ -238,13 +238,13 @@ module.exports = {
     if (!playerParam) return errorCard('error.command.faceitDatasNotFound', interaction.locale)
 
     const playerAimed = playerParam.playerDatas.player_id
-    const searchCurrentUser = !(currentPlayer.faceitId === playerAimed)
+    const searchCurrentUser = !(currentPlayer?.faceitId === playerAimed)
 
     const teamIncluded = (await getUsers(interaction, 5, null, null, true, null, searchCurrentUser))
       .map(e => e.param)
     const faceitIncluded = await Promise.all((await getUsers(interaction, 5 - teamIncluded.length, null, 'faceit_parameters', null, searchCurrentUser))
       .map(async e => {
-        if (e.faceitId) e.param = (await getFaceitPlayerDatas(e.param)).nickname
+        if (e?.faceitId) e.param = (await getFaceitPlayerDatas(e.param)).nickname
         return e.param
       }))
     const steamIncluded = (await getUsers(interaction, 5 - faceitIncluded.length, 'steam_parameters', null, true, false))
