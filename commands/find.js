@@ -19,6 +19,7 @@ const { getFaceitPlayerDatas } = require('../functions/player')
 const { getLastCard } = require('./last')
 const Graph = require('../functions/graph')
 const errorCard = require('../templates/errorCard')
+const successCard = require('../templates/successCard')
 
 const getOptions = () => {
   const options = structuredClone(Options.stats)
@@ -88,7 +89,7 @@ const sendCardWithInfo = async (
     faceitExcluded,
   })
 
-  if (!playerHistory.length) return errorCard(getTranslation('error.user.noMatchFoundWithOthers', interaction.locale, {
+  if (!playerHistory.length) return successCard(getTranslation('error.user.noMatchFoundWithOthers', interaction.locale, {
     playerName: playerDatas.nickname,
   }), interaction.locale)
 
