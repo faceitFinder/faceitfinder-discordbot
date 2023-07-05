@@ -67,7 +67,7 @@ const sendCardWithInfo = async (interaction, player1Param, player2Param, type = 
     [player1, player2].map(p => {
       mapStats = p.playerStats.segments.filter(segment => segment.label === map && segment.mode === '5v5')
 
-      if (!mapStats?.stats) throw getTranslation('error.user.mapNotPlayed', interaction.locale, {
+      if (!mapStats?.at(0)?.stats) throw getTranslation('error.user.mapNotPlayed', interaction.locale, {
         playerName: p.playerDatas.nickname,
       })
     })
@@ -106,10 +106,10 @@ const sendCardWithInfo = async (interaction, player1Param, player2Param, type = 
   const fields = [{
     name: 'Matches Compared',
     value: maxMatch.toString(),
-    inline: true
+    inline: !!map
   }]
 
-  if (map) fields.push({ name: 'Map', value: map, inline: true })
+  if (map) fields.push({ name: 'Map', value: map, inline: true }, { name: '\u200B', value: '\u200B', inline: true })
 
   fields.push({
     name: 'Winrate',
