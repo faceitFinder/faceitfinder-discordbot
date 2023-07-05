@@ -142,6 +142,8 @@ const getLastCard = async ({
   const files = []
   const pagination = getPageSlice(page)
 
+  maxMatch = maxMatch <= 0 ? playerHistory.length : maxMatch
+
   // Removing multiple ids
   const filteredHistory = playerHistory.map(e => e.matchId).filter((e, i, a) => a.indexOf(e) === i).slice(0, maxMatch)
   playerHistory = playerHistory.filter(e => filteredHistory.includes(e.matchId))
