@@ -208,6 +208,8 @@ module.exports = {
       invalidColor: '',
       invalidElo: '',
       invalidRole: '',
+      requiredParameters: '',
+      atLeastOneParameter: '',
     }
   },
   success: {
