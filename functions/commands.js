@@ -73,7 +73,7 @@ const getUsers = async (
       const teamCreator = await Team.getCreatorTeam(interaction.user.id)
 
       if (!teamUsers.length > 0) throw getTranslation('error.command.teamEmpty', interaction.locale)
-      else if ((teamCreator && 
+      else if ((teamCreator &&
         teamCreator.slug === team.slug) ||
         team.access ||
         teamUsers?.find(user => user.faceitId === currentUser.faceitId)
@@ -122,7 +122,10 @@ const getUsers = async (
     )
   })
 
-  if (params.length === 0 && searchCurrentUser) throw getTranslation('error.user.noParametersNoLink', interaction.locale)
+  if (params.length === 0 && searchCurrentUser) throw getTranslation('error.command.atLeastOneParameter', interaction.locale, {
+    parameters: [steam, faceit, searchTeam ? 'team' : null].filter(e => e).join(', '),
+    command: interaction.commandName
+  })
 
   return Promise.all(params
     .slice(0, maxUser)
@@ -134,10 +137,12 @@ const getCardsConditions = async (
   fn,
   maxUser = 10,
   steam = 'steam_parameters',
-  faceit = 'faceit_parameters'
+  faceit = 'faceit_parameters',
+  searchTeam = true,
+  searchCurrentUser = true
 ) => getCards(
   interaction,
-  await getUsers(interaction, maxUser, steam, faceit),
+  await getUsers(interaction, maxUser, steam, faceit, searchTeam, searchCurrentUser),
   fn)
 
 const getInteractionOption = (interaction, name) => {
