@@ -228,7 +228,18 @@ module.exports = {
     let currentPlayer = await User.getWithGuild(interaction.user.id, null)
     if (!currentPlayer) currentPlayer = await User.getWithGuild(interaction.user.id, interaction.guild.id)
 
-    const playerParams = await getUsers(interaction, 2, 'player_aimed', 'player_aimed', false)
+    let playerParams
+
+    // If player_aimed is not set, we return an error
+    try {
+      playerParams = await getUsers(interaction, 2, 'player_aimed', 'player_aimed', false)
+    } catch {
+      throw getTranslation('error.command.requiredParameters', interaction.locale, {
+        parameters: 'player_aimed',
+        command: 'find'
+      })
+    }
+
     const playerParam = (await Promise.all(playerParams.map(playerParam => getStats({
       playerParam,
       matchNumber: 1,
@@ -241,15 +252,25 @@ module.exports = {
     const playerAimed = playerParam.playerDatas.player_id
     const searchCurrentUser = !(currentPlayer?.faceitId === playerAimed)
 
-    const teamIncluded = (await getUsers(interaction, 5, null, null, true, null, searchCurrentUser))
-      .map(e => e.param)
-    const faceitIncluded = await Promise.all((await getUsers(interaction, 5 - teamIncluded.length, null, 'faceit_parameters', null, searchCurrentUser))
-      .map(async e => {
-        if (e?.faceitId) e.param = (await getFaceitPlayerDatas(e.param)).nickname
-        return e.param
-      }))
-    const steamIncluded = (await getUsers(interaction, 5 - faceitIncluded.length, 'steam_parameters', null, true, false))
-      .map(e => e.param)
+    let teamIncluded, faceitIncluded, steamIncluded
+
+    try {
+      teamIncluded = (await getUsers(interaction, 5, null, null, true, null, searchCurrentUser))
+        .map(e => e.param)
+      faceitIncluded = await Promise.all((await getUsers(interaction, 5 - teamIncluded.length, null, 'faceit_parameters', null, searchCurrentUser))
+        .map(async e => {
+          if (e?.faceitId) e.param = (await getFaceitPlayerDatas(e.param)).nickname
+          return e.param
+        }))
+      steamIncluded = (await getUsers(interaction, 5 - faceitIncluded.length, 'steam_parameters', null, true, false))
+        .map(e => e.param)
+    } catch {
+      throw getTranslation('error.command.atLeastOneParameter', 'en-GB', {
+        parameters: 'steam_parameters, faceit_parameters, team',
+        command: 'find'
+      })
+    }
+
     const faceitExcluded = (await getUsers(interaction, 5, null, 'excluded_faceit_parameters', null, false))
       .map(e => e.param)
     const steamExcluded = (await getUsers(interaction, 5 - faceitExcluded.length, 'excluded_steam_parameters', null, null, false))
