@@ -265,7 +265,7 @@ module.exports = {
       steamIncluded = (await getUsers(interaction, 5 - faceitIncluded.length, 'steam_parameters', null, true, false))
         .map(e => e.param)
     } catch {
-      throw getTranslation('error.command.atLeastOneParameter', 'en-GB', {
+      throw getTranslation('error.command.atLeastOneParameter', interaction.locale, {
         parameters: 'steam_parameters, faceit_parameters, team',
         command: 'find'
       })
