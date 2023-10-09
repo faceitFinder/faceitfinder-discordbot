@@ -4,12 +4,13 @@ const Graph = require('../functions/graph')
 const CustomType = require('../templates/customType')
 const CustomTypeFunc = require('../functions/customType')
 const Options = require('../templates/options')
-const { getCardsConditions } = require('../functions/commands')
+const { getCardsConditions, getGameOption } = require('../functions/commands')
 const { getTranslation, getTranslations } = require('../languages/setup')
 const { getStats, getLadder } = require('../functions/apiHandler')
 
-const sendCardWithInfo = async (interaction, playerParam, type = CustomType.TYPES.ELO) => {
+const sendCardWithInfo = async (interaction, playerParam, type = CustomType.TYPES.ELO, game = null) => {
   const maxMatch = 20
+  game ??= getGameOption(interaction)
 
   const {
     playerDatas,
@@ -20,7 +21,8 @@ const sendCardWithInfo = async (interaction, playerParam, type = CustomType.TYPE
   } = await getStats({
     playerParam,
     matchNumber: maxMatch,
-    checkElo: 1
+    checkElo: 1,
+    game
   })
 
   const playerId = playerDatas.player_id
@@ -29,17 +31,20 @@ const sendCardWithInfo = async (interaction, playerParam, type = CustomType.TYPE
   const ladderCountry = await getLadder({
     playerParam,
     region: playerRegion,
-    country: playerCountry
+    country: playerCountry,
+    game
   })
   const ladderRegion = await getLadder({
     playerParam,
     region: playerRegion,
+    game
   })
   const faceitElo = playerDatas.games.csgo.faceit_elo
   const buttonValues = {
     id: 'uSG',
     s: playerId,
-    u: interaction.user.id
+    u: interaction.user.id,
+    g: game
   }
 
   const graphBuffer = Graph.generateChart(interaction, playerDatas.nickname, playerHistory, maxMatch, type)

@@ -23,6 +23,7 @@ const getLadder = async ({
   return axios.get(`${process.env.API_URL}/api/ladder?faceit=${faceit}&steam=${steam}&id=${id}&region=${region}&country=${country}&game=${game}`)
     .then(res => res.data)
     .catch(e => {
+      if (e.response.status === 404) return { position: 'N/A' }
       console.error(e.response.status, e.response.statusText, e.response.config.url)
       throw e.response.data.error
     })
