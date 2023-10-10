@@ -39,14 +39,16 @@ module.exports = {
     )
   },
   getJSON(interaction, json) {
-    const options = Object.assign({}, ...interaction.message.components.map((e, i) => {
-      const option = getDefaultInteractionOption(interaction, 0, 0, i, false)
+    const componentIndex = 0, selectMenuIndex = 0
+    const options = interaction.message.components.at(componentIndex).components.at(selectMenuIndex).options
+    const values = Object.assign({}, ...options.map((e, i) => {
+      const option = getDefaultInteractionOption(interaction, componentIndex, selectMenuIndex, i, false)
       return JSON.parse(option.value)
     }))
 
     return {
       ...json,
-      ...options
+      ...values
     }
   }
 }
