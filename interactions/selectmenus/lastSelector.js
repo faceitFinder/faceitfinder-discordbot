@@ -52,7 +52,7 @@ module.exports = {
   },
   getJSON(interaction, json) {
     const dataRow = interaction.message.components.at(0)
-    const value = getOptionsValues(interaction, 0, 0)
+    const value = getOptionsValues(interaction)
     const m = interaction.values.at(0)
 
     return { ...value, l: m, dataRow }

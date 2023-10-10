@@ -23,7 +23,7 @@ module.exports = {
     )
   },
   getJSON(interaction, json) {
-    const values = getOptionsValues(interaction, 0, 0)
+    const values = getOptionsValues(interaction)
     const maxMatch = interaction.message.components.at(3)?.components.at(0).customId
     if (maxMatch) json.l = JSON.parse(maxMatch).l
 
