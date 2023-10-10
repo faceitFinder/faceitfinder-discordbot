@@ -37,7 +37,8 @@ const getCardWithInfo = async (
   maxPage = null,
   page = null,
   map = null,
-  updateStartDate = false
+  updateStartDate = false,
+  game = null
 ) => {
   const playerId = values.s
   const today = new Date().setHours(24, 0, 0, 0)
@@ -58,7 +59,8 @@ const getCardWithInfo = async (
     startDate,
     endDate,
     map: map || '',
-    checkElo: +((startDate !== '' ? today >= startDate : true) && today <= endDate)
+    checkElo: +((startDate !== '' ? today >= startDate : true) && today <= endDate),
+    game
   })
 
   if (!playerLastStats.games) throw getTranslation('error.user.noMatches', interaction.locale, {

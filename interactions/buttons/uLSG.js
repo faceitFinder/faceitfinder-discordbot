@@ -34,11 +34,19 @@ module.exports = {
       null,
       null,
       json.c,
-      true
+      true,
+      json.g
     )
   },
   getJSON(interaction, json) {
-    const values = getDefaultInteractionOption(interaction).value
-    return { ...json, ...JSON.parse(values) }
+    const options = Object.assign({}, ...interaction.message.components.map((e, i) => {
+      const option = getDefaultInteractionOption(interaction, 0, 0, i, false)
+      return JSON.parse(option.value)
+    }))
+
+    return {
+      ...json,
+      ...options
+    }
   }
 }
