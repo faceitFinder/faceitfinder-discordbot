@@ -1,5 +1,5 @@
 const CommandsStats = require('../../database/commandsStats')
-const { getDefaultInteractionOption } = require('../../functions/commands')
+const { getOptionsValues } = require('../../functions/commands')
 const { getTypeGraph } = require('../../functions/commandStats')
 const { getCardWithInfo, updateOptions } = require('../../functions/dateStats')
 const CustomType = require('../../templates/customType')
@@ -40,11 +40,7 @@ module.exports = {
   },
   getJSON(interaction, json) {
     const componentIndex = 0, selectMenuIndex = 0
-    const options = interaction.message.components.at(componentIndex).components.at(selectMenuIndex).options
-    const values = Object.assign({}, ...options.map((e, i) => {
-      const option = getDefaultInteractionOption(interaction, componentIndex, selectMenuIndex, i, false)
-      return JSON.parse(option.value)
-    }))
+    const values = getOptionsValues(interaction, componentIndex, selectMenuIndex)
 
     return {
       ...json,

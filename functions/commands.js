@@ -158,11 +158,22 @@ const isInteractionSubcommandEqual = (interaction, name) => {
   return interaction.options?._subcommand === name
 }
 
+const getOptionsValues = (interaction, componentIndex = 0, selectMenuIndex = 0) => {
+  const options = interaction.message.components.at(componentIndex).components.at(selectMenuIndex).options
+  const values = Object.assign({}, ...options.map((e, i) => {
+    const option = getDefaultInteractionOption(interaction, componentIndex, selectMenuIndex, i, false)
+    return JSON.parse(option.value)
+  }))
+
+  return values
+}
+
 module.exports = {
   getCardsConditions,
   getInteractionOption,
   isInteractionSubcommandEqual,
   getDefaultInteractionOption,
   getUsers,
-  getGameOption
+  getGameOption,
+  getOptionsValues
 }
