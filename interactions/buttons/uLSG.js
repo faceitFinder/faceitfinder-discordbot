@@ -39,8 +39,7 @@ module.exports = {
     )
   },
   getJSON(interaction, json) {
-    const componentIndex = 0, selectMenuIndex = 0
-    const values = getOptionsValues(interaction, componentIndex, selectMenuIndex)
+    const values = getOptionsValues(interaction)
 
     return {
       ...json,
