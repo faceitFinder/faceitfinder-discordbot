@@ -47,12 +47,14 @@ const sendCardWithInfo = async (interaction, playerParam, type = CustomType.TYPE
     g: game
   }
 
-  const graphBuffer = Graph.generateChart(interaction, playerDatas.nickname, playerHistory, maxMatch, type)
+  const graphBuffer = Graph.generateChart(interaction, playerDatas.nickname, playerHistory, maxMatch, type, game)
 
   const faceitLevel = playerDatas.games[game].skill_level
   const size = 40
 
-  const rankImageCanvas = await Graph.getRankImage(faceitLevel, faceitElo, size)
+  console.log(faceitLevel, faceitElo)
+
+  const rankImageCanvas = await Graph.getRankImage(faceitLevel, faceitElo, size, game)
 
   const card = new Discord.EmbedBuilder()
     .setAuthor({
@@ -71,7 +73,7 @@ const sendCardWithInfo = async (interaction, playerParam, type = CustomType.TYPE
       { name: `:flag_${playerRegion.toLowerCase()}:`, value: ladderRegion.position.toString(), inline: true }
     )
     .setImage('attachment://graph.png')
-    .setColor(color.levels[faceitLevel].color)
+    .setColor(color.levels[game][faceitLevel].color)
     .setFooter({ text: `Steam: ${steamDatas?.personaname || steamDatas}` })
 
   return {
