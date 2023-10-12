@@ -1,3 +1,4 @@
+const { defaultGame } = require('../config.json')
 const GuildCustomRole = require('../database/guildCustomRole')
 const User = require('../database/user')
 const { getFaceitPlayerDatas } = require('./player')
@@ -24,9 +25,9 @@ const setupRoles = async (client, user, guildId, remove) => {
     user = user.flat().at(0)
 
     const playerDatas = await getFaceitPlayerDatas(user.faceitId).catch(() => null)
-    if (!playerDatas?.games?.csgo) return
+    if (!playerDatas?.games[defaultGame]) return
 
-    const playerElo = playerDatas.games.csgo.faceit_elo
+    const playerElo = playerDatas.games[defaultGame].faceit_elo
 
     if (user.nickname) await member.edit({ nick: playerDatas.nickname }).catch(() => null)
 
