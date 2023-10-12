@@ -301,51 +301,52 @@ const sendCardWithInfo = async (interaction, player1Param, player2Param, type = 
 
 module.exports = {
   name: 'compare',
-  options: [{
-    name: 'match_number',
-    description: getTranslation('options.matchNumber', 'en-US', {
-      default: '20'
-    }),
-    descriptionLocalizations: getTranslations('options.matchNumber', {
-      default: '20'
-    }),
-    required: false,
-    type: Discord.ApplicationCommandOptionType.Integer,
-    slash: true,
-  },
-  {
-    name: 'first_user_steam',
-    description: getTranslation('options.steamParameter', 'en-US'),
-    descriptionLocalizations: getTranslations('options.steamParameter'),
-    required: false,
-    type: Discord.ApplicationCommandOptionType.String,
-    slash: true
-  },
-  {
-    name: 'first_user_faceit',
-    description: getTranslation('options.faceitParameter', 'en-US'),
-    descriptionLocalizations: getTranslations('options.faceitParameter'),
-    required: false,
-    type: Discord.ApplicationCommandOptionType.String,
-    slash: true
-  },
-  {
-    name: 'second_user_steam',
-    description: getTranslation('options.steamParameter', 'en-US'),
-    descriptionLocalizations: getTranslations('options.steamParameter'),
-    required: false,
-    type: Discord.ApplicationCommandOptionType.String,
-    slash: true
-  },
-  {
-    name: 'second_user_faceit',
-    description: getTranslation('options.faceitParameter', 'en-US'),
-    descriptionLocalizations: getTranslations('options.faceitParameter'),
-    required: false,
-    type: Discord.ApplicationCommandOptionType.String,
-    slash: true
-  },
-  getMapOption(),
+  options: [
+    {
+      name: 'match_number',
+      description: getTranslation('options.matchNumber', 'en-US', {
+        default: '20'
+      }),
+      descriptionLocalizations: getTranslations('options.matchNumber', {
+        default: '20'
+      }),
+      required: false,
+      type: Discord.ApplicationCommandOptionType.Integer,
+      slash: true,
+    },
+    {
+      name: 'first_user_steam',
+      description: getTranslation('options.steamParameter', 'en-US'),
+      descriptionLocalizations: getTranslations('options.steamParameter'),
+      required: false,
+      type: Discord.ApplicationCommandOptionType.String,
+      slash: true
+    },
+    {
+      name: 'first_user_faceit',
+      description: getTranslation('options.faceitParameter', 'en-US'),
+      descriptionLocalizations: getTranslations('options.faceitParameter'),
+      required: false,
+      type: Discord.ApplicationCommandOptionType.String,
+      slash: true
+    },
+    {
+      name: 'second_user_steam',
+      description: getTranslation('options.steamParameter', 'en-US'),
+      descriptionLocalizations: getTranslations('options.steamParameter'),
+      required: false,
+      type: Discord.ApplicationCommandOptionType.String,
+      slash: true
+    },
+    {
+      name: 'second_user_faceit',
+      description: getTranslation('options.faceitParameter', 'en-US'),
+      descriptionLocalizations: getTranslations('options.faceitParameter'),
+      required: false,
+      type: Discord.ApplicationCommandOptionType.String,
+      slash: true
+    },
+    getMapOption(),
     gameOption],
   description: getTranslation('command.compare.description', 'en-US'),
   descriptionLocalizations: getTranslations('command.compare.description'),
