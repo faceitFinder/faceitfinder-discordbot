@@ -1,4 +1,4 @@
-const { color, emojis } = require('../../config.json')
+const { color, emojis, defaultGame } = require('../../config.json')
 const Discord = require('discord.js')
 const loadingCard = require('../../templates/loadingCard')
 const UserTeam = require('../../database/userTeam')
@@ -57,7 +57,8 @@ module.exports = {
           param: user.faceitId,
           faceitId: true
         },
-        matchNumber: 1
+        matchNumber: 1,
+        game: defaultGame,
       })
 
       return {

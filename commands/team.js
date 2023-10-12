@@ -1,4 +1,4 @@
-const { maxLengthTeamName } = require('../config.json')
+const { maxLengthTeamName, defaultGame } = require('../config.json')
 const Discord = require('discord.js')
 const Team = require('../database/team')
 const UserTeam = require('../database/userTeam')
@@ -106,7 +106,8 @@ const addUser = async (interaction, playerParam) => {
     playerDatas
   } = await getStats({
     playerParam,
-    matchNumber: 1
+    matchNumber: 1,
+    game: defaultGame,
   })
   const playerId = playerDatas.player_id
 
@@ -133,7 +134,8 @@ const removeUser = async (interaction, playerParam) => {
     playerDatas
   } = await getStats({
     playerParam,
-    matchNumber: 1
+    matchNumber: 1,
+    game: defaultGame,
   })
   const playerId = playerDatas.player_id
 

@@ -15,7 +15,8 @@ const updateEmbedMessage = async (interaction, playerId, matchId, game) => {
       param: playerId,
       faceitId: true
     },
-    matchNumber: 0
+    matchNumber: 0,
+    game
   })
 
   return getMatchItems(interaction, playerDatas, steamDatas, playerHistory, matchId, game)
