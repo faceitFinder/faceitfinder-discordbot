@@ -1,5 +1,5 @@
 const CommandsStats = require('../../database/commandsStats')
-const { getDefaultInteractionOption } = require('../../functions/commands')
+const { getOptionsValues } = require('../../functions/commands')
 const { getTypeGraph } = require('../../functions/commandStats')
 const { getCardWithInfo, updateOptions } = require('../../functions/dateStats')
 const CustomType = require('../../templates/customType')
@@ -34,11 +34,16 @@ module.exports = {
       null,
       null,
       json.c,
-      true
+      true,
+      json.g
     )
   },
   getJSON(interaction, json) {
-    const values = getDefaultInteractionOption(interaction).value
-    return { ...json, ...JSON.parse(values) }
+    const values = getOptionsValues(interaction)
+
+    return {
+      ...json,
+      ...values
+    }
   }
 }

@@ -3,8 +3,9 @@ const loadingCard = require('../../templates/loadingCard')
 const { updateOptions } = require('../../functions/dateStats')
 const { getMatchItems } = require('../../commands/last')
 const { getStats } = require('../../functions/apiHandler')
+const { getOptionsValues } = require('../../functions/commands')
 
-const updateEmbedMessage = async (interaction, playerId, matchId, map) => {
+const updateEmbedMessage = async (interaction, playerId, matchId, map, game) => {
   const {
     playerDatas,
     steamDatas,
@@ -16,9 +17,10 @@ const updateEmbedMessage = async (interaction, playerId, matchId, map) => {
     },
     matchNumber: 0,
     map: map || '',
+    game
   })
 
-  return getMatchItems(interaction, playerDatas, steamDatas, playerHistory, matchId)
+  return getMatchItems(interaction, playerDatas, steamDatas, playerHistory, matchId, game)
 }
 
 module.exports = {
@@ -40,7 +42,7 @@ module.exports = {
       paginationComponents
     ]
 
-    const messageItems = await updateEmbedMessage(interaction, values.s, values.l, values.m)
+    const messageItems = await updateEmbedMessage(interaction, values.s, values.l, values.m, values.g)
     if (playerStatsCard) messageItems.embeds.unshift(playerStatsCard)
 
     return {
@@ -50,7 +52,7 @@ module.exports = {
   },
   getJSON(interaction, json) {
     const dataRow = interaction.message.components.at(0)
-    const value = JSON.parse(dataRow.components.at(0).options.at(0).value)
+    const value = getOptionsValues(interaction)
     const m = interaction.values.at(0)
 
     return { ...value, l: m, dataRow }

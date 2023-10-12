@@ -1,6 +1,6 @@
 const Discord = require('discord.js')
 const { color, emojis } = require('../config.json')
-const { getUsers, getInteractionOption } = require('../functions/commands')
+const { getUsers, getInteractionOption, getGameOption } = require('../functions/commands')
 const CustomTypeFunc = require('../functions/customType')
 const CustomType = require('../templates/customType')
 const Graph = require('../functions/graph')
@@ -8,6 +8,7 @@ const errorCard = require('../templates/errorCard')
 const { getTranslations, getTranslation } = require('../languages/setup')
 const { getMapOption } = require('../functions/map')
 const { getStats } = require('../functions/apiHandler')
+const { gameOption } = require('../templates/options')
 
 const compareStats = (stats1, stats2, positive = true) => {
   if (positive) {
@@ -41,22 +42,25 @@ const getMaxMatchLimit = (player1, player2, fn) => {
   }
 }
 
-const sendCardWithInfo = async (interaction, player1Param, player2Param, type = CustomType.TYPES.ELO, maxMatch = 20, map = null) => {
+const sendCardWithInfo = async (interaction, player1Param, player2Param, type = CustomType.TYPES.ELO, maxMatch = 20, map = null, game) => {
+  game ??= getGameOption(interaction)
   maxMatch = getInteractionOption(interaction, 'match_number') ?? maxMatch
   map = getInteractionOption(interaction, 'map') || map
 
-  const buttonValues = { id: 'uCSG', u: interaction.user.id }
+  const buttonValues = { id: 'uCSG', u: interaction.user.id, g: game }
   if (map) buttonValues.c = map
 
   // Get player datas
   let player1 = await getStats({
     playerParam: player1Param,
     matchNumber: 1,
+    game
   })
 
   let player2 = await getStats({
     playerParam: player2Param,
     matchNumber: 1,
+    game
   })
 
   let playerWithLessMatch
@@ -92,13 +96,15 @@ const sendCardWithInfo = async (interaction, player1Param, player2Param, type = 
   player1 = await getStats({
     playerParam: player1Param,
     matchNumber: maxMatch,
-    map: map || ''
+    map: map || '',
+    game
   })
 
   player2 = await getStats({
     playerParam: player2Param,
     matchNumber: maxMatch,
-    map: map || ''
+    map: map || '',
+    game
   })
 
   playerWithLessMatch = [player1, player2].filter(p => p.playerDatas.player_id === playerWithLessMatch.playerDatas.player_id).find(e => e)
@@ -111,108 +117,109 @@ const sendCardWithInfo = async (interaction, player1Param, player2Param, type = 
 
   if (map) fields.push({ name: 'Map', value: map, inline: true }, { name: '\u200B', value: '\u200B', inline: true })
 
-  fields.push({
-    name: 'Winrate',
-    value: `**${player1.playerLastStats.winrate.toFixed(2)}%** - \
-    ${player2.playerLastStats.winrate.toFixed(2)}% \
-    ${compareStats(player1.playerLastStats.winrate, player2.playerLastStats.winrate)}`,
-    inline: true
-  },
-  {
-    name: 'Elo',
-    value: `**${player1.playerDatas.games.csgo.faceit_elo}** - \
-    ${player2.playerDatas.games.csgo.faceit_elo} \
-    ${compareStats(player1.playerDatas.games.csgo.faceit_elo, player2.playerDatas.games.csgo.faceit_elo)}`,
-    inline: true
-  },
-  {
-    name: 'Average MVPs',
-    value: `**${player1.playerLastStats['Average MVPs'].toFixed(2)}** - \
-    ${player2.playerLastStats['Average MVPs'].toFixed(2)} \
-    ${compareStats(player1.playerLastStats['Average MVPs'], player2.playerLastStats['Average MVPs'])}`,
-    inline: true
-  },
-  {
-    name: 'K/D', value: `**${player1.playerLastStats.kd.toFixed(2)}** - \
-  ${player2.playerLastStats.kd.toFixed(2)} \
-  ${compareStats(player1.playerLastStats.kd, player2.playerLastStats.kd)}`,
-    inline: true
-  },
-  {
-    name: 'Kills', value: `**${player1.playerLastStats.kills}** - \
-  ${player2.playerLastStats.kills} \
-  ${compareStats(player1.playerLastStats.kills, player2.playerLastStats.kills)}`,
-    inline: true
-  },
-  {
-    name: 'Deaths', value: `**${player1.playerLastStats.deaths}** - \
-  ${player2.playerLastStats.deaths} \
-  ${compareStats(player1.playerLastStats.deaths, player2.playerLastStats.deaths, false)}`,
-    inline: true
-  },
-  {
-    name: 'Average K/D',
-    value: `**${player1.playerLastStats['Average K/D'].toFixed(2)}** - \
-    ${player2.playerLastStats['Average K/D'].toFixed(2)} \
-    ${compareStats(player1.playerLastStats['Average K/D'], player2.playerLastStats['Average K/D'])}`,
-    inline: true
-  },
-  {
-    name: 'Average K/R',
-    value: `**${player1.playerLastStats['Average K/R'].toFixed(2)}** - \
-    ${player2.playerLastStats['Average K/R'].toFixed(2)} \
-    ${compareStats(player1.playerLastStats['Average K/R'], player2.playerLastStats['Average K/R'])}`,
-    inline: true
-  },
-  {
-    name: 'Average HS',
-    value: `**${player1.playerLastStats['Average HS'].toFixed(2)}%** - \
-    ${player2.playerLastStats['Average HS'].toFixed(2)}% \
-    ${compareStats(player1.playerLastStats['Average HS'], player2.playerLastStats['Average HS'])}`,
-    inline: true
-  },
-  {
-    name: 'Average Kills',
-    value: `**${player1.playerLastStats['Average Kills'].toFixed(2)}** - \
-    ${player2.playerLastStats['Average Kills'].toFixed(2)} \
-    ${compareStats(player1.playerLastStats['Average Kills'], player2.playerLastStats['Average Kills'])}`,
-    inline: true
-  },
-  {
-    name: 'Average Deaths',
-    value: `**${player1.playerLastStats['Average Deaths'].toFixed(2)}** - \
-    ${player2.playerLastStats['Average Deaths'].toFixed(2)} \
-    ${compareStats(player1.playerLastStats['Average Deaths'], player2.playerLastStats['Average Deaths'], false)}`,
-    inline: true
-  },
-  {
-    name: 'Average Assists',
-    value: `**${player1.playerLastStats['Average Assists'].toFixed(2)}** - \
-    ${player2.playerLastStats['Average Assists'].toFixed(2)} \
-    ${compareStats(player1.playerLastStats['Average Assists'], player2.playerLastStats['Average Assists'])}`,
-    inline: true
-  },
-  {
-    name: 'Red K/D',
-    value: `**${player1.playerLastStats['Red K/D']}** - \
-    ${player2.playerLastStats['Red K/D']} \
-    ${compareStats(player1.playerLastStats['Red K/D'], player2.playerLastStats['Red K/D'], false)}`,
-    inline: true
-  },
-  {
-    name: 'Orange K/D',
-    value: `**${player1.playerLastStats['Orange K/D']}** - \
-    ${player2.playerLastStats['Orange K/D']} \
-    ${compareStats(player1.playerLastStats['Orange K/D'], player2.playerLastStats['Orange K/D'], false)}`,
-    inline: true
-  },
-  {
-    name: 'Green K/D',
-    value: `**${player1.playerLastStats['Green K/D']}** - \
-    ${player2.playerLastStats['Green K/D']} \
-    ${compareStats(player1.playerLastStats['Green K/D'], player2.playerLastStats['Green K/D'])}`,
-    inline: true
-  })
+  fields.push(
+    {
+      name: 'Winrate',
+      value: `**${player1.playerLastStats.winrate.toFixed(2)}%** - \
+      ${player2.playerLastStats.winrate.toFixed(2)}% \
+      ${compareStats(player1.playerLastStats.winrate, player2.playerLastStats.winrate)}`,
+      inline: true
+    },
+    {
+      name: 'Elo',
+      value: `**${player1.playerDatas.games[game].faceit_elo}** - \
+      ${player2.playerDatas.games[game].faceit_elo} \
+      ${compareStats(player1.playerDatas.games[game].faceit_elo, player2.playerDatas.games[game].faceit_elo)}`,
+      inline: true
+    },
+    {
+      name: 'Average MVPs',
+      value: `**${player1.playerLastStats['Average MVPs'].toFixed(2)}** - \
+      ${player2.playerLastStats['Average MVPs'].toFixed(2)} \
+      ${compareStats(player1.playerLastStats['Average MVPs'], player2.playerLastStats['Average MVPs'])}`,
+      inline: true
+    },
+    {
+      name: 'K/D', value: `**${player1.playerLastStats.kd.toFixed(2)}** - \
+      ${player2.playerLastStats.kd.toFixed(2)} \
+      ${compareStats(player1.playerLastStats.kd, player2.playerLastStats.kd)}`,
+      inline: true
+    },
+    {
+      name: 'Kills', value: `**${player1.playerLastStats.kills}** - \
+      ${player2.playerLastStats.kills} \
+      ${compareStats(player1.playerLastStats.kills, player2.playerLastStats.kills)}`,
+      inline: true
+    },
+    {
+      name: 'Deaths', value: `**${player1.playerLastStats.deaths}** - \
+      ${player2.playerLastStats.deaths} \
+      ${compareStats(player1.playerLastStats.deaths, player2.playerLastStats.deaths, false)}`,
+      inline: true
+    },
+    {
+      name: 'Average K/D',
+      value: `**${player1.playerLastStats['Average K/D'].toFixed(2)}** - \
+      ${player2.playerLastStats['Average K/D'].toFixed(2)} \
+      ${compareStats(player1.playerLastStats['Average K/D'], player2.playerLastStats['Average K/D'])}`,
+      inline: true
+    },
+    {
+      name: 'Average K/R',
+      value: `**${player1.playerLastStats['Average K/R'].toFixed(2)}** - \
+      ${player2.playerLastStats['Average K/R'].toFixed(2)} \
+      ${compareStats(player1.playerLastStats['Average K/R'], player2.playerLastStats['Average K/R'])}`,
+      inline: true
+    },
+    {
+      name: 'Average HS',
+      value: `**${player1.playerLastStats['Average HS'].toFixed(2)}%** - \
+      ${player2.playerLastStats['Average HS'].toFixed(2)}% \
+      ${compareStats(player1.playerLastStats['Average HS'], player2.playerLastStats['Average HS'])}`,
+      inline: true
+    },
+    {
+      name: 'Average Kills',
+      value: `**${player1.playerLastStats['Average Kills'].toFixed(2)}** - \
+      ${player2.playerLastStats['Average Kills'].toFixed(2)} \
+      ${compareStats(player1.playerLastStats['Average Kills'], player2.playerLastStats['Average Kills'])}`,
+      inline: true
+    },
+    {
+      name: 'Average Deaths',
+      value: `**${player1.playerLastStats['Average Deaths'].toFixed(2)}** - \
+      ${player2.playerLastStats['Average Deaths'].toFixed(2)} \
+      ${compareStats(player1.playerLastStats['Average Deaths'], player2.playerLastStats['Average Deaths'], false)}`,
+      inline: true
+    },
+    {
+      name: 'Average Assists',
+      value: `**${player1.playerLastStats['Average Assists'].toFixed(2)}** - \
+      ${player2.playerLastStats['Average Assists'].toFixed(2)} \
+      ${compareStats(player1.playerLastStats['Average Assists'], player2.playerLastStats['Average Assists'])}`,
+      inline: true
+    },
+    {
+      name: 'Red K/D',
+      value: `**${player1.playerLastStats['Red K/D']}** - \
+      ${player2.playerLastStats['Red K/D']} \
+      ${compareStats(player1.playerLastStats['Red K/D'], player2.playerLastStats['Red K/D'], false)}`,
+      inline: true
+    },
+    {
+      name: 'Orange K/D',
+      value: `**${player1.playerLastStats['Orange K/D']}** - \
+      ${player2.playerLastStats['Orange K/D']} \
+      ${compareStats(player1.playerLastStats['Orange K/D'], player2.playerLastStats['Orange K/D'], false)}`,
+      inline: true
+    },
+    {
+      name: 'Green K/D',
+      value: `**${player1.playerLastStats['Green K/D']}** - \
+      ${player2.playerLastStats['Green K/D']} \
+      ${compareStats(player1.playerLastStats['Green K/D'], player2.playerLastStats['Green K/D'])}`,
+      inline: true
+    })
 
   const card = new Discord.EmbedBuilder()
     .setAuthor({
@@ -242,7 +249,8 @@ const sendCardWithInfo = async (interaction, player1Param, player2Param, type = 
     label: 'Datas',
     value: JSON.stringify({
       m: maxMatch,
-      c: map
+      c: map,
+      g: game,
     })
   }]
 
@@ -253,7 +261,7 @@ const sendCardWithInfo = async (interaction, player1Param, player2Param, type = 
       user.playerDatas.nickname,
       type,
       playerColor[i],
-      Graph.getGraph(interaction, user.playerDatas.nickname, type, user.playerHistory, user.playerDatas.games.csgo.faceit_elo, maxMatch, true).reverse()
+      Graph.getGraph(interaction, user.playerDatas.nickname, type, user.playerHistory, user.playerDatas.games[game].faceit_elo, maxMatch, true).reverse()
     ])
 
   const graphBuffer = Graph.getChart(
@@ -293,51 +301,53 @@ const sendCardWithInfo = async (interaction, player1Param, player2Param, type = 
 
 module.exports = {
   name: 'compare',
-  options: [{
-    name: 'match_number',
-    description: getTranslation('options.matchNumber', 'en-US', {
-      default: '20'
-    }),
-    descriptionLocalizations: getTranslations('options.matchNumber', {
-      default: '20'
-    }),
-    required: false,
-    type: Discord.ApplicationCommandOptionType.Integer,
-    slash: true,
-  },
-  {
-    name: 'first_user_steam',
-    description: getTranslation('options.steamParameter', 'en-US'),
-    descriptionLocalizations: getTranslations('options.steamParameter'),
-    required: false,
-    type: Discord.ApplicationCommandOptionType.String,
-    slash: true
-  },
-  {
-    name: 'first_user_faceit',
-    description: getTranslation('options.faceitParameter', 'en-US'),
-    descriptionLocalizations: getTranslations('options.faceitParameter'),
-    required: false,
-    type: Discord.ApplicationCommandOptionType.String,
-    slash: true
-  },
-  {
-    name: 'second_user_steam',
-    description: getTranslation('options.steamParameter', 'en-US'),
-    descriptionLocalizations: getTranslations('options.steamParameter'),
-    required: false,
-    type: Discord.ApplicationCommandOptionType.String,
-    slash: true
-  },
-  {
-    name: 'second_user_faceit',
-    description: getTranslation('options.faceitParameter', 'en-US'),
-    descriptionLocalizations: getTranslations('options.faceitParameter'),
-    required: false,
-    type: Discord.ApplicationCommandOptionType.String,
-    slash: true
-  },
-  getMapOption(),],
+  options: [
+    {
+      name: 'match_number',
+      description: getTranslation('options.matchNumber', 'en-US', {
+        default: '20'
+      }),
+      descriptionLocalizations: getTranslations('options.matchNumber', {
+        default: '20'
+      }),
+      required: false,
+      type: Discord.ApplicationCommandOptionType.Integer,
+      slash: true,
+    },
+    {
+      name: 'first_user_steam',
+      description: getTranslation('options.steamParameter', 'en-US'),
+      descriptionLocalizations: getTranslations('options.steamParameter'),
+      required: false,
+      type: Discord.ApplicationCommandOptionType.String,
+      slash: true
+    },
+    {
+      name: 'first_user_faceit',
+      description: getTranslation('options.faceitParameter', 'en-US'),
+      descriptionLocalizations: getTranslations('options.faceitParameter'),
+      required: false,
+      type: Discord.ApplicationCommandOptionType.String,
+      slash: true
+    },
+    {
+      name: 'second_user_steam',
+      description: getTranslation('options.steamParameter', 'en-US'),
+      descriptionLocalizations: getTranslations('options.steamParameter'),
+      required: false,
+      type: Discord.ApplicationCommandOptionType.String,
+      slash: true
+    },
+    {
+      name: 'second_user_faceit',
+      description: getTranslation('options.faceitParameter', 'en-US'),
+      descriptionLocalizations: getTranslations('options.faceitParameter'),
+      required: false,
+      type: Discord.ApplicationCommandOptionType.String,
+      slash: true
+    },
+    getMapOption(),
+    gameOption],
   description: getTranslation('command.compare.description', 'en-US'),
   descriptionLocalizations: getTranslations('command.compare.description'),
   usage: '<match_number> {<first_user_steam> <first_user_faceit>} [<second_user_steam> <second_user_faceit>] <map>',

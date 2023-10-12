@@ -1,4 +1,4 @@
-const { maxLengthTeamName } = require('../config.json')
+const { maxLengthTeamName, defaultGame } = require('../config.json')
 const Discord = require('discord.js')
 const Team = require('../database/team')
 const UserTeam = require('../database/userTeam')
@@ -106,7 +106,8 @@ const addUser = async (interaction, playerParam) => {
     playerDatas
   } = await getStats({
     playerParam,
-    matchNumber: 1
+    matchNumber: 1,
+    game: defaultGame,
   })
   const playerId = playerDatas.player_id
 
@@ -123,7 +124,7 @@ const addUser = async (interaction, playerParam) => {
     teamName: currentTeam.name
   })
 
-  return successCard(`${successMessage} [Steam](https://steamcommunity.com/profiles/${playerDatas.games.csgo.game_player_id}) - [Faceit](https://www.faceit.com/en/players/${playerDatas.nickname})`, interaction.locale)
+  return successCard(`${successMessage} [Steam](https://steamcommunity.com/profiles/${playerDatas.games[defaultGame].game_player_id}) - [Faceit](https://www.faceit.com/en/players/${playerDatas.nickname})`, interaction.locale)
 }
 
 const removeUser = async (interaction, playerParam) => {
@@ -133,7 +134,8 @@ const removeUser = async (interaction, playerParam) => {
     playerDatas
   } = await getStats({
     playerParam,
-    matchNumber: 1
+    matchNumber: 1,
+    game: defaultGame,
   })
   const playerId = playerDatas.player_id
 

@@ -1,4 +1,4 @@
-const { getDefaultInteractionOption } = require('../../functions/commands')
+const { getDefaultInteractionOption, getOptionsValues } = require('../../functions/commands')
 const CommandsStats = require('../../database/commandsStats')
 const { getTypePage } = require('../../functions/commandStats')
 const loadingCard = require('../../templates/loadingCard')
@@ -20,10 +20,12 @@ module.exports = {
       .sendCardWithInfo(interaction, {
         param: json.s,
         faceitId: true
-      }, json.page)
+      }, json.page, json.g)
   },
   getJSON(interaction, json) {
-    const values = getDefaultInteractionOption(interaction).value
-    return { ...json, ...JSON.parse(values) }
+    const values = JSON.parse(getDefaultInteractionOption(interaction, 1).value)
+    const interactionValues = getOptionsValues(interaction)
+
+    return { ...json, ...values, ...interactionValues }
   }
 }

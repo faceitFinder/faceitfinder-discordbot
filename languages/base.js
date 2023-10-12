@@ -100,6 +100,7 @@ module.exports = {
     setupEloRoles: '',
     removeEloRole: '',
     eloRole: '',
+    gameParameter: '',
   },
   strings: {
     selectTeam: '',

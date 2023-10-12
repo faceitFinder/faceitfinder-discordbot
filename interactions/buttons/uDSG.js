@@ -2,7 +2,7 @@ const CommandsStats = require('../../database/commandsStats')
 const { sendCardWithInfo } = require('../selectmenus/dateStatsSelector')
 const CustomType = require('../../templates/customType')
 const loadingCard = require('../../templates/loadingCard')
-const { getDefaultInteractionOption } = require('../../functions/commands')
+const { getDefaultInteractionOption, getOptionsValues } = require('../../functions/commands')
 const { getTypeGraph } = require('../../functions/commandStats')
 
 /**
@@ -21,7 +21,18 @@ module.exports = {
     return sendCardWithInfo(interaction, json, CustomType.getType(interaction.component.label))
   },
   getJSON(interaction, json) {
-    const values = getDefaultInteractionOption(interaction).value
-    return { ...json, ...JSON.parse(values) }
+    const values = JSON.parse(getDefaultInteractionOption(interaction, 1).value)
+    const interactionValues = getOptionsValues(interaction)
+    const dataRow = interaction.message.components.at(0)
+
+    return Object.assign({}, json, values, interactionValues, { dataRow })
+  },
+  updateUser(interaction) {
+    const values = this.getJSON(interaction)
+    const dataRowValues = JSON.parse(values.dataRow.components.at(0).options.at(0).value)
+    dataRowValues.u = interaction.user.id
+    values.dataRow.components.at(0).options.at(0).value = JSON.stringify(dataRowValues)
+
+    return values
   }
 }

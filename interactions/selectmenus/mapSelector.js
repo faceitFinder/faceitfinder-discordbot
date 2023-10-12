@@ -7,8 +7,9 @@ const loadingCard = require('../../templates/loadingCard')
 const errorCard = require('../../templates/errorCard')
 const { getTranslation } = require('../../languages/setup')
 const { getStats } = require('../../functions/apiHandler')
+const { getOptionsValues } = require('../../functions/commands')
 
-const sendCardWithInfo = async (interaction, playerId, map, mode) => {
+const sendCardWithInfo = async (interaction, playerId, map, mode, game) => {
   if (!map) return
 
   const {
@@ -24,10 +25,11 @@ const sendCardWithInfo = async (interaction, playerId, map, mode) => {
     matchNumber: 0,
     checkElo: true,
     map,
+    game
   })
 
-  const faceitLevel = playerDatas.games.csgo.skill_level
-  const faceitElo = playerDatas.games.csgo.faceit_elo
+  const faceitLevel = playerDatas.games[game].skill_level
+  const faceitElo = playerDatas.games[game].faceit_elo
   const size = 40
   const filesAtt = []
 
@@ -46,7 +48,7 @@ const sendCardWithInfo = async (interaction, playerId, map, mode) => {
 
     return new Discord.EmbedBuilder()
       .setAuthor({ name: playerDatas.nickname, iconURL: playerDatas.avatar || null, url: `https://www.faceit.com/en/players/${playerDatas.nickname}` })
-      .setDescription(`[Steam](https://steamcommunity.com/profiles/${playerDatas.games.csgo.game_player_id}), [Faceit](https://www.faceit.com/en/players/${playerDatas.nickname})`)
+      .setDescription(`[Steam](https://steamcommunity.com/profiles/${playerDatas.games[game].game_player_id}), [Faceit](https://www.faceit.com/en/players/${playerDatas.nickname})`)
       .setThumbnail('attachment://level.png')
       .addFields({ name: 'Map', value: map, inline: true },
         { name: 'Mode', value: mode, inline: true },
@@ -87,7 +89,7 @@ module.exports = {
   async execute(interaction, values) {
     [values.m, values.v] = values.l.split(' ')
 
-    const options = interaction.message.components.at(0).components
+    const options = interaction.message.components.at(1).components
       .filter(e => e instanceof Discord.StringSelectMenuComponent)
       .map(msm => msm.options.map(o => {
         const active = o.value === interaction.values.at(0)
@@ -98,22 +100,36 @@ module.exports = {
         return o
       })).at(0)
 
-    const components = new Discord.ActionRowBuilder()
-      .addComponents(
-        new Discord.StringSelectMenuBuilder()
-          .setCustomId('mapSelector')
-          .addOptions(options))
+    const components = [
+      values.dataRow,
+      new Discord.ActionRowBuilder()
+        .addComponents(
+          new Discord.StringSelectMenuBuilder()
+            .setCustomId('mapSelector')
+            .addOptions(options))
+    ]
 
     loadingCard(interaction)
 
     return {
-      ...await sendCardWithInfo(interaction, values.s, values.m, values.v),
+      ...await sendCardWithInfo(interaction, values.s, values.m, values.v, values.g),
       content: null,
-      components: [components]
+      components: components
     }
   },
   sendCardWithInfo,
   getJSON(interaction, json) {
-    return JSON.parse(interaction.values)
+    const values = getOptionsValues(interaction)
+    const dataRow = interaction.message.components.at(0)
+
+    return Object.assign({}, JSON.parse(interaction.values), values, { dataRow })
+  },
+  updateUser(interaction) {
+    const values = this.getJSON(interaction)
+    const dataRowValues = JSON.parse(values.dataRow.components.at(0).options.at(0).value)
+    dataRowValues.u = interaction.user.id
+    values.dataRow.components.at(0).options.at(0).value = JSON.stringify(dataRowValues)
+
+    return values
   }
 }

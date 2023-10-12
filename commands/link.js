@@ -1,3 +1,4 @@
+const { defaultGame } = require('../config.json')
 const Discord = require('discord.js')
 const User = require('../database/user')
 const { getCardsConditions, getInteractionOption } = require('../functions/commands')
@@ -42,7 +43,8 @@ const link = async (interaction, playerParam, discordId, guildId = null, nicknam
     playerDatas
   } = await getStats({
     playerParam,
-    matchNumber: 1
+    matchNumber: 1,
+    game: defaultGame,
   })
 
   const playerId = playerDatas.player_id
