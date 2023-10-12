@@ -166,7 +166,7 @@ const getCardWithInfo = async (
   }
 }
 
-const buildButtonValues = (json) => {
+const buildButtonValues = (json, optionJson) => {
   return JSON.stringify({
     s: json.s,
     f: json.f,
@@ -183,7 +183,7 @@ const updateOptions = (components, values, updateEmoji = true) => {
         if (values.id.normalize() === 'uDSG') return o
       } catch (error) { }
 
-      const active = o.value.normalize() === buildButtonValues(values).normalize()
+      const active = o.value.normalize() === (typeof values === 'object' ? buildButtonValues(values) : values).normalize()
       if (updateEmoji) o.emoji = active ? emojis.select.balise : undefined
       o.default = active
 
