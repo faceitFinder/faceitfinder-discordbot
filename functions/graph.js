@@ -217,9 +217,9 @@ const getGraph = (interaction, playerName, type, matchHistory, maxMatch) => {
   })
 
   switch (type) {
-    case CustomType.TYPES.ELO: return getElo(maxMatch, matchHistory)
-    case CustomType.TYPES.KD: return getKD(maxMatch, matchHistory,)
-    default: break
+  case CustomType.TYPES.ELO: return getElo(maxMatch, matchHistory)
+  case CustomType.TYPES.KD: return getKD(maxMatch, matchHistory,)
+  default: break
   }
 }
 
