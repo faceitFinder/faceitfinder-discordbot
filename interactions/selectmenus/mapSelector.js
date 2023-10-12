@@ -112,7 +112,7 @@ module.exports = {
     loadingCard(interaction)
 
     return {
-      ...await sendCardWithInfo(interaction, values.s, values.m, values.v),
+      ...await sendCardWithInfo(interaction, values.s, values.m, values.v, values.g),
       content: null,
       components: components
     }

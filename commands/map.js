@@ -58,7 +58,7 @@ const sendCardWithInfo = async (interaction, playerParam) => {
         .addOptions(options.slice(0, 25)))
 
   return {
-    ...await mapSelector.sendCardWithInfo(interaction, playerId, map, '5v5'),
+    ...await mapSelector.sendCardWithInfo(interaction, playerId, map, '5v5', game),
     content: map ? ' ' : getTranslation('strings.selectMapDescription', interaction.locale, { playerName: playerDatas.nickname }),
     components: buildRows(row, interaction, game, 'strings.selectMap')
   }
