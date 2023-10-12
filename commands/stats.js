@@ -52,8 +52,6 @@ const sendCardWithInfo = async (interaction, playerParam, type = CustomType.TYPE
   const faceitLevel = playerDatas.games[game].skill_level
   const size = 40
 
-  console.log(faceitLevel, faceitElo)
-
   const rankImageCanvas = await Graph.getRankImage(faceitLevel, faceitElo, size, game)
 
   const card = new Discord.EmbedBuilder()
