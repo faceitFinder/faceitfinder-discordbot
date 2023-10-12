@@ -1,5 +1,5 @@
 const Discord = require('discord.js')
-const { getInteractionOption, getCardsConditions } = require('../functions/commands')
+const { getInteractionOption, getCardsConditions, getGameOption } = require('../functions/commands')
 const Options = require('../templates/options')
 const DateStats = require('../functions/dateStats')
 const CustomType = require('../templates/customType')
@@ -13,16 +13,18 @@ const sendCardWithInfo = async (interaction, playerParam, type = CustomType.TYPE
   const map = getInteractionOption(interaction, 'map')
   const maxMatch = getInteractionOption(interaction, 'match_number') ?? 20
   const lastMatchString = getTranslation('strings.lastStatsLabel', interaction.locale)
-  
+  const game = getGameOption(interaction)
+
   const {
     playerDatas
   } = await getStats({
     playerParam,
     matchNumber: maxMatch,
-    map: map
+    map: map,
+    game
   })
 
-  const option = {
+  const options = [{
     label: lastMatchString,
     description: lastMatchString,
     value: JSON.stringify({
@@ -32,15 +34,21 @@ const sendCardWithInfo = async (interaction, playerParam, type = CustomType.TYPE
       u: interaction.user.id
     }),
     default: true
-  }
+  }, {
+    label: 'game',
+    description: 'game',
+    value: JSON.stringify({
+      g: game
+    })
+  }]
 
   const row = new Discord.ActionRowBuilder()
     .addComponents(new Discord.StringSelectMenuBuilder()
       .setCustomId('lastStatsSelector')
-      .addOptions([option])
+      .addOptions(options)
       .setDisabled(true))
 
-  let values = JSON.parse(option.value)
+  let values = Object.assign({}, ...options.map(e => JSON.parse(e.value)))
 
   if (from.toString() !== 'Invalid Date') values.f = from.getTime() / 1000
   if (to.toString() !== 'Invalid Date') values.t = to.getTime() / 1000
@@ -55,13 +63,14 @@ const sendCardWithInfo = async (interaction, playerParam, type = CustomType.TYPE
     null,
     null,
     map,
-    true
+    true,
+    game
   )
 }
 
 const getOptions = () => {
   const options = structuredClone(Options.stats)
-  options.unshift({
+  options.push({
     name: 'match_number',
     description: getTranslation('options.matchNumber', 'en-US', {
       default: '20'

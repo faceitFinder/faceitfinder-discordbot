@@ -7,6 +7,7 @@ const Discord = require('discord.js')
 const noMention = require('../templates/noMention')
 const { updateRoles } = require('./roles')
 const { getTranslation } = require('../languages/setup')
+const { defaultGame } = require('../config.json')
 
 const getPlayerDatas = async (interaction, param, steam, discord = false, faceitId = false) => {
   if (discord) {
@@ -149,8 +150,22 @@ const getInteractionOption = (interaction, name) => {
   return interaction.options?._hoistedOptions?.filter(o => o.name === name)[0]?.value
 }
 
+const getGameOption = (interaction) => {
+  return interaction.options?._hoistedOptions?.filter(o => o.name === 'game')[0]?.value ?? defaultGame
+}
+
 const isInteractionSubcommandEqual = (interaction, name) => {
   return interaction.options?._subcommand === name
+}
+
+const getOptionsValues = (interaction, componentIndex = 0, selectMenuIndex = 0) => {
+  const options = interaction.message.components.at(componentIndex).components.at(selectMenuIndex).options
+  const values = Object.assign({}, ...options.map((e, i) => {
+    const option = getDefaultInteractionOption(interaction, componentIndex, selectMenuIndex, i, false)
+    return JSON.parse(option.value)
+  }))
+
+  return values
 }
 
 module.exports = {
@@ -158,5 +173,7 @@ module.exports = {
   getInteractionOption,
   isInteractionSubcommandEqual,
   getDefaultInteractionOption,
-  getUsers
+  getUsers,
+  getGameOption,
+  getOptionsValues
 }

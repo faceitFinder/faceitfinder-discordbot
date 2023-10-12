@@ -4,7 +4,7 @@ const fs = require('fs')
 const Graph = require('../functions/graph')
 const errorCard = require('../templates/errorCard')
 const Options = require('../templates/options')
-const { getCardsConditions, getInteractionOption } = require('../functions/commands')
+const { getCardsConditions, getInteractionOption, getGameOption } = require('../functions/commands')
 const { getPagination, getPageSlice, getMaxPage } = require('../functions/pagination')
 const { getMapOption } = require('../functions/map')
 const { getTranslations, getTranslation } = require('../languages/setup')
@@ -17,11 +17,11 @@ const getLevelFromElo = (elo) => {
   return colorLevel?.at(0)
 }
 
-const getMatchItems = async (interaction, playerDatas, steamDatas, playerHistory, matchId) => {
+const getMatchItems = async (interaction, playerDatas, steamDatas, playerHistory, matchId, game) => {
   const size = 40
   const filesAtt = []
   const cards = []
-  const faceitElo = playerDatas.games.csgo.faceit_elo
+  const faceitElo = playerDatas.games[game].faceit_elo
   const matchStats = playerHistory.filter(e => e.matchId === matchId)
 
   if (cards.length === 0)
@@ -51,7 +51,7 @@ const getMatchItems = async (interaction, playerDatas, steamDatas, playerHistory
       mapThumbnail = `./images/maps/${mapName}.jpg`
 
       card.setAuthor({ name: playerDatas.nickname, iconURL: playerDatas.avatar || null, url: `https://www.faceit.com/en/players/${playerDatas.nickname}` })
-        .setDescription(`[Steam](https://steamcommunity.com/profiles/${playerDatas.games.csgo.game_player_id}), [Game Lobby](https://www.faceit.com/en/csgo/room/${matchId}/scoreboard)`)
+        .setDescription(`[Steam](https://steamcommunity.com/profiles/${playerDatas.games[game].game_player_id}), [Game Lobby](https://www.faceit.com/en/${game}/room/${matchId}/scoreboard)`)
         .addFields({ name: 'Score', value: roundStats.i18, inline: true },
           { name: 'Map', value: mapName, inline: true },
           { name: 'Status', value: result ? emojis.won.balise : emojis.lost.balise, inline: true },
@@ -88,9 +88,10 @@ const sendCardWithInfo = async (
   mapName = null,
   lastSelectorId = 'lastSelector',
   pageId = 'pageLast',
-  maxMatch = null
+  maxMatch = null,
 ) => {
   const map = getInteractionOption(interaction, 'map')
+  const game = getGameOption(interaction)
   maxMatch = getInteractionOption(interaction, 'match_number') ?? maxMatch ?? 25
   if (map) mapName = map
 
@@ -106,6 +107,7 @@ const sendCardWithInfo = async (
     startDate: '',
     endDate: '',
     checkElo: +(page === 0),
+    game
   })
 
   if (!playerHistory.length > 0) return errorCard(getTranslation('error.user.lastMatchNoStats', interaction.locale, {
@@ -122,7 +124,8 @@ const sendCardWithInfo = async (
     playerHistory,
     page,
     lastSelectorId,
-    pageId
+    pageId,
+    game
   })
 }
 
@@ -136,7 +139,8 @@ const getLastCard = async ({
   matchId = null,
   page = 0,
   lastSelectorId = 'lastSelector',
-  pageId = 'pageLast'
+  pageId = 'pageLast',
+  game
 }) => {
   const playerId = playerDatas.player_id
   const files = []
@@ -151,7 +155,7 @@ const getLastCard = async ({
 
   if (!matchId) matchId = filteredHistory.slice(pagination.start, pagination.end).at(0)
 
-  const matchItems = await getMatchItems(interaction, playerDatas, steamDatas, playerHistory, matchId)
+  const matchItems = await getMatchItems(interaction, playerDatas, steamDatas, playerHistory, matchId, game)
   const options = filteredHistory.map(e => {
     const matchRounds = playerHistory.filter(matches => matches.matchId === e)
     const match = matchRounds.at(0)
@@ -188,6 +192,12 @@ const getLastCard = async ({
               m: mapName,
               l: maxMatch
             })
+          }, {
+            label: 'game',
+            description: game,
+            value: JSON.stringify({
+              g: game
+            })
           }])),
     new Discord.ActionRowBuilder()
       .addComponents(
@@ -206,8 +216,7 @@ const getLastCard = async ({
 
 const getOptions = () => {
   const options = structuredClone(Options.stats)
-  options.unshift(getMapOption())
-  options.push({
+  options.unshift(getMapOption(), {
     name: 'match_number',
     description: getTranslation('options.matchNumber', 'en-US', {
       default: '25'

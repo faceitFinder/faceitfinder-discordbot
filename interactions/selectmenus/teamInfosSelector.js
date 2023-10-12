@@ -1,4 +1,4 @@
-const { color, emojis } = require('../../config.json')
+const { color, emojis, defaultGame } = require('../../config.json')
 const Discord = require('discord.js')
 const loadingCard = require('../../templates/loadingCard')
 const UserTeam = require('../../database/userTeam')
@@ -57,7 +57,8 @@ module.exports = {
           param: user.faceitId,
           faceitId: true
         },
-        matchNumber: 1
+        matchNumber: 1,
+        game: defaultGame,
       })
 
       return {
@@ -74,7 +75,7 @@ module.exports = {
     if (usersInfo.length > 0) usersInfo.forEach(user => {
       embed.addFields({
         name: `${user.faceit.nickname}`,
-        value: `[Steam](https://steamcommunity.com/profiles/${user.faceit.games.csgo.game_player_id})\n[Faceit](https://www.faceit.com/en/players/${user.faceit.nickname})`,
+        value: `[Steam](https://steamcommunity.com/profiles/${user.faceit.games[defaultGame].game_player_id})\n[Faceit](https://www.faceit.com/en/players/${user.faceit.nickname})`,
         inline: true,
       })
     })

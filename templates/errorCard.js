@@ -8,7 +8,7 @@ module.exports = (description, lang) => {
   return {
     embeds: [new Discord.EmbedBuilder()
       .setColor(color.error)
-      .setDescription(description)
+      .setDescription(description ?? getTranslation('error.execution.command', lang))
       .setFooter({ text: `${name} ${getTranslation('strings.error', lang)}` })]
   }
 }

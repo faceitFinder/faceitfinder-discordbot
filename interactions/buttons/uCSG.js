@@ -1,5 +1,5 @@
 const CommandsStats = require('../../database/commandsStats')
-const { getDefaultInteractionOption } = require('../../functions/commands')
+const { getDefaultInteractionOption, getOptionsValues } = require('../../functions/commands')
 const { sendCardWithInfo } = require('../../commands/compare')
 const CustomType = require('../../templates/customType')
 const loadingCard = require('../../templates/loadingCard')
@@ -21,11 +21,10 @@ module.exports = {
     }, {
       param: json.p2,
       faceitId: true
-    }, CustomType.getType(interaction.component.label), json.m, json.c)
+    }, CustomType.getType(interaction.component.label), json.m, json.c, json.g)
   },
   getJSON(interaction, json) {
-    const values = getDefaultInteractionOption(interaction).value
-    const matchDatas = getDefaultInteractionOption(interaction, 0, 0, 1, false).value
-    return { ...json, ...JSON.parse(values), ...JSON.parse(matchDatas) }
+    const values = getOptionsValues(interaction)
+    return Object.assign({}, json, values)
   },
 }
