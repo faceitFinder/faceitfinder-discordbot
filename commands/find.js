@@ -124,7 +124,7 @@ const sendCardWithInfo = async (
 
   const selectedPlayerStats = new EmbedBuilder()
     .setAuthor({ name: playerDatas.nickname, iconURL: playerDatas.avatar || null, url: `https://www.faceit.com/en/players/${playerDatas.nickname}` })
-    .setDescription(`[Steam](https://steamcommunity.com/profiles/${playerDatas.games.csgo.game_player_id}), [Faceit](https://www.faceit.com/en/players/${playerDatas.nickname})`)
+    .setDescription(`[Steam](https://steamcommunity.com/profiles/${playerDatas.games[game].game_player_id}), [Faceit](https://www.faceit.com/en/players/${playerDatas.nickname})`)
     .setThumbnail(`attachment://${faceitLevel}level.png`)
     .addFields(
       ...head,

@@ -28,8 +28,8 @@ const sendCardWithInfo = async (interaction, playerId, map, mode, game) => {
     game
   })
 
-  const faceitLevel = playerDatas.games.csgo.skill_level
-  const faceitElo = playerDatas.games.csgo.faceit_elo
+  const faceitLevel = playerDatas.games[game].skill_level
+  const faceitElo = playerDatas.games[game].faceit_elo
   const size = 40
   const filesAtt = []
 
@@ -48,7 +48,7 @@ const sendCardWithInfo = async (interaction, playerId, map, mode, game) => {
 
     return new Discord.EmbedBuilder()
       .setAuthor({ name: playerDatas.nickname, iconURL: playerDatas.avatar || null, url: `https://www.faceit.com/en/players/${playerDatas.nickname}` })
-      .setDescription(`[Steam](https://steamcommunity.com/profiles/${playerDatas.games.csgo.game_player_id}), [Faceit](https://www.faceit.com/en/players/${playerDatas.nickname})`)
+      .setDescription(`[Steam](https://steamcommunity.com/profiles/${playerDatas.games[game].game_player_id}), [Faceit](https://www.faceit.com/en/players/${playerDatas.nickname})`)
       .setThumbnail('attachment://level.png')
       .addFields({ name: 'Map', value: map, inline: true },
         { name: 'Mode', value: mode, inline: true },

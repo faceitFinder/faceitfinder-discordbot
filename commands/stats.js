@@ -27,7 +27,7 @@ const sendCardWithInfo = async (interaction, playerParam, type = CustomType.TYPE
 
   const playerId = playerDatas.player_id
   const playerCountry = playerDatas.country
-  const playerRegion = playerDatas.games.csgo.region
+  const playerRegion = playerDatas.games[game].region
   const ladderCountry = await getLadder({
     playerParam,
     region: playerRegion,
@@ -39,7 +39,7 @@ const sendCardWithInfo = async (interaction, playerParam, type = CustomType.TYPE
     region: playerRegion,
     game
   })
-  const faceitElo = playerDatas.games.csgo.faceit_elo
+  const faceitElo = playerDatas.games[game].faceit_elo
   const buttonValues = {
     id: 'uSG',
     s: playerId,
@@ -49,7 +49,7 @@ const sendCardWithInfo = async (interaction, playerParam, type = CustomType.TYPE
 
   const graphBuffer = Graph.generateChart(interaction, playerDatas.nickname, playerHistory, maxMatch, type)
 
-  const faceitLevel = playerDatas.games.csgo.skill_level
+  const faceitLevel = playerDatas.games[game].skill_level
   const size = 40
 
   const rankImageCanvas = await Graph.getRankImage(faceitLevel, faceitElo, size)
@@ -60,7 +60,7 @@ const sendCardWithInfo = async (interaction, playerParam, type = CustomType.TYPE
       iconURL: playerDatas.avatar || null,
       url: `https://www.faceit.com/en/players/${playerDatas.nickname}`
     })
-    .setDescription(`[Steam](https://steamcommunity.com/profiles/${playerDatas.games.csgo.game_player_id}), [Faceit](https://www.faceit.com/en/players/${playerDatas.nickname})`)
+    .setDescription(`[Steam](https://steamcommunity.com/profiles/${playerDatas.games[game].game_player_id}), [Faceit](https://www.faceit.com/en/players/${playerDatas.nickname})`)
     .setThumbnail(`attachment://${faceitLevel}level.png`)
     .addFields(
       { name: 'Games', value: `${playerStats.lifetime.Matches} (${playerStats.lifetime['Win Rate %']}% Win)`, inline: true },

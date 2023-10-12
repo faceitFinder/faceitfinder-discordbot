@@ -51,7 +51,7 @@ const getMatchItems = async (interaction, playerDatas, steamDatas, playerHistory
       mapThumbnail = `./images/maps/${mapName}.jpg`
 
       card.setAuthor({ name: playerDatas.nickname, iconURL: playerDatas.avatar || null, url: `https://www.faceit.com/en/players/${playerDatas.nickname}` })
-        .setDescription(`[Steam](https://steamcommunity.com/profiles/${playerDatas.games.csgo.game_player_id}), [Game Lobby](https://www.faceit.com/en/csgo/room/${matchId}/scoreboard)`)
+        .setDescription(`[Steam](https://steamcommunity.com/profiles/${playerDatas.games[game].game_player_id}), [Game Lobby](https://www.faceit.com/en/${game}/room/${matchId}/scoreboard)`)
         .addFields({ name: 'Score', value: roundStats.i18, inline: true },
           { name: 'Map', value: mapName, inline: true },
           { name: 'Status', value: result ? emojis.won.balise : emojis.lost.balise, inline: true },

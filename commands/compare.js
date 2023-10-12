@@ -127,9 +127,9 @@ const sendCardWithInfo = async (interaction, player1Param, player2Param, type = 
     },
     {
       name: 'Elo',
-      value: `**${player1.playerDatas.games.csgo.faceit_elo}** - \
-      ${player2.playerDatas.games.csgo.faceit_elo} \
-      ${compareStats(player1.playerDatas.games.csgo.faceit_elo, player2.playerDatas.games.csgo.faceit_elo)}`,
+      value: `**${player1.playerDatas.games[game].faceit_elo}** - \
+      ${player2.playerDatas.games[game].faceit_elo} \
+      ${compareStats(player1.playerDatas.games[game].faceit_elo, player2.playerDatas.games[game].faceit_elo)}`,
       inline: true
     },
     {
@@ -261,7 +261,7 @@ const sendCardWithInfo = async (interaction, player1Param, player2Param, type = 
       user.playerDatas.nickname,
       type,
       playerColor[i],
-      Graph.getGraph(interaction, user.playerDatas.nickname, type, user.playerHistory, user.playerDatas.games.csgo.faceit_elo, maxMatch, true).reverse()
+      Graph.getGraph(interaction, user.playerDatas.nickname, type, user.playerHistory, user.playerDatas.games[game].faceit_elo, maxMatch, true).reverse()
     ])
 
   const graphBuffer = Graph.getChart(

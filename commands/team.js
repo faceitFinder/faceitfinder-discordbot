@@ -124,7 +124,7 @@ const addUser = async (interaction, playerParam) => {
     teamName: currentTeam.name
   })
 
-  return successCard(`${successMessage} [Steam](https://steamcommunity.com/profiles/${playerDatas.games.csgo.game_player_id}) - [Faceit](https://www.faceit.com/en/players/${playerDatas.nickname})`, interaction.locale)
+  return successCard(`${successMessage} [Steam](https://steamcommunity.com/profiles/${playerDatas.games[defaultGame].game_player_id}) - [Faceit](https://www.faceit.com/en/players/${playerDatas.nickname})`, interaction.locale)
 }
 
 const removeUser = async (interaction, playerParam) => {
