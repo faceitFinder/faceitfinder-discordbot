@@ -1,22 +1,25 @@
 const { emojis } = require('../config.json')
 const Discord = require('discord.js')
 const Options = require('../templates/options')
-const { getCardsConditions, getInteractionOption } = require('../functions/commands')
+const { getCardsConditions, getInteractionOption, getGameOption } = require('../functions/commands')
 const mapSelector = require('../interactions/selectmenus/mapSelector')
 const { getMapOption } = require('../functions/map')
 const { getTranslations, getTranslation } = require('../languages/setup')
 const { getStats } = require('../functions/apiHandler')
+const { buildRows } = require('../functions/dateStats')
 
 const sendCardWithInfo = async (interaction, playerParam) => {
   const options = []
   const map = getInteractionOption(interaction, 'map')
+  const game = getGameOption(interaction)
 
   const {
     playerDatas,
     playerStats,
   } = await getStats({
     playerParam,
-    matchNumber: 1
+    matchNumber: 1,
+    game
   })
 
   const playerId = playerDatas.player_id
@@ -25,8 +28,7 @@ const sendCardWithInfo = async (interaction, playerParam) => {
     const label = `${e.label} ${e.mode}`
     const values = {
       l: label,
-      s: playerId,
-      u: interaction.user.id
+      s: playerId
     }
 
     if (!options.filter(e => e.data.label === label).length > 0) {
@@ -53,13 +55,12 @@ const sendCardWithInfo = async (interaction, playerParam) => {
       new Discord.StringSelectMenuBuilder()
         .setCustomId('mapSelector')
         .setPlaceholder(getTranslation('strings.selectMap', interaction.locale))
-        .addOptions(options.slice(0, 25)),
-    )
+        .addOptions(options.slice(0, 25)))
 
   return {
     ...await mapSelector.sendCardWithInfo(interaction, playerId, map, '5v5'),
     content: map ? ' ' : getTranslation('strings.selectMapDescription', interaction.locale, { playerName: playerDatas.nickname }),
-    components: [row]
+    components: buildRows(row, interaction, game, 'strings.selectMap')
   }
 }
 

@@ -7,8 +7,9 @@ const loadingCard = require('../../templates/loadingCard')
 const errorCard = require('../../templates/errorCard')
 const { getTranslation } = require('../../languages/setup')
 const { getStats } = require('../../functions/apiHandler')
+const { getOptionsValues } = require('../../functions/commands')
 
-const sendCardWithInfo = async (interaction, playerId, map, mode) => {
+const sendCardWithInfo = async (interaction, playerId, map, mode, game) => {
   if (!map) return
 
   const {
@@ -24,6 +25,7 @@ const sendCardWithInfo = async (interaction, playerId, map, mode) => {
     matchNumber: 0,
     checkElo: true,
     map,
+    game
   })
 
   const faceitLevel = playerDatas.games.csgo.skill_level
@@ -87,7 +89,7 @@ module.exports = {
   async execute(interaction, values) {
     [values.m, values.v] = values.l.split(' ')
 
-    const options = interaction.message.components.at(0).components
+    const options = interaction.message.components.at(1).components
       .filter(e => e instanceof Discord.StringSelectMenuComponent)
       .map(msm => msm.options.map(o => {
         const active = o.value === interaction.values.at(0)
@@ -98,22 +100,36 @@ module.exports = {
         return o
       })).at(0)
 
-    const components = new Discord.ActionRowBuilder()
-      .addComponents(
-        new Discord.StringSelectMenuBuilder()
-          .setCustomId('mapSelector')
-          .addOptions(options))
+    const components = [
+      values.dataRow,
+      new Discord.ActionRowBuilder()
+        .addComponents(
+          new Discord.StringSelectMenuBuilder()
+            .setCustomId('mapSelector')
+            .addOptions(options))
+    ]
 
     loadingCard(interaction)
 
     return {
       ...await sendCardWithInfo(interaction, values.s, values.m, values.v),
       content: null,
-      components: [components]
+      components: components
     }
   },
   sendCardWithInfo,
   getJSON(interaction, json) {
-    return JSON.parse(interaction.values)
+    const values = getOptionsValues(interaction)
+    const dataRow = interaction.message.components.at(0)
+
+    return Object.assign({}, JSON.parse(interaction.values), values, { dataRow })
+  },
+  updateUser(interaction) {
+    const values = this.getJSON(interaction)
+    const dataRowValues = JSON.parse(values.dataRow.components.at(0).options.at(0).value)
+    dataRowValues.u = interaction.user.id
+    values.dataRow.components.at(0).options.at(0).value = JSON.stringify(dataRowValues)
+
+    return values
   }
 }
