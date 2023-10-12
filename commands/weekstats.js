@@ -1,7 +1,7 @@
 const Discord = require('discord.js')
 const errorCard = require('../templates/errorCard')
 const DateStats = require('../functions/dateStats')
-const { getCardsConditions } = require('../functions/commands')
+const { getCardsConditions, getGameOption } = require('../functions/commands')
 const CustomType = require('../templates/customType')
 const Options = require('../templates/options')
 const { getPageSlice, getMaxPage } = require('../functions/pagination')
@@ -16,13 +16,16 @@ const getMonday = date => {
   return new Date(date.setDate(date.getDate() - week[date.getDay()])).getTime()
 }
 
-const sendCardWithInfo = async (interaction, playerParam, page = 0) => {
+const sendCardWithInfo = async (interaction, playerParam, page = 0, game = null) => {
+  game ??= getGameOption(interaction)
+
   const {
     playerDatas,
     playerHistory
   } = await getStats({
     playerParam,
-    matchNumber: 0
+    matchNumber: 0,
+    game
   })
 
   const playerId = playerDatas.player_id
@@ -39,8 +42,7 @@ const sendCardWithInfo = async (interaction, playerParam, page = 0) => {
       .setValue(JSON.stringify({
         s: playerId,
         f: date.date / 1000,
-        t: to.getTime() / 1000,
-        u: interaction.user.id
+        t: to.getTime() / 1000
       }))
 
     options.push(option)
@@ -64,13 +66,16 @@ const sendCardWithInfo = async (interaction, playerParam, page = 0) => {
 
   return DateStats.getCardWithInfo(
     interaction,
-    row,
+    DateStats.buildRows(row, interaction, game, 'strings.selectWeek'),
     JSON.parse(pagination[0].data.value),
     CustomType.TYPES.ELO,
     'uDSG',
     0,
     getMaxPage(options),
-    page
+    page,
+    null,
+    false,
+    game
   )
 }
 

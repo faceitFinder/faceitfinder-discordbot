@@ -1,6 +1,25 @@
 const { ApplicationCommandOptionType } = require('discord.js')
 const { getTranslations, getTranslation } = require('../languages/setup')
 
+const gameOption = {
+  name: 'game',
+  description: getTranslation('options.gameParameter', 'en-US'),
+  // descriptionLocalizations: getTranslations('options.gameParameter'),
+  required: false,
+  type: ApplicationCommandOptionType.String,
+  slash: true,
+  choices: [
+    {
+      name: 'CS:GO',
+      value: 'csgo'
+    },
+    {
+      name: 'Counter-Strike 2',
+      value: 'cs2'
+    }
+  ]
+}
+
 const stats = [
   {
     name: 'steam_parameters',
@@ -25,7 +44,8 @@ const stats = [
     required: false,
     type: ApplicationCommandOptionType.String,
     slash: true
-  }
+  },
+  gameOption,
 ]
 
 const dateRange = [
@@ -54,5 +74,6 @@ module.exports = {
   stats,
   usage,
   dateRange,
-  dateRangeUsage
+  dateRangeUsage,
+  gameOption
 }

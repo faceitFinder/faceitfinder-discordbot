@@ -8,7 +8,7 @@ const {
 } = require('discord.js')
 const { color } = require('../config.json')
 const Options = require('../templates/options')
-const { getUsers, getInteractionOption } = require('../functions/commands')
+const { getUsers, getInteractionOption, getGameOption } = require('../functions/commands')
 const { getMapOption } = require('../functions/map')
 const { getTranslations, getTranslation } = require('../languages/setup')
 const User = require('../database/user')
@@ -23,7 +23,7 @@ const successCard = require('../templates/successCard')
 
 const getOptions = () => {
   const options = structuredClone(Options.stats)
-  options.unshift({
+  options.push({
     name: 'player_aimed',
     description: getTranslation('options.playerAimed', 'en-US'),
     descriptionLocalizations: getTranslations('options.playerAimed'),
@@ -69,7 +69,8 @@ const sendCardWithInfo = async (
   steamIncluded,
   faceitIncluded,
   steamExcluded,
-  faceitExcluded
+  faceitExcluded,
+  game
 ) => {
   let {
     playerDatas,
@@ -87,6 +88,7 @@ const sendCardWithInfo = async (
     faceitIncluded,
     steamExcluded,
     faceitExcluded,
+    game
   })
 
   if (!playerHistory.length) return successCard(getTranslation('error.user.noMatchFoundWithOthers', interaction.locale, {
@@ -94,8 +96,8 @@ const sendCardWithInfo = async (
   }), interaction.locale)
 
   const playerId = playerDatas.player_id
-  const faceitLevel = playerDatas.games.csgo.skill_level
-  const faceitElo = playerDatas.games.csgo.faceit_elo
+  const faceitLevel = playerDatas.games[game].skill_level
+  const faceitElo = playerDatas.games[game].faceit_elo
   const size = 40
   const graphBuffer = generateChart(
     interaction,
@@ -122,7 +124,7 @@ const sendCardWithInfo = async (
 
   const selectedPlayerStats = new EmbedBuilder()
     .setAuthor({ name: playerDatas.nickname, iconURL: playerDatas.avatar || null, url: `https://www.faceit.com/en/players/${playerDatas.nickname}` })
-    .setDescription(`[Steam](https://steamcommunity.com/profiles/${playerDatas.games.csgo.game_player_id}), [Faceit](https://www.faceit.com/en/players/${playerDatas.nickname})`)
+    .setDescription(`[Steam](https://steamcommunity.com/profiles/${playerDatas.games[game].game_player_id}), [Faceit](https://www.faceit.com/en/players/${playerDatas.nickname})`)
     .setThumbnail(`attachment://${faceitLevel}level.png`)
     .addFields(
       ...head,
@@ -170,7 +172,8 @@ const sendCardWithInfo = async (
     mapName: map,
     maxMatch: matchNumber,
     lastSelectorId: 'findSelector',
-    pageId: 'pageFind'
+    pageId: 'pageFind',
+    game
   })
 
   if (includedPlayers.length > 0)
@@ -240,10 +243,12 @@ module.exports = {
       })
     }
 
+    const game = getGameOption(interaction)
     const playerParam = (await Promise.all(playerParams.map(playerParam => getStats({
       playerParam,
       matchNumber: 1,
-      checkElo: 1
+      checkElo: 1,
+      game
     }).catch(() => null))
     )).filter(e => e).find(e => e.playerDatas)
 
@@ -265,7 +270,7 @@ module.exports = {
       steamIncluded = (await getUsers(interaction, 5 - faceitIncluded.length, 'steam_parameters', null, true, false))
         .map(e => e.param)
     } catch {
-      throw getTranslation('error.command.atLeastOneParameter', 'en-GB', {
+      throw getTranslation('error.command.atLeastOneParameter', interaction.locale, {
         parameters: 'steam_parameters, faceit_parameters, team',
         command: 'find'
       })
@@ -292,7 +297,8 @@ module.exports = {
       steamIncluded,
       faceitIncluded,
       steamExcluded,
-      faceitExcluded
+      faceitExcluded,
+      game
     )
   }
 }

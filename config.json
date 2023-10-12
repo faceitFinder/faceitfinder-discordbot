@@ -214,5 +214,6 @@
     "uk": "uk-UA",
     "vi": "vi-VN"
   },
-  "maxLengthTeamName": 14
+  "maxLengthTeamName": 14,
+  "defaultGame": "cs2"
 }

@@ -11,7 +11,8 @@ const formatParam = (playerParam) => {
 const getLadder = async ({
   playerParam,
   region = '',
-  country = ''
+  country = '',
+  game = ''
 }) => {
   const {
     faceit,
@@ -19,9 +20,10 @@ const getLadder = async ({
     id
   } = formatParam(playerParam)
 
-  return axios.get(`${process.env.API_URL}/api/ladder?faceit=${faceit}&steam=${steam}&id=${id}&region=${region}&country=${country}`)
+  return axios.get(`${process.env.API_URL}/api/ladder?faceit=${faceit}&steam=${steam}&id=${id}&region=${region}&country=${country}&game=${game}`)
     .then(res => res.data)
     .catch(e => {
+      if (e.response.status === 404) return { position: 'N/A' }
       console.error(e.response.status, e.response.statusText, e.response.config.url)
       throw e.response.data.error
     })
@@ -33,7 +35,8 @@ const getStats = async ({
   checkElo = 1,
   map = '',
   startDate = '',
-  endDate = ''
+  endDate = '',
+  game = ''
 }) => {
   const {
     faceit,
@@ -41,7 +44,7 @@ const getStats = async ({
     id
   } = formatParam(playerParam)
 
-  return axios.get(`${process.env.API_URL}/api/stats/${matchNumber}?faceit=${faceit}&steam=${steam}&id=${id}&checkElo=${checkElo}&map=${map}&startDate=${startDate}&endDate=${endDate}`)
+  return axios.get(`${process.env.API_URL}/api/stats/${matchNumber}?faceit=${faceit}&steam=${steam}&id=${id}&checkElo=${checkElo}&map=${map}&startDate=${startDate}&endDate=${endDate}&game=${game}`)
     .then(res => res.data)
     .catch(e => {
       console.error(e.response.status, e.response.statusText, e.response.config.url)
@@ -59,7 +62,8 @@ const getFind = async ({
   faceitIncluded = [],
   steamIncluded = [],
   faceitExcluded = [],
-  steamExcluded = []
+  steamExcluded = [],
+  game = ''
 }) => {
   const {
     faceit,
@@ -71,7 +75,7 @@ const getFind = async ({
   const faceitExcludedParam = faceitExcluded.join('&faceitExcluded=')
   const steamExcludedParam = steamExcluded.join('&steamExcluded=')
 
-  return axios.get(`${process.env.API_URL}/api/find?faceit=${faceit}&steam=${steam}&id=${id}&matchNumber=${matchNumber}&checkElo=${checkElo}&map=${map}&startDate=${startDate}&endDate=${endDate}&steamIncluded=${steamIncludedParam}&faceitIncluded=${faceitIncludedParam}&faceitExcluded=${faceitExcludedParam}&steamExcluded=${steamExcludedParam}`)
+  return axios.get(`${process.env.API_URL}/api/find?faceit=${faceit}&steam=${steam}&id=${id}&matchNumber=${matchNumber}&checkElo=${checkElo}&map=${map}&startDate=${startDate}&endDate=${endDate}&steamIncluded=${steamIncludedParam}&faceitIncluded=${faceitIncludedParam}&faceitExcluded=${faceitExcludedParam}&steamExcluded=${steamExcludedParam}&game=${game}`)
     .then(res => res.data)
     .catch(e => {
       console.error(e.response.status, e.response.statusText, e.response.config.url)

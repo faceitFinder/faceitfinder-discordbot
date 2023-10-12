@@ -37,7 +37,8 @@ const getCardWithInfo = async (
   maxPage = null,
   page = null,
   map = null,
-  updateStartDate = false
+  updateStartDate = false,
+  game = null
 ) => {
   const playerId = values.s
   const today = new Date().setHours(24, 0, 0, 0)
@@ -58,15 +59,16 @@ const getCardWithInfo = async (
     startDate,
     endDate,
     map: map || '',
-    checkElo: +((startDate !== '' ? today >= startDate : true) && today <= endDate)
+    checkElo: +((startDate !== '' ? today >= startDate : true) && today <= endDate),
+    game
   })
 
   if (!playerLastStats.games) throw getTranslation('error.user.noMatches', interaction.locale, {
     playerName: playerDatas.nickname
   })
 
-  const faceitLevel = playerDatas.games.csgo.skill_level
-  const faceitElo = playerDatas.games.csgo.faceit_elo
+  const faceitLevel = playerDatas.games[game].skill_level
+  const faceitElo = playerDatas.games[game].faceit_elo
   const size = 40
 
   const graphBuffer = Graph.generateChart(
@@ -97,7 +99,7 @@ const getCardWithInfo = async (
       iconURL: playerDatas.avatar || null,
       url: `https://www.faceit.com/en/players/${playerDatas.nickname}`
     })
-    .setDescription(`[Steam](https://steamcommunity.com/profiles/${playerDatas.games.csgo.game_player_id}), [Faceit](https://www.faceit.com/en/players/${playerDatas.nickname})`)
+    .setDescription(`[Steam](https://steamcommunity.com/profiles/${playerDatas.games[game].game_player_id}), [Faceit](https://www.faceit.com/en/players/${playerDatas.nickname})`)
     .setThumbnail(`attachment://${faceitLevel}level.png`)
     .addFields(...head,
       { name: 'Highest Elo', value: playerLastStats['Highest Elo'].toString(), inline: true },
@@ -131,7 +133,7 @@ const getCardWithInfo = async (
     .setFooter({ text: `Steam: ${steamDatas?.personaname || steamDatas}` })
 
   const components = [
-    actionRow,
+    ...[actionRow].flat(),
     new Discord.ActionRowBuilder()
       .addComponents([
         CustomTypeFunc.generateButtons(
@@ -164,18 +166,24 @@ const getCardWithInfo = async (
   }
 }
 
+const buildButtonValues = (json, optionJson) => {
+  return JSON.stringify({
+    s: json.s,
+    f: json.f,
+    t: json.t
+  })
+}
+
 const updateOptions = (components, values, updateEmoji = true) => {
   return components.filter(e => e instanceof Discord.StringSelectMenuComponent)
     .map(msm => msm.options.map(o => {
       // Do not reset if a button is clicked
       try {
-        const json = JSON.parse(values)
-        setOptionValues(o, json)
-
-        if (json.id.normalize() === 'uDSG') return o
+        setOptionValues(o, values)
+        if (values.id.normalize() === 'uDSG') return o
       } catch (error) { }
 
-      const active = o.value.normalize() === values.normalize()
+      const active = o.value.normalize() === (typeof values === 'object' ? buildButtonValues(values) : values).normalize()
       if (updateEmoji) o.emoji = active ? emojis.select.balise : undefined
       o.default = active
 
@@ -185,7 +193,7 @@ const updateOptions = (components, values, updateEmoji = true) => {
 
 const setOptionValues = (option, values) => {
   const oValue = JSON.parse(option.value)
-  oValue.u = values.u
+  if (oValue.u) oValue.u = values.u
   option.value = JSON.stringify(oValue)
   return option
 }
@@ -197,11 +205,35 @@ const getFromTo = (interaction, nameFrom = 'from_date', nameTo = 'to_date') => {
   return { from: new Date(from), to: new Date(to) }
 }
 
+const buildRows = (row, interaction, game, stringTranslation) => {
+  const selectDate = getTranslation(stringTranslation, interaction.locale)
+
+  return [
+    new Discord.ActionRowBuilder()
+      .addComponents(
+        new Discord.StringSelectMenuBuilder()
+          .setCustomId('dateStatsSelectorInfo')
+          .setPlaceholder(selectDate)
+          .addOptions({
+            label: selectDate,
+            description: selectDate,
+            value: JSON.stringify({
+              u: interaction.user.id,
+              g: game
+            })
+          })
+          .setDisabled(true)),
+    row
+  ]
+}
+
+
 module.exports = {
   getDates,
   getCardWithInfo,
   setOptionDefault,
   updateOptions,
   getFromTo,
-  setOptionValues
+  setOptionValues,
+  buildRows
 }

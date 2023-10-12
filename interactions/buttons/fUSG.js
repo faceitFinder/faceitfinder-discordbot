@@ -1,5 +1,6 @@
 const { sendCardWithInfo } = require('../../commands/find')
 const CommandsStats = require('../../database/commandsStats')
+const { getOptionsValues } = require('../../functions/commands')
 const loadingCard = require('../../templates/loadingCard')
 
 /**
@@ -18,10 +19,10 @@ module.exports = {
     return sendCardWithInfo(interaction, {
       param: json.s,
       faceitId: true
-    }, json.l, 1, json.m, [], players, [], excludedPlayers)
+    }, json.l, 1, json.m, [], players, [], excludedPlayers, json.g)
   },
   getJSON(interaction, json) {
-    const values = JSON.parse(interaction.message.components.at(0).components.at(0).options.at(0).value)
+    const values = getOptionsValues(interaction)
     values.s = json.s
     values.l = json.l
     return values
