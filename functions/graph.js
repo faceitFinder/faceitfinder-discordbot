@@ -5,7 +5,7 @@ const CustomType = require('../templates/customType')
 const Chart = require('chart.js/auto')
 const { getTranslation } = require('../languages/setup')
 
-const generateChart = (interaction, playerName, matchHistory, maxMatch = 20, type = CustomType.TYPES.ELO) => {
+const generateChart = (interaction, playerName, matchHistory, maxMatch = 20, type = CustomType.TYPES.ELO, game) => {
   const datas = []
   const types = type.name.split('-').map(e => {
     return CustomType.getType(e.trim())
@@ -19,10 +19,10 @@ const generateChart = (interaction, playerName, matchHistory, maxMatch = 20, typ
     year: 'numeric'
   }))
 
-  return getChart(datas, labels.slice(0, maxMatch).reverse(), getClassicDatasets, datas.length > 1)
+  return getChart(datas, labels.slice(0, maxMatch).reverse(), getClassicDatasets, datas.length > 1, game)
 }
 
-const getChart = (datasets, labels, datasetFunc, displayY1) => {
+const getChart = (datasets, labels, datasetFunc, displayY1, game) => {
   const canvas = Canvas.createCanvas(600, 400)
   const ctx = canvas.getContext('2d')
 
@@ -44,7 +44,7 @@ const getChart = (datasets, labels, datasetFunc, displayY1) => {
     type: 'line',
     data: {
       labels: labels,
-      datasets: datasets.map((datas, i) => datasetFunc(datas, i, ctx)),
+      datasets: datasets.map((datas, i) => datasetFunc(datas, i, ctx, game)),
     },
     options: {
       scales: {
@@ -91,7 +91,7 @@ const getChart = (datasets, labels, datasetFunc, displayY1) => {
   return canvas.toBuffer()
 }
 
-const getClassicDatasets = (datas, i, ctx) => {
+const getClassicDatasets = (datas, i, ctx, game) => {
   const [type, data] = datas
   return {
     label: type.name,
@@ -99,10 +99,10 @@ const getClassicDatasets = (datas, i, ctx) => {
     fill: i === 0,
     yAxisID: `y${i}`,
     borderColor: (segment) => {
-      if (segment.raw) return colorFilter(type.color, segment.raw).color
+      if (segment.raw) return colorFilter(type.color[game] ?? type.color, segment.raw).color
     },
     pointBackgroundColor: (segment) => {
-      if (segment.raw) return colorFilter(type.color, segment.raw).color
+      if (segment.raw) return colorFilter(type.color[game] ?? type.color, segment.raw).color
     },
     spanGaps: true,
     segment: {
@@ -110,7 +110,7 @@ const getClassicDatasets = (datas, i, ctx) => {
         if (segment.p0.skip || segment.p1.skip) return 'rgb(0,0,0,0.2)'
         const prev = segment.p0, current = segment.p1
 
-        ctx.strokeStyle = getGradient(prev, current, ctx, type)
+        ctx.strokeStyle = getGradient(prev, current, ctx, type, game)
         ctx.lineWidth = 2
         ctx.beginPath()
         ctx.moveTo(prev.x, prev.y)
@@ -125,7 +125,7 @@ const getClassicDatasets = (datas, i, ctx) => {
   }
 }
 
-const getCompareDatasets = (datas, i, ctx) => {
+const getCompareDatasets = (datas, i, ctx, game) => {
   const [nickname, type, playerColor, data] = [...datas]
   return {
     label: nickname,
@@ -145,7 +145,9 @@ const getCompareDatasets = (datas, i, ctx) => {
   }
 }
 
-const getRankImage = async (faceitLevel, faceitElo = color.levels['3'].min, size) => {
+const getRankImage = async (faceitLevel, faceitElo = null, size, game) => {
+  faceitElo ??= color.levels[game]['3'].min
+
   const space = 6,
     maxWidth = size - space,
     height = 4,
@@ -164,11 +166,11 @@ const getRankImage = async (faceitLevel, faceitElo = color.levels['3'].min, size
   ctx.fillStyle = ctx.strokeStyle = '#1f1f22'
   ctx = roundRect(ctx, x, y, maxWidth, height, space)
 
-  const range = color.levels[faceitLevel],
+  const range = color.levels[game][faceitLevel],
     width = parseInt(faceitLevel) === 10 ? maxWidth : (maxWidth * (faceitElo - range.min) / (range.max - range.min))
 
   ctx.globalCompositeOperation = 'source-over'
-  ctx.fillStyle = ctx.strokeStyle = color.levels[faceitLevel].color
+  ctx.fillStyle = ctx.strokeStyle = color.levels[game][faceitLevel].color
   ctx = roundRect(ctx, x, y, width, height, space)
 
   return canvas.toBuffer()
@@ -195,17 +197,19 @@ const getEloGain = (maxMatch, matchHistory) => matchHistory.map(e => e?.eloGain)
 
 const getKD = (maxMatch, matchHistory) => matchHistory.map(e => e?.c2).slice(0, maxMatch)
 
-const getGradient = (prev, current, ctx, type) => {
+const getGradient = (prev, current, ctx, type, game) => {
   const gradient = ctx.createLinearGradient(prev.x, prev.y, current.x, current.y)
-  gradient.addColorStop(0, colorFilter(type.color, prev.raw).color)
-  gradient.addColorStop(1, colorFilter(type.color, current.raw).color)
+  gradient.addColorStop(0, colorFilter(type.color[game] ?? type.color, prev.raw).color)
+  gradient.addColorStop(1, colorFilter(type.color[game] ?? type.color, current.raw).color)
   return gradient
 }
 
-const colorFilter = (colors, value) => Object.entries(colors)
-  .filter(color => parseFloat(value) >= parseFloat(color[1].min) && parseFloat(value) <= parseFloat(color[1].max))
-  .at(0)
-  .at(1)
+const colorFilter = (colors, value) => {
+  return Object.entries(colors)
+    .filter(color => parseFloat(value) >= parseFloat(color[1].min) && parseFloat(value) <= parseFloat(color[1].max))
+    .at(0)
+    .at(1)
+}
 
 const getGraph = (interaction, playerName, type, matchHistory, maxMatch) => {
   if (!matchHistory.length > 0) throw getTranslation('error.user.noMatches', interaction.locale, {
@@ -213,9 +217,9 @@ const getGraph = (interaction, playerName, type, matchHistory, maxMatch) => {
   })
 
   switch (type) {
-  case CustomType.TYPES.ELO: return getElo(maxMatch, matchHistory)
-  case CustomType.TYPES.KD: return getKD(maxMatch, matchHistory,)
-  default: break
+    case CustomType.TYPES.ELO: return getElo(maxMatch, matchHistory)
+    case CustomType.TYPES.KD: return getKD(maxMatch, matchHistory,)
+    default: break
   }
 }
 
