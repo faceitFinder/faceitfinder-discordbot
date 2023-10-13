@@ -104,14 +104,15 @@ const sendCardWithInfo = async (
     playerDatas.nickname,
     playerHistory,
     playerLastStats.games,
-    TYPES.ELO_KD
+    TYPES.ELO_KD,
+    game
   )
 
   includedPlayers.push(playerId)
   includedPlayers = includedPlayers.filter((v, i, a) => a.indexOf(v) === i)
   excludedPlayers = excludedPlayers.filter((v, i, a) => a.indexOf(v) === i)
 
-  const rankImageCanvas = await Graph.getRankImage(faceitLevel, faceitElo, size)
+  const rankImageCanvas = await Graph.getRankImage(faceitLevel, faceitElo, size, game)
   const head = []
 
   head.push({
@@ -155,7 +156,7 @@ const sendCardWithInfo = async (
       { name: 'Orange K/D', value: playerLastStats['Orange K/D'].toString(), inline: true },
       { name: 'Green K/D', value: playerLastStats['Green K/D'].toString(), inline: true })
     .setImage(`attachment://${playerId}graph.png`)
-    .setColor(color.levels[faceitLevel].color)
+    .setColor(color.levels[game][faceitLevel].color)
     .setFooter({ text: `Steam: ${steamDatas?.personaname || steamDatas}`, iconURL: 'attachment://game.png' })
 
   matchNumber = matchNumber < 1 ? playerLastStats.games : matchNumber

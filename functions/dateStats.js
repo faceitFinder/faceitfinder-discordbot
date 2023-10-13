@@ -77,9 +77,10 @@ const getCardWithInfo = async (
     playerHistory,
     playerLastStats.games + (type === CustomType.TYPES.ELO),
     type,
+    game
   )
 
-  const rankImageCanvas = await Graph.getRankImage(faceitLevel, faceitElo, size)
+  const rankImageCanvas = await Graph.getRankImage(faceitLevel, faceitElo, size, game)
   const toRealTimeStamp = new Date(endDate).setHours(-24)
 
   const head = []
@@ -129,7 +130,7 @@ const getCardWithInfo = async (
       { name: 'Orange K/D', value: playerLastStats['Orange K/D'].toString(), inline: true },
       { name: 'Green K/D', value: playerLastStats['Green K/D'].toString(), inline: true })
     .setImage(`attachment://${values.s}graph.png`)
-    .setColor(color.levels[faceitLevel].color)
+    .setColor(color.levels[game][faceitLevel].color)
     .setFooter({ text: `Steam: ${steamDatas?.personaname || steamDatas}`, iconURL: 'attachment://game.png' })
 
   const components = [
