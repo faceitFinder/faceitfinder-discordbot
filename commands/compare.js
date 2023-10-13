@@ -67,6 +67,12 @@ const sendCardWithInfo = async (interaction, player1Param, player2Param, type = 
   let maxMatchLimit
   let limits
 
+  [player1, player2].filter(p => !p.playerHistory.length).map(p => {
+    throw getTranslation('error.user.noMatches', interaction.locale, {
+      playerName: p.playerDatas.nickname,
+    })
+  })
+
   if (map) {
     [player1, player2].map(p => {
       mapStats = p.playerStats.segments.filter(segment => segment.label === map && segment.mode === '5v5')
