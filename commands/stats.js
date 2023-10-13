@@ -72,14 +72,15 @@ const sendCardWithInfo = async (interaction, playerParam, type = CustomType.TYPE
     )
     .setImage('attachment://graph.png')
     .setColor(color.levels[game][faceitLevel].color)
-    .setFooter({ text: `Steam: ${steamDatas?.personaname || steamDatas}` })
+    .setFooter({ text: `Steam: ${steamDatas?.personaname || steamDatas}`, iconURL: 'attachment://game.png' })
 
   return {
     content: ' ',
     embeds: [card],
     files: [
       new Discord.AttachmentBuilder(graphBuffer, { name: 'graph.png' }),
-      new Discord.AttachmentBuilder(rankImageCanvas, { name: `${faceitLevel}level.png` })
+      new Discord.AttachmentBuilder(rankImageCanvas, { name: `${faceitLevel}level.png` }),
+      new Discord.AttachmentBuilder(`images/${game}.png`, { name: 'game.png' })
     ],
     components: [
       new Discord.ActionRowBuilder()

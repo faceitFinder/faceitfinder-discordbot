@@ -157,7 +157,7 @@ const sendCardWithInfo = async (
       { name: 'Green K/D', value: playerLastStats['Green K/D'].toString(), inline: true })
     .setImage(`attachment://${playerId}graph.png`)
     .setColor(color.levels[game][faceitLevel].color)
-    .setFooter({ text: `Steam: ${steamDatas?.personaname || steamDatas}` })
+    .setFooter({ text: `Steam: ${steamDatas?.personaname || steamDatas}`, iconURL: 'attachment://game.png' })
 
   matchNumber = matchNumber < 1 ? playerLastStats.games : matchNumber
 
@@ -208,8 +208,11 @@ const sendCardWithInfo = async (
         }))))
 
 
-  files.push(new AttachmentBuilder(graphBuffer, { name: `${playerId}graph.png` }),
-    new AttachmentBuilder(rankImageCanvas, { name: `${faceitLevel}level.png` }))
+  files.push(
+    new AttachmentBuilder(graphBuffer, { name: `${playerId}graph.png` }),
+    new AttachmentBuilder(rankImageCanvas, { name: `${faceitLevel}level.png` }),
+    new AttachmentBuilder(`images/${game}.png`, { name: 'game.png' })
+  )
 
   embeds.unshift(selectedPlayerStats)
 

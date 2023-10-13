@@ -74,9 +74,11 @@ const sendCardWithInfo = async (interaction, playerId, map, mode, game) => {
         { name: 'Average Deaths', value: m.stats['Average Deaths'], inline: true },
         { name: 'Average Assists', value: m.stats['Average Assists'], inline: true })
       .setColor(color.levels[game][faceitLevel].color)
-      .setFooter({ text: `Steam: ${steamDatas?.personaname || steamDatas}` })
+      .setFooter({ text: `Steam: ${steamDatas?.personaname || steamDatas}`, iconURL: 'attachment://game.png' })
       .setImage(`attachment://${map}.jpg`)
   })
+
+  filesAtt.push(new Discord.AttachmentBuilder(`images/${game}.png`, { name: 'game.png' }))
 
   return {
     embeds: cards,
