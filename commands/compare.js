@@ -233,6 +233,7 @@ const sendCardWithInfo = async (interaction, player1Param, player2Param, type = 
     .setColor(color.primary)
     .addFields(...fields)
     .setImage('attachment://graph.png')
+    .setFooter({ text: new Date().toLocaleDateString(interaction.locale), iconURL: 'attachment://game.png' })
 
   const options = [{
     label: getTranslation('strings.compare', interaction.locale, {
@@ -275,6 +276,7 @@ const sendCardWithInfo = async (interaction, player1Param, player2Param, type = 
     embeds: [card],
     files: [
       new Discord.AttachmentBuilder(graphBuffer, { name: 'graph.png' }),
+      new Discord.AttachmentBuilder(`images/${game}.png`, { name: 'game.png' })
     ],
     components: [
       new Discord.ActionRowBuilder()
