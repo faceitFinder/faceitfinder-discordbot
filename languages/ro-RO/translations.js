@@ -1,11 +1,11 @@
 /* eslint-disable semi */
 const {maxLengthTeamName, invite, join} = require('../../config.json');
 const base = structuredClone(require('../base'));
-base.command.compare.description = 'Compare both user stats';
-base.command.dailystats.description = 'Displays the stats of the chosen day, with elo graph of the day';
-base.command.find.description = 'Find out which of the last 1000 games include the requested players (up to 5)';
-base.command.help.description = 'Display the command list';
-base.command.info.description = 'Get the info about the bot';
+base.command.compare.description = 'Compara statisticile a doi jucători';
+base.command.dailystats.description = 'Vezi statisticile unei zile, cu graficul elo al zilei';
+base.command.find.description = 'Află care dintre ultimele 1000 de jocuri includ jucătorii solicitați (până la 5)';
+base.command.help.description = 'Afișează lista de comenzi';
+base.command.info.description = 'Vezi informații despre bot';
 base.command.invite.description = 'Get the link to invite the bot on your server';
 base.command.join.description = 'Get the link to join the community server of the bot';
 base.command.last.description = 'Get the stats of last game';
