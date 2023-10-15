@@ -10,8 +10,8 @@ const { getMapOption } = require('../functions/map')
 const { getTranslations, getTranslation } = require('../languages/setup')
 const { getStats } = require('../functions/apiHandler')
 
-const getLevelFromElo = (elo) => {
-  const colorLevel = Object.entries(color.levels).filter(e => {
+const getLevelFromElo = (elo, game) => {
+  const colorLevel = Object.entries(color.levels[game]).filter(e => {
     return elo >= e.at(1).min && elo <= e.at(1).max
   }).at(0)
   return colorLevel?.at(0)
@@ -30,13 +30,14 @@ const getMatchItems = async (interaction, playerDatas, steamDatas, playerHistory
       const mapName = roundStats.i1
       const result = Math.max(...roundStats.i18.split('/').map(Number)) === parseInt(roundStats.c5)
       const eloGain = roundStats?.eloGain || 0
-      const level = getLevelFromElo(roundStats.elo)
+      const level = getLevelFromElo(roundStats.elo, game)
 
       if (level !== undefined) {
         const rankImageCanvas = await Graph.getRankImage(
           level,
           roundStats.elo,
-          size)
+          size,
+          game)
         filesAtt.push(new Discord.AttachmentBuilder(rankImageCanvas, { name: `${faceitElo}${i}.png` }))
       }
 
@@ -66,10 +67,13 @@ const getMatchItems = async (interaction, playerDatas, steamDatas, playerHistory
         .setThumbnail(`attachment://${faceitElo}${i}.png`)
         .setImage(`attachment://${mapName}.jpg`)
         .setColor(result ? color.won : color.lost)
-        .setFooter({ text: `Steam: ${steamDatas?.personaname || steamDatas}` })
+        .setFooter({ text: `Steam: ${steamDatas?.personaname || steamDatas}`, iconURL: 'attachment://game.png' })
 
       if (fs.existsSync(mapThumbnail))
-        filesAtt.push(new Discord.AttachmentBuilder(mapThumbnail, { name: `${mapName}.jpg` }))
+        filesAtt.push(
+          new Discord.AttachmentBuilder(mapThumbnail, { name: `${mapName}.jpg` }),
+          new Discord.AttachmentBuilder(`images/${game}.png`, { name: 'game.png' })
+        )
 
       cards.push(card)
     })

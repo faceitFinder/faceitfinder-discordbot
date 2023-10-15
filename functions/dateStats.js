@@ -77,9 +77,10 @@ const getCardWithInfo = async (
     playerHistory,
     playerLastStats.games + (type === CustomType.TYPES.ELO),
     type,
+    game
   )
 
-  const rankImageCanvas = await Graph.getRankImage(faceitLevel, faceitElo, size)
+  const rankImageCanvas = await Graph.getRankImage(faceitLevel, faceitElo, size, game)
   const toRealTimeStamp = new Date(endDate).setHours(-24)
 
   const head = []
@@ -129,8 +130,8 @@ const getCardWithInfo = async (
       { name: 'Orange K/D', value: playerLastStats['Orange K/D'].toString(), inline: true },
       { name: 'Green K/D', value: playerLastStats['Green K/D'].toString(), inline: true })
     .setImage(`attachment://${values.s}graph.png`)
-    .setColor(color.levels[faceitLevel].color)
-    .setFooter({ text: `Steam: ${steamDatas?.personaname || steamDatas}` })
+    .setColor(color.levels[game][faceitLevel].color)
+    .setFooter({ text: `Steam: ${steamDatas?.personaname || steamDatas}`, iconURL: 'attachment://game.png' })
 
   const components = [
     ...[actionRow].flat(),
@@ -160,7 +161,8 @@ const getCardWithInfo = async (
     content: null,
     files: [
       new Discord.AttachmentBuilder(graphBuffer, { name: `${values.s}graph.png` }),
-      new Discord.AttachmentBuilder(rankImageCanvas, { name: `${faceitLevel}level.png` })
+      new Discord.AttachmentBuilder(rankImageCanvas, { name: `${faceitLevel}level.png` }),
+      new Discord.AttachmentBuilder(`images/${game}.png`, { name: 'game.png' })
     ],
     components: components
   }
