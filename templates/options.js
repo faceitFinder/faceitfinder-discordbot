@@ -4,7 +4,7 @@ const { getTranslations, getTranslation } = require('../languages/setup')
 const gameOption = {
   name: 'game',
   description: getTranslation('options.gameParameter', 'en-US'),
-  // descriptionLocalizations: getTranslations('options.gameParameter'),
+  descriptionLocalizations: getTranslations('options.gameParameter'),
   required: false,
   type: ApplicationCommandOptionType.String,
   slash: true,
