@@ -33,7 +33,7 @@ const sendCardWithInfo = async (interaction, playerId, map, mode, game) => {
   const size = 40
   const filesAtt = []
 
-  const rankImageCanvas = await Graph.getRankImage(faceitLevel, faceitElo, size)
+  const rankImageCanvas = await Graph.getRankImage(faceitLevel, faceitElo, size, game)
   filesAtt.push(new Discord.AttachmentBuilder(rankImageCanvas, { name: 'level.png' }))
 
   const mapThumbnail = `./images/maps/${map}.jpg`
@@ -73,10 +73,12 @@ const sendCardWithInfo = async (interaction, playerId, map, mode, game) => {
         { name: 'Average Kills', value: m.stats['Average Kills'], inline: true },
         { name: 'Average Deaths', value: m.stats['Average Deaths'], inline: true },
         { name: 'Average Assists', value: m.stats['Average Assists'], inline: true })
-      .setColor(color.levels[faceitLevel].color)
-      .setFooter({ text: `Steam: ${steamDatas?.personaname || steamDatas}` })
+      .setColor(color.levels[game][faceitLevel].color)
+      .setFooter({ text: `Steam: ${steamDatas?.personaname || steamDatas}`, iconURL: 'attachment://game.png' })
       .setImage(`attachment://${map}.jpg`)
   })
+
+  filesAtt.push(new Discord.AttachmentBuilder(`images/${game}.png`, { name: 'game.png' }))
 
   return {
     embeds: cards,

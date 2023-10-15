@@ -47,12 +47,12 @@ const sendCardWithInfo = async (interaction, playerParam, type = CustomType.TYPE
     g: game
   }
 
-  const graphBuffer = Graph.generateChart(interaction, playerDatas.nickname, playerHistory, maxMatch, type)
+  const graphBuffer = Graph.generateChart(interaction, playerDatas.nickname, playerHistory, maxMatch, type, game)
 
   const faceitLevel = playerDatas.games[game].skill_level
   const size = 40
 
-  const rankImageCanvas = await Graph.getRankImage(faceitLevel, faceitElo, size)
+  const rankImageCanvas = await Graph.getRankImage(faceitLevel, faceitElo, size, game)
 
   const card = new Discord.EmbedBuilder()
     .setAuthor({
@@ -71,15 +71,16 @@ const sendCardWithInfo = async (interaction, playerParam, type = CustomType.TYPE
       { name: `:flag_${playerRegion.toLowerCase()}:`, value: ladderRegion.position.toString(), inline: true }
     )
     .setImage('attachment://graph.png')
-    .setColor(color.levels[faceitLevel].color)
-    .setFooter({ text: `Steam: ${steamDatas?.personaname || steamDatas}` })
+    .setColor(color.levels[game][faceitLevel].color)
+    .setFooter({ text: `Steam: ${steamDatas?.personaname || steamDatas}`, iconURL: 'attachment://game.png' })
 
   return {
     content: ' ',
     embeds: [card],
     files: [
       new Discord.AttachmentBuilder(graphBuffer, { name: 'graph.png' }),
-      new Discord.AttachmentBuilder(rankImageCanvas, { name: `${faceitLevel}level.png` })
+      new Discord.AttachmentBuilder(rankImageCanvas, { name: `${faceitLevel}level.png` }),
+      new Discord.AttachmentBuilder(`images/${game}.png`, { name: 'game.png' })
     ],
     components: [
       new Discord.ActionRowBuilder()

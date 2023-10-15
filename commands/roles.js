@@ -1,5 +1,5 @@
 const Discord = require('discord.js')
-const { color, name } = require('../config.json')
+const { color, name, defaultGame } = require('../config.json')
 const { isInteractionSubcommandEqual, getInteractionOption } = require('../functions/commands')
 const errorCard = require('../templates/errorCard')
 const GuildRoles = require('../database/guildRoles')
@@ -61,8 +61,8 @@ const setupRoles = async (interaction) => {
     roles.forEach((roleId, i) => GuildCustomRole.create(
       interaction.guild.id,
       roleId,
-      color.levels[1 + i].min,
-      color.levels[1 + i].max
+      color.levels[defaultGame][1 + i].min,
+      color.levels[defaultGame][1 + i].max
     ))
 
     await updateRoles(interaction.client, null, interaction.guild.id)
@@ -89,7 +89,7 @@ const generateRoles = async (interaction) => {
   for (let i = 10; i >= 1; i--) {
     await interaction.guild.roles.create({
       name: `Level ${i}`,
-      color: color.levels[i].color,
+      color: color.levels[defaultGame][i].color,
       permissions: []
     })
       .then(e => roles.push(e.id))
@@ -119,8 +119,8 @@ const generateRoles = async (interaction) => {
     GuildCustomRole.create(
       interaction.guild.id,
       roleId,
-      color.levels[i].min,
-      color.levels[i].max
+      color.levels[defaultGame][i].min,
+      color.levels[defaultGame][i].max
     )
   })
 
