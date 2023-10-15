@@ -6,8 +6,8 @@ base.command.dailystats.description = 'Vezi statisticile unei zile, cu graficul 
 base.command.find.description = 'Află care dintre ultimele 1000 de jocuri includ jucătorii solicitați (până la 5)';
 base.command.help.description = 'Afișează lista de comenzi';
 base.command.info.description = 'Vezi informații despre bot';
-base.command.invite.description = 'Get the link to invite the bot on your server';
-base.command.join.description = 'Get the link to join the community server of the bot';
+base.command.invite.description = 'Obțineți linkul pentru a invita botul pe serverul dvs.';
+base.command.join.description = 'Obțineți link-ul pentru a vă alătura serverului comunitar al botului';
 base.command.last.description = 'Get the stats of last game';
 base.command.laststats.description = 'Displays the stats of the x last match, with elo graph of the X last match';
 base.command.link.description = 'Link a faceit profile to the discord user, to get your stats directly (no parameters needed)';
@@ -18,61 +18,61 @@ base.command.stats.description = 'Displays general stats, with elo graph of the 
 base.command.team.description = 'Create a team and link up to 5 users to it (limited to 1 team by discord account)';
 base.command.unlink.description = 'Unlink your faceit id from the discord bot';
 base.command.vote.description = 'Get the link to vote for the bot on top.gg';
-base.command.weekstats.description = 'Displays the stats of the chosen week, with elo graph of the week';
-base.command.yearstats.description = 'Displays the stats of the chosen year, with elo graph of the year';
-base.options.matchNumber = 'Number of matches to display. Default: {default}';
+base.command.weekstats.description = 'Afișează statisticile săptămânii alese, cu graficul elo al săptămânii';
+base.command.yearstats.description = 'Afișează statisticile din anul ales, cu graficul elo al anului.';
+base.options.matchNumber = 'Numărul de meciuri care trebuie afișate. Implicit: {default}';
 base.options.steamParameter = 'steamID / steam custom ID / steam profile url / @user / CSGO status';
 base.options.faceitParameter = 'faceit nickname / @user / faceit profile url';
 base.options.steamParameters = 'steamIDs / steam custom IDs / steam profile urls / @users / CSGO status';
 base.options.faceitParameters = 'faceit nicknames / @users / faceit profile urls';
 base.options.faceitParametersTeam = 'faceit nicknames / @users / faceit profile urls (Max 5)';
 base.options.steamParametersTeam = 'steamIDs / steam custom IDs / steam profile urls / @users / CSGO status (Max 5)';
-base.options.teamParameter = 'team slug (you need to be a part of it, the creator, or it has to be public)';
-base.options.fromDate = 'INCLUDED. Start date, format MM/DD/YYYY';
-base.options.toDate = 'EXCLUDED. End date (at least 1 day interval), if empty gets the current day Format MM/DD/YYYY';
+base.options.teamParameter = 'team slug (trebuie să faci parte din ea, să fii creatorul ei, sau să fie publică)';
+base.options.fromDate = 'INCLUSE. Data de începere, format MM/DD/AAAA';
+base.options.toDate = 'EXCLUSE. Data de sfârșit (minim o zi interval), dacă este goală se ia ziua curentă Format MM/DD/AAAA';
 base.options.playerAimed = 'steam_parameters / faceit_parameters / @user / empty if linked';
-base.options.globalUnlink = 'This will unlink your account on all servers (False by default)';
-base.options.commandName = 'The name of one command';
-base.options.mapName = 'Specify a map to get the stats related';
+base.options.globalUnlink = 'Vei primi unlink pe toate serverele (Fals ca implicit)';
+base.options.commandName = 'Numele comenzii';
+base.options.mapName = 'Specifica o hartă pentru a-ți vedea statisticile pe ea';
 base.options.levelRoles = {
-  1: 'Level 1',
-  2: 'Level 2',
-  3: 'Level 3',
-  4: 'Level 4',
-  5: 'Level 5',
-  6: 'Level 6',
-  7: 'Level 7',
-  8: 'Level 8',
-  9: 'Level 9',
-  10: 'Level 10'
+  1: 'Nivel 1',
+  2: 'Nivel 2',
+  3: 'Nivel 3',
+  4: 'Nivel 4',
+  5: 'Nivel 5',
+  6: 'Nivel 6',
+  7: 'Nivel 7',
+  8: 'Nivel 8',
+  9: 'Nivel 9',
+  10: 'Nivel 10'
 };
-base.options.removeOldRoles = 'Remove the old roles if they exist';
-base.options.generateRoles = 'Generates the rank roles on the server';
-base.options.setupRoles = 'Setup the roles that you want for each ranks on the server';
-base.options.removeRoles = 'Removes the rank roles on the server';
-base.options.infoTeam = 'Get information about your teams';
-base.options.createTeam = 'Create your team';
-base.options.deleteTeam = 'Delete your team';
-base.options.addUserTeam = 'Add a user to your team';
-base.options.updateTeam = 'Update your team';
-base.options.removeUserTeam = 'Remove a user from your team';
-base.options.nameTeam = `name of your team, up to ${ maxLengthTeamName } characters`;
-base.options.accessTeam = 'Allow every discord users to show your team statistics';
-base.options.excludedSteamParameters = 'Exclude steam parameters from the search';
-base.options.excludedFaceitParameters = 'Exclude faceit parameters from the search';
-base.options.discordUserLink = 'Link the user only for this server (Role management permissions to link someone else)';
+base.options.removeOldRoles = 'Scoate rolurile vechi daca exista';
+base.options.generateRoles = 'Genereaza rolurile pe server';
+base.options.setupRoles = 'Configurați rolurile pe care le doriți pentru fiecare rang de pe server';
+base.options.removeRoles = 'Îndepărtează rolurile de rang de pe server';
+base.options.infoTeam = 'Vezi informații despre echipa ta';
+base.options.createTeam = 'Fa-ți o echipa';
+base.options.deleteTeam = 'Șterge-ți echipa';
+base.options.addUserTeam = 'Adaugă un utilizator in echipa ta';
+base.options.updateTeam = 'Actualizează-ți echipa';
+base.options.removeUserTeam = 'Scoate un membru din echipa ta';
+base.options.nameTeam = `numele echipei tale, pana la ${ maxLengthTeamName } caractere`;
+base.options.accessTeam = 'Permiteți fiecărui utilizator discord să arate statisticile echipei dvs.';
+base.options.excludedSteamParameters = 'Excludeți parametrii steam din căutare';
+base.options.excludedFaceitParameters = 'Excludeți parametrii faceit din căutare';
+base.options.discordUserLink = 'Conectați utilizatorul doar pentru acest server, permisiuni gestionare roluri pentru legătura altora';
 base.options.nicknameLink = 'Makes your discord nickname the same as your faceit nickname (Only works with non admin users)';
-base.options.eloRoleName = 'Name to assign to this role';
-base.options.eloRoleColor = 'Color to assign to this role (HEX, ex: #FF0000)';
-base.options.eloRoleMin = 'Minimum elo required to get this role (included)';
-base.options.eloRoleMax = 'Maximum elo required to get this role (included)';
-base.options.setupEloRoles = 'Generates a role that will be assign to the users depending on the elo range you set';
-base.options.removeEloRole = 'Removes the selected role from the server';
-base.options.eloRole = '@role';
-base.options.gameParameter = 'Game to get the stats from (Default: CS2)';
-base.strings.selectTeam = 'Select a team';
-base.strings.infoTeam = 'Get info about the team {teamName}';
-base.strings.voteDescription = 'Hey, {discord}! You can vote on top.gg to help me grow';
+base.options.eloRoleName = 'Numele care se atribuie acestui rol';
+base.options.eloRoleColor = 'Culoarea care se atribuie acestui rol (HEX, de exemplu: #FF0000)';
+base.options.eloRoleMin = 'Elo minim necesar pentru acest rol (inclus)';
+base.options.eloRoleMax = 'Elo maxim necesar pentru acest rol (inclus)';
+base.options.setupEloRoles = 'Generează un rol care va fi atribuit utilizatorilor în funcție de intervalul elo pe care l-ați setat';
+base.options.removeEloRole = 'Ștergeți rolul selectat';
+base.options.eloRole = '@rol';
+base.options.gameParameter = 'Jocul de la care se obțin statisticile (implicit: CS2)';
+base.strings.selectTeam = 'Selectează o echipa';
+base.strings.infoTeam = 'Obține informații legate despre echipa {teamName}';
+base.strings.voteDescription = 'Hey, {discord}! Poți sa ma votezi pe top.gg!';
 base.strings.messageProcessing = 'Your request is currently processing...';
 base.strings.error = 'Error';
 base.strings.info = 'Info';
@@ -176,10 +176,10 @@ base.success.command.createTeam = 'Your team **{teamName}** has been created';
 base.success.command.removeUser = '**{playerName}** has been removed from the team **{teamName}**';
 base.success.command.addUser = '**{playerName}** has been added to the team **{teamName}**';
 base.success.command.unlink = {
-  global: 'Your account has been unlinked successfully',
-  server: 'Your account has been unlinked successfully on this server'
+  global: 'Ai primit unlink la cont cu succes',
+  server: 'Ai primit unlink la cont pe acest server cu succes'
 };
-base.success.command.link = '{discord} has been linked to **{playerName}**';
+base.success.command.link = '{discord} a fost asociat cu **{playerName}**';
 base.success.command.setupEloRoles = 'The elo role has been generated successfully';
 base.success.command.removeRole = 'The role has been removed successfully';
 module.exports = base;
