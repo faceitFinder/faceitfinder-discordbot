@@ -8,10 +8,13 @@ const { getCardsConditions, getGameOption } = require('../functions/commands')
 const { getTranslation, getTranslations } = require('../languages/setup')
 const { getStats, getLadder } = require('../functions/apiHandler')
 
-const sendCardWithInfo = async (interaction, playerParam, type = CustomType.TYPES.ELO, game = null) => {
+const buildEmbed = async ({
+  playerParam,
+  game,
+  type = CustomType.TYPES.ELO,
+  locale
+}) => {
   const maxMatch = 20
-  game ??= getGameOption(interaction)
-
   const {
     playerDatas,
     steamDatas,
@@ -28,30 +31,28 @@ const sendCardWithInfo = async (interaction, playerParam, type = CustomType.TYPE
   const playerId = playerDatas.player_id
   const playerCountry = playerDatas.country
   const playerRegion = playerDatas.games[game].region
+  const buttonValues = {
+    id: 'uSG',
+    s: playerId,
+    g: game
+  }
+
   const ladderCountry = await getLadder({
     playerParam,
     region: playerRegion,
     country: playerCountry,
     game
   })
+
   const ladderRegion = await getLadder({
     playerParam,
     region: playerRegion,
     game
   })
+
   const faceitElo = playerDatas.games[game].faceit_elo
-  const buttonValues = {
-    id: 'uSG',
-    s: playerId,
-    u: interaction.user.id,
-    g: game
-  }
-
-  const graphBuffer = Graph.generateChart(interaction, playerDatas.nickname, playerHistory, maxMatch, type, game)
-
   const faceitLevel = playerDatas.games[game].skill_level
   const size = 40
-
   const rankImageCanvas = await Graph.getRankImage(faceitLevel, faceitElo, size, game)
 
   const card = new Discord.EmbedBuilder()
@@ -66,42 +67,60 @@ const sendCardWithInfo = async (interaction, playerParam, type = CustomType.TYPE
       { name: 'Games', value: `${playerStats.lifetime.Matches} (${playerStats.lifetime['Win Rate %']}% Win)`, inline: true },
       { name: 'K/D', value: playerStats.lifetime['Average K/D Ratio'], inline: true },
       { name: 'HS', value: `${playerStats.lifetime['Average Headshots %']}%`, inline: true },
-      { name: 'Elo', value: playerLastStats['Current Elo'], inline: true },
+      { name: 'Elo', value: playerLastStats['Current Elo'] ?? faceitElo.toString(), inline: true },
       { name: `:flag_${playerCountry.toLowerCase()}:`, value: ladderCountry.position.toString(), inline: true },
       { name: `:flag_${playerRegion.toLowerCase()}:`, value: ladderRegion.position.toString(), inline: true }
     )
-    .setImage('attachment://graph.png')
     .setColor(color.levels[game][faceitLevel].color)
     .setFooter({ text: `Steam: ${steamDatas?.personaname || steamDatas}`, iconURL: 'attachment://game.png' })
+
+
+  const files = [
+    new Discord.AttachmentBuilder(rankImageCanvas, { name: `${faceitLevel}level.png` }),
+    new Discord.AttachmentBuilder(`images/${game}.png`, { name: 'game.png' })
+  ]
+
+  if (playerHistory.length > 0) {
+    const graphBuffer = Graph.generateChart(locale, playerDatas.nickname, playerHistory, maxMatch, type, game)
+    files.push(new Discord.AttachmentBuilder(graphBuffer, { name: 'graph.png' }))
+    card.setImage('attachment://graph.png')
+  }
+
+  return {
+    card,
+    files,
+    buttonValues,
+    historyLength: playerHistory.length
+  }
+}
+
+const sendCardWithInfo = async (interaction, playerParam) => {
+  const game = getGameOption(interaction)
+  const {
+    card,
+    files,
+    buttonValues,
+    historyLength
+  } = await buildEmbed({
+    playerParam,
+    game,
+    locale: interaction.locale
+  })
+
+  let components = []
+
+  if (historyLength) {
+    const buttons = await Promise.all([CustomType.TYPES.KD, CustomType.TYPES.ELO, CustomType.TYPES.ELO_KD]
+      .map((t) => CustomTypeFunc.generateButtons(interaction, buttonValues, t)))
+
+    components.push(new Discord.ActionRowBuilder().addComponents(buttons))
+  }
 
   return {
     content: ' ',
     embeds: [card],
-    files: [
-      new Discord.AttachmentBuilder(graphBuffer, { name: 'graph.png' }),
-      new Discord.AttachmentBuilder(rankImageCanvas, { name: `${faceitLevel}level.png` }),
-      new Discord.AttachmentBuilder(`images/${game}.png`, { name: 'game.png' })
-    ],
-    components: [
-      new Discord.ActionRowBuilder()
-        .addComponents([
-          CustomTypeFunc.generateButtons(
-            interaction,
-            { ...buttonValues, n: 1 },
-            CustomType.TYPES.KD,
-            type === CustomType.TYPES.KD),
-          CustomTypeFunc.generateButtons(
-            interaction,
-            { ...buttonValues, n: 2 },
-            CustomType.TYPES.ELO,
-            type === CustomType.TYPES.ELO),
-          CustomTypeFunc.generateButtons(
-            interaction,
-            { ...buttonValues, n: 3 },
-            CustomType.TYPES.ELO_KD,
-            type === CustomType.TYPES.ELO_KD)
-        ])
-    ]
+    files: files,
+    components
   }
 }
 
@@ -113,8 +132,12 @@ module.exports = {
   usage: Options.usage,
   type: 'stats',
   async execute(interaction) {
-    return getCardsConditions(interaction, sendCardWithInfo)
+    return getCardsConditions({
+      interaction,
+      fn: sendCardWithInfo
+    })
   }
 }
 
 module.exports.sendCardWithInfo = sendCardWithInfo
+module.exports.buildEmbed = buildEmbed
