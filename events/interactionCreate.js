@@ -111,7 +111,7 @@ module.exports = {
           }).catch((error) => errorHandler(interaction, error))
       } else {
         interaction.deferReply({ ephemeral: true }).then(() => {
-          interactionButton?.execute(interaction, updateUser(interaction, interactionButton, json))
+          interactionButton?.execute(interaction, json, true)
             .then(e => interaction.editReply(noMention(e)).catch((error) => errorHandler(interaction, error)))
             .catch(err => errorInteraction(interaction, err, getTranslation('error.execution.button', interaction.locale)))
         }).catch((error) => errorHandler(interaction, error))
