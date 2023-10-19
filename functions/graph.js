@@ -5,13 +5,13 @@ const CustomType = require('../templates/customType')
 const Chart = require('chart.js/auto')
 const { getTranslation } = require('../languages/setup')
 
-const generateChart = (interaction, playerName, matchHistory, maxMatch = 20, type = CustomType.TYPES.ELO, game) => {
+const generateChart = (locale, playerName, matchHistory, maxMatch = 20, type = CustomType.TYPES.ELO, game) => {
   const datas = []
   const types = type.name.split('-').map(e => {
     return CustomType.getType(e.trim())
   })
 
-  datas.push(...types.map(type => [type, getGraph(interaction, playerName, type, matchHistory, maxMatch).reverse()]))
+  datas.push(...types.map(type => [type, getGraph(locale, playerName, type, matchHistory, maxMatch).reverse()]))
 
   const labels = matchHistory.map(match => new Date(match.date).toLocaleString('en-US', {
     month: 'short',
@@ -211,15 +211,15 @@ const colorFilter = (colors, value) => {
     .at(1)
 }
 
-const getGraph = (interaction, playerName, type, matchHistory, maxMatch) => {
-  if (!matchHistory.length > 0) throw getTranslation('error.user.noMatches', interaction.locale, {
+const getGraph = (locale, playerName, type, matchHistory, maxMatch) => {
+  if (!matchHistory.length > 0) throw getTranslation('error.user.noMatches', locale, {
     playerName: playerName
   })
 
   switch (type) {
-  case CustomType.TYPES.ELO: return getElo(maxMatch, matchHistory)
-  case CustomType.TYPES.KD: return getKD(maxMatch, matchHistory,)
-  default: break
+    case CustomType.TYPES.ELO: return getElo(maxMatch, matchHistory)
+    case CustomType.TYPES.KD: return getKD(maxMatch, matchHistory,)
+    default: break
   }
 }
 
