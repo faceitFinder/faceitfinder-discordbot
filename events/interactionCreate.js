@@ -5,6 +5,7 @@ const CommandsStats = require('../database/commandsStats')
 const { getTranslation } = require('../languages/setup')
 const errorHandler = require('../functions/error')
 const Interaction = require('../database/interaction')
+const { updateCard } = require('../templates/loadingCard')
 
 const editInteraction = (interaction, resp) => {
   if (!resp) return
@@ -95,7 +96,15 @@ module.exports = {
      */
     else if (interaction.isButton()) {
       const interactionDatas = await Interaction.getOne(interaction.customId)
-      if (!interactionDatas) return
+      if (!interactionDatas) {
+        interaction.deferUpdate().then(() => {
+          editInteraction(interaction, {
+            content: '```This interaction has expired```',
+          })
+          updateCard(interaction)
+        })
+        return
+      }
 
       const json = interactionDatas.jsonData
       const interactionButton = interaction.client.buttons?.get(json.id)
