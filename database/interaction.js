@@ -10,13 +10,10 @@ const create = (jsonData = null) => {
   return newInteraction.save()
 }
 
-const updateOne = (id, jsonData) => InteractionModel.findOneAndUpdate({
+const updateOne = (id) => InteractionModel.updateOne({
   _id: id
 }, {
-  jsonData: jsonData,
   updatedAt: new Date(),
-}, {
-  new: true,
 }).exec()
 
 const getOne = (_id) => InteractionModel.findById(_id).exec()

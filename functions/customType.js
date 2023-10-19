@@ -21,6 +21,8 @@ const generateButtons = async (interaction, values, type) => {
 const updateButtons = (components, type) => {
   return components.map(button => {
     button = button.toJSON()
+    Interaction.updateOne(button.custom_id)
+
     return new ButtonBuilder()
       .setCustomId(button.custom_id)
       .setLabel(button.label)
