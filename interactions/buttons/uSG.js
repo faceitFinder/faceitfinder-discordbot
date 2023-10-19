@@ -1,7 +1,7 @@
 const { ActionRowBuilder } = require('discord.js')
 const CommandsStats = require('../../database/commandsStats')
 const Stats = require('../../commands/stats')
-const loadingCard = require('../../templates/loadingCard')
+const { loadingCard, updateCard } = require('../../templates/loadingCard')
 const CustomType = require('../../templates/customType')
 const CustomTypeFunc = require('../../functions/customType')
 const { updateButtons } = require('../../functions/customType')
@@ -15,7 +15,7 @@ module.exports = {
     CommandsStats.create('stats', `button - ${json.t.name}`, interaction)
     let components = interaction.message.components
 
-    loadingCard(interaction)
+    newUser ? loadingCard(interaction) : updateCard(interaction)
 
     const {
       card,
