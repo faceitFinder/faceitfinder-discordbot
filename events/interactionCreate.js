@@ -4,6 +4,7 @@ const { InteractionType } = require('discord.js')
 const CommandsStats = require('../database/commandsStats')
 const { getTranslation } = require('../languages/setup')
 const errorHandler = require('../functions/error')
+const Interaction = require('../database/interaction')
 
 const editInteraction = (interaction, resp) => {
   if (!resp) return
@@ -36,12 +37,16 @@ module.exports = {
      * Checking if the user is temporary banned
      * when the interaction is command or context menu
      */
-    if (interaction.type === InteractionType.ApplicationCommand &&
-      interaction.client.antispam.isIgnored(interaction.user.id, interaction.createdAt, interaction.channel)) return
+    if (
+      interaction.type === InteractionType.ApplicationCommand &&
+      interaction.client.antispam.isIgnored(interaction.user.id, interaction.createdAt, interaction.channel)
+    ) {
+      return
+    }
     /**
      * Check if the channel is accessible
      */
-    else if (!interaction.channel.permissionsFor(interaction.client.user).has('ViewChannel'))
+    else if (!interaction.channel.permissionsFor(interaction.client.user).has('ViewChannel')) {
       interaction
         .deferReply({ ephemeral: true })
         .then(() => {
@@ -53,6 +58,7 @@ module.exports = {
             .catch((error) => errorHandler(interaction, error))
         })
         .catch((error) => errorHandler(interaction, error))
+    }
     /**
      * Check if the interaction is a selectmenu
      */
@@ -62,7 +68,7 @@ module.exports = {
 
       const values = interactionSelectMenu.getJSON(interaction)
 
-      if (interaction.user.id === values.u)
+      if (interaction.user.id === values.u) {
         interaction
           .deferUpdate()
           .then(() => {
@@ -72,7 +78,7 @@ module.exports = {
               .catch(err => errorInteraction(interaction, err, getTranslation('error.execution.selectmenu', interaction.locale)))
           })
           .catch((error) => errorHandler(interaction, error))
-      else
+      } else {
         interaction
           .deferReply({ ephemeral: true })
           .then(() => {
@@ -82,34 +88,39 @@ module.exports = {
               .catch(err => errorInteraction(interaction, err, getTranslation('error.execution.selectmenu', interaction.locale)))
           })
           .catch((error) => errorHandler(interaction, error))
+      }
     }
     /**
      * Check if the interaction is a button
      */
     else if (interaction.isButton()) {
-      const id = JSON.parse(interaction.customId)?.id
-      const interactionButton = interaction.client.buttons?.get(id)
+      const interactionDatas = await Interaction.getOne(interaction.customId)
+      if (!interactionDatas) return
+
+      const json = interactionDatas.jsonData
+      const interactionButton = interaction.client.buttons?.get(json.id)
+
       if (!interactionButton) return
 
-      const json = interactionButton.getJSON(interaction, JSON.parse(interaction.customId))
-
-      if (interaction.user.id === json.u)
-        interaction.deferUpdate().then(() => {
-          interactionButton?.execute(interaction, json)
-            .then(e => editInteraction(interaction, e))
-            .catch(err => errorInteraction(interaction, err, getTranslation('error.execution.button', interaction.locale)))
-        }).catch((error) => errorHandler(interaction, error))
-      else
+      if (interaction.user.id === json.u) {
+        interaction
+          .deferUpdate().then(() => {
+            interactionButton?.execute(interaction, json)
+              .then(e => editInteraction(interaction, e))
+              .catch(err => errorInteraction(interaction, err, getTranslation('error.execution.button', interaction.locale)))
+          }).catch((error) => errorHandler(interaction, error))
+      } else {
         interaction.deferReply({ ephemeral: true }).then(() => {
           interactionButton?.execute(interaction, updateUser(interaction, interactionButton, json))
             .then(e => interaction.editReply(noMention(e)).catch((error) => errorHandler(interaction, error)))
             .catch(err => errorInteraction(interaction, err, getTranslation('error.execution.button', interaction.locale)))
         }).catch((error) => errorHandler(interaction, error))
+      }
     }
     /**
      * Check if the interaction is a contextmenu
      */
-    else if (interaction.type === InteractionType.ApplicationCommand && interaction.targetId !== undefined)
+    else if (interaction.type === InteractionType.ApplicationCommand && interaction.targetId !== undefined) {
       interaction
         .deferReply()
         .then(() => {
@@ -121,6 +132,7 @@ module.exports = {
             .catch(err => errorInteraction(interaction, err, getTranslation('error.execution.contextmenu', interaction.locale)))
         })
         .catch((error) => errorHandler(interaction, error))
+    }
     /**
      * Check if the interaction is a command
      */
@@ -133,15 +145,16 @@ module.exports = {
           CommandsStats.create(interaction.commandName, 'command', interaction)
           command?.execute(interaction)
             .then(resp => {
-              if (Array.isArray(resp))
+              if (Array.isArray(resp)) {
                 resp
                   .forEach(r => interaction
                     .followUp(r)
                     .catch((error) => errorHandler(interaction, error)))
-              else
+              } else {
                 interaction
                   .followUp(resp)
                   .catch((error) => errorHandler(interaction, error))
+              }
             })
             .catch(err => errorInteraction(interaction, err, getTranslation('error.execution.command', interaction.locale)))
         })

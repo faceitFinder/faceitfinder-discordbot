@@ -35,8 +35,8 @@ const getDefaultInteractionOption = (interaction, componentIndex = 0, selectMenu
   return res.at(optionIndex)
 }
 
-const getCards = async (interaction, array, fn) => {
-  return Promise.all(array.map(async obj => fn(interaction, obj).catch(err => noMention(errorCard(err, interaction.locale)))))
+const getCards = ({ interaction, array, fn }) => {
+  return Promise.all(array.map(obj => fn(interaction, obj).catch(err => noMention(errorCard(err, interaction.locale)))))
     .then(msgs => msgs.map(msg => {
       const data = {
         embeds: msg.embeds || [],
@@ -133,18 +133,22 @@ const getUsers = async (
     .map(e => getPlayerDatas(interaction, e.param, e.steam, e.discord, e.faceitId)))
 }
 
-const getCardsConditions = async (
+const getCardsConditions = async ({
   interaction,
   fn,
   maxUser = 10,
   steam = 'steam_parameters',
   faceit = 'faceit_parameters',
   searchTeam = true,
-  searchCurrentUser = true
-) => getCards(
-  interaction,
-  await getUsers(interaction, maxUser, steam, faceit, searchTeam, searchCurrentUser),
-  fn)
+  searchCurrentUser = true,
+}) => {
+  const users = await getUsers(interaction, maxUser, steam, faceit, searchTeam, searchCurrentUser)
+  return getCards({
+    interaction,
+    array: users,
+    fn
+  })
+}
 
 const getInteractionOption = (interaction, name) => {
   return interaction.options?._hoistedOptions?.filter(o => o.name === name)[0]?.value
