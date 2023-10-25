@@ -2,8 +2,6 @@ const { ActionRowBuilder } = require('discord.js')
 const CommandsStats = require('../../database/commandsStats')
 const Stats = require('../../commands/stats')
 const { loadingCard, updateCard } = require('../../templates/loadingCard')
-const CustomType = require('../../templates/customType')
-const CustomTypeFunc = require('../../functions/customType')
 const { updateButtons } = require('../../functions/customType')
 
 /**
@@ -32,8 +30,7 @@ module.exports = {
     })
 
     if (newUser) {
-      const buttons = await Promise.all([CustomType.TYPES.KD, CustomType.TYPES.ELO, CustomType.TYPES.ELO_KD]
-        .map((t) => CustomTypeFunc.generateButtons(interaction, buttonValues, t)))
+      const buttons = await Stats.buildButtons(interaction, buttonValues)
       components = [new ActionRowBuilder().addComponents(buttons)]
     }
 

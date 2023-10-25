@@ -94,6 +94,9 @@ const buildEmbed = async ({
   }
 }
 
+const buildButtons = (interaction, buttonValues) => Promise.all([CustomType.TYPES.KD, CustomType.TYPES.ELO, CustomType.TYPES.ELO_KD]
+  .map((t) => CustomTypeFunc.generateButtons(interaction, buttonValues, t)))
+
 const sendCardWithInfo = async (interaction, playerParam) => {
   const game = getGameOption(interaction)
   const {
@@ -110,9 +113,7 @@ const sendCardWithInfo = async (interaction, playerParam) => {
   let components = []
 
   if (historyLength) {
-    const buttons = await Promise.all([CustomType.TYPES.KD, CustomType.TYPES.ELO, CustomType.TYPES.ELO_KD]
-      .map((t) => CustomTypeFunc.generateButtons(interaction, buttonValues, t)))
-
+    const buttons = await buildButtons(interaction, buttonValues)
     components.push(new Discord.ActionRowBuilder().addComponents(buttons))
   }
 
@@ -141,3 +142,4 @@ module.exports = {
 
 module.exports.sendCardWithInfo = sendCardWithInfo
 module.exports.buildEmbed = buildEmbed
+module.exports.buildButtons = buildButtons
