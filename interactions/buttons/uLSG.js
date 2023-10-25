@@ -1,9 +1,8 @@
 const CommandsStats = require('../../database/commandsStats')
 const { getOptionsValues } = require('../../functions/commands')
-const { getTypeGraph } = require('../../functions/commandStats')
 const { getCardWithInfo, updateOptions } = require('../../functions/dateStats')
 const CustomType = require('../../templates/customType')
-const loadingCard = require('../../templates/loadingCard')
+const { loadingCard } = require('../../templates/loadingCard')
 
 /**
  * Update last stats graph.
@@ -11,7 +10,7 @@ const loadingCard = require('../../templates/loadingCard')
 module.exports = {
   name: 'uLSG',
   async execute(interaction, json) {
-    CommandsStats.create('laststats', `button - ${getTypeGraph(json)}`, interaction)
+    CommandsStats.create('laststats', `button - ${json.t.name}`, interaction)
 
     loadingCard(interaction)
 

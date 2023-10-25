@@ -1,7 +1,7 @@
 const { sendCardWithInfo } = require('../../commands/find')
 const CommandsStats = require('../../database/commandsStats')
 const { getOptionsValues } = require('../../functions/commands')
-const loadingCard = require('../../templates/loadingCard')
+const { loadingCard } = require('../../templates/loadingCard')
 
 /**
  * Find user stats graph.

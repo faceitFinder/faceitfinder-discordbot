@@ -1,9 +1,8 @@
 const CommandsStats = require('../../database/commandsStats')
 const { sendCardWithInfo } = require('../selectmenus/dateStatsSelector')
 const CustomType = require('../../templates/customType')
-const loadingCard = require('../../templates/loadingCard')
+const { loadingCard } = require('../../templates/loadingCard')
 const { getDefaultInteractionOption, getOptionsValues } = require('../../functions/commands')
-const { getTypeGraph } = require('../../functions/commandStats')
 
 /**
  * Update date stats graph.
@@ -14,7 +13,7 @@ module.exports = {
     const commandName = await interaction.message.fetchReference()
       .then((message) => message.interaction.commandName)
       .catch(() => interaction.message.interaction.commandName)
-    CommandsStats.create(commandName, `button - ${getTypeGraph(json)}`, interaction)
+    CommandsStats.create(commandName, `button - ${json.t.name}`, interaction)
 
     loadingCard(interaction)
 

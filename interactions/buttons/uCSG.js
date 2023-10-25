@@ -1,30 +1,52 @@
+const { ActionRowBuilder } = require('discord.js')
 const CommandsStats = require('../../database/commandsStats')
-const { getDefaultInteractionOption, getOptionsValues } = require('../../functions/commands')
-const { sendCardWithInfo } = require('../../commands/compare')
-const CustomType = require('../../templates/customType')
-const loadingCard = require('../../templates/loadingCard')
-const { getTypeGraph } = require('../../functions/commandStats')
+const { buildEmbed, getInitPlayersDatas, buildButtons } = require('../../commands/compare')
+const { getCardByUserType } = require('../../templates/loadingCard')
+const { updateButtons } = require('../../functions/customType')
 
 /**
  * Update compare stats graph.
  */
 module.exports = {
   name: 'uCSG',
-  async execute(interaction, json) {
-    CommandsStats.create('compare', `button - ${getTypeGraph(json)}`, interaction)
+  async execute(interaction, json, newUser = false) {
+    CommandsStats.create('compare', `button - ${json.t.name}`, interaction)
+    let components = interaction.message.components
 
-    loadingCard(interaction)
+    getCardByUserType(newUser, interaction)
 
-    return sendCardWithInfo(interaction, {
-      param: json.p1,
-      faceitId: true
-    }, {
-      param: json.p2,
-      faceitId: true
-    }, CustomType.getType(interaction.component.label), json.m, json.c, json.g)
-  },
-  getJSON(interaction, json) {
-    const values = getOptionsValues(interaction)
-    return Object.assign({}, json, values)
-  },
+    const [player1, player2] = await getInitPlayersDatas({
+      player1Param: { faceitId: true, param: json.p1 },
+      player2Param: { faceitId: true, param: json.p2 },
+      game: json.g,
+      map: json.c,
+    })
+
+    const {
+      card,
+      files,
+      buttonValues
+    } = await buildEmbed({
+      player1,
+      player2,
+      maxMatch: json.m,
+      map: json.c,
+      type: json.t,
+      game: json.g,
+      locale: interaction.locale
+    })
+
+    if (newUser) {
+      components = [new ActionRowBuilder().addComponents(await buildButtons(interaction, buttonValues))]
+    }
+
+    components.at(0).components = updateButtons(components.at(0).components, json.t)
+
+    return {
+      content: ' ',
+      embeds: [card],
+      files,
+      components
+    }
+  }
 }

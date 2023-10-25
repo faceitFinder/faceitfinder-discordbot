@@ -1,7 +1,6 @@
 const { getDefaultInteractionOption, getOptionsValues } = require('../../functions/commands')
 const CommandsStats = require('../../database/commandsStats')
-const { getTypePage } = require('../../functions/commandStats')
-const loadingCard = require('../../templates/loadingCard')
+const { loadingCard } = require('../../templates/loadingCard')
 
 /**
  * Page date stats.
@@ -12,7 +11,7 @@ module.exports = {
     const commandName = await interaction.message.fetchReference()
       .then((message) => message.interaction.commandName)
       .catch(() => interaction.message.interaction.commandName)
-    CommandsStats.create(commandName, `button - ${getTypePage(json)}`, interaction)
+    CommandsStats.create(commandName, `button - ${json.t.name}`, interaction)
 
     loadingCard(interaction)
 

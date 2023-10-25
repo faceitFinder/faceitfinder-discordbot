@@ -1,13 +1,12 @@
 const CommandsStats = require('../../database/commandsStats')
 const { sendCardWithInfo } = require('../../commands/last')
-const { getTypePage } = require('../../functions/commandStats')
-const loadingCard = require('../../templates/loadingCard')
+const { loadingCard } = require('../../templates/loadingCard')
 const { getOptionsValues } = require('../../functions/commands')
 
 module.exports = {
   name: 'pageLast',
   async execute(interaction, json) {
-    CommandsStats.create('last', `button - ${getTypePage(json)}`, interaction)
+    CommandsStats.create('last', `button - ${json.t.name}`, interaction)
     loadingCard(interaction)
 
     return sendCardWithInfo(

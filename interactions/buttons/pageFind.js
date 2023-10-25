@@ -1,6 +1,5 @@
 const CommandsStats = require('../../database/commandsStats')
-const { getTypePage } = require('../../functions/commandStats')
-const loadingCard = require('../../templates/loadingCard')
+const { loadingCard } = require('../../templates/loadingCard')
 const Last = require('../../commands/last')
 
 module.exports = {
@@ -10,7 +9,7 @@ module.exports = {
     const excludedPlayers = interaction.message.components.at(4)
     const playerStatsCard = interaction.message.embeds.filter(e => e.data.image.url.includes('graph'))?.at(0)
 
-    CommandsStats.create('find', `button - ${getTypePage(json)}`, interaction)
+    CommandsStats.create('find', `button - ${json.t.name}`, interaction)
 
     loadingCard(interaction)
 

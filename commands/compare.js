@@ -35,85 +35,86 @@ const getMaxMatchLimit = (player1, player2, fn) => {
   const playerMaxMatches = [player1, player2]
     .map(p => fn(p))
   const maxMatchLimit = structuredClone(playerMaxMatches).sort((a, b) => a - b)[0]
-
-  return {
-    maxMatchLimit,
-    playerWithLessMatch: [player1, player2][playerMaxMatches.indexOf(maxMatchLimit)]
-  }
+  return maxMatchLimit
 }
 
-const sendCardWithInfo = async (interaction, player1Param, player2Param, type = CustomType.TYPES.ELO, maxMatch = 20, map = null, game) => {
-  game ??= getGameOption(interaction)
-  maxMatch = getInteractionOption(interaction, 'match_number') ?? maxMatch
-  map = getInteractionOption(interaction, 'map') || map
+const buildButtons = (interaction, buttonsValues) => Promise.all([
+  CustomType.TYPES.KD,
+  CustomType.TYPES.ELO
+].map((t) => CustomTypeFunc.generateButtons(interaction, buttonsValues, t, CustomType.TYPES.ELO)))
 
-  const buttonValues = { id: 'uCSG', u: interaction.user.id, g: game }
-  if (map) buttonValues.c = map
+const getPlayersStats = ({
+  players,
+  matchNumber,
+  game,
+  map = ''
+}) => Promise.all(players.map((player) => getStats({
+  playerParam: player,
+  matchNumber,
+  map,
+  game
+})))
 
-  // Get player datas
-  let player1 = await getStats({
-    playerParam: player1Param,
-    matchNumber: 1,
-    game
-  })
+const getInitPlayersDatas = ({
+  player1Param,
+  player2Param,
+  game,
+  map
+}) => getPlayersStats({
+  players: [player1Param, player2Param],
+  matchNumber: 1,
+  game,
+  map
+})
 
-  let player2 = await getStats({
-    playerParam: player2Param,
-    matchNumber: 1,
-    game
-  })
-
-  let playerWithLessMatch
-  let maxMatchLimit
-  let limits
-
+const buildEmbed = async ({
+  player1,
+  player2,
+  maxMatch,
+  map,
+  type,
+  game,
+  locale
+}) => {
+  // Check if players have played at least one match
   [player1, player2].filter(p => !p.playerHistory.length).map(p => {
-    throw getTranslation('error.user.noMatches', interaction.locale, {
+    throw getTranslation('error.user.noMatches', locale, {
       playerName: p.playerDatas.nickname,
     })
   })
 
+  let filter = (p) => parseInt(p.playerStats.lifetime.Matches)
+
   if (map) {
+    // Check if players have played the map
     [player1, player2].map(p => {
       mapStats = p.playerStats.segments.filter(segment => segment.label === map && segment.mode === '5v5')
 
-      if (!mapStats?.at(0)?.stats) throw getTranslation('error.user.mapNotPlayed', interaction.locale, {
+      if (!mapStats?.at(0)?.stats) throw getTranslation('error.user.mapNotPlayed', locale, {
         playerName: p.playerDatas.nickname,
       })
     })
 
-    limits = getMaxMatchLimit(
-      player1,
-      player2,
-      (p) => parseInt(p.playerStats.segments.find(segment => segment.label === map && segment.mode === '5v5').stats.Matches)
-    )
-  } else limits = getMaxMatchLimit(
+    filter = (p) => parseInt(p.playerStats.segments.find(segment => segment.label === map && segment.mode === '5v5').stats.Matches)
+  }
+
+  const maxMatchLimit = getMaxMatchLimit(
     player1,
     player2,
-    (p) => parseInt(p.playerStats.lifetime.Matches)
+    (p) => filter(p)
   )
 
-  maxMatchLimit = limits.maxMatchLimit
-  playerWithLessMatch = limits.playerWithLessMatch
-
-  maxMatch = maxMatch > maxMatchLimit || maxMatch <= 0 ? maxMatchLimit : maxMatch
+  if (maxMatch > maxMatchLimit || maxMatch <= 0) {
+    maxMatch = maxMatchLimit
+  }
 
   // Get player stats
-  player1 = await getStats({
-    playerParam: player1Param,
+  [player1, player2] = await getPlayersStats({
+    players: [{ faceitId: true, param: player1.playerDatas.player_id }, { faceitId: true, param: player2.playerDatas.player_id }],
     matchNumber: maxMatch,
-    map: map || '',
+    map,
     game
   })
-
-  player2 = await getStats({
-    playerParam: player2Param,
-    matchNumber: maxMatch,
-    map: map || '',
-    game
-  })
-
-  playerWithLessMatch = [player1, player2].filter(p => p.playerDatas.player_id === playerWithLessMatch.playerDatas.player_id).find(e => e)
 
   const fields = [{
     name: 'Matches Compared',
@@ -225,41 +226,22 @@ const sendCardWithInfo = async (interaction, player1Param, player2Param, type = 
       ${player2.playerLastStats['Green K/D']} \
       ${compareStats(player1.playerLastStats['Green K/D'], player2.playerLastStats['Green K/D'])}`,
       inline: true
-    })
+    }
+  )
 
   const card = new Discord.EmbedBuilder()
     .setAuthor({
       name: player1.playerDatas.nickname,
       iconURL: player1.playerDatas.avatar || null
     })
-    .setDescription(getTranslation('strings.compare', interaction.locale, {
+    .setDescription(getTranslation('strings.compare', locale, {
       playerName1: `[${player1.playerDatas.nickname}](https://www.faceit.com/en/players/${player1.playerDatas.nickname})`,
       playerName2: `[${player2.playerDatas.nickname}](https://www.faceit.com/en/players/${player2.playerDatas.nickname})`
     }))
     .setColor(color.primary)
     .addFields(...fields)
     .setImage('attachment://graph.png')
-    .setFooter({ text: new Date().toLocaleDateString(interaction.locale), iconURL: 'attachment://game.png' })
-
-  const options = [{
-    label: getTranslation('strings.compare', interaction.locale, {
-      playerName1: player1.playerDatas.nickname,
-      playerName2: player2.playerDatas.nickname
-    }),
-    value: JSON.stringify({
-      p1: player1.playerDatas.player_id,
-      p2: player2.playerDatas.player_id,
-    }),
-    default: true
-  },
-  {
-    label: 'Datas',
-    value: JSON.stringify({
-      m: maxMatch,
-      c: map,
-      g: game,
-    })
-  }]
+    .setFooter({ text: '\u200b', iconURL: 'attachment://game.png' })
 
   const playerColor = getRandomColors(2)
 
@@ -268,41 +250,86 @@ const sendCardWithInfo = async (interaction, player1Param, player2Param, type = 
       user.playerDatas.nickname,
       type,
       playerColor[i],
-      Graph.getGraph(interaction, user.playerDatas.nickname, type, user.playerHistory, user.playerDatas.games[game].faceit_elo, maxMatch, true).reverse()
+      Graph.getGraph(
+        locale,
+        user.playerDatas.nickname,
+        type,
+        user.playerHistory,
+        maxMatch
+      ).reverse()
     ])
 
   const graphBuffer = Graph.getChart(
     datasets,
     new Array(maxMatch).fill(''),
     Graph.getCompareDatasets,
-    false
+    false,
+    game
   )
+
+  const files = [
+    new Discord.AttachmentBuilder(graphBuffer, { name: 'graph.png' }),
+    new Discord.AttachmentBuilder(`images/${game}.png`, { name: 'game.png' })
+  ]
+
+  const buttonValues = {
+    id: 'uCSG',
+    m: maxMatch,
+    g: game,
+    c: map,
+    p1: player1.playerDatas.player_id,
+    p2: player2.playerDatas.player_id,
+  }
+
+  return {
+    card,
+    files,
+    buttonValues
+  }
+}
+
+const sendCardWithInfo = async (
+  interaction,
+  player1Param,
+  player2Param,
+  type = CustomType.TYPES.ELO,
+  maxMatch = null,
+  map = null,
+  game = null
+) => {
+  const defaultMaxMatch = 20
+
+  game ??= getGameOption(interaction)
+  maxMatch ??= getInteractionOption(interaction, 'match_number') ?? defaultMaxMatch
+  map ??= getInteractionOption(interaction, 'map') ?? ''
+
+  const [player1, player2] = await getInitPlayersDatas({
+    player1Param,
+    player2Param,
+    game,
+    map
+  })
+
+  const {
+    card,
+    files,
+    buttonValues
+  } = await buildEmbed({
+    player1,
+    player2,
+    maxMatch,
+    map,
+    type,
+    game,
+    locale: interaction.locale
+  })
 
   return {
     embeds: [card],
-    files: [
-      new Discord.AttachmentBuilder(graphBuffer, { name: 'graph.png' }),
-      new Discord.AttachmentBuilder(`images/${game}.png`, { name: 'game.png' })
-    ],
+    files,
     components: [
       new Discord.ActionRowBuilder()
-        .addComponents(new Discord.StringSelectMenuBuilder()
-          .setCustomId('compareStatsSelector')
-          .addOptions(options)
-          .setDisabled(true)),
-      new Discord.ActionRowBuilder()
-        .addComponents([
-          CustomTypeFunc.generateButtons(
-            interaction,
-            { ...buttonValues, n: 1 },
-            CustomType.TYPES.KD,
-            type === CustomType.TYPES.KD),
-          CustomTypeFunc.generateButtons(
-            interaction,
-            { ...buttonValues, n: 2 },
-            CustomType.TYPES.ELO,
-            type === CustomType.TYPES.ELO)
-        ])
+        .addComponents(await buildButtons(interaction, buttonValues))
     ]
   }
 }
@@ -373,3 +400,6 @@ module.exports = {
 }
 
 module.exports.sendCardWithInfo = sendCardWithInfo
+module.exports.buildEmbed = buildEmbed
+module.exports.buildButtons = buildButtons
+module.exports.getInitPlayersDatas = getInitPlayersDatas

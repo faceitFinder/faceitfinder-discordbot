@@ -41,8 +41,10 @@ const updateCard = (interaction) => {
   }).catch((error) => errorHandler(interaction, error))
 }
 
+const getCardByUserType = (newUser, interaction) => newUser ? loadingCard(interaction) : updateCard(interaction)
 
 module.exports = {
   loadingCard,
-  updateCard
+  updateCard,
+  getCardByUserType
 }
