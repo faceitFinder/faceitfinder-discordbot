@@ -1,6 +1,22 @@
 const { ButtonBuilder } = require('discord.js')
 const { getTranslation } = require('../languages/setup')
 const Interaction = require('../database/interaction')
+const CustomType = require('../templates/customType')
+
+const buildButtons = (interaction, buttonsValues, types) => Promise.all(types.map((t) => generateButtons(interaction, buttonsValues, t)))
+
+const buildButtonsGraph = (interaction, buttonValues) => buildButtons(interaction, buttonValues, [
+  CustomType.TYPES.KD,
+  CustomType.TYPES.ELO,
+  CustomType.TYPES.ELO_KD
+])
+
+const buildButtonsPagination = (interaction, buttonValues) => buildButtons(interaction, buttonValues, [
+  CustomType.TYPES.FIRST,
+  CustomType.TYPES.NEXT,
+  CustomType.TYPES.PREVIOUS,
+  CustomType.TYPES.LAST
+])
 
 const generateButtons = async (interaction, values, type) => {
   let name = type.name
@@ -34,5 +50,8 @@ const updateButtons = (components, type) => {
 
 module.exports = {
   generateButtons,
-  updateButtons
+  updateButtons,
+  buildButtonsGraph,
+  buildButtonsPagination,
+  buildButtons
 }

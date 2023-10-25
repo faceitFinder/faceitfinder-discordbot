@@ -2,7 +2,7 @@ const { color } = require('../config.json')
 const Discord = require('discord.js')
 const Graph = require('../functions/graph')
 const CustomType = require('../templates/customType')
-const CustomTypeFunc = require('../functions/customType')
+const { buildButtonsGraph } = require('../functions/customType')
 const Options = require('../templates/options')
 const { getCardsConditions, getGameOption } = require('../functions/commands')
 const { getTranslation, getTranslations } = require('../languages/setup')
@@ -94,9 +94,6 @@ const buildEmbed = async ({
   }
 }
 
-const buildButtons = (interaction, buttonValues) => Promise.all([CustomType.TYPES.KD, CustomType.TYPES.ELO, CustomType.TYPES.ELO_KD]
-  .map((t) => CustomTypeFunc.generateButtons(interaction, buttonValues, t)))
-
 const sendCardWithInfo = async (interaction, playerParam) => {
   const game = getGameOption(interaction)
   const {
@@ -113,8 +110,7 @@ const sendCardWithInfo = async (interaction, playerParam) => {
   let components = []
 
   if (historyLength) {
-    const buttons = await buildButtons(interaction, buttonValues)
-    components.push(new Discord.ActionRowBuilder().addComponents(buttons))
+    components.push(new Discord.ActionRowBuilder().addComponents(await buildButtonsGraph(interaction, buttonValues)))
   }
 
   return {
@@ -142,4 +138,3 @@ module.exports = {
 
 module.exports.sendCardWithInfo = sendCardWithInfo
 module.exports.buildEmbed = buildEmbed
-module.exports.buildButtons = buildButtons
