@@ -3,6 +3,21 @@ const { ActionRowBuilder } = require('discord.js')
 const { generateButtons } = require('../functions/customType')
 const CustomType = require('../templates/customType')
 
+const disabledOptions = (page, maxPage, type) => {
+  switch (type) {
+  case CustomType.TYPES.FIRST:
+    return page === 0 ? type : null
+  case CustomType.TYPES.PREV:
+    return !(page - 1 >= 0) ? type : null
+  case CustomType.TYPES.NEXT:
+    return !(page + 1 <= maxPage) ? type : null
+  case CustomType.TYPES.LAST:
+    return page === maxPage ? type : null
+  default:
+    return null
+  }
+}
+
 const getPageSlice = (page, items = itemByPage) => {
   return {
     start: page * items,
@@ -17,37 +32,38 @@ const getMaxPage = (array, items = itemByPage) => {
 const getPagination = async (interaction, page, maxPage, id) => {
   /**
    * id: button interaction id
-   * page: target page
-   * c: current page
+   * tp: target page
+   * cp: current page
    */
 
   return new ActionRowBuilder()
     .addComponents(await Promise.all([
       generateButtons(
         interaction,
-        { id: id, page: 0, c: page },
+        { id: id, tp: 0, cp: page },
         CustomType.TYPES.FIRST,
-        page === 0 ? CustomType.TYPES.FIRST : null),
+        disabledOptions(page, maxPage, CustomType.TYPES.FIRST)),
       generateButtons(
         interaction,
-        { id: id, page: page - 1, c: page },
+        { id: id, tp: page - 1, cp: page },
         CustomType.TYPES.PREV,
-        !(page - 1 >= 0) ? CustomType.TYPES.PREV : null),
+        disabledOptions(page, maxPage, CustomType.TYPES.PREV)),
       generateButtons(
         interaction,
-        { id: id, page: page + 1, c: page },
+        { id: id, tp: page + 1, cp: page },
         CustomType.TYPES.NEXT,
-        !(page + 1 <= maxPage) ? CustomType.TYPES.NEXT : null),
+        disabledOptions(page, maxPage, CustomType.TYPES.NEXT)),
       generateButtons(
         interaction,
-        { id: id, page: maxPage, c: page },
+        { id: id, tp: maxPage, cp: page },
         CustomType.TYPES.LAST,
-        page === maxPage ? CustomType.TYPES.LAST : null)
+        disabledOptions(page, maxPage, CustomType.TYPES.LAST))
     ]))
 }
 
 module.exports = {
   getPagination,
   getPageSlice,
-  getMaxPage
+  getMaxPage,
+  disabledOptions
 }

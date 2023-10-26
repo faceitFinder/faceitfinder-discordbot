@@ -19,16 +19,13 @@ const errorInteraction = (interaction, error, message) => {
     .catch((error) => errorHandler(interaction, error))
 }
 
-const updateUser = (interaction, interactionEl, json = null) => {
-  let values
-  try {
-    values = interactionEl.updateUser(interaction, json)
-  } catch (error) {
-    values = interactionEl.getJSON(interaction, json)
-    values.u = interaction.user.id
-  }
-
-  return values
+const expiredInteraction = (interaction) => {
+  interaction.deferUpdate().then(() => {
+    editInteraction(interaction, {
+      content: '```md\n# This interaction has expired```',
+    })
+    updateCard(interaction)
+  })
 }
 
 module.exports = {
@@ -67,14 +64,20 @@ module.exports = {
       const interactionSelectMenu = interaction.client.selectmenus?.get(interaction.customId)
       if (!interactionSelectMenu) return
 
-      const values = interactionSelectMenu.getJSON(interaction)
+      const interactionDatas = await Interaction.getOne(interaction.values)
+      if (!interactionDatas) {
+        expiredInteraction(interaction)
+        return
+      }
 
-      if (interaction.user.id === values.u) {
+      const json = interactionDatas.jsonData
+
+      if (interaction.user.id === json.u) {
         interaction
           .deferUpdate()
           .then(() => {
             CommandsStats.create(interaction.customId, 'selectmenu', interaction)
-            interactionSelectMenu?.execute(interaction, values)
+            interactionSelectMenu?.execute(interaction, json)
               .then(e => editInteraction(interaction, e))
               .catch(err => errorInteraction(interaction, err, getTranslation('error.execution.selectmenu', interaction.locale)))
           })
@@ -84,7 +87,7 @@ module.exports = {
           .deferReply({ ephemeral: true })
           .then(() => {
             CommandsStats.create(interaction.customId, 'selectmenu', interaction)
-            interactionSelectMenu?.execute(interaction, updateUser(interaction, interactionSelectMenu))
+            interactionSelectMenu?.execute(interaction, json, true)
               .then(e => interaction.editReply(noMention(e)).catch((error) => errorHandler(interaction, error)))
               .catch(err => errorInteraction(interaction, err, getTranslation('error.execution.selectmenu', interaction.locale)))
           })
@@ -97,12 +100,7 @@ module.exports = {
     else if (interaction.isButton()) {
       const interactionDatas = await Interaction.getOne(interaction.customId)
       if (!interactionDatas) {
-        interaction.deferUpdate().then(() => {
-          editInteraction(interaction, {
-            content: '```md\n# This interaction has expired```',
-          })
-          updateCard(interaction)
-        })
+        expiredInteraction(interaction)
         return
       }
 
@@ -165,7 +163,10 @@ module.exports = {
                   .catch((error) => errorHandler(interaction, error))
               }
             })
-            .catch(err => errorInteraction(interaction, err, getTranslation('error.execution.command', interaction.locale)))
+            .catch(err => {
+              console.error(err)
+              errorInteraction(interaction, err, getTranslation('error.execution.command', interaction.locale))
+            })
         })
         .catch((error) => errorHandler(interaction, error))
     }

@@ -12,3 +12,4 @@ module.exports.TYPES = {
 }
 
 module.exports.getType = (t) => Object.entries(this.TYPES).filter(e => e[1].name === t)[0][1]
+module.exports.getTypeFromEmoji = (t) => Object.entries(this.TYPES).filter(e => e[1].emoji === t)[0][1]

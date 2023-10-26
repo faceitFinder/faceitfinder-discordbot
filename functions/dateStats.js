@@ -39,13 +39,9 @@ const setOptionDefault = option => {
  */
 const getCardWithInfo = async ({
   interaction,
-  actionRow,
   values,
-  type,
-  id,
-  maxPage = null,
-  page = null,
-  updateStartDate = false,
+  type = CustomType.TYPES.ELO,
+  updateStartDate = false
 }) => {
   const playerId = values.s
   const today = new Date().setHours(24, 0, 0, 0)
@@ -84,7 +80,7 @@ const getCardWithInfo = async ({
     interaction.locale,
     playerDatas.nickname,
     playerHistory,
-    playerLastStats.games + (type === CustomType.TYPES.ELO),
+    playerLastStats.games + (CustomType.getType(type.name) === CustomType.TYPES.ELO),
     type,
     game
   )
@@ -142,23 +138,16 @@ const getCardWithInfo = async ({
     .setColor(color.levels[game][faceitLevel].color)
     .setFooter({ text: `Steam: ${steamDatas?.personaname || steamDatas}`, iconURL: 'attachment://game.png' })
 
-  const components = [
-    actionRow,
-    new Discord.ActionRowBuilder()
-      .addComponents(await CustomTypeFunc.buildButtonsGraph(interaction, { id }))
+  const files = [
+    new Discord.AttachmentBuilder(graphBuffer, { name: `${values.s}graph.png` }),
+    new Discord.AttachmentBuilder(rankImageCanvas, { name: `${faceitLevel}level.png` }),
+    new Discord.AttachmentBuilder(`images/${game}.png`, { name: 'game.png' })
   ]
-
-  if (page !== null) components.push(await getPagination(interaction, page, maxPage, 'pageDS'))
 
   return {
     content: '',
     embeds: [card],
-    files: [
-      new Discord.AttachmentBuilder(graphBuffer, { name: `${values.s}graph.png` }),
-      new Discord.AttachmentBuilder(rankImageCanvas, { name: `${faceitLevel}level.png` }),
-      new Discord.AttachmentBuilder(`images/${game}.png`, { name: 'game.png' })
-    ],
-    components
+    files
   }
 }
 
@@ -172,8 +161,6 @@ const generateDatasForCard = async ({
   formatLabel,
   selectTranslationString
 }) => {
-  game ??= getGameOption(interaction)
-
   const {
     playerDatas,
     playerHistory
@@ -210,7 +197,12 @@ const generateDatasForCard = async ({
 
     optionsValues.push(option)
   })
-
+  
+  const maxPage = getMaxPage(optionsValues)
+  optionsValues.forEach(option => {
+    option.values.mp = maxMatch
+    option.values.cp = page
+  })
   const pages = getPageSlice(page)
   const pagination = await Promise.all(optionsValues.slice(pages.start, pages.end).map(option => CustomTypeFunc.generateOption(interaction, option)))
 
@@ -220,23 +212,33 @@ const generateDatasForCard = async ({
 
   pagination[0] = setOptionDefault(pagination.at(0))
 
-  const row = new Discord.ActionRowBuilder()
-    .addComponents(
-      new Discord.StringSelectMenuBuilder()
-        .setCustomId('dateStatsSelector')
-        .setPlaceholder(getTranslation(selectTranslationString, interaction.locale))
-        .addOptions(pagination))
-
-  return getCardWithInfo({
+  const resp = await getCardWithInfo({
     interaction,
-    actionRow: row,
     values: optionsValues[0].values,
-    type: CustomType.TYPES.ELO,
-    id: 'uDSG',
-    maxPage: getMaxPage(optionsValues),
-    page,
-    updateStartDate: false
+    type: CustomType.TYPES.ELO
   })
+
+  const components = [
+    new Discord.ActionRowBuilder()
+      .addComponents(
+        new Discord.StringSelectMenuBuilder()
+          .setCustomId('dateStatsSelector')
+          .setPlaceholder(getTranslation(selectTranslationString, interaction.locale))
+          .addOptions(pagination)
+          .setDisabled(false)),
+    new Discord.ActionRowBuilder()
+      .addComponents(await CustomTypeFunc.buildButtonsGraph(interaction, Object.assign({}, optionsValues[0].values, {
+        id: 'uDSG',
+        mp: maxPage,
+        cp: page
+      })))
+  ]
+
+  if (page !== null) components.push(await getPagination(interaction, page, maxPage, 'pageDS'))
+
+  resp.components = components
+
+  return resp
 }
 
 const buildButtonValues = (json, optionJson) => {
