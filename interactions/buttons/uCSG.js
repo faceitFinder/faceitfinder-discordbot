@@ -33,7 +33,8 @@ module.exports = {
       map: json.c,
       type: json.t,
       game: json.g,
-      locale: interaction.locale
+      locale: interaction.locale,
+      playerColor: json.pc,
     })
 
     if (newUser) {

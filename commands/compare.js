@@ -74,7 +74,8 @@ const buildEmbed = async ({
   map,
   type,
   game,
-  locale
+  locale,
+  playerColor = getRandomColors(2)
 }) => {
   // Check if players have played at least one match
   [player1, player2].filter(p => !p.playerHistory.length).map(p => {
@@ -243,8 +244,6 @@ const buildEmbed = async ({
     .setImage('attachment://graph.png')
     .setFooter({ text: '\u200b', iconURL: 'attachment://game.png' })
 
-  const playerColor = getRandomColors(2)
-
   const datasets = [player1, player2]
     .map((user, i) => [
       user.playerDatas.nickname,
@@ -279,6 +278,7 @@ const buildEmbed = async ({
     c: map,
     p1: player1.playerDatas.player_id,
     p2: player2.playerDatas.player_id,
+    pc: playerColor,
   }
 
   return {
