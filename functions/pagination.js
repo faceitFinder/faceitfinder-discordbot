@@ -1,6 +1,6 @@
 const { itemByPage } = require('../config.json')
-const Discord = require('discord.js')
-const CustomTypeFunc = require('../functions/customType')
+const { ActionRowBuilder } = require('discord.js')
+const { generateButtons } = require('../functions/customType')
 const CustomType = require('../templates/customType')
 
 const getPageSlice = (page, items = itemByPage) => {
@@ -14,36 +14,36 @@ const getMaxPage = (array, items = itemByPage) => {
   return Math.floor(array.length / items) - !(array.length % items >= 1)
 }
 
-const getPagination = (interaction, page, maxPage, id) => {
+const getPagination = async (interaction, page, maxPage, id) => {
   /**
    * id: button interaction id
    * page: target page
    * c: current page
-   * n: prevent custom id duplication
    */
-  return new Discord.ActionRowBuilder()
-    .addComponents([
-      CustomTypeFunc.generateButtons(
+
+  return new ActionRowBuilder()
+    .addComponents(await Promise.all([
+      generateButtons(
         interaction,
-        { id: id, page: 0, c: page, n: 1 },
+        { id: id, page: 0, c: page },
         CustomType.TYPES.FIRST,
-        page === 0),
-      CustomTypeFunc.generateButtons(
+        page === 0 ? CustomType.TYPES.FIRST : null),
+      generateButtons(
         interaction,
-        { id: id, page: page - 1, c: page, n: 3 },
+        { id: id, page: page - 1, c: page },
         CustomType.TYPES.PREV,
-        !(page - 1 >= 0)),
-      CustomTypeFunc.generateButtons(
+        !(page - 1 >= 0) ? CustomType.TYPES.PREV : null),
+      generateButtons(
         interaction,
-        { id: id, page: page + 1, c: page, n: 2 },
+        { id: id, page: page + 1, c: page },
         CustomType.TYPES.NEXT,
-        !(page + 1 <= maxPage)),
-      CustomTypeFunc.generateButtons(
+        !(page + 1 <= maxPage) ? CustomType.TYPES.NEXT : null),
+      generateButtons(
         interaction,
-        { id: id, page: maxPage, c: page, n: 4 },
+        { id: id, page: maxPage, c: page },
         CustomType.TYPES.LAST,
-        page === maxPage),
-    ])
+        page === maxPage ? CustomType.TYPES.LAST : null)
+    ]))
 }
 
 module.exports = {
