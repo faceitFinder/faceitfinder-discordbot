@@ -1,4 +1,4 @@
-const { ButtonBuilder } = require('discord.js')
+const { ButtonBuilder, StringSelectMenuOptionBuilder } = require('discord.js')
 const { getTranslation } = require('../languages/setup')
 const Interaction = require('../database/interaction')
 const CustomType = require('../templates/customType')
@@ -11,13 +11,6 @@ const buildButtonsGraph = (interaction, buttonValues) => buildButtons(interactio
   CustomType.TYPES.ELO,
   CustomType.TYPES.ELO_KD
 ], CustomType.TYPES.ELO)
-
-const buildButtonsPagination = (interaction, buttonValues) => buildButtons(interaction, buttonValues, [
-  CustomType.TYPES.FIRST,
-  CustomType.TYPES.NEXT,
-  CustomType.TYPES.PREVIOUS,
-  CustomType.TYPES.LAST
-])
 
 const generateButtons = async (interaction, values, type, disabledType = null) => {
   let name = type.name
@@ -50,10 +43,21 @@ const updateButtons = (components, type) => {
   })
 }
 
+const generateOption = async (interaction, { values, label, description }) => {
+  const customId = (await Interaction.create(Object.assign({}, values, {
+    u: interaction.user.id
+  }))).id
+
+  return new StringSelectMenuOptionBuilder()
+    .setLabel(label)
+    .setDescription(description)
+    .setValue(customId)
+}
+
 module.exports = {
   generateButtons,
   updateButtons,
   buildButtonsGraph,
-  buildButtonsPagination,
-  buildButtons
+  buildButtons,
+  generateOption
 }
