@@ -1,11 +1,11 @@
-const InteractionModel = require('./models/interactionModel');
+const InteractionModel = require('./models/interactionModel')
 
 const create = (jsonData = null) => {
   const newInteraction = new InteractionModel({
     jsonData: jsonData,
     createdAt: new Date(),
     updatedAt: new Date(),
-  });
+  })
 
   return newInteraction.save()
 }
