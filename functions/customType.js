@@ -26,7 +26,7 @@ const generateButtons = async (interaction, values, type, disabledType = null) =
     .setLabel(name)
     .setEmoji(type.emoji)
     .setStyle(type.style)
-    .setDisabled(type.name === disabledType.name)
+    .setDisabled(type.name === disabledType?.name)
 }
 
 const updateButtons = (components, type) => {
