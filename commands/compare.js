@@ -273,12 +273,12 @@ const buildEmbed = async ({
 
   const buttonValues = {
     id: 'uCSG',
-    m: maxMatch,
-    g: game,
-    c: map,
+    maxMatch,
+    game,
+    map,
     p1: player1.playerDatas.player_id,
     p2: player2.playerDatas.player_id,
-    pc: playerColor,
+    playerColor,
   }
 
   return {
