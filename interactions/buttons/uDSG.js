@@ -15,7 +15,7 @@ module.exports = {
     const commandName = await interaction.message.fetchReference()
       .then((message) => message.interaction.commandName)
       .catch(() => interaction.message.interaction.commandName)
-    CommandsStats.create(commandName, `button - ${json.t.name}`, interaction)
+    CommandsStats.create(commandName, `button - ${json.type.name}`, interaction)
 
     let components = interaction.message.components
 
@@ -24,15 +24,13 @@ module.exports = {
     const resp = await DateStats.getCardWithInfo({
       interaction,
       values: json,
-      type: json.t
+      type: json.type
     })
 
-    // Select menu
     components.at(0).components.at(0).setDisabled(false)
-    // Graph buttons
-    components.at(1).components = updateButtons(components.at(1).components, json.t)
-    // Pagination buttons
-    components.at(2).components.forEach((button) => button.setDisabled(!!disabledOptions(json.cp, json.mp, getTypeFromEmoji(button.data.emoji.name))))
+    components.at(1).components = updateButtons(components.at(1).components, json.type)
+    components.at(2).components.forEach((button) =>
+      button.setDisabled(!!disabledOptions(json.currentPage, json.maxPage, getTypeFromEmoji(button.data.emoji.name))))
 
     resp.components = components
 
