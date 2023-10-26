@@ -99,7 +99,7 @@ module.exports = {
       if (!interactionDatas) {
         interaction.deferUpdate().then(() => {
           editInteraction(interaction, {
-            content: '```This interaction has expired```',
+            content: '```md\n# This interaction has expired```',
           })
           updateCard(interaction)
         })
