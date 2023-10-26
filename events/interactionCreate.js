@@ -64,7 +64,7 @@ module.exports = {
       const interactionSelectMenu = interaction.client.selectmenus?.get(interaction.customId)
       if (!interactionSelectMenu) return
 
-      const interactionDatas = await Interaction.getOne(interaction.values)
+      const interactionDatas = await Interaction.getOne(interaction.values[0])
       if (!interactionDatas) {
         expiredInteraction(interaction)
         return
@@ -109,7 +109,7 @@ module.exports = {
 
       if (!interactionButton) return
 
-      if (interaction.user.id === json.u) {
+      if (interaction.user.id === json.userId) {
         interaction
           .deferUpdate().then(() => {
             interactionButton?.execute(interaction, json)

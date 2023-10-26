@@ -33,8 +33,8 @@ const buildEmbed = async ({
   const playerRegion = playerDatas.games[game].region
   const buttonValues = {
     id: 'uSG',
-    s: playerId,
-    g: game
+    playerId,
+    game
   }
 
   const ladderCountry = await getLadder({

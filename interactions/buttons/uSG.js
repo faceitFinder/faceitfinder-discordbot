@@ -10,7 +10,7 @@ const { updateButtons, buildButtonsGraph } = require('../../functions/customType
 module.exports = {
   name: 'uSG',
   async execute(interaction, json, newUser = false) {
-    CommandsStats.create('stats', `button - ${json.t.name}`, interaction)
+    CommandsStats.create('stats', `button - ${json.type.name}`, interaction)
     let components = interaction.message.components
 
     getCardByUserType(newUser, interaction)
@@ -21,11 +21,11 @@ module.exports = {
       buttonValues,
     } = await buildEmbed({
       playerParam: {
-        param: json.s,
+        param: json.playerId,
         faceitId: true
       },
-      game: json.g,
-      type: json.t,
+      game: json.game,
+      type: json.type,
       locale: interaction.locale
     })
 
@@ -33,7 +33,7 @@ module.exports = {
       components = [new ActionRowBuilder().addComponents(await buildButtonsGraph(interaction, buttonValues))]
     }
 
-    components.at(0).components = updateButtons(components.at(0).components, json.t)
+    components.at(0).components = updateButtons(components.at(0).components, json.type)
 
     return {
       content: ' ',
