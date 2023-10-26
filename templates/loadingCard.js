@@ -25,11 +25,19 @@ const updateCard = (interaction) => {
     components: interaction.message.components.map((c) => {
       c.components = c.components.map((cc) => {
         if (cc instanceof Discord.ButtonComponent) {
-          return new Discord.ButtonBuilder()
+          cc = new Discord.ButtonBuilder()
             .setCustomId(cc.customId)
             .setLabel(cc.label)
             .setEmoji(cc.emoji)
             .setStyle(cc.style)
+            .setDisabled(true)
+        }
+
+        if (cc instanceof Discord.StringSelectMenuComponent) {
+          cc = new Discord.StringSelectMenuBuilder()
+            .setCustomId(cc.customId)
+            .setPlaceholder(cc.placeholder)
+            .addOptions(cc.options)
             .setDisabled(true)
         }
 
