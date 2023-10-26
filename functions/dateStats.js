@@ -3,6 +3,7 @@ const Discord = require('discord.js')
 const Graph = require('./graph')
 const CustomType = require('../templates/customType')
 const CustomTypeFunc = require('../functions/customType')
+const Interaction = require('../database/interaction')
 const { getPagination, getMaxPage, getPageSlice } = require('./pagination')
 const { getInteractionOption } = require('./commands')
 const { getStats } = require('./apiHandler')
@@ -27,28 +28,18 @@ const setOptionDefault = option => {
   return option
 }
 
-/**
- * @param {
- *   s, // faceitId
- *   f, // fromDate
- *   t, // toDate
- *   g, // game
- *   m, // maxMatch
- *   c, // map
- * } values
- */
 const getCardWithInfo = async ({
   interaction,
   values,
   type = CustomType.TYPES.ELO,
   updateStartDate = false
 }) => {
-  const playerId = values.s
+  const playerId = values.playerId
   const today = new Date().setHours(24, 0, 0, 0)
-  let startDate = values.f || ''
-  const endDate = values.t || new Date().setHours(+24)
-  const map = values.c ?? ''
-  const game = values.g ?? defaultGame
+  let startDate = values.from || ''
+  const endDate = values.to || new Date().setHours(+24)
+  const map = values.map ?? ''
+  const game = values.game ?? defaultGame
 
   const {
     playerDatas,
@@ -60,7 +51,7 @@ const getCardWithInfo = async ({
       param: playerId,
       faceitId: true
     },
-    matchNumber: values.m,
+    matchNumber: values.maxMatch,
     startDate,
     endDate,
     map: map,
@@ -134,12 +125,12 @@ const getCardWithInfo = async ({
       { name: 'Red K/D', value: playerLastStats['Red K/D'].toString(), inline: true },
       { name: 'Orange K/D', value: playerLastStats['Orange K/D'].toString(), inline: true },
       { name: 'Green K/D', value: playerLastStats['Green K/D'].toString(), inline: true })
-    .setImage(`attachment://${values.s}graph.png`)
+    .setImage(`attachment://${values.playerId}graph.png`)
     .setColor(color.levels[game][faceitLevel].color)
     .setFooter({ text: `Steam: ${steamDatas?.personaname || steamDatas}`, iconURL: 'attachment://game.png' })
 
   const files = [
-    new Discord.AttachmentBuilder(graphBuffer, { name: `${values.s}graph.png` }),
+    new Discord.AttachmentBuilder(graphBuffer, { name: `${values.playerId}graph.png` }),
     new Discord.AttachmentBuilder(rankImageCanvas, { name: `${faceitLevel}level.png` }),
     new Discord.AttachmentBuilder(`images/${game}.png`, { name: 'game.png' })
   ]
@@ -186,22 +177,22 @@ const generateDatasForCard = async ({
       label: formatLabel(from, to, interaction.locale),
       description: getTranslation('strings.matchPlayed', interaction.locale, { matchNumber: date.number }),
       values: {
-        s: playerId,
-        f: from,
-        t: to,
-        g: game,
-        m: maxMatch,
-        c: map
+        playerId,
+        from,
+        to,
+        game,
+        maxMatch,
+        map
       }
     }
 
     optionsValues.push(option)
   })
-  
+
   const maxPage = getMaxPage(optionsValues)
   optionsValues.forEach(option => {
-    option.values.mp = maxMatch
-    option.values.cp = page
+    option.values.maxPage = maxPage
+    option.values.currentPage = page
   })
   const pages = getPageSlice(page)
   const pagination = await Promise.all(optionsValues.slice(pages.start, pages.end).map(option => CustomTypeFunc.generateOption(interaction, option)))
@@ -229,8 +220,8 @@ const generateDatasForCard = async ({
     new Discord.ActionRowBuilder()
       .addComponents(await CustomTypeFunc.buildButtonsGraph(interaction, Object.assign({}, optionsValues[0].values, {
         id: 'uDSG',
-        mp: maxPage,
-        cp: page
+        maxPage,
+        currentPage: page
       })))
   ]
 
@@ -241,36 +232,17 @@ const generateDatasForCard = async ({
   return resp
 }
 
-const buildButtonValues = (json, optionJson) => {
-  return JSON.stringify({
-    s: json.s,
-    f: json.f,
-    t: json.t
-  })
-}
-
-const updateOptions = (components, values, updateEmoji = true) => {
+const updateOptions = (components, id, updateEmoji = true) => {
   return components.filter(e => e instanceof Discord.StringSelectMenuComponent)
     .map(msm => msm.options.map(o => {
-      // Do not reset if a button is clicked
-      try {
-        setOptionValues(o, values)
-        if (values.id.normalize() === 'uDSG') return o
-      } catch (error) { }
+      Interaction.updateOne(id)
 
-      const active = o.value.normalize() === (typeof values === 'object' ? buildButtonValues(values) : values).normalize()
+      const active = o.value.normalize() === id.normalize()
       if (updateEmoji) o.emoji = active ? emojis.select.balise : undefined
       o.default = active
 
       return o
     })).at(0)
-}
-
-const setOptionValues = (option, values) => {
-  const oValue = JSON.parse(option.value)
-  if (oValue.u) oValue.u = values.u
-  option.value = JSON.stringify(oValue)
-  return option
 }
 
 const getFromTo = (interaction, nameFrom = 'from_date', nameTo = 'to_date') => {
@@ -286,6 +258,5 @@ module.exports = {
   setOptionDefault,
   updateOptions,
   getFromTo,
-  setOptionValues,
   generateDatasForCard
 }

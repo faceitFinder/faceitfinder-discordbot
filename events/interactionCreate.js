@@ -72,7 +72,7 @@ module.exports = {
 
       const json = interactionDatas.jsonData
 
-      if (interaction.user.id === json.u) {
+      if (interaction.user.id === json.userId) {
         interaction
           .deferUpdate()
           .then(() => {
