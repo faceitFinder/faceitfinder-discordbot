@@ -1,9 +1,9 @@
-const { color, emojis } = require('../config.json')
+const { color, emojis, defaultGame } = require('../config.json')
 const Discord = require('discord.js')
 const Graph = require('./graph')
 const CustomType = require('../templates/customType')
 const CustomTypeFunc = require('../functions/customType')
-const { getPagination } = require('./pagination')
+const { getPagination, getMaxPage, getPageSlice } = require('./pagination')
 const { getInteractionOption } = require('./commands')
 const { getStats } = require('./apiHandler')
 const { getTranslation } = require('../languages/setup')
@@ -27,23 +27,32 @@ const setOptionDefault = option => {
   return option
 }
 
-const getCardWithInfo = async (
+/**
+ * @param {
+ *   s, // faceitId
+ *   f, // fromDate
+ *   t, // toDate
+ *   g, // game
+ *   m, // maxMatch
+ *   c, // map
+ * } values
+ */
+const getCardWithInfo = async ({
   interaction,
   actionRow,
   values,
   type,
   id,
-  maxMatch,
   maxPage = null,
   page = null,
-  map = null,
   updateStartDate = false,
-  game = null
-) => {
+}) => {
   const playerId = values.s
   const today = new Date().setHours(24, 0, 0, 0)
-  let startDate = values.f * 1000 || ''
-  const endDate = values.t * 1000 || new Date().setHours(+24)
+  let startDate = values.f || ''
+  const endDate = values.t || new Date().setHours(+24)
+  const map = values.c ?? ''
+  const game = values.g ?? defaultGame
 
   const {
     playerDatas,
@@ -55,10 +64,10 @@ const getCardWithInfo = async (
       param: playerId,
       faceitId: true
     },
-    matchNumber: maxMatch,
+    matchNumber: values.m,
     startDate,
     endDate,
-    map: map || '',
+    map: map,
     checkElo: +((startDate !== '' ? today >= startDate : true) && today <= endDate),
     game
   })
@@ -72,7 +81,7 @@ const getCardWithInfo = async (
   const size = 40
 
   const graphBuffer = Graph.generateChart(
-    interaction,
+    interaction.locale,
     playerDatas.nickname,
     playerHistory,
     playerLastStats.games + (type === CustomType.TYPES.ELO),
@@ -134,38 +143,100 @@ const getCardWithInfo = async (
     .setFooter({ text: `Steam: ${steamDatas?.personaname || steamDatas}`, iconURL: 'attachment://game.png' })
 
   const components = [
-    ...[actionRow].flat(),
+    actionRow,
     new Discord.ActionRowBuilder()
-      .addComponents([
-        CustomTypeFunc.generateButtons(
-          interaction,
-          { id: id, n: 1 },
-          CustomType.TYPES.KD,
-          type === CustomType.TYPES.KD),
-        CustomTypeFunc.generateButtons(
-          interaction,
-          { id: id, n: 2 },
-          CustomType.TYPES.ELO,
-          type === CustomType.TYPES.ELO),
-        CustomTypeFunc.generateButtons(
-          interaction,
-          { id: id, n: 3 },
-          CustomType.TYPES.ELO_KD,
-          type === CustomType.TYPES.ELO_KD)
-      ])]
+      .addComponents(await CustomTypeFunc.buildButtonsGraph(interaction, { id }))
+  ]
 
-  if (page !== null) components.push(getPagination(interaction, page, maxPage, 'pageDS'))
+  if (page !== null) components.push(await getPagination(interaction, page, maxPage, 'pageDS'))
 
   return {
+    content: '',
     embeds: [card],
-    content: null,
     files: [
       new Discord.AttachmentBuilder(graphBuffer, { name: `${values.s}graph.png` }),
       new Discord.AttachmentBuilder(rankImageCanvas, { name: `${faceitLevel}level.png` }),
       new Discord.AttachmentBuilder(`images/${game}.png`, { name: 'game.png' })
     ],
-    components: components
+    components
   }
+}
+
+const generateDatasForCard = async ({
+  interaction,
+  playerParam,
+  page = 0,
+  game = '',
+  functionToGetDates,
+  formatFromToDates,
+  formatLabel,
+  selectTranslationString
+}) => {
+  game ??= getGameOption(interaction)
+
+  const {
+    playerDatas,
+    playerHistory
+  } = await getStats({
+    playerParam,
+    matchNumber: 0,
+    game
+  })
+
+  const playerId = playerDatas.player_id
+  const optionsValues = []
+  const dates = await getDates(playerHistory, functionToGetDates)
+  const maxMatch = 0
+  const map = ''
+
+  dates.forEach(date => {
+    const {
+      from,
+      to
+    } = formatFromToDates(date)
+
+    let option = {
+      label: formatLabel(from, to, interaction.locale),
+      description: getTranslation('strings.matchPlayed', interaction.locale, { matchNumber: date.number }),
+      values: {
+        s: playerId,
+        f: from,
+        t: to,
+        g: game,
+        m: maxMatch,
+        c: map
+      }
+    }
+
+    optionsValues.push(option)
+  })
+
+  const pages = getPageSlice(page)
+  const pagination = await Promise.all(optionsValues.slice(pages.start, pages.end).map(option => CustomTypeFunc.generateOption(interaction, option)))
+
+  if (pagination.length === 0) return errorCard(getTranslation('error.user.noMatches', interaction.locale, {
+    playerName: playerDatas.nickname
+  }), interaction.locale)
+
+  pagination[0] = setOptionDefault(pagination.at(0))
+
+  const row = new Discord.ActionRowBuilder()
+    .addComponents(
+      new Discord.StringSelectMenuBuilder()
+        .setCustomId('dateStatsSelector')
+        .setPlaceholder(getTranslation(selectTranslationString, interaction.locale))
+        .addOptions(pagination))
+
+  return getCardWithInfo({
+    interaction,
+    actionRow: row,
+    values: optionsValues[0].values,
+    type: CustomType.TYPES.ELO,
+    id: 'uDSG',
+    maxPage: getMaxPage(optionsValues),
+    page,
+    updateStartDate: false
+  })
 }
 
 const buildButtonValues = (json, optionJson) => {
@@ -207,29 +278,6 @@ const getFromTo = (interaction, nameFrom = 'from_date', nameTo = 'to_date') => {
   return { from: new Date(from), to: new Date(to) }
 }
 
-const buildRows = (row, interaction, game, stringTranslation) => {
-  const selectDate = getTranslation(stringTranslation, interaction.locale)
-
-  return [
-    new Discord.ActionRowBuilder()
-      .addComponents(
-        new Discord.StringSelectMenuBuilder()
-          .setCustomId('dateStatsSelectorInfo')
-          .setPlaceholder(selectDate)
-          .addOptions({
-            label: selectDate,
-            description: selectDate,
-            value: JSON.stringify({
-              u: interaction.user.id,
-              g: game
-            })
-          })
-          .setDisabled(true)),
-    row
-  ]
-}
-
-
 module.exports = {
   getDates,
   getCardWithInfo,
@@ -237,5 +285,5 @@ module.exports = {
   updateOptions,
   getFromTo,
   setOptionValues,
-  buildRows
+  generateDatasForCard
 }
