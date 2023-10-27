@@ -10,9 +10,16 @@ const create = (jsonData = null) => {
   return newInteraction.save()
 }
 
-const updateOne = (id) => InteractionModel.updateOne({
+const updateOne = (id) => InteractionModel.findOneAndUpdate({
   _id: id
 }, {
+  updatedAt: new Date(),
+}).exec()
+
+const updateOneWithJson = (id, jsonData) => InteractionModel.findOneAndUpdate({
+  _id: id
+}, {
+  jsonData: jsonData,
   updatedAt: new Date(),
 }).exec()
 
@@ -22,4 +29,5 @@ module.exports = {
   create,
   getOne,
   updateOne,
+  updateOneWithJson
 }

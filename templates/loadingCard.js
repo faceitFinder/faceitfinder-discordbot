@@ -2,6 +2,7 @@ const Discord = require('discord.js')
 const { color, name } = require('../config.json')
 const { getTranslation } = require('../languages/setup')
 const errorHandler = require('../functions/error')
+const Interaction = require('../database/interaction')
 
 const loadingCard = (interaction) => {
   if (!interaction.channel.permissionsFor(interaction.client.user).has('ViewChannel')) return
@@ -31,6 +32,8 @@ const updateCard = (interaction) => {
             .setEmoji(cc.emoji)
             .setStyle(cc.style)
             .setDisabled(true)
+
+          Interaction.updateOne(cc.customId)
         }
 
         if (cc instanceof Discord.StringSelectMenuComponent) {
@@ -39,6 +42,8 @@ const updateCard = (interaction) => {
             .setPlaceholder(cc.placeholder)
             .addOptions(cc.options)
             .setDisabled(true)
+
+          cc.options.forEach((option) => Interaction.updateOne(option.data.value))
         }
 
         return cc

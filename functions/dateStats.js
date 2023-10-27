@@ -150,7 +150,8 @@ const generateDatasForCard = async ({
   functionToGetDates,
   formatFromToDates,
   formatLabel,
-  selectTranslationString
+  selectTranslationString,
+  type = CustomType.TYPES.ELO
 }) => {
   const {
     playerDatas,
@@ -182,7 +183,8 @@ const generateDatasForCard = async ({
         to,
         game,
         maxMatch,
-        map
+        map,
+        type
       }
     }
 
@@ -206,7 +208,7 @@ const generateDatasForCard = async ({
   const resp = await getCardWithInfo({
     interaction,
     values: optionsValues[0].values,
-    type: CustomType.TYPES.ELO
+    type
   })
 
   const components = [
@@ -232,7 +234,7 @@ const generateDatasForCard = async ({
   return resp
 }
 
-const updateOptions = (components, id, updateEmoji = true) => {
+const updateDefaultOption = (components, id, updateEmoji = true) => {
   return components.filter(e => e instanceof Discord.StringSelectMenuComponent)
     .map(msm => msm.options.map(o => {
       Interaction.updateOne(id)
@@ -243,6 +245,13 @@ const updateOptions = (components, id, updateEmoji = true) => {
 
       return o
     })).at(0)
+}
+
+const updateOptionsType = (id, newType) => {
+  Interaction.getOne(id).then(data => {
+    const newJson = Object.assign({}, data.jsonData, { type: newType })
+    Interaction.updateOneWithJson(id, newJson)
+  })
 }
 
 const getFromTo = (interaction, nameFrom = 'from_date', nameTo = 'to_date') => {
@@ -256,7 +265,8 @@ module.exports = {
   getDates,
   getCardWithInfo,
   setOptionDefault,
-  updateOptions,
+  updateDefaultOption,
+  updateOptionsType,
   getFromTo,
   generateDatasForCard
 }

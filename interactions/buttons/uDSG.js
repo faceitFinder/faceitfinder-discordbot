@@ -27,10 +27,14 @@ module.exports = {
       type: json.type
     })
 
-    components.at(0).components.at(0).setDisabled(false)
+    components.at(0).components.at(0).options.forEach((option) => {
+      DateStats.updateOptionsType(option.data.value, json.type)
+    })
+    components.at(0).components.at(0).data.disabled = false
     components.at(1).components = updateButtons(components.at(1).components, json.type)
-    components.at(2).components.forEach((button) =>
-      button.setDisabled(!!disabledOptions(json.currentPage, json.maxPage, getTypeFromEmoji(button.data.emoji.name))))
+    components.at(2).components.forEach((button) => {
+      button.data.disabled = !!disabledOptions(json.currentPage, json.maxPage, getTypeFromEmoji(button.data.emoji.name))
+    })
 
     resp.components = components
 

@@ -17,8 +17,8 @@ const generateButtons = async (interaction, values, type, disabledType = null) =
   if (type.translate) name = getTranslation(name, interaction.locale)
 
   const customId = (await Interaction.create(Object.assign({}, values, {
-    t: type,
-    u: interaction.user.id
+    type,
+    userId: interaction.user.id
   }))).id
 
   return new ButtonBuilder()
@@ -29,13 +29,20 @@ const generateButtons = async (interaction, values, type, disabledType = null) =
     .setDisabled(type.name === disabledType?.name)
 }
 
-const updateButtons = (components, type) => {
+const updateButtons = (components, type, jsonData = null) => {
   return components.map(button => {
     button = button.toJSON()
-    Interaction.updateOne(button.custom_id)
+    const id = button.custom_id
+
+    if (jsonData) {
+      Interaction.getOne(id).then((data) => {
+        const newJson = Object.assign({}, data.jsonData, jsonData, { type: CustomType.getTypeFromEmoji(button.emoji.name) })
+        Interaction.updateOneWithJson(id, newJson)
+      })
+    } else Interaction.updateOne(id)
 
     return new ButtonBuilder()
-      .setCustomId(button.custom_id)
+      .setCustomId(id)
       .setLabel(button.label)
       .setEmoji(button.emoji)
       .setStyle(button.style)
@@ -45,7 +52,7 @@ const updateButtons = (components, type) => {
 
 const generateOption = async (interaction, { values, label, description }) => {
   const customId = (await Interaction.create(Object.assign({}, values, {
-    u: interaction.user.id
+    userId: interaction.user.id
   }))).id
 
   return new StringSelectMenuOptionBuilder()
