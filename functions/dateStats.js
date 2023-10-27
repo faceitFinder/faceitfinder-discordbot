@@ -151,7 +151,8 @@ const generateDatasForCard = async ({
   formatFromToDates,
   formatLabel,
   selectTranslationString,
-  type
+  type,
+  defaultOption = 0
 }) => {
   type ??= CustomType.TYPES.ELO
 
@@ -200,14 +201,14 @@ const generateDatasForCard = async ({
   })
   const pages = getPageSlice(page)
   const paginationOptionsRaw = optionsValues.slice(pages.start, pages.end)
-  const values = paginationOptionsRaw[0].values
+  const values = paginationOptionsRaw[defaultOption].values
   const pagination = await Promise.all(paginationOptionsRaw.map(option => CustomTypeFunc.generateOption(interaction, option)))
 
   if (pagination.length === 0) return errorCard(getTranslation('error.user.noMatches', interaction.locale, {
     playerName: playerDatas.nickname
   }), interaction.locale)
 
-  pagination[0] = setOptionDefault(pagination.at(0))
+  pagination[defaultOption] = setOptionDefault(pagination.at(defaultOption))
 
   const resp = await getCardWithInfo({
     interaction,

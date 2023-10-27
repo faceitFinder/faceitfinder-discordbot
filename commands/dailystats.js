@@ -23,7 +23,7 @@ const formatLabel = (from, to) => {
   return new Date(from).toDateString()
 }
 
-const sendCardWithInfo = async (interaction, playerParam, page = 0, game = null, type = null) => {
+const sendCardWithInfo = async (interaction, playerParam, page = 0, game = null, type = null, defaultOption = 0) => {
   game ??= getGameOption(interaction)
 
   return DateStats.generateDatasForCard({
@@ -35,7 +35,8 @@ const sendCardWithInfo = async (interaction, playerParam, page = 0, game = null,
     formatFromToDates,
     formatLabel,
     selectTranslationString: 'strings.selectDate',
-    type
+    type,
+    defaultOption
   })
 }
 

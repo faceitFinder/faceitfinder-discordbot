@@ -21,6 +21,17 @@ module.exports = {
 
     getCardByUserType(newUser, interaction)
 
+    if (newUser) {
+      return await require(`../../commands/${commandName}.js`)
+        .sendCardWithInfo(
+          interaction,
+          { param: json.playerId, faceitId: true },
+          json.currentPage,
+          json.game,
+          json.type
+        )
+    }
+
     const resp = await DateStats.getCardWithInfo({
       interaction,
       values: json,

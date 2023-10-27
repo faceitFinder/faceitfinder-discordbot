@@ -15,15 +15,17 @@ module.exports = {
 
     getCardByUserType(newUser, interaction)
 
-    interaction.message.components.at(0).components.at(0).options.forEach((option) => {
-      Interaction.deleteOne(option.data.value)
-    })
-    interaction.message.components.at(1).components.forEach((component) => {
-      Interaction.deleteOne(component.data.custom_id)
-    })
-    interaction.message.components.at(2).components.forEach((component) => {
-      Interaction.deleteOne(component.data.custom_id)
-    })
+    if (!newUser) {
+      interaction.message.components.at(0).components.at(0).options.forEach((option) => {
+        Interaction.deleteOne(option.data.value)
+      })
+      interaction.message.components.at(1).components.forEach((component) => {
+        Interaction.deleteOne(component.data.custom_id)
+      })
+      interaction.message.components.at(2).components.forEach((component) => {
+        Interaction.deleteOne(component.data.custom_id)
+      })
+    }
 
     return await require(`../../commands/${commandName}.js`)
       .sendCardWithInfo(
