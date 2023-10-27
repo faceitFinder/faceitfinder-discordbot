@@ -294,8 +294,8 @@ module.exports = {
     else if (isInteractionSubcommandEqual(interaction, ADD_USER)) {
       const teamUsers = await UserTeam.getTeamUsers(currentTeam.slug)
       if (teamUsers.length >= 5) return errorCard('error.user.teamFull', interaction.locale)
-      return getCardsConditions(interaction, addUser, 5 - teamUsers.length, 'steam_parameters', 'faceit_parameters', false)
-    } else if (isInteractionSubcommandEqual(interaction, REMOVE_USER)) return getCardsConditions(interaction, removeUser, 5)
+      return getCardsConditions({ interaction, fn: addUser, maxUser: 5 - teamUsers.length, searchTeam: false })
+    } else if (isInteractionSubcommandEqual(interaction, REMOVE_USER)) return getCardsConditions({ interaction, fn: removeUser, maxUser: 5 })
     else return errorCard('error.command.notFound', interaction.locale)
   }
 }

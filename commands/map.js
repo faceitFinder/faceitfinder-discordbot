@@ -80,6 +80,9 @@ module.exports = {
   example: 'steam_parameters: justdams map: Vertigo',
   type: 'stats',
   async execute(interaction) {
-    return getCardsConditions(interaction, sendCardWithInfo)
+    return getCardsConditions({
+      interaction,
+      fn: sendCardWithInfo
+    })
   }
 }

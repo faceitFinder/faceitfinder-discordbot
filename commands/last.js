@@ -245,7 +245,10 @@ module.exports = {
   example: 'steam_parameters: justdams',
   type: 'stats',
   async execute(interaction) {
-    return getCardsConditions(interaction, sendCardWithInfo)
+    return getCardsConditions({
+      interaction,
+      fn: sendCardWithInfo
+    })
   },
 }
 

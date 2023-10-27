@@ -106,6 +106,10 @@ module.exports = {
   example: 'steam_parameter: justdams',
   type: 'utility',
   async execute(interaction) {
-    return getCardsConditions(interaction, sendCardWithInfo, 1, 'steam_parameter', 'faceit_parameter', false)
+    return getCardsConditions({
+      interaction,
+      fn: sendCardWithInfo,
+      searchTeam: false
+    })
   }
 }

@@ -1,6 +1,6 @@
 const Discord = require('discord.js')
 const loadingCard = require('../../templates/loadingCard')
-const { updateOptions } = require('../../functions/dateStats')
+const { updateDefaultOption } = require('../../functions/dateStats')
 const { getMatchItems } = require('../../commands/last')
 const { getStats } = require('../../functions/apiHandler')
 const { getOptionsValues } = require('../../functions/commands')
@@ -40,7 +40,7 @@ module.exports = {
           .addComponents(
             new Discord.StringSelectMenuBuilder()
               .setCustomId('findSelector')
-              .addOptions(updateOptions(optionsComponents, values.m, false))),
+              .addOptions(updateDefaultOption(optionsComponents, values.m, false))),
         paginationComponents
       ]
 
