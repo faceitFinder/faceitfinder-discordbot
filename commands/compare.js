@@ -258,6 +258,8 @@ const buildEmbed = async ({
       ).reverse()
     ])
 
+  console.log(datasets)
+
   const graphBuffer = Graph.getChart(
     datasets,
     new Array(maxMatch).fill(''),
@@ -393,7 +395,7 @@ module.exports = {
     const player2 = (await getUsers(interaction, 1, 'second_user_steam', 'second_user_faceit'))?.at(0)
 
     if (!player1 || !player2) return errorCard('error.user.missing', interaction.locale)
-    else if (player1 === player2) return errorCard('error.user.compareSame', interaction.locale)
+    else if (player1.param === player2.param) return errorCard('error.user.compareSame', interaction.locale)
 
     return sendCardWithInfo(interaction, player1, player2)
   }
