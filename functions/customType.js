@@ -6,11 +6,11 @@ const CustomType = require('../templates/customType')
 const buildButtons = (interaction, buttonsValues, types, disabledType = null) =>
   Promise.all(types.map((t) => generateButtons(interaction, buttonsValues, t, disabledType)))
 
-const buildButtonsGraph = (interaction, buttonValues) => buildButtons(interaction, buttonValues, [
+const buildButtonsGraph = (interaction, buttonValues, type = CustomType.TYPES.ELO) => buildButtons(interaction, buttonValues, [
   CustomType.TYPES.KD,
   CustomType.TYPES.ELO,
   CustomType.TYPES.ELO_KD
-], CustomType.TYPES.ELO)
+], type)
 
 const generateButtons = async (interaction, values, type, disabledType = null) => {
   let name = type.name

@@ -32,6 +32,7 @@ module.exports = {
     })
     components.at(0).components.at(0).data.disabled = false
     components.at(1).components = updateButtons(components.at(1).components, json.type)
+    components.at(2).components = updateButtons(components.at(2).components, json.type, { chartType: json.type })
     components.at(2).components.forEach((button) => {
       button.data.disabled = !!disabledOptions(json.currentPage, json.maxPage, getTypeFromEmoji(button.data.emoji.name))
     })

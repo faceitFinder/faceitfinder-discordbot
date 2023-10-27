@@ -24,7 +24,7 @@ const formatLabel = (from, to, locale) => {
   return new Date(from).toLocaleDateString('en-EN', { month: 'short', year: 'numeric' })
 }
 
-const sendCardWithInfo = async (interaction, playerParam, page = 0, game = null) => {
+const sendCardWithInfo = async (interaction, playerParam, page = 0, game = null, type = null) => {
   game ??= getGameOption(interaction)
 
   return DateStats.generateDatasForCard({
@@ -35,7 +35,8 @@ const sendCardWithInfo = async (interaction, playerParam, page = 0, game = null)
     functionToGetDates: getFirstDay,
     formatFromToDates,
     formatLabel,
-    selectTranslationString: 'strings.selectMonth'
+    selectTranslationString: 'strings.selectMonth',
+    type
   })
 }
 

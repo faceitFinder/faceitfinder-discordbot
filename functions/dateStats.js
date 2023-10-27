@@ -151,8 +151,10 @@ const generateDatasForCard = async ({
   formatFromToDates,
   formatLabel,
   selectTranslationString,
-  type = CustomType.TYPES.ELO
+  type
 }) => {
+  type ??= CustomType.TYPES.ELO
+
   const {
     playerDatas,
     playerHistory
@@ -197,7 +199,9 @@ const generateDatasForCard = async ({
     option.values.currentPage = page
   })
   const pages = getPageSlice(page)
-  const pagination = await Promise.all(optionsValues.slice(pages.start, pages.end).map(option => CustomTypeFunc.generateOption(interaction, option)))
+  const paginationOptionsRaw = optionsValues.slice(pages.start, pages.end)
+  const values = paginationOptionsRaw[0].values
+  const pagination = await Promise.all(paginationOptionsRaw.map(option => CustomTypeFunc.generateOption(interaction, option)))
 
   if (pagination.length === 0) return errorCard(getTranslation('error.user.noMatches', interaction.locale, {
     playerName: playerDatas.nickname
@@ -207,7 +211,7 @@ const generateDatasForCard = async ({
 
   const resp = await getCardWithInfo({
     interaction,
-    values: optionsValues[0].values,
+    values,
     type
   })
 
@@ -220,14 +224,14 @@ const generateDatasForCard = async ({
           .addOptions(pagination)
           .setDisabled(false)),
     new Discord.ActionRowBuilder()
-      .addComponents(await CustomTypeFunc.buildButtonsGraph(interaction, Object.assign({}, optionsValues[0].values, {
+      .addComponents(await CustomTypeFunc.buildButtonsGraph(interaction, Object.assign({}, values, {
         id: 'uDSG',
         maxPage,
         currentPage: page
-      })))
+      }), type))
   ]
 
-  if (page !== null) components.push(await getPagination(interaction, page, maxPage, 'pageDS'))
+  if (page !== null) components.push(await getPagination(interaction, page, maxPage, 'pageDS', values))
 
   resp.components = components
 

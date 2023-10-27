@@ -19,6 +19,7 @@ const sendCardWithInfo = async (interaction, values, newUser = false) => {
   components.at(0).components.at(0).data.options = options
   components.at(0).components.at(0).data.disabled = false
   components.at(1).components = await updateButtons(components.at(1).components, values.type, values)
+  components.at(2).components = updateButtons(components.at(2).components, values.type)
   components.at(2).components.forEach((button) => {
     button.data.disabled = !!disabledOptions(values.currentPage, values.maxPage, CustomType.getTypeFromEmoji(button.data.emoji.name))
   })

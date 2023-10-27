@@ -28,7 +28,7 @@ const formatLabel = (from, to, locale) => {
   return `${getTranslation('strings.year', locale)} ${new Date(from).getFullYear()}`
 }
 
-const sendCardWithInfo = async (interaction, playerParam, page = 0, game = null) => {
+const sendCardWithInfo = async (interaction, playerParam, page = 0, game = null, type = null) => {
   game ??= getGameOption(interaction)
 
   return DateStats.generateDatasForCard({
@@ -39,7 +39,8 @@ const sendCardWithInfo = async (interaction, playerParam, page = 0, game = null)
     functionToGetDates: getYear,
     formatFromToDates,
     formatLabel,
-    selectTranslationString: 'strings.selectYear'
+    selectTranslationString: 'strings.selectYear',
+    type
   })
 }
 

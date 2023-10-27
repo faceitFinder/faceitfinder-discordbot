@@ -25,9 +25,12 @@ const updateOneWithJson = (id, jsonData) => InteractionModel.findOneAndUpdate({
 
 const getOne = (_id) => InteractionModel.findById(_id).exec()
 
+const deleteOne = (_id) => InteractionModel.deleteOne({ _id }).exec()
+
 module.exports = {
   create,
   getOne,
   updateOne,
-  updateOneWithJson
+  updateOneWithJson,
+  deleteOne
 }

@@ -29,33 +29,31 @@ const getMaxPage = (array, items = itemByPage) => {
   return Math.floor(array.length / items) - !(array.length % items >= 1)
 }
 
-const getPagination = async (interaction, page, maxPage, id) => {
+const getPagination = async (interaction, page, maxPage, id, values) => {
   /**
    * id: button interaction id
-   * tp: target page
-   * cp: current page
    */
 
   return new ActionRowBuilder()
     .addComponents(await Promise.all([
       generateButtons(
         interaction,
-        { id: id, tp: 0, cp: page },
+        Object.assign({}, values, { id: id, targetPage: 0, currentPage: page, chartType: values.type }),
         CustomType.TYPES.FIRST,
         disabledOptions(page, maxPage, CustomType.TYPES.FIRST)),
       generateButtons(
         interaction,
-        { id: id, tp: page - 1, cp: page },
+        Object.assign({}, values, { id: id, targetPage: page - 1, currentPage: page, chartType: values.type }),
         CustomType.TYPES.PREV,
         disabledOptions(page, maxPage, CustomType.TYPES.PREV)),
       generateButtons(
         interaction,
-        { id: id, tp: page + 1, cp: page },
+        Object.assign({}, values, { id: id, targetPage: page + 1, currentPage: page, chartType: values.type }),
         CustomType.TYPES.NEXT,
         disabledOptions(page, maxPage, CustomType.TYPES.NEXT)),
       generateButtons(
         interaction,
-        { id: id, tp: maxPage, cp: page },
+        Object.assign({}, values, { id: id, targetPage: maxPage, currentPage: page, chartType: values.type }),
         CustomType.TYPES.LAST,
         disabledOptions(page, maxPage, CustomType.TYPES.LAST))
     ]))

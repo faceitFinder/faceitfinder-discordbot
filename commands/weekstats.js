@@ -25,7 +25,7 @@ const formatLabel = (from, to, locale) => {
   return [new Date(from).toDateString(), '-', new Date(new Date(to).setHours(-24)).toDateString()].join(' ')
 }
 
-const sendCardWithInfo = async (interaction, playerParam, page = 0, game = null) => {
+const sendCardWithInfo = async (interaction, playerParam, page = 0, game = null, type = null) => {
   game ??= getGameOption(interaction)
 
   return DateStats.generateDatasForCard({
@@ -36,7 +36,8 @@ const sendCardWithInfo = async (interaction, playerParam, page = 0, game = null)
     functionToGetDates: getMonday,
     formatFromToDates,
     formatLabel,
-    selectTranslationString: 'strings.selectWeek'
+    selectTranslationString: 'strings.selectWeek',
+    type
   })
 }
 
