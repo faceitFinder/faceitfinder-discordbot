@@ -25,6 +25,7 @@
     "@discordjs/rest": "^2.0.1",
     "@top-gg/sdk": "^3.1.5",
     "axios": "^1.4.0",
+    "axios-retry": "^3.8.1",
     "big.js": "^6.2.1",
     "cache-manager": "^5.2.3",
     "canvas": "^2.11.2",
