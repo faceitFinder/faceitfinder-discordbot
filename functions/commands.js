@@ -27,14 +27,6 @@ const getPlayerDatas = async (interaction, param, steam, discord = false, faceit
   return { param: param, steam, discord, faceitId }
 }
 
-const getDefaultInteractionOption = (interaction, componentIndex = 0, selectMenuIndex = 0, optionIndex = 0, defaultValue = true) => {
-  let res = interaction.message.components.at(componentIndex).components
-    .filter(e => e instanceof Discord.StringSelectMenuComponent).at(selectMenuIndex).options
-  if (defaultValue) res = res.filter(e => e.default)
-
-  return res.at(optionIndex)
-}
-
 const getCards = ({ interaction, array, fn }) => {
   return Promise.all(array.map(obj => fn(interaction, obj).catch(err => noMention(errorCard(err, interaction.locale)))))
     .then(msgs => msgs.map(msg => {
@@ -166,7 +158,6 @@ module.exports = {
   getCardsConditions,
   getInteractionOption,
   isInteractionSubcommandEqual,
-  getDefaultInteractionOption,
   getUsers,
   getGameOption
 }
