@@ -247,7 +247,7 @@ const generateDatasForCard = async ({
 const updateDefaultOption = (components, id, updateEmoji = true) => {
   return components.filter(e => e instanceof Discord.StringSelectMenuComponent)
     .map(msm => msm.options.map(o => {
-      Interaction.updateOne(id)
+      Interaction.updateOne(o.value)
 
       const active = o.value.normalize() === id.normalize()
       if (updateEmoji) o.emoji = active ? emojis.select.balise : undefined
