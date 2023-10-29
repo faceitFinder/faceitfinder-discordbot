@@ -95,7 +95,8 @@ const sendCardWithInfo = async (
   lastSelectorId = 'lastSelector',
   pageId = 'pageLast',
   maxMatch = null,
-  game = null
+  game = null,
+  previousValues = {}
 ) => {
   const map = getInteractionOption(interaction, 'map')
   game ??= getGameOption(interaction)
@@ -133,7 +134,8 @@ const sendCardWithInfo = async (
     page,
     lastSelectorId,
     pageId,
-    game
+    game,
+    previousValues
   })
 }
 
@@ -148,22 +150,23 @@ const getLastCard = async ({
   page = 0,
   lastSelectorId = 'lastSelector',
   pageId = 'pageLast',
-  game
+  game,
+  previousValues = {}
 }) => {
   const playerId = playerDatas.player_id
   const files = []
   const pagination = getPageSlice(page)
 
-  maxMatch = maxMatch <= 0 ? playerHistory.length : maxMatch
+  maxMatch = maxMatch < 1 ? 0 : maxMatch
 
   // Removing multiple ids
-  const filteredHistory = playerHistory.map(e => e.matchId).filter((e, i, a) => a.indexOf(e) === i).slice(0, maxMatch)
-  playerHistory = playerHistory.filter(e => filteredHistory.includes(e.matchId))
+  let filteredHistory = playerHistory.map(e => e.matchId).filter((e, i, a) => a.indexOf(e) === i).slice(0, maxMatch ?? playerHistory.length)
   const maxPage = getMaxPage(filteredHistory)
+  filteredHistory = filteredHistory.slice(pagination.start, pagination.end)
 
-  if (!matchId) matchId = filteredHistory.slice(pagination.start, pagination.end).at(0)
+  if (!matchId) matchId = filteredHistory.at(0)
 
-  const values = {
+  const values = Object.assign({}, previousValues, {
     userId: interaction.user.id,
     playerId,
     map: mapName,
@@ -171,8 +174,11 @@ const getLastCard = async ({
     game,
     currentPage: page,
     maxPage
-  }
+  })
+
   const matchItems = await getMatchItems(interaction, playerDatas, steamDatas, playerHistory, matchId, game)
+  matchItems.files.push(...files)
+
   const options = filteredHistory.map(e => {
     const matchRounds = playerHistory.filter(matches => matches.matchId === e)
     const match = matchRounds.at(0)
@@ -191,9 +197,7 @@ const getLastCard = async ({
     }
   })
 
-  matchItems.files.push(...files)
-
-  const paginationOptionsRaw = options.slice(pagination.start, pagination.end)
+  const paginationOptionsRaw = options
   const paginationOptions = await Promise.all(paginationOptionsRaw.map(option => CustomTypeFunc.generateOption(interaction, option)))
 
   const components = [
