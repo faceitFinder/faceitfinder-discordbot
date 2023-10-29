@@ -1,48 +1,31 @@
+const { ActionRowBuilder } = require('discord.js')
+const { buildButtons } = require('../../commands/laststats')
 const CommandsStats = require('../../database/commandsStats')
-const { getOptionsValues } = require('../../functions/commands')
-const { getCardWithInfo, updateDefaultOption } = require('../../functions/dateStats')
-const CustomType = require('../../templates/customType')
-const { loadingCard } = require('../../templates/loadingCard')
+const { updateButtons } = require('../../functions/customType')
+const { getCardWithInfo } = require('../../functions/dateStats')
+const { getCardByUserType } = require('../../templates/loadingCard')
 
 /**
  * Update last stats graph.
  */
 module.exports = {
   name: 'uLSG',
-  async execute(interaction, json) {
-    CommandsStats.create('laststats', `button - ${json.t.name}`, interaction)
+  async execute(interaction, json, newUser = false) {
+    CommandsStats.create('laststats', `button - ${json.type.name}`, interaction)
 
-    loadingCard(interaction)
+    getCardByUserType(newUser, interaction)
 
-    const actionRow = interaction.message.components.at(0)
-    const [from, to] = interaction.message.embeds.at(0).data.fields[0].value.split('\n').map(e => new Date(e.trim()))
+    const resp = await getCardWithInfo({
+      interaction,
+      values: json,
+      type: json.type,
+      updateStartDate: true
+    })
 
-    const options = updateDefaultOption(actionRow.components, JSON.stringify(json))
-    options.at(0).default = true
-    actionRow.components.at(0).options = options
+    if (newUser) resp.components = await buildButtons(interaction, json, json.type)
+    else resp.components = [new ActionRowBuilder()
+      .addComponents(updateButtons(interaction.message.components.at(0).components, json.type))]
 
-    json.f = from.getTime() / 1000
-    json.t = to.setHours(+24) / 1000
-
-    return getCardWithInfo(interaction,
-      actionRow,
-      json,
-      CustomType.getType(interaction.component.label),
-      'uLSG',
-      json.m,
-      null,
-      null,
-      json.c,
-      true,
-      json.g
-    )
-  },
-  getJSON(interaction, json) {
-    const values = getOptionsValues(interaction)
-
-    return {
-      ...json,
-      ...values
-    }
+    return resp
   }
 }
