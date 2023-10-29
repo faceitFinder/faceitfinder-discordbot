@@ -1,10 +1,8 @@
-const { Interaction } = require('discord.js')
 const CommandsStats = require('../../database/commandsStats')
 const DateStats = require('../../functions/dateStats')
 const { getCardByUserType } = require('../../templates/loadingCard')
 const { updateButtons } = require('../../functions/customType')
-const { disabledOptions } = require('../../functions/pagination')
-const { getTypeFromEmoji } = require('../../templates/customType')
+const { updatePaginationComponents } = require('../../functions/pagination')
 
 /**
  * Update date stats graph.
@@ -43,10 +41,7 @@ module.exports = {
     })
     components.at(0).components.at(0).data.disabled = false
     components.at(1).components = updateButtons(components.at(1).components, json.type)
-    components.at(2).components = updateButtons(components.at(2).components, json.type, { chartType: json.type })
-    components.at(2).components.forEach((button) => {
-      button.data.disabled = !!disabledOptions(json.currentPage, json.maxPage, getTypeFromEmoji(button.data.emoji.name))
-    })
+    updatePaginationComponents(components.at(2).components, json, { chartType: json.type })
 
     resp.components = components
 

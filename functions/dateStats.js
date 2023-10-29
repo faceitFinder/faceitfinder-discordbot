@@ -222,8 +222,7 @@ const generateDatasForCard = async ({
         new Discord.StringSelectMenuBuilder()
           .setCustomId('dateStatsSelector')
           .setPlaceholder(getTranslation(selectTranslationString, interaction.locale))
-          .addOptions(pagination)
-          .setDisabled(false)),
+          .addOptions(pagination)),
     new Discord.ActionRowBuilder()
       .addComponents(await CustomTypeFunc.buildButtonsGraph(interaction, Object.assign({}, values, {
         id: 'uDSG',

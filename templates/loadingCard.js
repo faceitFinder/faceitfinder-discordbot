@@ -39,7 +39,7 @@ const updateCard = (interaction) => {
         if (cc instanceof Discord.StringSelectMenuComponent) {
           cc = new Discord.StringSelectMenuBuilder()
             .setCustomId(cc.customId)
-            .setPlaceholder(cc.placeholder)
+            .setPlaceholder(cc.placeholder ?? '')
             .addOptions(cc.options)
             .setDisabled(true)
 

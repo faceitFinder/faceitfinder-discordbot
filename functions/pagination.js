@@ -1,6 +1,6 @@
 const { itemByPage } = require('../config.json')
 const { ActionRowBuilder } = require('discord.js')
-const { generateButtons } = require('../functions/customType')
+const { generateButtons, updateButtons } = require('../functions/customType')
 const CustomType = require('../templates/customType')
 
 const disabledOptions = (page, maxPage, type) => {
@@ -59,9 +59,16 @@ const getPagination = async (interaction, page, maxPage, id, values) => {
     ]))
 }
 
+const updatePaginationComponents = (components, values, jsonData = null) => {
+  updateButtons(components, values.type, jsonData)
+  components?.forEach((button) => {
+    button.data.disabled = !!disabledOptions(values.currentPage, values.maxPage, CustomType.getTypeFromEmoji(button.data.emoji.name))
+  })
+}
+
 module.exports = {
   getPagination,
   getPageSlice,
   getMaxPage,
-  disabledOptions
+  updatePaginationComponents,
 }
