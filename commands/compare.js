@@ -258,8 +258,6 @@ const buildEmbed = async ({
       ).reverse()
     ])
 
-  console.log(datasets)
-
   const graphBuffer = Graph.getChart(
     datasets,
     new Array(maxMatch).fill(''),
