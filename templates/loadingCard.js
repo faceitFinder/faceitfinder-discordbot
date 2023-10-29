@@ -26,21 +26,24 @@ const updateCard = (interaction) => {
     components: interaction.message.components.map((c) => {
       c.components = c.components.map((cc) => {
         if (cc instanceof Discord.ButtonComponent) {
+          const jsonButton = cc.toJSON()
           cc = new Discord.ButtonBuilder()
-            .setCustomId(cc.customId)
-            .setLabel(cc.label)
-            .setEmoji(cc.emoji)
-            .setStyle(cc.style)
+            .setCustomId(jsonButton.custom_id)
+            .setLabel(jsonButton.label)
+            .setStyle(jsonButton.style)
             .setDisabled(true)
+
+          if (jsonButton.emoji) cc.setEmoji(jsonButton.emoji)
 
           Interaction.updateOne(cc.customId)
         }
 
         if (cc instanceof Discord.StringSelectMenuComponent) {
+          const jsonSelectMenu = cc.toJSON()
           cc = new Discord.StringSelectMenuBuilder()
-            .setCustomId(cc.customId)
-            .setPlaceholder(cc.placeholder ?? '')
-            .addOptions(cc.options)
+            .setCustomId(jsonSelectMenu.custom_id)
+            .setPlaceholder(jsonSelectMenu.placeholder ?? '')
+            .addOptions(jsonSelectMenu.options)
             .setDisabled(true)
 
           cc.options.forEach((option) => Interaction.updateOne(option.data.value))
