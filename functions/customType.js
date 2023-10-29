@@ -41,24 +41,32 @@ const updateButtons = (components, type, jsonData = null) => {
       })
     } else Interaction.updateOne(id)
 
-    return new ButtonBuilder()
+    const buttonBuilder = new ButtonBuilder()
       .setCustomId(id)
       .setLabel(button.label)
       .setEmoji(button.emoji)
       .setStyle(button.style)
-      .setDisabled(button.label === type.name)
+
+    if (type) buttonBuilder.setDisabled(button.label === type.name)
+
+    return buttonBuilder
   })
 }
 
-const generateOption = async (interaction, { values, label, description }) => {
+const generateOption = async (interaction, { values, label, description, emoji = null, defaultOption = false }) => {
   const customId = (await Interaction.create(Object.assign({}, values, {
     userId: interaction.user.id
   }))).id
 
-  return new StringSelectMenuOptionBuilder()
+  const option = new StringSelectMenuOptionBuilder()
     .setLabel(label)
     .setDescription(description)
     .setValue(customId)
+    .setDefault(defaultOption)
+
+  if (emoji) option.setEmoji(emoji)
+
+  return option
 }
 
 module.exports = {

@@ -1,31 +1,31 @@
 const CommandsStats = require('../../database/commandsStats')
 const { sendCardWithInfo } = require('../../commands/last')
-const { loadingCard } = require('../../templates/loadingCard')
-const { getOptionsValues } = require('../../functions/commands')
+const { getCardByUserType } = require('../../templates/loadingCard')
+const Interaction = require('../../database/interaction')
 
 module.exports = {
   name: 'pageLast',
-  async execute(interaction, json) {
-    CommandsStats.create('last', `button - ${json.t.name}`, interaction)
-    loadingCard(interaction)
+  async execute(interaction, json, newUser = false) {
+    CommandsStats.create('last', `button - ${json.type.name}`, interaction)
+
+    getCardByUserType(newUser, interaction)
+
+    if (!newUser) {
+      interaction.message.components.at(0).components.at(0).options.forEach((option) => {
+        Interaction.deleteOne(option.data.value)
+      })
+    }
 
     return sendCardWithInfo(
       interaction,
-      { param: json.s, faceitId: true },
+      { param: json.playerId, faceitId: true },
       null,
-      json.page,
-      json.m,
+      json.targetPage,
+      json.map,
       'lastSelector',
       'pageLast',
-      json.l,
-      json.g
+      json.maxMatch,
+      json.game
     )
-  },
-  getJSON(interaction, json) {
-    const values = getOptionsValues(interaction)
-    const maxMatch = interaction.message.components.at(3)?.components.at(0).customId
-    if (maxMatch) json.l = JSON.parse(maxMatch).l
-
-    return { ...json, ...values }
-  },
+  }
 }

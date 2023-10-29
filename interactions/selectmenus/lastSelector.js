@@ -1,9 +1,9 @@
 const Discord = require('discord.js')
-const loadingCard = require('../../templates/loadingCard')
+const { getCardByUserType } = require('../../templates/loadingCard')
 const { updateDefaultOption } = require('../../functions/dateStats')
-const { getMatchItems } = require('../../commands/last')
+const { getMatchItems, sendCardWithInfo } = require('../../commands/last')
 const { getStats } = require('../../functions/apiHandler')
-const { getOptionsValues } = require('../../functions/commands')
+const { updatePaginationComponents } = require('../../functions/pagination')
 
 const updateEmbedMessage = async (interaction, playerId, matchId, map, game) => {
   const {
@@ -16,7 +16,7 @@ const updateEmbedMessage = async (interaction, playerId, matchId, map, game) => 
       faceitId: true
     },
     matchNumber: 0,
-    map: map || '',
+    map: map,
     game
   })
 
@@ -25,44 +25,45 @@ const updateEmbedMessage = async (interaction, playerId, matchId, map, game) => 
 
 module.exports = {
   name: 'lastSelector',
-  async execute(interaction, values) {
-    const optionsComponents = interaction.message.components.at(1).components
-    const paginationComponents = interaction.message.components.at(2)
+  async execute(interaction, values, newUser = false) {
+    const optionsComponents = interaction.message.components.at(0).components
+    const pagination = interaction.message.components.at(1)
+    // Cheking if the interaction is from the find command
     const playerStatsCard = interaction.message.embeds.filter(e => e.data.image.url.includes('graph'))?.at(0)
 
-    loadingCard(interaction)
+    getCardByUserType(newUser, interaction)
+
+    if (newUser) {
+      return sendCardWithInfo(
+        interaction,
+        { param: values.playerId, faceitId: true },
+        values.matchId,
+        values.currentPage,
+        values.map,
+        'lastSelector',
+        'pageLast',
+        values.maxMatch,
+        values.game
+      )
+    }
+
+    updatePaginationComponents(pagination.components, values)
 
     const components = [
-      values.dataRow,
       new Discord.ActionRowBuilder()
         .addComponents(
           new Discord.StringSelectMenuBuilder()
             .setCustomId('lastSelector')
-            .addOptions(updateDefaultOption(optionsComponents, values.l, false))),
-      paginationComponents
+            .addOptions(updateDefaultOption(optionsComponents, interaction.values[0], false))),
+      pagination
     ]
 
-    const messageItems = await updateEmbedMessage(interaction, values.s, values.l, values.m, values.g)
+    const messageItems = await updateEmbedMessage(interaction, values.playerId, values.matchId, values.map, values.game)
     if (playerStatsCard) messageItems.embeds.unshift(playerStatsCard)
 
     return {
       ...messageItems,
-      components: components
+      components
     }
-  },
-  getJSON(interaction, json) {
-    const dataRow = interaction.message.components.at(0)
-    const value = getOptionsValues(interaction)
-    const m = interaction.values.at(0)
-
-    return { ...value, l: m, dataRow }
-  },
-  updateUser(interaction) {
-    const values = this.getJSON(interaction)
-    const dataRowValues = JSON.parse(values.dataRow.components.at(0).options.at(0).value)
-    dataRowValues.u = interaction.user.id
-    values.dataRow.components.at(0).options.at(0).value = JSON.stringify(dataRowValues)
-
-    return values
   }
 }

@@ -1,9 +1,10 @@
-const { color, emojis, itemByPage } = require('../config.json')
+const { color, emojis } = require('../config.json')
 const Discord = require('discord.js')
 const fs = require('fs')
 const Graph = require('../functions/graph')
 const errorCard = require('../templates/errorCard')
 const Options = require('../templates/options')
+const CustomTypeFunc = require('../functions/customType')
 const { getCardsConditions, getInteractionOption, getGameOption } = require('../functions/commands')
 const { getPagination, getPageSlice, getMaxPage } = require('../functions/pagination')
 const { getMapOption } = require('../functions/map')
@@ -37,7 +38,8 @@ const getMatchItems = async (interaction, playerDatas, steamDatas, playerHistory
           level,
           roundStats.elo,
           size,
-          game)
+          game
+        )
         filesAtt.push(new Discord.AttachmentBuilder(rankImageCanvas, { name: `${faceitElo}${i}.png` }))
       }
 
@@ -93,11 +95,13 @@ const sendCardWithInfo = async (
   lastSelectorId = 'lastSelector',
   pageId = 'pageLast',
   maxMatch = null,
+  game = null
 ) => {
   const map = getInteractionOption(interaction, 'map')
-  const game = getGameOption(interaction)
+  game ??= getGameOption(interaction)
   maxMatch = getInteractionOption(interaction, 'match_number') ?? maxMatch ?? 25
   if (map) mapName = map
+  mapName ??= ''
 
   let {
     playerDatas,
@@ -107,7 +111,7 @@ const sendCardWithInfo = async (
   } = await getStats({
     playerParam,
     matchNumber: maxMatch,
-    map: mapName || '',
+    map: mapName,
     startDate: '',
     endDate: '',
     checkElo: +(page === 0),
@@ -159,6 +163,15 @@ const getLastCard = async ({
 
   if (!matchId) matchId = filteredHistory.slice(pagination.start, pagination.end).at(0)
 
+  const values = {
+    userId: interaction.user.id,
+    playerId,
+    map: mapName,
+    maxMatch,
+    game,
+    currentPage: page,
+    maxPage
+  }
   const matchItems = await getMatchItems(interaction, playerDatas, steamDatas, playerHistory, matchId, game)
   const options = filteredHistory.map(e => {
     const matchRounds = playerHistory.filter(matches => matches.matchId === e)
@@ -173,48 +186,29 @@ const getLastCard = async ({
       label: new Date(match.date).toDateString(),
       description: maps.join(' '),
       emoji: result !== undefined ? result ? emojis.won.balise : emojis.lost.balise : null,
-      default: e === matchId,
-      value: e.toString()
+      defaultOption: e === matchId,
+      values: Object.assign({}, values, { matchId: e })
     }
   })
 
   matchItems.files.push(...files)
 
+  const paginationOptionsRaw = options.slice(pagination.start, pagination.end)
+  const paginationOptions = await Promise.all(paginationOptionsRaw.map(option => CustomTypeFunc.generateOption(interaction, option)))
+
   const components = [
-    new Discord.ActionRowBuilder()
-      .addComponents(
-        new Discord.StringSelectMenuBuilder()
-          .setCustomId('lastSelectorInfo')
-          .setPlaceholder(getTranslation('strings.selectMatchBelow', interaction.locale))
-          .setDisabled(true)
-          .setOptions([{
-            label: getTranslation('strings.lastMatchLabel', interaction.locale),
-            description: getTranslation('strings.lastMatchDescription', interaction.locale),
-            value: JSON.stringify({
-              u: interaction.user.id,
-              s: playerId,
-              m: mapName,
-              l: maxMatch
-            })
-          }, {
-            label: 'game',
-            description: game,
-            value: JSON.stringify({
-              g: game
-            })
-          }])),
     new Discord.ActionRowBuilder()
       .addComponents(
         new Discord.StringSelectMenuBuilder()
           .setCustomId(lastSelectorId)
           .setPlaceholder(getTranslation('strings.selectAnotherMatch', interaction.locale))
-          .addOptions(options.slice(pagination.start, pagination.end))),
-    getPagination(interaction, page, maxPage, pageId)
+          .addOptions(paginationOptions)),
+    await getPagination(interaction, page, maxPage, pageId, values)
   ]
 
   return {
     ...matchItems,
-    components: components,
+    components,
   }
 }
 

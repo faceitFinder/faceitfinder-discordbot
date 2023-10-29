@@ -60,7 +60,7 @@ const getPagination = async (interaction, page, maxPage, id, values) => {
 }
 
 const updatePaginationComponents = (components, values, jsonData = null) => {
-  updateButtons(components, values.type, jsonData)
+  updateButtons(components, values?.type, jsonData)
   components?.forEach((button) => {
     button.data.disabled = !!disabledOptions(values.currentPage, values.maxPage, CustomType.getTypeFromEmoji(button.data.emoji.name))
   })
