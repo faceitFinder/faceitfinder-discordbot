@@ -77,14 +77,14 @@ const getCardWithInfo = async ({
   )
 
   const rankImageCanvas = await Graph.getRankImage(faceitLevel, faceitElo, size, game)
-  const toRealTimeStamp = new Date(endDate).setHours(-24)
+  const endDateToRealTimeStamp = new Date(endDate).setHours(-24)
 
   const head = []
 
   if (updateStartDate) startDate = playerLastStats.from
 
-  if (startDate !== toRealTimeStamp) head.push({
-    name: 'From - To', value: [new Date(startDate).toDateString(), '\n', new Date(toRealTimeStamp).toDateString()].join(' '),
+  if (startDate !== endDateToRealTimeStamp) head.push({
+    name: 'From - To', value: [new Date(startDate).toDateString(), '\n', new Date(endDateToRealTimeStamp).toDateString()].join(' '),
     inline: !!map
   })
   else head.push({ name: 'From', value: new Date(startDate).toDateString(), inline: false })
@@ -136,6 +136,8 @@ const getCardWithInfo = async ({
   ]
 
   return {
+    from: startDate,
+    to: endDate,
     content: '',
     embeds: [card],
     files
@@ -266,7 +268,7 @@ const getFromTo = (interaction, nameFrom = 'from_date', nameTo = 'to_date') => {
   const from = new Date(getInteractionOption(interaction, nameFrom)?.trim())
   const to = new Date(getInteractionOption(interaction, nameTo)?.trim())
 
-  return { from: new Date(from), to: new Date(to) }
+  return { from: new Date(from).getTime() || 0, to: new Date(to).getTime() || new Date().setHours(+24)}
 }
 
 module.exports = {
