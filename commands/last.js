@@ -93,9 +93,10 @@ const sendCardWithInfo = async (
   lastSelectorId = 'lastSelector',
   pageId = 'pageLast',
   maxMatch = null,
+  game = null
 ) => {
   const map = getInteractionOption(interaction, 'map')
-  const game = getGameOption(interaction)
+  game ??= getGameOption(interaction)
   maxMatch = getInteractionOption(interaction, 'match_number') ?? maxMatch ?? 25
   if (map) mapName = map
 
