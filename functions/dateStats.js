@@ -165,6 +165,10 @@ const generateDatasForCard = async ({
     game
   })
 
+  if (!playerHistory.length) throw getTranslation('error.user.noMatches', interaction.locale, {
+    playerName: playerDatas.nickname
+  })
+
   const playerId = playerDatas.player_id
   const optionsValues = []
   const dates = await getDates(playerHistory, functionToGetDates)
