@@ -109,7 +109,12 @@ module.exports = {
     return getCardsConditions({
       interaction,
       fn: sendCardWithInfo,
-      searchTeam: false
+      maxUser: 1,
+      steam: 'steam_parameter',
+      faceit: 'faceit_parameter',
+      searchTeam: false,
+      searchCurrentUser: false,
+      required: true
     })
   }
 }

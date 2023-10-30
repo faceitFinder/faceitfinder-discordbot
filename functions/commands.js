@@ -133,8 +133,15 @@ const getCardsConditions = async ({
   faceit = 'faceit_parameters',
   searchTeam = true,
   searchCurrentUser = true,
+  required = false
 }) => {
   const users = await getUsers(interaction, maxUser, steam, faceit, searchTeam, searchCurrentUser)
+
+  if (required && !users.length) throw getTranslation('error.command.atLeastOneParameter', interaction.locale, {
+    parameters: [steam, faceit, searchTeam ? 'team' : null].filter(e => e).join(', '),
+    command: interaction.commandName
+  })
+
   return getCards({
     interaction,
     array: users,
