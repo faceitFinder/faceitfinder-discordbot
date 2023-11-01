@@ -1,17 +1,98 @@
-const { emojis } = require('../config.json')
+const { emojis, itemByPage, color } = require('../config.json')
+const fs = require('fs')
 const Discord = require('discord.js')
 const Options = require('../templates/options')
+const Graph = require('../functions/graph')
+const Interaction = require('../database/interaction')
 const { getCardsConditions, getInteractionOption, getGameOption } = require('../functions/commands')
-const mapSelector = require('../interactions/selectmenus/mapSelector')
 const { getMapOption } = require('../functions/map')
 const { getTranslations, getTranslation } = require('../languages/setup')
 const { getStats } = require('../functions/apiHandler')
-const { buildRows } = require('../functions/dateStats')
+const { errorCard } = require('../templates/errorCard')
 
-const sendCardWithInfo = async (interaction, playerParam) => {
-  const options = []
-  const map = getInteractionOption(interaction, 'map')
-  const game = getGameOption(interaction)
+const buildEmbed = async (interaction, playerId, map, mode, game) => {
+  if (!map) return
+
+  const {
+    playerDatas,
+    playerStats,
+    steamDatas,
+    playerLastStats,
+  } = await getStats({
+    playerParam: {
+      param: playerId,
+      faceitId: true,
+    },
+    matchNumber: 0,
+    checkElo: true,
+    map,
+    game
+  })
+
+  const faceitLevel = playerDatas.games[game].skill_level
+  const faceitElo = playerDatas.games[game].faceit_elo
+  const size = 40
+  const filesAtt = []
+
+  const rankImageCanvas = await Graph.getRankImage(faceitLevel, faceitElo, size, game)
+  filesAtt.push(new Discord.AttachmentBuilder(rankImageCanvas, { name: 'level.png' }))
+
+  const mapThumbnail = `./images/maps/${map}.jpg`
+  const playerMapStats = playerStats.segments.filter(e => e.label === map && e.mode == mode)
+
+  if (playerMapStats.length === 0) return errorCard(getTranslation('error.user.mapNotPlayed', interaction.locale, {
+    playerName: playerDatas.nickname,
+  }), interaction.locale)
+
+  const cards = playerMapStats.map(m => {
+    if (fs.existsSync(mapThumbnail)) filesAtt.push(new Discord.AttachmentBuilder(mapThumbnail, { name: `${map}.jpg` }))
+
+    return new Discord.EmbedBuilder()
+      .setAuthor({ name: playerDatas.nickname, iconURL: playerDatas.avatar || null, url: `https://www.faceit.com/en/players/${playerDatas.nickname}` })
+      .setDescription(`[Steam](https://steamcommunity.com/profiles/${playerDatas.games[game].game_player_id}), [Faceit](https://www.faceit.com/en/players/${playerDatas.nickname})`)
+      .setThumbnail('attachment://level.png')
+      .addFields({ name: 'Map', value: map, inline: true },
+        { name: 'Mode', value: mode, inline: true },
+        { name: '\u200b', value: '\u200b', inline: true },
+        { name: 'Games', value: m.stats.Matches.toString(), inline: true },
+        { name: 'Winrate', value: `${playerLastStats.winrate.toFixed(2)}%`, inline: true },
+        {
+          name: 'Elo Gain',
+          value: isNaN(playerLastStats.eloGain) ?
+            '0'
+            : playerLastStats.eloGain > 0 ?
+              `+${playerLastStats.eloGain}`
+              : playerLastStats.eloGain.toString(),
+          inline: true
+        },
+        { name: 'K/D', value: playerLastStats.kd.toFixed(2), inline: true },
+        { name: 'Kills', value: playerLastStats.kills.toString(), inline: true },
+        { name: 'Deaths', value: playerLastStats.deaths.toString(), inline: true },
+        { name: 'Average K/D', value: m.stats['Average K/D Ratio'], inline: true },
+        { name: 'Average HS', value: `${m.stats['Average Headshots %']}%`, inline: true },
+        { name: 'Average MVPs', value: m.stats['Average MVPs'], inline: true },
+        { name: 'Average Kills', value: m.stats['Average Kills'], inline: true },
+        { name: 'Average Deaths', value: m.stats['Average Deaths'], inline: true },
+        { name: 'Average Assists', value: m.stats['Average Assists'], inline: true })
+      .setColor(color.levels[game][faceitLevel].color)
+      .setFooter({ text: `Steam: ${steamDatas?.personaname || steamDatas}`, iconURL: 'attachment://game.png' })
+      .setImage(`attachment://${map}.jpg`)
+  })
+
+  filesAtt.push(new Discord.AttachmentBuilder(`images/${game}.png`, { name: 'game.png' }))
+
+  return {
+    embeds: cards,
+    files: filesAtt
+  }
+}
+
+const sendCardWithInfo = async (interaction, playerParam, map = null, mode = null, game = null) => {
+  map ??= getInteractionOption(interaction, 'map')
+  game ??= getGameOption(interaction)
+  mode ??= '5v5'
+  let embeds = []
+  let files = []
 
   const {
     playerDatas,
@@ -22,16 +103,24 @@ const sendCardWithInfo = async (interaction, playerParam) => {
     game
   })
 
-  const playerId = playerDatas.player_id
+  if (!playerStats.segments.length) throw getTranslation('error.user.noMatches', interaction.locale, { playerName: playerDatas.nickname })
 
-  playerStats.segments.forEach(e => {
+  const playerId = playerDatas.player_id
+  let content = getTranslation('strings.selectMapDescription', interaction.locale, { playerName: playerDatas.nickname })
+
+  let options = []
+  await Promise.all(playerStats.segments.map(async (e) => {
     const label = `${e.label} ${e.mode}`
     const values = {
-      l: label,
-      s: playerId
+      playerId,
+      userId: interaction.user.id,
+      game,
+      map: e.label,
+      mode: e.mode
     }
 
     if (!options.filter(e => e.data.label === label).length > 0) {
+      const customId = (await Interaction.create(values)).id
       const option = new Discord.StringSelectMenuOptionBuilder()
         .setLabel(label)
         .setDescription(
@@ -40,7 +129,7 @@ const sendCardWithInfo = async (interaction, playerParam) => {
             interaction.locale, { matchNumber: `${e.stats.Matches} (${e.stats['Win Rate %']}%)` }
           )
         )
-        .setValue(JSON.stringify(values))
+        .setValue(customId)
         .setDefault(`${map} 5v5` === label)
 
       const emoji = emojis.maps[e.label]
@@ -48,19 +137,30 @@ const sendCardWithInfo = async (interaction, playerParam) => {
 
       options.push(option)
     }
-  })
+  }))
+  options = options.slice(0, itemByPage)
 
-  const row = new Discord.ActionRowBuilder()
-    .addComponents(
-      new Discord.StringSelectMenuBuilder()
-        .setCustomId('mapSelector')
-        .setPlaceholder(getTranslation('strings.selectMap', interaction.locale))
-        .addOptions(options.slice(0, 25)))
+  const components = [
+    new Discord.ActionRowBuilder()
+      .addComponents(
+        new Discord.StringSelectMenuBuilder()
+          .setCustomId('mapSelector')
+          .setPlaceholder(getTranslation('strings.selectMap', interaction.locale))
+          .addOptions(options))
+  ]
+
+  if (map) {
+    const resp = await buildEmbed(interaction, playerId, map, mode, game)
+    embeds = resp.embeds
+    files = resp.files
+    content = ''
+  }
 
   return {
-    ...await mapSelector.sendCardWithInfo(interaction, playerId, map, '5v5', game),
-    content: map ? ' ' : getTranslation('strings.selectMapDescription', interaction.locale, { playerName: playerDatas.nickname }),
-    components: buildRows(row, interaction, game, 'strings.selectMap')
+    content,
+    embeds,
+    files,
+    components
   }
 }
 
@@ -86,3 +186,6 @@ module.exports = {
     })
   }
 }
+
+module.exports.sendCardWithInfo = sendCardWithInfo
+module.exports.buildEmbed = buildEmbed
