@@ -20,7 +20,7 @@ const Graph = require('../functions/graph')
 const errorCard = require('../templates/errorCard')
 const successCard = require('../templates/successCard')
 const Interaction = require('../database/interaction')
-const { getInteractionOption } = require('../functions/utility')
+const { getInteractionOption, getGameOption } = require('../functions/utility')
 
 const getOptions = () => {
   const options = structuredClone(Options.stats)
