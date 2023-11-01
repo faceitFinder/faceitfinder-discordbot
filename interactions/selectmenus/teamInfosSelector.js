@@ -1,38 +1,31 @@
 const { color, emojis, defaultGame } = require('../../config.json')
 const Discord = require('discord.js')
-const loadingCard = require('../../templates/loadingCard')
+const { getCardByUserType } = require('../../templates/loadingCard')
 const UserTeam = require('../../database/userTeam')
 const Team = require('../../database/team')
 const User = require('../../database/user')
 const errorCard = require('../../templates/errorCard')
-const { setOptionValues } = require('../../functions/dateStats')
 const { getStats } = require('../../functions/apiHandler')
+const { updateDefaultOption } = require('../../functions/utility')
 
 module.exports = {
   name: 'teamInfoSelector',
-  async execute(interaction, values) {
-    const options = interaction.message.components.at(0).components
-      .filter(e => e instanceof Discord.StringSelectMenuComponent)
-      .map(msm => {
-        return msm.options.map(o => {
-          const active = JSON.parse(o.value).tn.normalize() === values.tn.normalize()
-          o.emoji = active ? emojis.select.balise : undefined
-          o.default = active
+  async execute(interaction, values, newUser = false) {
+    const optionComponent = interaction.message.components.at(0).components
+    
+    updateDefaultOption(optionComponent, interaction.values[0], true)
 
-          setOptionValues(o, values)
+    const components = [
+      new Discord.ActionRowBuilder()
+        .addComponents(
+          new Discord.StringSelectMenuBuilder()
+            .setCustomId('teamInfoSelector')
+            .addOptions(optionComponent.at(0).data.options))
+    ]
 
-          return o
-        })
-      }).at(0)
-
-    const components = new Discord.ActionRowBuilder()
-      .addComponents(
-        new Discord.StringSelectMenuBuilder()
-          .setCustomId('teamInfoSelector')
-          .addOptions(options))
-
-    loadingCard(interaction)
-    const currentTeam = await Team.getTeamSlug(values.tn)
+    getCardByUserType(newUser, interaction)
+  
+    const currentTeam = await Team.getTeamSlug(values.slug)
     const teamUsers = await UserTeam.getTeamUsers(currentTeam.slug)
 
     // check if user is part of the team if not the creator
@@ -43,9 +36,7 @@ module.exports = {
       const userIsPartOfTeam = teamUsers.find(user => user.faceitId === currentUser.faceitId)
       if (!userIsPartOfTeam) return {
         ...errorCard('error.command.teamNoAccess', interaction.locale),
-        components: [
-          components
-        ]
+        components
       }
     }
 
@@ -85,12 +76,7 @@ module.exports = {
       embeds: [
         embed,
       ],
-      components: [
-        components
-      ]
+      components
     }
-  },
-  getJSON(interaction, json) {
-    return JSON.parse(interaction.values)
   }
 }

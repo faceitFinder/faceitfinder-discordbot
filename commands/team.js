@@ -1,13 +1,14 @@
-const { maxLengthTeamName, defaultGame } = require('../config.json')
+const { maxLengthTeamName, defaultGame, itemByPage } = require('../config.json')
 const Discord = require('discord.js')
 const Team = require('../database/team')
 const UserTeam = require('../database/userTeam')
 const User = require('../database/user')
 const errorCard = require('../templates/errorCard')
-const { isInteractionSubcommandEqual, getInteractionOption, getCardsConditions } = require('../functions/commands')
+const { getCardsConditions } = require('../functions/commands')
 const successCard = require('../templates/successCard')
 const { getTranslation, getTranslations } = require('../languages/setup')
 const { getStats } = require('../functions/apiHandler')
+const { isInteractionSubcommandEqual, getInteractionOption, generateOption } = require('../functions/utility')
 
 const INFO = 'info'
 const CREATE = 'create'
@@ -45,34 +46,34 @@ const infoTeam = async (interaction, currentTeam, user) => {
   if (currentTeam) userTeams.push(currentTeam)
   if (userTeams.length === 0) return errorCard('error.user.noTeam', interaction.locale)
 
-  const options = Array.from(new Set(userTeams.map(JSON.stringify)))
-    .map(JSON.parse)
-    .map(userteam => {
-      if (userteam) return {
-        label: userteam.name,
-        description: getTranslation('strings.infoTeam', interaction.locale, {
-          teamName: userteam.name,
-        }),
-        value: JSON.stringify({
-          tn: userteam.slug,
-          u: user,
-        })
+  const options = userTeams.map(userteam => {
+    return {
+      label: userteam.name,
+      description: getTranslation('strings.infoTeam', interaction.locale, {
+        teamName: userteam.name,
+      }),
+      values: {
+        slug: userteam.slug,
+        userId: user
+      }
+    }
+  })
+
+  return Promise.all(options.map(option => generateOption(interaction, option)))
+    .then(options => {
+      const row = new Discord.ActionRowBuilder()
+        .addComponents(
+          new Discord.StringSelectMenuBuilder()
+            .setCustomId('teamInfoSelector')
+            .setPlaceholder(getTranslation('strings.selectTeam', interaction.locale))
+            .addOptions(options.slice(0, itemByPage)))
+
+      return {
+        components: [
+          row
+        ]
       }
     })
-    .filter(e => e !== undefined)
-
-  const row = new Discord.ActionRowBuilder()
-    .addComponents(
-      new Discord.StringSelectMenuBuilder()
-        .setCustomId('teamInfoSelector')
-        .setPlaceholder(getTranslation('strings.selectTeam', interaction.locale))
-        .addOptions(options.slice(0, 25)))
-
-  return {
-    components: [
-      row
-    ]
-  }
 }
 
 const updateTeam = async (interaction, currentTeam) => {
@@ -281,6 +282,7 @@ module.exports = {
   - ${ADD_USER} [<steam_parameters> <faceit_parameters>]
   - ${REMOVE_USER} [<steam_parameters> <faceit_parameters>]`,
   type: 'utility',
+  ephemeral: true,
   async execute(interaction) {
     const user = interaction.user.id
     const currentTeam = await Team.getCreatorTeam(user)
