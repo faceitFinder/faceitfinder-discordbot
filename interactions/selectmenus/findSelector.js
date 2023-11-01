@@ -33,7 +33,8 @@ module.exports = {
     const activePlayer = players?.components.findIndex((c) => c.data.disabled)
     const excludedPlayers = interaction.message.components.at(3)
     const playerStatsCard = interaction.message.embeds.filter(e => e.data.image.url.includes('graph'))?.at(0)
-
+    
+    updateDefaultOption(optionsComponents, interaction.values[0], true)
     getCardByUserType(newUser, interaction)
 
     if (newUser) {
