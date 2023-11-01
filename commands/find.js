@@ -8,7 +8,7 @@ const {
 } = require('discord.js')
 const { color } = require('../config.json')
 const Options = require('../templates/options')
-const { getUsers, getInteractionOption, getGameOption } = require('../functions/commands')
+const { getUsers } = require('../functions/commands')
 const { getMapOption } = require('../functions/map')
 const { getTranslations, getTranslation } = require('../languages/setup')
 const User = require('../database/user')
@@ -20,6 +20,7 @@ const Graph = require('../functions/graph')
 const errorCard = require('../templates/errorCard')
 const successCard = require('../templates/successCard')
 const Interaction = require('../database/interaction')
+const { getInteractionOption } = require('../functions/utility')
 
 const getOptions = () => {
   const options = structuredClone(Options.stats)

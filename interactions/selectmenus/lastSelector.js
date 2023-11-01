@@ -1,9 +1,8 @@
-const Discord = require('discord.js')
 const { getCardByUserType } = require('../../templates/loadingCard')
-const { updateDefaultOption } = require('../../functions/dateStats')
 const { getMatchItems, sendCardWithInfo } = require('../../commands/last')
 const { getStats } = require('../../functions/apiHandler')
 const { updatePaginationComponents } = require('../../functions/pagination')
+const { updateDefaultOption } = require('../../functions/utility')
 
 const updateEmbedMessage = async (interaction, playerId, matchId, map, game) => {
   const {

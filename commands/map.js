@@ -4,11 +4,12 @@ const Discord = require('discord.js')
 const Options = require('../templates/options')
 const Graph = require('../functions/graph')
 const Interaction = require('../database/interaction')
-const { getCardsConditions, getInteractionOption, getGameOption } = require('../functions/commands')
+const { getCardsConditions } = require('../functions/commands')
 const { getMapOption } = require('../functions/map')
 const { getTranslations, getTranslation } = require('../languages/setup')
 const { getStats } = require('../functions/apiHandler')
 const { errorCard } = require('../templates/errorCard')
+const { getInteractionOption, getGameOption } = require('../functions/utility')
 
 const buildEmbed = async (interaction, playerId, map, mode, game) => {
   if (!map) return

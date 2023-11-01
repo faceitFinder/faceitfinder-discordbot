@@ -1,6 +1,6 @@
-const DateStats = require('../../functions/dateStats')
 const { getCardByUserType } = require('../../templates/loadingCard')
 const { buildEmbed, sendCardWithInfo } = require('../../commands/map')
+const { updateDefaultOption } = require('../../functions/utility')
 
 module.exports = {
   name: 'mapSelector',
@@ -14,7 +14,7 @@ module.exports = {
     const optionsComponent = interaction.message.components.at(0)
     let components
 
-    DateStats.updateDefaultOption(optionsComponent.components, interaction.values[0], false)
+    updateDefaultOption(optionsComponent.components, interaction.values[0], false)
 
     getCardByUserType(newUser, interaction)
 

@@ -4,12 +4,12 @@ const fs = require('fs')
 const Graph = require('../functions/graph')
 const errorCard = require('../templates/errorCard')
 const Options = require('../templates/options')
-const CustomTypeFunc = require('../functions/customType')
-const { getCardsConditions, getInteractionOption, getGameOption } = require('../functions/commands')
+const { getCardsConditions } = require('../functions/commands')
 const { getPagination, getPageSlice, getMaxPage } = require('../functions/pagination')
 const { getMapOption } = require('../functions/map')
 const { getTranslations, getTranslation } = require('../languages/setup')
 const { getStats } = require('../functions/apiHandler')
+const { generateOption, getInteractionOption, getGameOption } = require('../functions/utility')
 
 const getLevelFromElo = (elo, game) => {
   const colorLevel = Object.entries(color.levels[game]).filter(e => {
@@ -198,7 +198,7 @@ const getLastCard = async ({
   })
 
   const paginationOptionsRaw = options
-  const paginationOptions = await Promise.all(paginationOptionsRaw.map(option => CustomTypeFunc.generateOption(interaction, option)))
+  const paginationOptions = await Promise.all(paginationOptionsRaw.map(option => generateOption(interaction, option)))
 
   const components = [
     new Discord.ActionRowBuilder()

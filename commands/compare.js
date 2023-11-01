@@ -1,6 +1,6 @@
 const Discord = require('discord.js')
 const { color, emojis } = require('../config.json')
-const { getUsers, getInteractionOption, getGameOption } = require('../functions/commands')
+const { getUsers } = require('../functions/commands')
 const CustomTypeFunc = require('../functions/customType')
 const CustomType = require('../templates/customType')
 const Graph = require('../functions/graph')
@@ -9,6 +9,7 @@ const { getTranslations, getTranslation } = require('../languages/setup')
 const { getMapOption } = require('../functions/map')
 const { getStats } = require('../functions/apiHandler')
 const { gameOption } = require('../templates/options')
+const { getInteractionOption, getGameOption } = require('../functions/utility')
 
 const compareStats = (stats1, stats2, positive = true) => {
   if (positive) {

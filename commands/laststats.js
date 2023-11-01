@@ -1,5 +1,5 @@
 const { ActionRowBuilder, ApplicationCommandOptionType } = require('discord.js')
-const { getInteractionOption, getCardsConditions, getGameOption } = require('../functions/commands')
+const { getCardsConditions } = require('../functions/commands')
 const Options = require('../templates/options')
 const DateStats = require('../functions/dateStats')
 const CustomType = require('../templates/customType')
@@ -7,6 +7,7 @@ const { getMapOption } = require('../functions/map')
 const { getTranslations, getTranslation } = require('../languages/setup')
 const { getStats } = require('../functions/apiHandler')
 const { buildButtonsGraph } = require('../functions/customType')
+const { getInteractionOption, getGameOption } = require('../functions/utility')
 
 const buildButtons = async (interaction, values, type) => [
   new ActionRowBuilder()

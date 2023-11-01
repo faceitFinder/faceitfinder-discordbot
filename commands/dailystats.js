@@ -1,7 +1,8 @@
 const DateStats = require('../functions/dateStats')
-const { getCardsConditions, getGameOption } = require('../functions/commands')
+const { getCardsConditions } = require('../functions/commands')
 const Options = require('../templates/options')
 const { getTranslations, getTranslation } = require('../languages/setup')
+const { getGameOption } = require('../functions/utility')
 
 const getDay = date => {
   date = new Date(date)

@@ -1,13 +1,12 @@
-const { color, emojis, defaultGame } = require('../config.json')
+const { color, defaultGame } = require('../config.json')
 const Discord = require('discord.js')
 const Graph = require('./graph')
 const CustomType = require('../templates/customType')
 const CustomTypeFunc = require('../functions/customType')
-const Interaction = require('../database/interaction')
 const { getPagination, getMaxPage, getPageSlice } = require('./pagination')
-const { getInteractionOption } = require('./commands')
 const { getStats } = require('./apiHandler')
 const { getTranslation } = require('../languages/setup')
+const { generateOption, setOptionDefault, getInteractionOption } = require('./utility')
 
 const getDates = async (playerHistory, getDay) => {
   const dates = new Map()
@@ -19,13 +18,6 @@ const getDates = async (playerHistory, getDay) => {
   })
 
   return dates
-}
-
-const setOptionDefault = option => {
-  option.setEmoji(emojis.select.balise)
-    .setDefault(true)
-
-  return option
 }
 
 const getCardWithInfo = async ({
@@ -208,7 +200,7 @@ const generateDatasForCard = async ({
   const pages = getPageSlice(page)
   const paginationOptionsRaw = optionsValues.slice(pages.start, pages.end)
   const values = paginationOptionsRaw[defaultOption].values
-  const pagination = await Promise.all(paginationOptionsRaw.map(option => CustomTypeFunc.generateOption(interaction, option)))
+  const pagination = await Promise.all(paginationOptionsRaw.map(option => generateOption(interaction, option)))
 
   if (pagination.length === 0) return errorCard(getTranslation('error.user.noMatches', interaction.locale, {
     playerName: playerDatas.nickname
@@ -244,26 +236,6 @@ const generateDatasForCard = async ({
   return resp
 }
 
-const updateDefaultOption = (components, id, updateEmoji = true) => {
-  return components.filter(e => e instanceof Discord.StringSelectMenuComponent)
-    .map(msm => msm.options.map(o => {
-      Interaction.updateOne(o.value)
-
-      const active = o.value.normalize() === id.normalize()
-      if (updateEmoji) o.emoji = active ? emojis.select.balise : undefined
-      o.default = active
-
-      return o
-    })).at(0)
-}
-
-const updateOptionsType = (id, newType) => {
-  Interaction.getOne(id).then(data => {
-    const newJson = Object.assign({}, data.jsonData, { type: newType })
-    Interaction.updateOneWithJson(id, newJson)
-  })
-}
-
 const getFromTo = (interaction, nameFrom = 'from_date', nameTo = 'to_date') => {
   const from = new Date(getInteractionOption(interaction, nameFrom)?.trim())
   const to = new Date(getInteractionOption(interaction, nameTo)?.trim())
@@ -274,9 +246,6 @@ const getFromTo = (interaction, nameFrom = 'from_date', nameTo = 'to_date') => {
 module.exports = {
   getDates,
   getCardWithInfo,
-  setOptionDefault,
-  updateDefaultOption,
-  updateOptionsType,
   getFromTo,
   generateDatasForCard
 }

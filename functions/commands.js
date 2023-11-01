@@ -3,11 +3,10 @@ const Team = require('../database/team')
 const RegexFun = require('./regex')
 const UserTeam = require('../database/userTeam')
 const errorCard = require('../templates/errorCard')
-const Discord = require('discord.js')
 const noMention = require('../templates/noMention')
 const { updateRoles } = require('./roles')
 const { getTranslation } = require('../languages/setup')
-const { defaultGame } = require('../config.json')
+const { getInteractionOption } = require('./utility')
 
 const getPlayerDatas = async (interaction, param, steam, discord = false, faceitId = false) => {
   if (discord) {
@@ -149,22 +148,7 @@ const getCardsConditions = async ({
   })
 }
 
-const getInteractionOption = (interaction, name) => {
-  return interaction.options?._hoistedOptions?.filter(o => o.name === name)[0]?.value
-}
-
-const getGameOption = (interaction) => {
-  return interaction.options?._hoistedOptions?.filter(o => o.name === 'game')[0]?.value ?? defaultGame
-}
-
-const isInteractionSubcommandEqual = (interaction, name) => {
-  return interaction.options?._subcommand === name
-}
-
 module.exports = {
   getCardsConditions,
-  getInteractionOption,
-  isInteractionSubcommandEqual,
-  getUsers,
-  getGameOption
+  getUsers
 }

@@ -2,13 +2,14 @@ const { getCardByUserType } = require('../../templates/loadingCard')
 const DateStats = require('../../functions/dateStats')
 const { updateButtons } = require('../../functions/customType')
 const { updatePaginationComponents } = require('../../functions/pagination')
+const { updateDefaultOption } = require('../../functions/utility')
 
 const sendCardWithInfo = async (interaction, values, newUser = false) => {
   const commandName = await interaction.message.fetchReference()
     .then((message) => message.interaction.commandName)
     .catch(() => interaction.message.interaction.commandName)
   let components = interaction.message.components
-  const options = DateStats.updateDefaultOption(components.at(0).components, interaction.values[0])
+  const options = updateDefaultOption(components.at(0).components, interaction.values[0])
 
   getCardByUserType(newUser, interaction)
 

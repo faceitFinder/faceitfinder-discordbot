@@ -1,7 +1,8 @@
 const DateStats = require('../functions/dateStats')
-const { getCardsConditions, getGameOption } = require('../functions/commands')
+const { getCardsConditions } = require('../functions/commands')
 const Options = require('../templates/options')
 const { getTranslation, getTranslations } = require('../languages/setup')
+const { getGameOption } = require('../functions/utility')
 
 const getMonday = date => {
   const week = [6, 0, 1, 2, 3, 4, 5]

@@ -1,7 +1,14 @@
-const { ButtonBuilder, StringSelectMenuOptionBuilder } = require('discord.js')
+const { ButtonBuilder } = require('discord.js')
 const { getTranslation } = require('../languages/setup')
 const Interaction = require('../database/interaction')
 const CustomType = require('../templates/customType')
+
+const updateOptionsType = (id, newType, jsonData = {}) => {
+  Interaction.getOne(id).then(data => {
+    const newJson = Object.assign({}, data.jsonData, jsonData, { type: newType })
+    Interaction.updateOneWithJson(id, newJson)
+  })
+}
 
 const buildButtons = (interaction, buttonsValues, types, disabledType = null) =>
   Promise.all(types.map((t) => generateButtons(interaction, buttonsValues, t, disabledType)))
@@ -34,12 +41,8 @@ const updateButtons = (components, type, jsonData = null) => {
     button = button.toJSON()
     const id = button.custom_id
 
-    if (jsonData) {
-      Interaction.getOne(id).then((data) => {
-        const newJson = Object.assign({}, data.jsonData, jsonData, { type: CustomType.getTypeFromEmoji(button.emoji.name) })
-        Interaction.updateOneWithJson(id, newJson)
-      })
-    } else Interaction.updateOne(id)
+    if (jsonData) updateOptionsType(id, CustomType.getTypeFromEmoji(button.emoji.name), jsonData)
+    else Interaction.updateOne(id)
 
     const buttonBuilder = new ButtonBuilder()
       .setCustomId(id)
@@ -53,26 +56,10 @@ const updateButtons = (components, type, jsonData = null) => {
   })
 }
 
-const generateOption = async (interaction, { values, label, description, emoji = null, defaultOption = false }) => {
-  const customId = (await Interaction.create(Object.assign({}, values, {
-    userId: interaction.user.id
-  }))).id
-
-  const option = new StringSelectMenuOptionBuilder()
-    .setLabel(label)
-    .setDescription(description)
-    .setValue(customId)
-    .setDefault(defaultOption)
-
-  if (emoji) option.setEmoji(emoji)
-
-  return option
-}
-
 module.exports = {
   generateButtons,
   updateButtons,
   buildButtonsGraph,
   buildButtons,
-  generateOption
+  updateOptionsType
 }

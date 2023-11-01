@@ -4,9 +4,10 @@ const Graph = require('../functions/graph')
 const CustomType = require('../templates/customType')
 const { buildButtonsGraph } = require('../functions/customType')
 const Options = require('../templates/options')
-const { getCardsConditions, getGameOption } = require('../functions/commands')
+const { getCardsConditions } = require('../functions/commands')
 const { getTranslation, getTranslations } = require('../languages/setup')
 const { getStats, getLadder } = require('../functions/apiHandler')
+const { getGameOption } = require('../functions/utility')
 
 const buildEmbed = async ({
   playerParam,
