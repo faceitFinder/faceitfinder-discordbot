@@ -28,8 +28,6 @@ module.exports = {
   async execute(interaction, values, newUser = false) {
     const optionsComponents = interaction.message.components.at(0).components
     const pagination = interaction.message.components.at(1)
-    // Cheking if the interaction is from the find command
-    const playerStatsCard = interaction.message.embeds.filter(e => e.data.image.url.includes('graph'))?.at(0)
 
     getCardByUserType(newUser, interaction)
 
@@ -59,7 +57,6 @@ module.exports = {
     ]
 
     const messageItems = await updateEmbedMessage(interaction, values.playerId, values.matchId, values.map, values.game)
-    if (playerStatsCard) messageItems.embeds.unshift(playerStatsCard)
 
     return {
       ...messageItems,
