@@ -1,5 +1,5 @@
 const Discord = require('discord.js')
-const { color, emojis } = require('../config.json')
+const { color, emojis, defaultGame } = require('../config.json')
 const { getUsers } = require('../functions/commands')
 const CustomTypeFunc = require('../functions/customType')
 const CustomType = require('../templates/customType')
@@ -71,10 +71,10 @@ const getInitPlayersDatas = ({
 const buildEmbed = async ({
   player1,
   player2,
-  maxMatch,
+  maxMatch = 20,
   map,
   type,
-  game,
+  game = defaultGame,
   locale,
   playerColor = getRandomColors(2)
 }) => {
@@ -84,8 +84,6 @@ const buildEmbed = async ({
       playerName: p.playerDatas.nickname,
     })
   })
-
-  let filter = (p) => parseInt(p.playerStats.lifetime.Matches)
 
   if (map) {
     // Check if players have played the map
@@ -98,16 +96,12 @@ const buildEmbed = async ({
     })
 
     filter = (p) => parseInt(p.playerStats.segments.find(segment => segment.label === map && segment.mode === '5v5').stats.Matches)
-  }
 
-  const maxMatchLimit = getMaxMatchLimit(
-    player1,
-    player2,
-    (p) => filter(p)
-  )
-
-  if (maxMatch > maxMatchLimit || maxMatch <= 0) {
-    maxMatch = maxMatchLimit
+    maxMatch = getMaxMatchLimit(
+      player1,
+      player2,
+      (p) => filter(p)
+    )
   }
 
   // Get player stats
@@ -117,6 +111,14 @@ const buildEmbed = async ({
     map,
     game
   })
+
+  const maxMatchLimit = getMaxMatchLimit(
+    player1,
+    player2,
+    (p) => p.playerHistory.length
+  )
+
+  if (maxMatch > maxMatchLimit || maxMatch < 1) maxMatch = maxMatchLimit
 
   const fields = [{
     name: 'Matches Compared',
