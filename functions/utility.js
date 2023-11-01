@@ -1,5 +1,5 @@
 const Interaction = require('../database/interaction')
-const { StringSelectMenuOptionBuilder } = require('discord.js')
+const { StringSelectMenuOptionBuilder, StringSelectMenuComponent } = require('discord.js')
 
 const generateOption = async (interaction, { values, label, description, emoji = null, defaultOption = false }) => {
   const customId = (await Interaction.create(Object.assign({}, values, {
@@ -18,7 +18,7 @@ const generateOption = async (interaction, { values, label, description, emoji =
 }
 
 const updateDefaultOption = (components, id, updateEmoji = true) => {
-  return components.filter(e => e instanceof Discord.StringSelectMenuComponent)
+  return components.filter(e => e instanceof StringSelectMenuComponent)
     .map(msm => msm.options.map(o => {
       Interaction.updateOne(o.value)
 
