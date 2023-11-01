@@ -1,3 +1,4 @@
+const { emojis, defaultGame } = require('../config')
 const Interaction = require('../database/interaction')
 const { StringSelectMenuOptionBuilder, StringSelectMenuComponent } = require('discord.js')
 
