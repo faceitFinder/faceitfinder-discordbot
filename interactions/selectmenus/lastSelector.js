@@ -26,8 +26,10 @@ const updateEmbedMessage = async (interaction, playerId, matchId, map, game) => 
 module.exports = {
   name: 'lastSelector',
   async execute(interaction, values, newUser = false) {
-    const optionsComponents = interaction.message.components.at(0).components
+    const optionsComponent = interaction.message.components.at(0)
     const pagination = interaction.message.components.at(1)
+    
+    updateDefaultOption(optionsComponent.components, interaction.values[0], false)
 
     getCardByUserType(newUser, interaction)
 
@@ -46,13 +48,10 @@ module.exports = {
     }
 
     updatePaginationComponents(pagination.components, values)
+    optionsComponent.components.at(0).data.disabled = false
 
     const components = [
-      new Discord.ActionRowBuilder()
-        .addComponents(
-          new Discord.StringSelectMenuBuilder()
-            .setCustomId('lastSelector')
-            .addOptions(updateDefaultOption(optionsComponents, interaction.values[0], false))),
+      optionsComponent,
       pagination
     ]
 
