@@ -56,7 +56,7 @@ const buildEmbed = async (interaction, playerId, map, mode, game) => {
         { name: 'Mode', value: mode, inline: true },
         { name: '\u200b', value: '\u200b', inline: true },
         { name: 'Games', value: m.stats.Matches.toString(), inline: true },
-        { name: 'Winrate', value: `${playerLastStats.winrate.toFixed(2)}%`, inline: true },
+        { name: 'Winrate', value: `${parseFloat(m.stats['Win Rate %']).toFixed(2)}%`, inline: true },
         {
           name: 'Elo Gain',
           value: isNaN(playerLastStats.eloGain) ?
@@ -66,9 +66,9 @@ const buildEmbed = async (interaction, playerId, map, mode, game) => {
               : playerLastStats.eloGain.toString(),
           inline: true
         },
-        { name: 'K/D', value: playerLastStats.kd.toFixed(2), inline: true },
-        { name: 'Kills', value: playerLastStats.kills.toString(), inline: true },
-        { name: 'Deaths', value: playerLastStats.deaths.toString(), inline: true },
+        { name: 'K/D', value: (parseFloat(m.stats['Kills']) / parseFloat(m.stats['Deaths']))?.toFixed(2), inline: true },
+        { name: 'Kills', value: m.stats['Kills'], inline: true },
+        { name: 'Deaths', value: m.stats['Deaths'], inline: true },
         { name: 'Average K/D', value: m.stats['Average K/D Ratio'], inline: true },
         { name: 'Average HS', value: `${m.stats['Average Headshots %']}%`, inline: true },
         { name: 'Average MVPs', value: m.stats['Average MVPs'], inline: true },
