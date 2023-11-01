@@ -37,7 +37,7 @@ const getOne = (id) => {
 
 const deleteOne = (id) => {
   if (!ObjectId.isValid(id)) return
-  InteractionModel.deleteOne({ id }).exec()
+  InteractionModel.deleteOne({ _id: id }).exec()
 }
 
 module.exports = {
