@@ -1,12 +1,12 @@
 const Discord = require('discord.js')
 const { color, name, defaultGame } = require('../config.json')
-const { isInteractionSubcommandEqual, getInteractionOption } = require('../functions/commands')
 const errorCard = require('../templates/errorCard')
 const GuildRoles = require('../database/guildRoles')
 const GuildCustomRole = require('../database/guildCustomRole')
 const successCard = require('../templates/successCard')
 const { updateRoles, getRoleIds } = require('../functions/roles')
 const { getTranslations, getTranslation } = require('../languages/setup')
+const { isInteractionSubcommandEqual, getInteractionOption } = require('../functions/utility')
 
 const SETUP = 'setup'
 const GENERATE = 'generate'

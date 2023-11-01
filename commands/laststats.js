@@ -1,71 +1,60 @@
-const Discord = require('discord.js')
-const { getInteractionOption, getCardsConditions, getGameOption } = require('../functions/commands')
+const { ActionRowBuilder, ApplicationCommandOptionType } = require('discord.js')
+const { getCardsConditions } = require('../functions/commands')
 const Options = require('../templates/options')
 const DateStats = require('../functions/dateStats')
 const CustomType = require('../templates/customType')
 const { getMapOption } = require('../functions/map')
 const { getTranslations, getTranslation } = require('../languages/setup')
 const { getStats } = require('../functions/apiHandler')
+const { buildButtonsGraph } = require('../functions/customType')
+const { getInteractionOption, getGameOption } = require('../functions/utility')
+
+const buildButtons = async (interaction, values, type) => [
+  new ActionRowBuilder()
+    .addComponents(await buildButtonsGraph(interaction, Object.assign({}, values, {
+      id: 'uLSG'
+    }), type))
+]
 
 const sendCardWithInfo = async (interaction, playerParam, type = CustomType.TYPES.ELO) => {
-  const { from, to } = DateStats.getFromTo(interaction)
+  let { from, to } = DateStats.getFromTo(interaction)
 
   const map = getInteractionOption(interaction, 'map')
   const maxMatch = getInteractionOption(interaction, 'match_number') ?? 20
-  const lastMatchString = getTranslation('strings.lastStatsLabel', interaction.locale)
   const game = getGameOption(interaction)
 
   const {
     playerDatas
   } = await getStats({
     playerParam,
-    matchNumber: maxMatch,
-    map: map,
+    matchNumber: 1,
     game
   })
 
-  const options = [{
-    label: lastMatchString,
-    description: lastMatchString,
-    value: JSON.stringify({
-      s: playerDatas.player_id,
-      c: map,
-      m: maxMatch,
-      u: interaction.user.id
-    }),
-    default: true
-  }, {
-    label: 'game',
-    description: 'game',
-    value: JSON.stringify({
-      g: game
-    })
-  }]
+  const values = {
+    playerId: playerDatas.player_id,
+    map,
+    maxMatch,
+    userId: interaction.user.id,
+    game,
+    from,
+    type,
+    to
+  }
 
-  const row = new Discord.ActionRowBuilder()
-    .addComponents(new Discord.StringSelectMenuBuilder()
-      .setCustomId('lastStatsSelector')
-      .addOptions(options)
-      .setDisabled(true))
-
-  let values = Object.assign({}, ...options.map(e => JSON.parse(e.value)))
-
-  if (from.toString() !== 'Invalid Date') values.f = from.getTime() / 1000
-  if (to.toString() !== 'Invalid Date') values.t = to.getTime() / 1000
-
-  return DateStats.getCardWithInfo(
+  const resp = await DateStats.getCardWithInfo({
     interaction,
-    row,
     values,
     type,
-    'uLSG',
-    maxMatch,
-    null,
-    null,
-    map,
-    true,
-    game
-  )
+    updateStartDate: true
+  })
+
+  values.from = resp.from
+  values.to = resp.to
+
+  resp.components = await buildButtons(interaction, values, type)
+
+  return resp
 }
 
 const getOptions = () => {
@@ -79,7 +68,7 @@ const getOptions = () => {
       default: '20'
     }),
     required: false,
-    type: Discord.ApplicationCommandOptionType.Integer,
+    type: ApplicationCommandOptionType.Integer,
     slash: true,
   }, getMapOption(), ...Options.dateRange)
 
@@ -95,8 +84,12 @@ module.exports = {
   example: 'steam_parameters: justdams match_number: 1000 from_date: 01/01/2022 to_date: 01/01/2023',
   type: 'stats',
   async execute(interaction) {
-    return getCardsConditions(interaction, sendCardWithInfo)
+    return getCardsConditions({
+      interaction,
+      fn: sendCardWithInfo
+    })
   }
 }
 
 module.exports.sendCardWithInfo = sendCardWithInfo
+module.exports.buildButtons = buildButtons

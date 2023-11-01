@@ -1,14 +1,15 @@
-const { color, emojis, itemByPage } = require('../config.json')
+const { color, emojis } = require('../config.json')
 const Discord = require('discord.js')
 const fs = require('fs')
 const Graph = require('../functions/graph')
 const errorCard = require('../templates/errorCard')
 const Options = require('../templates/options')
-const { getCardsConditions, getInteractionOption, getGameOption } = require('../functions/commands')
+const { getCardsConditions } = require('../functions/commands')
 const { getPagination, getPageSlice, getMaxPage } = require('../functions/pagination')
 const { getMapOption } = require('../functions/map')
 const { getTranslations, getTranslation } = require('../languages/setup')
 const { getStats } = require('../functions/apiHandler')
+const { generateOption, getInteractionOption, getGameOption } = require('../functions/utility')
 
 const getLevelFromElo = (elo, game) => {
   const colorLevel = Object.entries(color.levels[game]).filter(e => {
@@ -37,7 +38,8 @@ const getMatchItems = async (interaction, playerDatas, steamDatas, playerHistory
           level,
           roundStats.elo,
           size,
-          game)
+          game
+        )
         filesAtt.push(new Discord.AttachmentBuilder(rankImageCanvas, { name: `${faceitElo}${i}.png` }))
       }
 
@@ -93,12 +95,14 @@ const sendCardWithInfo = async (
   lastSelectorId = 'lastSelector',
   pageId = 'pageLast',
   maxMatch = null,
-  game = null
+  game = null,
+  previousValues = {}
 ) => {
   const map = getInteractionOption(interaction, 'map')
   game ??= getGameOption(interaction)
   maxMatch = getInteractionOption(interaction, 'match_number') ?? maxMatch ?? 25
   if (map) mapName = map
+  mapName ??= ''
 
   let {
     playerDatas,
@@ -108,7 +112,7 @@ const sendCardWithInfo = async (
   } = await getStats({
     playerParam,
     matchNumber: maxMatch,
-    map: mapName || '',
+    map: mapName,
     startDate: '',
     endDate: '',
     checkElo: +(page === 0),
@@ -130,7 +134,8 @@ const sendCardWithInfo = async (
     page,
     lastSelectorId,
     pageId,
-    game
+    game,
+    previousValues
   })
 }
 
@@ -145,22 +150,35 @@ const getLastCard = async ({
   page = 0,
   lastSelectorId = 'lastSelector',
   pageId = 'pageLast',
-  game
+  game,
+  previousValues = {}
 }) => {
   const playerId = playerDatas.player_id
   const files = []
   const pagination = getPageSlice(page)
 
-  maxMatch = maxMatch <= 0 ? playerHistory.length : maxMatch
+  maxMatch = maxMatch < 1 ? 0 : maxMatch
 
   // Removing multiple ids
-  const filteredHistory = playerHistory.map(e => e.matchId).filter((e, i, a) => a.indexOf(e) === i).slice(0, maxMatch)
-  playerHistory = playerHistory.filter(e => filteredHistory.includes(e.matchId))
+  let filteredHistory = playerHistory.map(e => e.matchId).filter((e, i, a) => a.indexOf(e) === i).slice(0, maxMatch ?? playerHistory.length)
   const maxPage = getMaxPage(filteredHistory)
+  filteredHistory = filteredHistory.slice(pagination.start, pagination.end)
 
-  if (!matchId) matchId = filteredHistory.slice(pagination.start, pagination.end).at(0)
+  if (!matchId) matchId = filteredHistory.at(0)
+
+  const values = Object.assign({}, previousValues, {
+    userId: interaction.user.id,
+    playerId,
+    map: mapName,
+    maxMatch,
+    game,
+    currentPage: page,
+    maxPage
+  })
 
   const matchItems = await getMatchItems(interaction, playerDatas, steamDatas, playerHistory, matchId, game)
+  matchItems.files.push(...files)
+
   const options = filteredHistory.map(e => {
     const matchRounds = playerHistory.filter(matches => matches.matchId === e)
     const match = matchRounds.at(0)
@@ -174,48 +192,27 @@ const getLastCard = async ({
       label: new Date(match.date).toDateString(),
       description: maps.join(' '),
       emoji: result !== undefined ? result ? emojis.won.balise : emojis.lost.balise : null,
-      default: e === matchId,
-      value: e.toString()
+      defaultOption: e === matchId,
+      values: Object.assign({}, values, { matchId: e })
     }
   })
 
-  matchItems.files.push(...files)
+  const paginationOptionsRaw = options
+  const paginationOptions = await Promise.all(paginationOptionsRaw.map(option => generateOption(interaction, option)))
 
   const components = [
     new Discord.ActionRowBuilder()
       .addComponents(
         new Discord.StringSelectMenuBuilder()
-          .setCustomId('lastSelectorInfo')
-          .setPlaceholder(getTranslation('strings.selectMatchBelow', interaction.locale))
-          .setDisabled(true)
-          .setOptions([{
-            label: getTranslation('strings.lastMatchLabel', interaction.locale),
-            description: getTranslation('strings.lastMatchDescription', interaction.locale),
-            value: JSON.stringify({
-              u: interaction.user.id,
-              s: playerId,
-              m: mapName,
-              l: maxMatch
-            })
-          }, {
-            label: 'game',
-            description: game,
-            value: JSON.stringify({
-              g: game
-            })
-          }])),
-    new Discord.ActionRowBuilder()
-      .addComponents(
-        new Discord.StringSelectMenuBuilder()
           .setCustomId(lastSelectorId)
           .setPlaceholder(getTranslation('strings.selectAnotherMatch', interaction.locale))
-          .addOptions(options.slice(pagination.start, pagination.end))),
-    getPagination(interaction, page, maxPage, pageId)
+          .addOptions(paginationOptions)),
+    await getPagination(interaction, page, maxPage, pageId, values)
   ]
 
   return {
     ...matchItems,
-    components: components,
+    components,
   }
 }
 
@@ -246,7 +243,10 @@ module.exports = {
   example: 'steam_parameters: justdams',
   type: 'stats',
   async execute(interaction) {
-    return getCardsConditions(interaction, sendCardWithInfo)
+    return getCardsConditions({
+      interaction,
+      fn: sendCardWithInfo
+    })
   },
 }
 

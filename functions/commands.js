@@ -3,11 +3,10 @@ const Team = require('../database/team')
 const RegexFun = require('./regex')
 const UserTeam = require('../database/userTeam')
 const errorCard = require('../templates/errorCard')
-const Discord = require('discord.js')
 const noMention = require('../templates/noMention')
 const { updateRoles } = require('./roles')
 const { getTranslation } = require('../languages/setup')
-const { defaultGame } = require('../config.json')
+const { getInteractionOption } = require('./utility')
 
 const getPlayerDatas = async (interaction, param, steam, discord = false, faceitId = false) => {
   if (discord) {
@@ -27,16 +26,8 @@ const getPlayerDatas = async (interaction, param, steam, discord = false, faceit
   return { param: param, steam, discord, faceitId }
 }
 
-const getDefaultInteractionOption = (interaction, componentIndex = 0, selectMenuIndex = 0, optionIndex = 0, defaultValue = true) => {
-  let res = interaction.message.components.at(componentIndex).components
-    .filter(e => e instanceof Discord.StringSelectMenuComponent).at(selectMenuIndex).options
-  if (defaultValue) res = res.filter(e => e.default)
-
-  return res.at(optionIndex)
-}
-
-const getCards = async (interaction, array, fn) => {
-  return Promise.all(array.map(async obj => fn(interaction, obj).catch(err => noMention(errorCard(err, interaction.locale)))))
+const getCards = ({ interaction, array, fn }) => {
+  return Promise.all(array.map(obj => fn(interaction, obj).catch(err => noMention(errorCard(err, interaction.locale)))))
     .then(msgs => msgs.map(msg => {
       const data = {
         embeds: msg.embeds || [],
@@ -133,47 +124,31 @@ const getUsers = async (
     .map(e => getPlayerDatas(interaction, e.param, e.steam, e.discord, e.faceitId)))
 }
 
-const getCardsConditions = async (
+const getCardsConditions = async ({
   interaction,
   fn,
   maxUser = 10,
   steam = 'steam_parameters',
   faceit = 'faceit_parameters',
   searchTeam = true,
-  searchCurrentUser = true
-) => getCards(
-  interaction,
-  await getUsers(interaction, maxUser, steam, faceit, searchTeam, searchCurrentUser),
-  fn)
+  searchCurrentUser = true,
+  required = false
+}) => {
+  const users = await getUsers(interaction, maxUser, steam, faceit, searchTeam, searchCurrentUser)
 
-const getInteractionOption = (interaction, name) => {
-  return interaction.options?._hoistedOptions?.filter(o => o.name === name)[0]?.value
-}
+  if (required && !users.length) throw getTranslation('error.command.atLeastOneParameter', interaction.locale, {
+    parameters: [steam, faceit, searchTeam ? 'team' : null].filter(e => e).join(', '),
+    command: interaction.commandName
+  })
 
-const getGameOption = (interaction) => {
-  return interaction.options?._hoistedOptions?.filter(o => o.name === 'game')[0]?.value ?? defaultGame
-}
-
-const isInteractionSubcommandEqual = (interaction, name) => {
-  return interaction.options?._subcommand === name
-}
-
-const getOptionsValues = (interaction, componentIndex = 0, selectMenuIndex = 0) => {
-  const options = interaction.message.components.at(componentIndex).components.at(selectMenuIndex).options
-  const values = Object.assign({}, ...options.map((e, i) => {
-    const option = getDefaultInteractionOption(interaction, componentIndex, selectMenuIndex, i, false)
-    return JSON.parse(option.value)
-  }))
-
-  return values
+  return getCards({
+    interaction,
+    array: users,
+    fn
+  })
 }
 
 module.exports = {
   getCardsConditions,
-  getInteractionOption,
-  isInteractionSubcommandEqual,
-  getDefaultInteractionOption,
-  getUsers,
-  getGameOption,
-  getOptionsValues
+  getUsers
 }

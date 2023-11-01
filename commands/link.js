@@ -1,12 +1,13 @@
 const { defaultGame } = require('../config.json')
 const Discord = require('discord.js')
 const User = require('../database/user')
-const { getCardsConditions, getInteractionOption } = require('../functions/commands')
+const { getCardsConditions } = require('../functions/commands')
 const successCard = require('../templates/successCard')
 const { updateRoles } = require('../functions/roles')
 const errorCard = require('../templates/errorCard')
 const { getTranslations, getTranslation } = require('../languages/setup')
 const { getStats } = require('../functions/apiHandler')
+const { getInteractionOption } = require('../functions/utility')
 
 const sendCardWithInfo = async (interaction, playerParam) => {
   const discordId = interaction.user.id
@@ -106,6 +107,15 @@ module.exports = {
   example: 'steam_parameter: justdams',
   type: 'utility',
   async execute(interaction) {
-    return getCardsConditions(interaction, sendCardWithInfo, 1, 'steam_parameter', 'faceit_parameter', false)
+    return getCardsConditions({
+      interaction,
+      fn: sendCardWithInfo,
+      maxUser: 1,
+      steam: 'steam_parameter',
+      faceit: 'faceit_parameter',
+      searchTeam: false,
+      searchCurrentUser: false,
+      required: true
+    })
   }
 }

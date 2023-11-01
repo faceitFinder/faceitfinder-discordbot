@@ -1,12 +1,12 @@
-const { color, emojis } = require('../config.json')
+const { color, defaultGame } = require('../config.json')
 const Discord = require('discord.js')
 const Graph = require('./graph')
 const CustomType = require('../templates/customType')
 const CustomTypeFunc = require('../functions/customType')
-const { getPagination } = require('./pagination')
-const { getInteractionOption } = require('./commands')
+const { getPagination, getMaxPage, getPageSlice } = require('./pagination')
 const { getStats } = require('./apiHandler')
 const { getTranslation } = require('../languages/setup')
+const { generateOption, setOptionDefault, getInteractionOption } = require('./utility')
 
 const getDates = async (playerHistory, getDay) => {
   const dates = new Map()
@@ -20,30 +20,18 @@ const getDates = async (playerHistory, getDay) => {
   return dates
 }
 
-const setOptionDefault = option => {
-  option.setEmoji(emojis.select.balise)
-    .setDefault(true)
-
-  return option
-}
-
-const getCardWithInfo = async (
+const getCardWithInfo = async ({
   interaction,
-  actionRow,
   values,
-  type,
-  id,
-  maxMatch,
-  maxPage = null,
-  page = null,
-  map = null,
-  updateStartDate = false,
-  game = null
-) => {
-  const playerId = values.s
+  type = CustomType.TYPES.ELO,
+  updateStartDate = false
+}) => {
+  const playerId = values.playerId
   const today = new Date().setHours(24, 0, 0, 0)
-  let startDate = values.f * 1000 || ''
-  const endDate = values.t * 1000 || new Date().setHours(+24)
+  let startDate = values.from || ''
+  const endDate = values.to || new Date().setHours(+24)
+  const map = values.map ?? ''
+  const game = values.game ?? defaultGame
 
   const {
     playerDatas,
@@ -55,10 +43,10 @@ const getCardWithInfo = async (
       param: playerId,
       faceitId: true
     },
-    matchNumber: maxMatch,
+    matchNumber: values.maxMatch,
     startDate,
     endDate,
-    map: map || '',
+    map: map,
     checkElo: +((startDate !== '' ? today >= startDate : true) && today <= endDate),
     game
   })
@@ -72,23 +60,23 @@ const getCardWithInfo = async (
   const size = 40
 
   const graphBuffer = Graph.generateChart(
-    interaction,
+    interaction.locale,
     playerDatas.nickname,
     playerHistory,
-    playerLastStats.games + (type === CustomType.TYPES.ELO),
+    playerLastStats.games + (CustomType.getType(type.name) === CustomType.TYPES.ELO),
     type,
     game
   )
 
   const rankImageCanvas = await Graph.getRankImage(faceitLevel, faceitElo, size, game)
-  const toRealTimeStamp = new Date(endDate).setHours(-24)
+  const endDateToRealTimeStamp = new Date(endDate).setHours(-24)
 
   const head = []
 
   if (updateStartDate) startDate = playerLastStats.from
 
-  if (startDate !== toRealTimeStamp) head.push({
-    name: 'From - To', value: [new Date(startDate).toDateString(), '\n', new Date(toRealTimeStamp).toDateString()].join(' '),
+  if (startDate !== endDateToRealTimeStamp) head.push({
+    name: 'From - To', value: [new Date(startDate).toDateString(), '\n', new Date(endDateToRealTimeStamp).toDateString()].join(' '),
     inline: !!map
   })
   else head.push({ name: 'From', value: new Date(startDate).toDateString(), inline: false })
@@ -129,113 +117,135 @@ const getCardWithInfo = async (
       { name: 'Red K/D', value: playerLastStats['Red K/D'].toString(), inline: true },
       { name: 'Orange K/D', value: playerLastStats['Orange K/D'].toString(), inline: true },
       { name: 'Green K/D', value: playerLastStats['Green K/D'].toString(), inline: true })
-    .setImage(`attachment://${values.s}graph.png`)
+    .setImage(`attachment://${values.playerId}graph.png`)
     .setColor(color.levels[game][faceitLevel].color)
     .setFooter({ text: `Steam: ${steamDatas?.personaname || steamDatas}`, iconURL: 'attachment://game.png' })
 
-  const components = [
-    ...[actionRow].flat(),
-    new Discord.ActionRowBuilder()
-      .addComponents([
-        CustomTypeFunc.generateButtons(
-          interaction,
-          { id: id, n: 1 },
-          CustomType.TYPES.KD,
-          type === CustomType.TYPES.KD),
-        CustomTypeFunc.generateButtons(
-          interaction,
-          { id: id, n: 2 },
-          CustomType.TYPES.ELO,
-          type === CustomType.TYPES.ELO),
-        CustomTypeFunc.generateButtons(
-          interaction,
-          { id: id, n: 3 },
-          CustomType.TYPES.ELO_KD,
-          type === CustomType.TYPES.ELO_KD)
-      ])]
-
-  if (page !== null) components.push(getPagination(interaction, page, maxPage, 'pageDS'))
+  const files = [
+    new Discord.AttachmentBuilder(graphBuffer, { name: `${values.playerId}graph.png` }),
+    new Discord.AttachmentBuilder(rankImageCanvas, { name: `${faceitLevel}level.png` }),
+    new Discord.AttachmentBuilder(`images/${game}.png`, { name: 'game.png' })
+  ]
 
   return {
+    from: startDate,
+    to: endDate,
+    content: '',
     embeds: [card],
-    content: null,
-    files: [
-      new Discord.AttachmentBuilder(graphBuffer, { name: `${values.s}graph.png` }),
-      new Discord.AttachmentBuilder(rankImageCanvas, { name: `${faceitLevel}level.png` }),
-      new Discord.AttachmentBuilder(`images/${game}.png`, { name: 'game.png' })
-    ],
-    components: components
+    files
   }
 }
 
-const buildButtonValues = (json, optionJson) => {
-  return JSON.stringify({
-    s: json.s,
-    f: json.f,
-    t: json.t
+const generateDatasForCard = async ({
+  interaction,
+  playerParam,
+  page = 0,
+  game = '',
+  functionToGetDates,
+  formatFromToDates,
+  formatLabel,
+  selectTranslationString,
+  type,
+  defaultOption = 0
+}) => {
+  type ??= CustomType.TYPES.ELO
+
+  const {
+    playerDatas,
+    playerHistory
+  } = await getStats({
+    playerParam,
+    matchNumber: 0,
+    game
   })
-}
 
-const updateOptions = (components, values, updateEmoji = true) => {
-  return components.filter(e => e instanceof Discord.StringSelectMenuComponent)
-    .map(msm => msm.options.map(o => {
-      // Do not reset if a button is clicked
-      try {
-        setOptionValues(o, values)
-        if (values.id.normalize() === 'uDSG') return o
-      } catch (error) { }
+  if (!playerHistory.length) throw getTranslation('error.user.noMatches', interaction.locale, {
+    playerName: playerDatas.nickname
+  })
 
-      const active = o.value.normalize() === (typeof values === 'object' ? buildButtonValues(values) : values).normalize()
-      if (updateEmoji) o.emoji = active ? emojis.select.balise : undefined
-      o.default = active
+  const playerId = playerDatas.player_id
+  const optionsValues = []
+  const dates = await getDates(playerHistory, functionToGetDates)
+  const maxMatch = 0
+  const map = ''
 
-      return o
-    })).at(0)
-}
+  dates.forEach(date => {
+    const {
+      from,
+      to
+    } = formatFromToDates(date)
 
-const setOptionValues = (option, values) => {
-  const oValue = JSON.parse(option.value)
-  if (oValue.u) oValue.u = values.u
-  option.value = JSON.stringify(oValue)
-  return option
+    let option = {
+      label: formatLabel(from, to, interaction.locale),
+      description: getTranslation('strings.matchPlayed', interaction.locale, { matchNumber: date.number }),
+      values: {
+        playerId,
+        from,
+        to,
+        game,
+        maxMatch,
+        map,
+        type
+      }
+    }
+
+    optionsValues.push(option)
+  })
+
+  const maxPage = getMaxPage(optionsValues)
+  optionsValues.forEach(option => {
+    option.values.maxPage = maxPage
+    option.values.currentPage = page
+  })
+  const pages = getPageSlice(page)
+  const paginationOptionsRaw = optionsValues.slice(pages.start, pages.end)
+  const values = paginationOptionsRaw[defaultOption].values
+  const pagination = await Promise.all(paginationOptionsRaw.map(option => generateOption(interaction, option)))
+
+  if (pagination.length === 0) return errorCard(getTranslation('error.user.noMatches', interaction.locale, {
+    playerName: playerDatas.nickname
+  }), interaction.locale)
+
+  pagination[defaultOption] = setOptionDefault(pagination.at(defaultOption))
+
+  const resp = await getCardWithInfo({
+    interaction,
+    values,
+    type
+  })
+
+  const components = [
+    new Discord.ActionRowBuilder()
+      .addComponents(
+        new Discord.StringSelectMenuBuilder()
+          .setCustomId('dateStatsSelector')
+          .setPlaceholder(getTranslation(selectTranslationString, interaction.locale))
+          .addOptions(pagination)),
+    new Discord.ActionRowBuilder()
+      .addComponents(await CustomTypeFunc.buildButtonsGraph(interaction, Object.assign({}, values, {
+        id: 'uDSG',
+        maxPage,
+        currentPage: page
+      }), type))
+  ]
+
+  if (page !== null) components.push(await getPagination(interaction, page, maxPage, 'pageDS', values))
+
+  resp.components = components
+
+  return resp
 }
 
 const getFromTo = (interaction, nameFrom = 'from_date', nameTo = 'to_date') => {
   const from = new Date(getInteractionOption(interaction, nameFrom)?.trim())
   const to = new Date(getInteractionOption(interaction, nameTo)?.trim())
 
-  return { from: new Date(from), to: new Date(to) }
+  return { from: new Date(from).getTime() || 0, to: new Date(to).getTime() || new Date().setHours(+24)}
 }
-
-const buildRows = (row, interaction, game, stringTranslation) => {
-  const selectDate = getTranslation(stringTranslation, interaction.locale)
-
-  return [
-    new Discord.ActionRowBuilder()
-      .addComponents(
-        new Discord.StringSelectMenuBuilder()
-          .setCustomId('dateStatsSelectorInfo')
-          .setPlaceholder(selectDate)
-          .addOptions({
-            label: selectDate,
-            description: selectDate,
-            value: JSON.stringify({
-              u: interaction.user.id,
-              g: game
-            })
-          })
-          .setDisabled(true)),
-    row
-  ]
-}
-
 
 module.exports = {
   getDates,
   getCardWithInfo,
-  setOptionDefault,
-  updateOptions,
   getFromTo,
-  setOptionValues,
-  buildRows
+  generateDatasForCard
 }
