@@ -104,6 +104,8 @@ const sendCardWithInfo = async (
   if (map) mapName = map
   mapName ??= ''
 
+  maxMatch = maxMatch < 1 ? 0 : maxMatch
+  
   let {
     playerDatas,
     steamDatas,
@@ -157,10 +159,8 @@ const getLastCard = async ({
   const files = []
   const pagination = getPageSlice(page)
 
-  maxMatch = maxMatch < 1 ? 0 : maxMatch
-
   // Removing multiple ids
-  let filteredHistory = playerHistory.map(e => e.matchId).filter((e, i, a) => a.indexOf(e) === i).slice(0, maxMatch ?? playerHistory.length)
+  let filteredHistory = playerHistory.map(e => e.matchId).filter((e, i, a) => a.indexOf(e) === i).slice(0, playerHistory.length)
   const maxPage = getMaxPage(filteredHistory)
   filteredHistory = filteredHistory.slice(pagination.start, pagination.end)
 
