@@ -160,7 +160,7 @@ const getLastCard = async ({
   const pagination = getPageSlice(page)
 
   // Removing multiple ids
-  let filteredHistory = playerHistory.map(e => e.matchId).filter((e, i, a) => a.indexOf(e) === i).slice(0, playerHistory.games)
+  let filteredHistory = playerHistory.map(e => e.matchId).filter((e, i, a) => a.indexOf(e) === i).slice(0, maxMatch || playerHistory.length)
   const maxPage = getMaxPage(filteredHistory)
   filteredHistory = filteredHistory.slice(pagination.start, pagination.end)
 
