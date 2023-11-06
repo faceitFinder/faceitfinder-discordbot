@@ -25,7 +25,12 @@ const setupRoles = async (client, user, guildId, remove) => {
     user = user.flat().at(0)
 
     const playerParam = { param: user.faceitId, faceitId: true }
-    const { playerDatas } = await getStats({ playerParam, game: defaultGame, matchNumber: 1 }).catch(() => null)
+    const stats = await getStats({ playerParam, game: defaultGame, matchNumber: 1 }).catch(() => null)
+
+    if (!stats) return
+
+    const playerDatas = stats.playerDatas
+
     if (!playerDatas?.games[defaultGame]) return
 
     const playerElo = playerDatas.games[defaultGame].faceit_elo
