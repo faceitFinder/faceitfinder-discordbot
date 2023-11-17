@@ -1,10 +1,10 @@
 const Discord = require('discord.js')
 const User = require('../database/user')
-const { getInteractionOption } = require('../functions/commands')
 const { updateRoles } = require('../functions/roles')
 const { getTranslation, getTranslations } = require('../languages/setup')
 const errorCard = require('../templates/errorCard')
 const successCard = require('../templates/successCard')
+const { getInteractionOption } = require('../functions/utility')
 
 const sendCardWithInfo = async (interaction) => {
   const discordId = interaction.user.id

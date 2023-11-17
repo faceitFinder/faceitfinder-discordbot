@@ -1,7 +1,22 @@
 const { itemByPage } = require('../config.json')
-const Discord = require('discord.js')
-const CustomTypeFunc = require('../functions/customType')
+const { ActionRowBuilder } = require('discord.js')
+const { generateButtons, updateButtons } = require('../functions/customType')
 const CustomType = require('../templates/customType')
+
+const disabledOptions = (page, maxPage, type) => {
+  switch (type) {
+  case CustomType.TYPES.FIRST:
+    return page === 0 ? type : null
+  case CustomType.TYPES.PREV:
+    return !(page - 1 >= 0) ? type : null
+  case CustomType.TYPES.NEXT:
+    return !(page + 1 <= maxPage) ? type : null
+  case CustomType.TYPES.LAST:
+    return page === maxPage ? type : null
+  default:
+    return null
+  }
+}
 
 const getPageSlice = (page, items = itemByPage) => {
   return {
@@ -14,40 +29,46 @@ const getMaxPage = (array, items = itemByPage) => {
   return Math.floor(array.length / items) - !(array.length % items >= 1)
 }
 
-const getPagination = (interaction, page, maxPage, id) => {
+const getPagination = async (interaction, page, maxPage, id, values) => {
   /**
    * id: button interaction id
-   * page: target page
-   * c: current page
-   * n: prevent custom id duplication
    */
-  return new Discord.ActionRowBuilder()
-    .addComponents([
-      CustomTypeFunc.generateButtons(
+
+  return new ActionRowBuilder()
+    .addComponents(await Promise.all([
+      generateButtons(
         interaction,
-        { id: id, page: 0, c: page, n: 1 },
+        Object.assign({}, values, { id: id, targetPage: 0, currentPage: page, chartType: values.type }),
         CustomType.TYPES.FIRST,
-        page === 0),
-      CustomTypeFunc.generateButtons(
+        disabledOptions(page, maxPage, CustomType.TYPES.FIRST)),
+      generateButtons(
         interaction,
-        { id: id, page: page - 1, c: page, n: 3 },
+        Object.assign({}, values, { id: id, targetPage: page - 1, currentPage: page, chartType: values.type }),
         CustomType.TYPES.PREV,
-        !(page - 1 >= 0)),
-      CustomTypeFunc.generateButtons(
+        disabledOptions(page, maxPage, CustomType.TYPES.PREV)),
+      generateButtons(
         interaction,
-        { id: id, page: page + 1, c: page, n: 2 },
+        Object.assign({}, values, { id: id, targetPage: page + 1, currentPage: page, chartType: values.type }),
         CustomType.TYPES.NEXT,
-        !(page + 1 <= maxPage)),
-      CustomTypeFunc.generateButtons(
+        disabledOptions(page, maxPage, CustomType.TYPES.NEXT)),
+      generateButtons(
         interaction,
-        { id: id, page: maxPage, c: page, n: 4 },
+        Object.assign({}, values, { id: id, targetPage: maxPage, currentPage: page, chartType: values.type }),
         CustomType.TYPES.LAST,
-        page === maxPage),
-    ])
+        disabledOptions(page, maxPage, CustomType.TYPES.LAST))
+    ]))
+}
+
+const updatePaginationComponents = (components, values, jsonData = null) => {
+  updateButtons(components, values?.type, jsonData)
+  components?.forEach((button) => {
+    button.data.disabled = !!disabledOptions(values.currentPage, values.maxPage, CustomType.getTypeFromEmoji(button.data.emoji.name))
+  })
 }
 
 module.exports = {
   getPagination,
   getPageSlice,
-  getMaxPage
+  getMaxPage,
+  updatePaginationComponents,
 }

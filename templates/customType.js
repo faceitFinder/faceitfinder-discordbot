@@ -11,4 +11,5 @@ module.exports.TYPES = {
   FIRST: { name: 'strings.pagination.first', emoji: '⏮', style: ButtonStyle.Primary, translate: true },
 }
 
-module.exports.getType = (t) => Object.entries(this.TYPES).filter(e => e[1].name === t)[0][1]
+module.exports.getType = (t) => Object.entries(this.TYPES).filter(e => e[1].name.normalize() === t)[0][1]
+module.exports.getTypeFromEmoji = (t) => Object.entries(this.TYPES).filter(e => e[1].emoji.normalize() === t)[0][1]

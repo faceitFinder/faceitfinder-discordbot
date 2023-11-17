@@ -8,18 +8,19 @@ const {
 } = require('discord.js')
 const { color } = require('../config.json')
 const Options = require('../templates/options')
-const { getUsers, getInteractionOption, getGameOption } = require('../functions/commands')
+const { getUsers } = require('../functions/commands')
 const { getMapOption } = require('../functions/map')
 const { getTranslations, getTranslation } = require('../languages/setup')
 const User = require('../database/user')
 const { getStats, getFind } = require('../functions/apiHandler')
 const { generateChart } = require('../functions/graph')
 const { TYPES } = require('../templates/customType')
-const { getFaceitPlayerDatas } = require('../functions/player')
 const { getLastCard } = require('./last')
 const Graph = require('../functions/graph')
 const errorCard = require('../templates/errorCard')
 const successCard = require('../templates/successCard')
+const Interaction = require('../database/interaction')
+const { getInteractionOption, getGameOption } = require('../functions/utility')
 
 const getOptions = () => {
   const options = structuredClone(Options.stats)
@@ -60,6 +61,24 @@ const getOptions = () => {
   return options
 }
 
+const buildButtons = (faceitIds, game, playerId, style, values, allDisabled = false) => faceitIds.map(async (faceitId) => {
+  const { playerDatas } = await getStats({
+    playerParam: { param: faceitId, faceitId: true },
+    matchNumber: 1,
+    game
+  })
+
+  const customId = allDisabled ?
+    faceitId :
+    (await Interaction.create(Object.assign({}, values, { playerIdTarget: faceitId }))).id
+
+  return new ButtonBuilder()
+    .setCustomId(customId)
+    .setLabel(playerDatas.nickname)
+    .setStyle(style)
+    .setDisabled(allDisabled ? true : playerId === faceitId)
+})
+
 const sendCardWithInfo = async (
   interaction,
   playerParam,
@@ -70,7 +89,9 @@ const sendCardWithInfo = async (
   faceitIncluded,
   steamExcluded,
   faceitExcluded,
-  game
+  game,
+  page = 0,
+  matchId = null
 ) => {
   let {
     playerDatas,
@@ -161,6 +182,18 @@ const sendCardWithInfo = async (
 
   matchNumber = matchNumber < 1 ? playerLastStats.games : matchNumber
 
+  const values = {
+    userId: interaction.user.id,
+    maxMatch: 0,
+    playerId,
+    map,
+    page,
+    game,
+    includedPlayers,
+    excludedPlayers,
+    matchId
+  }
+
   const {
     embeds,
     files,
@@ -170,43 +203,23 @@ const sendCardWithInfo = async (
     playerDatas,
     steamDatas,
     playerHistory,
-    mapName: map,
     maxMatch: matchNumber,
-    lastSelectorId: 'findSelector',
+    mapName: map,
+    matchId,
+    page,
     pageId: 'pageFind',
-    game
+    lastSelectorId: 'findSelector',
+    game,
+    previousValues: values,
   })
 
   if (includedPlayers.length > 0)
-    components.push(
-      new ActionRowBuilder()
-        .addComponents(await Promise.all(includedPlayers.map(async (p) => {
-          const playerDatas = await getFaceitPlayerDatas(p)
-
-          return new ButtonBuilder()
-            .setCustomId(JSON.stringify({
-              id: 'fUSG',
-              s: p,
-              l: matchNumber
-            }))
-            .setLabel(playerDatas.nickname)
-            .setStyle(ButtonStyle.Success)
-            .setDisabled(playerId === p)
-        }))))
+    components.push(new ActionRowBuilder().addComponents(
+      await Promise.all(buildButtons(includedPlayers, game, playerId, ButtonStyle.Success, Object.assign(values, { id: 'fUSG' })))))
 
   if (excludedPlayers.length > 0)
-    components.push(
-      new ActionRowBuilder()
-        .addComponents(await Promise.all(excludedPlayers.map(async (p) => {
-          const playerDatas = await getFaceitPlayerDatas(p)
-
-          return new ButtonBuilder()
-            .setCustomId(p)
-            .setLabel(playerDatas.nickname)
-            .setStyle(ButtonStyle.Danger)
-            .setDisabled(true)
-        }))))
-
+    components.push(new ActionRowBuilder().addComponents(
+      await Promise.all(buildButtons(excludedPlayers, game, playerId, ButtonStyle.Danger, values, true))))
 
   files.push(
     new AttachmentBuilder(graphBuffer, { name: `${playerId}graph.png` }),
@@ -259,33 +272,27 @@ module.exports = {
     if (!playerParam) return errorCard('error.command.faceitDatasNotFound', interaction.locale)
 
     const playerAimed = playerParam.playerDatas.player_id
-    const searchCurrentUser = !(currentPlayer?.faceitId === playerAimed)
-
     let teamIncluded, faceitIncluded, steamIncluded
 
-    try {
-      teamIncluded = (await getUsers(interaction, 5, null, null, true, null, searchCurrentUser))
-        .map(e => e.param)
-      faceitIncluded = await Promise.all((await getUsers(interaction, 5 - teamIncluded.length, null, 'faceit_parameters', null, searchCurrentUser))
-        .map(async e => {
-          if (e?.faceitId) e.param = (await getFaceitPlayerDatas(e.param)).nickname
-          return e.param
-        }))
-      steamIncluded = (await getUsers(interaction, 5 - faceitIncluded.length, 'steam_parameters', null, true, false))
-        .map(e => e.param)
-    } catch {
+    teamIncluded = await Promise.all((await getUsers(interaction, 5, null, null, true, false))
+      .map(async e => e.param))
+    faceitIncluded = (await getUsers(interaction, 5 - teamIncluded.length, null, 'faceit_parameters', false, false))
+      .map(e => e.param)
+    steamIncluded = (await getUsers(interaction, 5 - faceitIncluded.length, 'steam_parameters', null, false, false))
+      .map(e => e.param)
+
+    if (!teamIncluded.length && !faceitIncluded.length && !steamIncluded.length)
       throw getTranslation('error.command.atLeastOneParameter', interaction.locale, {
         parameters: 'steam_parameters, faceit_parameters, team',
         command: 'find'
       })
-    }
 
-    const faceitExcluded = (await getUsers(interaction, 5, null, 'excluded_faceit_parameters', null, false))
+    const faceitExcluded = (await getUsers(interaction, 5, null, 'excluded_faceit_parameters', false, false))
       .map(e => e.param)
-    const steamExcluded = (await getUsers(interaction, 5 - faceitExcluded.length, 'excluded_steam_parameters', null, null, false))
+    const steamExcluded = (await getUsers(interaction, 5 - faceitExcluded.length, 'excluded_steam_parameters', null, false, false))
       .map(e => e.param)
-    const maxMatch = getInteractionOption(interaction, 'match_number')
-    const map = getInteractionOption(interaction, 'map')
+    const maxMatch = getInteractionOption(interaction, 'match_number') ?? 0
+    const map = getInteractionOption(interaction, 'map') ?? ''
 
     faceitIncluded.push(...teamIncluded)
 

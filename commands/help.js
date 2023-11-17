@@ -2,8 +2,8 @@ const { name, color } = require('../config.json')
 const Discord = require('discord.js')
 const fs = require('fs')
 const errorCard = require('../templates/errorCard')
-const { getInteractionOption } = require('../functions/commands')
 const { getTranslations, getTranslation } = require('../languages/setup')
+const { getInteractionOption } = require('../functions/utility')
 
 const getCommandsList = () => {
   return fs.readdirSync('./commands')

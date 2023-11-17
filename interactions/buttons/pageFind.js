@@ -1,43 +1,40 @@
 const CommandsStats = require('../../database/commandsStats')
-const { getTypePage } = require('../../functions/commandStats')
-const loadingCard = require('../../templates/loadingCard')
-const Last = require('../../commands/last')
+const { getCardByUserType } = require('../../templates/loadingCard')
+const Interaction = require('../../database/interaction')
+const { sendCardWithInfo } = require('../../commands/find')
 
 module.exports = {
   name: 'pageFind',
-  async execute(interaction, json) {
-    const players = interaction.message.components.at(3)
-    const excludedPlayers = interaction.message.components.at(4)
-    const playerStatsCard = interaction.message.embeds.filter(e => e.data.image.url.includes('graph'))?.at(0)
+  async execute(interaction, json, newUser = false) {
+    CommandsStats.create('find', `button - ${json.type.name}`, interaction)
 
-    CommandsStats.create('find', `button - ${getTypePage(json)}`, interaction)
+    getCardByUserType(newUser, interaction)
 
-    loadingCard(interaction)
-
-    const {
-      embeds,
-      components,
-      files
-    } = await Last.sendCardWithInfo(interaction, {
-      param: json.s,
-      faceitId: true
-    }, null, json.page, json.m, 'findSelector', 'pageFind', json.l)
-
-    if (playerStatsCard) embeds.unshift(playerStatsCard)
-    if (players) components.push(players)
-    if (excludedPlayers) components.push(excludedPlayers)
-
-    return {
-      embeds,
-      components,
-      files
+    if (!newUser) {
+      interaction.message.components.at(0).components.at(0).options.forEach((option) => {
+        Interaction.deleteOne(option.data.value)
+      })
+      interaction.message.components.at(1).components.forEach((button) => {
+        Interaction.deleteOne(button.data.custom_id)
+      })
+      interaction.message.components.at(2).components.forEach((button) => {
+        Interaction.deleteOne(button.data.custom_id)
+      })
     }
-  },
-  getJSON(interaction, json) {
-    const values = interaction.message.components.at(0).components.at(0).options.at(0).value
-    const maxMatch = interaction.message.components.at(3)?.components.at(0).customId
-    if (maxMatch) json.l = JSON.parse(maxMatch).l
 
-    return { ...json, ...JSON.parse(values) }
-  },
+    return sendCardWithInfo(
+      interaction,
+      { param: json.playerId, faceitId: true },
+      json.maxMatch,
+      true,
+      json.map,
+      [],
+      json.includedPlayers,
+      [],
+      json.excludedPlayers,
+      json.game,
+      json.targetPage,
+      null
+    )
+  }
 }

@@ -1,30 +1,43 @@
 const { sendCardWithInfo } = require('../../commands/find')
 const CommandsStats = require('../../database/commandsStats')
-const { getOptionsValues } = require('../../functions/commands')
-const loadingCard = require('../../templates/loadingCard')
+const { getCardByUserType } = require('../../templates/loadingCard')
+const Interaction = require('../../database/interaction')
 
 /**
  * Find user stats graph.
  */
 module.exports = {
   name: 'fUSG',
-  async execute(interaction, json) {
+  async execute(interaction, json, newUser = false) {
     CommandsStats.create('find', 'button - player', interaction)
 
-    const players = interaction.message.components.at(3)?.components.map(p => JSON.parse(p.customId).s).filter(e => e !== json.s) || []
-    const excludedPlayers = interaction.message.components.at(4)?.components.map(p => p.customId) || []
+    getCardByUserType(newUser, interaction)
 
-    loadingCard(interaction)
+    if (!newUser) {
+      interaction.message.components.at(0).components.at(0).options.forEach((option) => {
+        Interaction.deleteOne(option.data.value)
+      })
+      interaction.message.components.at(1).components.forEach((component) => {
+        Interaction.deleteOne(component.data.custom_id)
+      })
+      interaction.message.components.at(2).components.forEach((component) => {
+        Interaction.deleteOne(component.data.custom_id)
+      })
+    }
 
-    return sendCardWithInfo(interaction, {
-      param: json.s,
-      faceitId: true
-    }, json.l, 1, json.m, [], players, [], excludedPlayers, json.g)
-  },
-  getJSON(interaction, json) {
-    const values = getOptionsValues(interaction)
-    values.s = json.s
-    values.l = json.l
-    return values
-  },
+    return sendCardWithInfo(
+      interaction,
+      { param: json.playerIdTarget, faceitId: true },
+      json.maxMatch,
+      true,
+      json.map,
+      [],
+      json.includedPlayers,
+      [],
+      json.excludedPlayers,
+      json.game,
+      0,
+      null
+    )
+  }
 }

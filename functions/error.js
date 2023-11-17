@@ -1,5 +1,5 @@
 const { logChannel } = require('../config.json')
-const { getInteractionOption } = require('./commands')
+const { getInteractionOption } = require('./utility')
 
 module.exports = (interaction, error) => {
   interaction.followUp().catch(() => null)
@@ -23,9 +23,9 @@ ${Error(error).stack}
 }
 
 const getOptionsKeyValues = (interaction) => {
-  const keys = interaction.client.commands.get(interaction.commandName).options.map(option => option.name)
-  if (!keys.length) return ''
+  let keys = interaction.client.commands.get(interaction.commandName)?.options?.map(option => option.name)
+  if (!keys?.length) return ''
 
-  const keyValues = keys.map(key => `- ${key}: ${getInteractionOption(interaction, key) ?? ''}`)
-  return keyValues.join('\n')
+  keys = keys.map(key => `- ${key}: ${getInteractionOption(interaction, key) ?? ''}`)
+  return keys.join('\n')
 }
