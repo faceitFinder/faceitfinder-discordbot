@@ -223,8 +223,7 @@ const sendCardWithInfo = async (
 
   files.push(
     new AttachmentBuilder(graphBuffer, { name: `${playerId}graph.png` }),
-    new AttachmentBuilder(rankImageCanvas, { name: `${faceitLevel}level.png` }),
-    new AttachmentBuilder(`images/${game}.png`, { name: 'game.png' })
+    new AttachmentBuilder(rankImageCanvas, { name: `${faceitLevel}level.png` })
   )
 
   embeds.unshift(selectedPlayerStats)
