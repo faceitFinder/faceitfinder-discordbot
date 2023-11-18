@@ -14,4 +14,4 @@ fs.readdirSync('./events').filter(file => file.endsWith('.js')).forEach(async (f
 // Start the bot
 client.login(process.env.TOKEN)
 
-setInterval(() => { updateRoles(client) }, 3600000)
+// setInterval(() => { updateRoles(client) }, 3600000)
