@@ -8,8 +8,7 @@
     "start": "node index.js",
     "dev": "nodemon --trace-warnings bot.js",
     "lint": "eslint --ext .js .",
-    "lint-and-fix": "eslint --fix --ext .js .",
-    "updatebdd": "node changeSteamIdsToFaceitIdsBdd.js"
+    "lint-and-fix": "eslint --fix --ext .js ."
   },
   "repository": {
     "type": "git",
@@ -22,20 +21,20 @@
   },
   "homepage": "https://github.com/JustDams/faceitFinder#readme",
   "dependencies": {
-    "@discordjs/rest": "^2.0.1",
-    "@top-gg/sdk": "^3.1.5",
-    "axios": "^1.4.0",
-    "axios-retry": "^3.8.1",
+    "@discordjs/rest": "^2.2.0",
+    "@top-gg/sdk": "^3.1.6",
+    "axios": "^1.6.8",
+    "axios-retry": "^4.1.0",
     "big.js": "^6.2.1",
-    "cache-manager": "^5.2.3",
+    "cache-manager": "^5.4.0",
     "canvas": "^2.11.2",
-    "chart.js": "^4.4.0",
-    "discord-api-types": "^0.37.55",
-    "discord.js": "^14.13.0",
-    "mongoose": "^7.6.3"
+    "chart.js": "^4.4.2",
+    "discord-api-types": "^0.37.76",
+    "discord.js": "^14.14.1",
+    "mongoose": "^8.2.3"
   },
   "devDependencies": {
-    "eslint": "^8.48.0",
-    "nodemon": "^3.0.1"
+    "eslint": "^8.57.0",
+    "nodemon": "^3.1.0"
   }
 }

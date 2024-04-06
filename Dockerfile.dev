@@ -1,6 +1,7 @@
 FROM node:21-alpine
 
 ARG APP=/usr/src/app
+ARG CACHE=/usr/src/cache
 
 ENV NODE_ENV=
 ENV TOKEN=
@@ -18,12 +19,12 @@ RUN apk update && \
   librsvg-dev
 
 
-WORKDIR $APP
+WORKDIR $CACHE
 COPY package.json .
-COPY yarn.lock .
+# COPY yarn.lock .
 
 RUN yarn install
 
-COPY . .
+WORKDIR $APP
 
-CMD ["yarn", "start"]
+CMD ["yarn", "dev"]

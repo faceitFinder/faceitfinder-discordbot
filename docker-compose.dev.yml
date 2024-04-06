@@ -3,15 +3,12 @@ services:
   app:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     restart: always
-    container_name: faceitfinder_dev
-    command: npm run dev
-    links:
-      - mongodb
+    entrypoint: /bin/sh -c "cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && yarn dev"
     volumes:
-      - /usr/src/app/node_modules
       - .:/usr/src/app
+      - ./node_modules:/usr/src/app/node_modules
     environment:
       - NODE_ENV=dev
     env_file:
