@@ -1,4 +1,4 @@
-FROM node:21-alpine
+FROM node:21
 
 ARG APP=/usr/src/app
 
@@ -8,15 +8,13 @@ ENV FACEIT_TOKEN=
 ENV STEAM_TOKEN=
 ENV TOPGG_TOKEN=
 
-RUN apk update && \
-  apk add --no-cache \
-  build-base \
-  cairo-dev \
-  pango-dev \
-  jpeg-dev \
-  giflib-dev \
-  librsvg-dev
-
+RUN apt-get update && apt-get install -y \
+  build-essential \
+  libcairo2-dev \
+  libpango1.0-dev \
+  libjpeg-dev \
+  libgif-dev \
+  librsvg2-dev
 
 WORKDIR $APP
 COPY package.json .
