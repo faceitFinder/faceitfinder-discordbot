@@ -1,5 +1,5 @@
 const Discord = require('discord.js')
-const { color, emojis, defaultGame } = require('../config.json')
+const { color, emojis, defaultGame, maps } = require('../config.json')
 const { getUsers } = require('../functions/commands')
 const CustomTypeFunc = require('../functions/customType')
 const CustomType = require('../templates/customType')
@@ -88,14 +88,18 @@ const buildEmbed = async ({
   if (map) {
     // Check if players have played the map
     [player1, player2].map(p => {
-      mapStats = p.playerStats.segments.filter(segment => segment.label === map && segment.mode === '5v5')
+      mapStats = p.playerStats.segments.filter(segment =>
+        (segment.label === maps[map] || segment.label === map) && segment.mode === '5v5'
+      )
 
       if (!mapStats?.at(0)?.stats) throw getTranslation('error.user.mapNotPlayed', locale, {
         playerName: p.playerDatas.nickname,
       })
     })
 
-    filter = (p) => parseInt(p.playerStats.segments.find(segment => segment.label === map && segment.mode === '5v5').stats.Matches)
+    filter = (p) => parseInt(p.playerStats.segments.find(segment =>
+      (segment.label === maps[map] || segment.label === map) && segment.mode === '5v5').stats.Matches
+    )
 
     maxMatch = getMaxMatchLimit(
       player1,

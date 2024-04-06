@@ -1,5 +1,5 @@
 const axios = require('axios')
-const axiosRetry = require('axios-retry')
+const axiosRetry = require('axios-retry').default
 
 axiosRetry(axios, { retries: 3 })
 
@@ -50,6 +50,7 @@ const getStats = async ({
   return axios.get(`${process.env.API_URL}/api/stats/${matchNumber}?faceit=${faceit}&steam=${steam}&id=${id}&checkElo=${checkElo}&map=${map}&startDate=${startDate}&endDate=${endDate}&game=${game}`)
     .then(res => res.data)
     .catch(e => {
+      console.log(e)
       console.error(e.response.status, e.response.statusText, e.response.config.url)
       throw e.response.data.error
     })
