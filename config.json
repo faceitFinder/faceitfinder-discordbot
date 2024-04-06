@@ -268,6 +268,30 @@
     "uk": "uk-UA",
     "vi": "vi-VN"
   },
+  "maps": {
+    "Vertigo": "de_vertigo",
+    "Ancient": "de_ancient",
+    "Nuke": "de_nuke",
+    "Cache": "de_cache",
+    "Dust2": "de_dust2",
+    "Cobblestone": "de_cbble",
+    "Inferno": "de_inferno",
+    "Mirage": "de_mirage",
+    "Overpass": "de_overpass",
+    "Train": "de_train",
+    "Anubis": "de_anubis",
+    "de_vertigo": "Vertigo",
+    "de_ancient": "Ancient",
+    "de_nuke": "Nuke",
+    "de_cache": "Cache",
+    "de_dust2": "Dust2",
+    "de_cbble": "Cobblestone",
+    "de_inferno": "Inferno",
+    "de_mirage": "Mirage",
+    "de_overpass": "Overpass",
+    "de_train": "Train",
+    "de_anubis": "Anubis"
+  },
   "maxLengthTeamName": 14,
   "defaultGame": "cs2"
 }

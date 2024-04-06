@@ -1,4 +1,4 @@
-const { emojis, itemByPage, color } = require('../config.json')
+const { emojis, itemByPage, color, maps } = require('../config.json')
 const fs = require('fs')
 const Discord = require('discord.js')
 const Options = require('../templates/options')
@@ -8,7 +8,7 @@ const { getCardsConditions } = require('../functions/commands')
 const { getMapOption } = require('../functions/map')
 const { getTranslations, getTranslation } = require('../languages/setup')
 const { getStats } = require('../functions/apiHandler')
-const { errorCard } = require('../templates/errorCard')
+const errorCard = require('../templates/errorCard')
 const { getInteractionOption, getGameOption } = require('../functions/utility')
 
 const buildEmbed = async (interaction, playerId, map, mode, game) => {
@@ -39,7 +39,7 @@ const buildEmbed = async (interaction, playerId, map, mode, game) => {
   filesAtt.push(new Discord.AttachmentBuilder(rankImageCanvas, { name: 'level.png' }))
 
   const mapThumbnail = `./images/maps/${map}.jpg`
-  const playerMapStats = playerStats.segments.filter(e => e.label === map && e.mode == mode)
+  const playerMapStats = playerStats.segments.filter(e => (e.label === maps[map] || e.label === map) && e.mode == mode)
 
   if (playerMapStats.length === 0) return errorCard(getTranslation('error.user.mapNotPlayed', interaction.locale, {
     playerName: playerDatas.nickname,
@@ -111,6 +111,7 @@ const sendCardWithInfo = async (interaction, playerParam, map = null, mode = nul
 
   let options = []
   await Promise.all(playerStats.segments.map(async (e) => {
+    e.label = game === 'cs2' ? maps[e.label] : e.label
     const label = `${e.label} ${e.mode}`
     const values = {
       playerId,
