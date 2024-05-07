@@ -73,7 +73,7 @@ const getCardWithInfo = async ({
 
   const head = []
 
-  if (updateStartDate) startDate = playerLastStats.from
+  if (updateStartDate) startDate = new Date(playerLastStats.from).getTime()
 
   if (startDate !== endDateToRealTimeStamp) head.push({
     name: 'From - To', value: [new Date(startDate).toDateString(), '\n', new Date(endDateToRealTimeStamp).toDateString()].join(' '),
