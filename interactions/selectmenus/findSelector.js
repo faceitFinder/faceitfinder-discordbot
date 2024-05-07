@@ -34,7 +34,7 @@ module.exports = {
     const excludedPlayers = interaction.message.components.at(3)
     const playerStatsCard = interaction.message.embeds.filter(e => e.data.image.url.includes('graph'))?.at(0)
     
-    updateDefaultOption(optionsComponents, interaction.values[0], true)
+    updateDefaultOption(optionsComponents, interaction.values[0], false)
     getCardByUserType(newUser, interaction)
 
     if (newUser) {
