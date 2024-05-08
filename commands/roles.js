@@ -15,7 +15,7 @@ const SETUP_ELO = 'setup_elo'
 const REMOVE_ELO = 'remove_elo'
 
 const setupRoles = async (interaction) => {
-  if (getInteractionOption(interaction, 'remove_old')) await removeRoles(interaction)
+  await removeRoles(interaction, getInteractionOption(interaction, 'remove_old'))
 
   const roles = []
   const rolesFields = []
@@ -82,8 +82,7 @@ const setupRoles = async (interaction) => {
 }
 
 const generateRoles = async (interaction) => {
-  if (getInteractionOption(interaction, 'remove_old')) await removeRoles(interaction)
-
+  await removeRoles(interaction, getInteractionOption(interaction, 'remove_old'))
   const roles = []
 
   for (let i = 10; i >= 1; i--) {
@@ -145,16 +144,18 @@ const generateRoles = async (interaction) => {
   }
 }
 
-const removeRoles = async (interaction) => {
+const removeRoles = async (interaction, removeOnGuild) => {
   const guildRoles = await GuildRoles.getRolesOf(interaction.guild.id)
   if (!guildRoles) return
 
   const roles = getRoleIds(guildRoles)
 
   if (guildRoles) {
-    for (let i = 1; i <= 10; i++) {
-      if (guildRoles[`level${i}`] && interaction.guild.roles.cache.has(guildRoles[`level${i}`]))
-        await interaction.guild.roles.delete(guildRoles[`level${i}`]).catch(console.error)
+    if (removeOnGuild) {
+      for (let i = 1; i <= 10; i++) {
+        if (guildRoles[`level${i}`] && interaction.guild.roles.cache.has(guildRoles[`level${i}`]))
+          await interaction.guild.roles.delete(guildRoles[`level${i}`]).catch(console.error)
+      }
     }
 
     await GuildRoles.remove(interaction.guild.id)
