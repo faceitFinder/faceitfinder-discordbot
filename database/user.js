@@ -6,6 +6,7 @@ const create = (discordId, faceitId, guildId, nickname) => {
     faceitId: faceitId,
     guildId: guildId,
     nickname: nickname,
+    verified: false,
   })
 
   newUser.save()
@@ -23,7 +24,7 @@ const exists = (discordId, guildId = null) => getWithGuild(discordId, guildId)
 
 const update = (discordId, faceitId, guildId = null, nickname) => User.updateOne(
   { discordId: discordId, guildId: guildId },
-  { faceitId: faceitId, nickname: nickname }
+  { faceitId: faceitId, nickname: nickname, verified: false }
 ).exec()
 
 

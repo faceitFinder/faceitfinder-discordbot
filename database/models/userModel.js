@@ -6,6 +6,7 @@ const userSchema = mongoose.Schema({
   faceitId: String,
   guildId: String,
   nickname: Boolean,
+  verified: Boolean,
 })
 
 module.exports = mongoose.model('user', userSchema)

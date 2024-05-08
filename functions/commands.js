@@ -15,7 +15,7 @@ const getPlayerDatas = async (interaction, param, steam, discord = false, faceit
     if (userGuilds.length > 0) {
       let user = userGuilds.find(e => !e.guildId)
       if (!user) user = userGuilds.find(e => e.guildId === interaction.guild.id)
-      if (user) return { param: user.faceitId, steam: false, discord: false, faceitId: true }
+      if (user) return { param: user.faceitId, steam: false, discord: false, faceitId: true, verified: user.verified }
     }
 
     throw getTranslation('error.user.notLinked', interaction.locale, {
