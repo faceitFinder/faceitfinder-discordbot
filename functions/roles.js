@@ -51,7 +51,11 @@ const setupRoles = async (client, user, guildId, remove) => {
 const updateRoles = async (client, discordId, guildId, remove = false) => {
   let user, guilds
 
-  if (discordId) user = [await User.get(discordId)].flat()
+  if (discordId) {
+    user = [await User.get(discordId)].flat()
+    if (user.length > 1) user = user.filter(e => e.guildId === guildId)
+    guildId = user.at(0).guildId
+  }
 
   if (guildId) guilds = [guildId].flat()
   else guilds = (await GuildCustomRole.getAll()).map(e => e.guildId).filter((e, i, a) => a.indexOf(e) === i)

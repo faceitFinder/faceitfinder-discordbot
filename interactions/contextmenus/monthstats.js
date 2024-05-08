@@ -15,7 +15,7 @@ module.exports = {
         discord: `<@${interaction.targetId}>`
       }), interaction.locale)
     }
-    await GuildRoles.updateRoles(interaction.client, user.discordId)
+    await GuildRoles.updateRoles(interaction.client, user.discordId, interaction.guild.id)
     return Monthstats.sendCardWithInfo(interaction, {
       param: user.faceitId,
       faceitId: true

@@ -97,7 +97,7 @@ const getUsers = async (
 
   if (parameters.length === 0 && currentUser && searchCurrentUser) {
     parameters.push({ param: currentUser.faceitId, faceitId: true })
-    updateRoles(interaction.client, interaction.user.id)
+    updateRoles(interaction.client, interaction.user.id, interaction.guild.id)
   }
 
   let params = []
