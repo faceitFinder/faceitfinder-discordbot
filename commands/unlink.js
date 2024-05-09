@@ -9,6 +9,10 @@ const { getInteractionOption } = require('../functions/utility')
 const sendCardWithInfo = async (interaction) => {
   const discordId = interaction.user.id
 
+  if (await User.getVerified(discordId)) {
+    return errorCard(getTranslation('error.user.unlink.verified', interaction.locale))
+  }
+
   if (await User.exists(discordId) || getInteractionOption(interaction, 'global')) {
     await updateRoles(interaction.client, discordId, null, true)
     return successCard(getTranslation('success.command.unlink.global', interaction.locale), interaction.locale)

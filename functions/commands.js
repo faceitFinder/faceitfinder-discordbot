@@ -8,14 +8,16 @@ const { updateRoles } = require('./roles')
 const { getTranslation } = require('../languages/setup')
 const { getInteractionOption } = require('./utility')
 
-const getPlayerDatas = async (interaction, param, steam, discord = false, faceitId = false) => {
+const getPlayerDatas = async (interaction, param, steam, discord = false, faceitId = false, verified = false) => {
   if (discord) {
     const userGuilds = await User.get(param)
-
     if (userGuilds.length > 0) {
       let user = userGuilds.find(e => !e.guildId)
       if (!user) user = userGuilds.find(e => e.guildId === interaction.guild.id)
-      if (user) return { param: user.faceitId, steam: false, discord: false, faceitId: true, verified: user.verified }
+
+      verified = user.verified ?? false
+
+      if (user) return { param: user.faceitId, steam: false, discord: false, faceitId: true, verified: verified }
     }
 
     throw getTranslation('error.user.notLinked', interaction.locale, {
@@ -23,7 +25,7 @@ const getPlayerDatas = async (interaction, param, steam, discord = false, faceit
     })
   }
 
-  return { param: param, steam, discord, faceitId }
+  return { param: param, steam, discord, faceitId, verified: verified }
 }
 
 const getCards = ({ interaction, array, fn }) => {
@@ -76,10 +78,11 @@ const getUsers = async (
     }
   }
 
-  if (faceitParameters)
+  if (faceitParameters) {
     parameters.push(...faceitParameters.map(nickname => nickname.split('/').filter(e => e).pop()).map(e => {
       return { param: e }
     }))
+  }
 
   if (steamParameters) {
     const steamIds = RegexFun.findSteamUIds(steamParameters)
@@ -96,7 +99,7 @@ const getUsers = async (
   }
 
   if (parameters.length === 0 && currentUser && searchCurrentUser) {
-    parameters.push({ param: currentUser.faceitId, faceitId: true })
+    parameters.push({ param: currentUser.faceitId, faceitId: true, verified: !!currentUser?.verified })
     updateRoles(interaction.client, interaction.user.id, interaction.guild.id)
   }
 
@@ -105,12 +108,8 @@ const getUsers = async (
     const res = RegexFun.findUserMentions(e.param)
     params = params.concat(
       res.length > 0 ?
-        res.map(r => {
-          return {
-            param: r,
-            discord: true,
-          }
-        }) : { param: e.param.split('/').filter(e => e).pop(), steam: e.steam, discord: e.discord, faceitId: e.faceitId }
+        res.map(r => { return { param: r, discord: true, verified: !!e?.verified } }) :
+        { param: e.param.split('/').filter(e => e).pop(), steam: e.steam, discord: e.discord, faceitId: e.faceitId, verified: !!e?.verified }
     )
   })
 
@@ -121,7 +120,7 @@ const getUsers = async (
 
   return Promise.all(params
     .slice(0, maxUser)
-    .map(e => getPlayerDatas(interaction, e.param, e.steam, e.discord, e.faceitId)))
+    .map(e => getPlayerDatas(interaction, e.param, e.steam, e.discord, e.faceitId, e.verified)))
 }
 
 const getCardsConditions = async ({
