@@ -120,7 +120,6 @@ base.strings.pagination = {
   last: 'Dernière Page'
 };
 base.strings.donate = 'Soutenir le projet';
-base.strings.translation = 'Participer à la traduction';
 base.strings.fullHistory = 'Historique complet';
 base.strings.verifyDescription = `Hey {discord}, afin de vérifier ton compte faceit cliques sur le lien ci-dessous !\n${oauth2}\nUne fois ton compte vérifié, tu pourras obtenir le rôle lié, et plus encore !`;
 base.strings.verify = 'Vérification';
