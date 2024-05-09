@@ -119,7 +119,6 @@ base.strings.pagination = {
   last: 'Letzte Seite'
 };
 base.strings.donate = 'Unterstütze das Projekt';
-base.strings.translation = 'Helfe mit der Übersetzung';
 base.strings.fullHistory = 'Kompletter Verlauf';
 base.error.user.missing = 'Es scheint, als fehle ein User';
 base.error.user.compareSame = 'Du kannst nicht den gleichen User vergleichen';

@@ -120,7 +120,6 @@ base.strings.pagination = {
   last: 'Last Page'
 }
 base.strings.donate = 'Support the project'
-base.strings.translation = 'Help with the translation'
 base.strings.fullHistory = 'Full history'
 base.strings.verifyDescription = `Hey {discord}, to verify your faceit account click on the link below!\n${oauth2}\nOnce you have verified your account, you will be able to get the linked role, and more !`
 base.strings.verify = 'Verify'
