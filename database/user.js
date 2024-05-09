@@ -27,10 +27,11 @@ const update = (discordId, faceitId, guildId = null, nickname) => User.updateOne
   { faceitId: faceitId, nickname: nickname, verified: false }
 ).exec()
 
-
 const getAll = () => User.find({}).exec()
 
 const count = () => User.countDocuments({})
+
+const getVerified = (discordId) => User.find({ discordId: discordId, verified: true }).exec()
 
 module.exports = {
   create,
@@ -40,5 +41,6 @@ module.exports = {
   count,
   remove,
   getAll,
-  getWithGuild
+  getWithGuild,
+  getVerified,
 }

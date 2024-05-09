@@ -40,6 +40,9 @@ const sendCardWithInfo = async (interaction, playerParam) => {
 }
 
 const link = async (interaction, playerParam, discordId, guildId = null, nickname) => {
+  const user = await User.exists(discordId, guildId)
+  if (!!user?.verified) return errorCard('error.user.unlink.verified', interaction.locale)
+
   const {
     playerDatas
   } = await getStats({
@@ -50,8 +53,7 @@ const link = async (interaction, playerParam, discordId, guildId = null, nicknam
 
   const playerId = playerDatas.player_id
 
-  if (!guildId) await User.remove(discordId)
-  const user = await User.exists(discordId, guildId)
+  if (guildId) await User.remove(discordId)
 
   user ?
     User.update(discordId, playerId, guildId, nickname || user.nickname) :

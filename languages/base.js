@@ -30,6 +30,9 @@ module.exports = {
     link: {
       description: '',
     },
+    verify: {
+      description: '',
+    },
     map: {
       description: '',
     },
@@ -154,6 +157,8 @@ module.exports = {
     donate: '',
     translation: '',
     fullHistory: '',
+    verifyDescription: '',
+    verify: '',
   },
   error: {
     user: {
@@ -177,6 +182,9 @@ module.exports = {
       globalLink: '',
       notFound: '',
       mapNotPlayed: '',
+      unlink: {
+        verified: '',
+      }
     },
     execution: {
       command: '',
