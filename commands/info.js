@@ -24,7 +24,6 @@ module.exports = {
             { name: getTranslation('strings.voteLink', interaction.locale), value: vote },
             { name: getTranslation('strings.serverLink', interaction.locale), value: join },
             { name: getTranslation('strings.donate', interaction.locale), value: donate },
-            { name: getTranslation('strings.translation', interaction.locale), value: translate },
             { name: getTranslation('strings.accountLinked', interaction.locale), value: (await User.count()).toString() },)
           .setFooter({ text: `${name} ${info}` })
       ],
