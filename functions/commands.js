@@ -15,7 +15,7 @@ const getPlayerDatas = async (interaction, param, steam, discord = false, faceit
       let user = userGuilds.find(e => !e.guildId)
       if (!user) user = userGuilds.find(e => e.guildId === interaction.guild.id)
 
-      verified = user.verified ?? false
+      verified = user?.verified ?? false
 
       if (user) return { param: user.faceitId, steam: false, discord: false, faceitId: true, verified: verified }
     }
