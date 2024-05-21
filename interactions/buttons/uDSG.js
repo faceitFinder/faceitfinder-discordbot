@@ -16,6 +16,7 @@ module.exports = {
     CommandsStats.create(commandName, `button - ${json.type.name}`, interaction)
 
     let components = interaction.message.components
+    const defaultOption = components.at(0).components.at(0).options.findIndex(option => option.default)
 
     getCardByUserType(newUser, interaction)
 
@@ -26,7 +27,8 @@ module.exports = {
           { param: json.playerId, faceitId: true },
           json.currentPage,
           json.game,
-          json.type
+          json.type,
+          defaultOption
         )
     }
 
