@@ -191,7 +191,8 @@ const sendCardWithInfo = async (
     game,
     includedPlayers,
     excludedPlayers,
-    matchId
+    matchId,
+    graphBuffer
   }
 
   const {
