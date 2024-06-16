@@ -7,7 +7,7 @@ const Options = require('../templates/options')
 const { getCardsConditions } = require('../functions/commands')
 const { getTranslation, getTranslations } = require('../languages/setup')
 const { getStats, getLadder } = require('../functions/apiHandler')
-const { getGameOption } = require('../functions/utility')
+const { getGameOption, getCurrentEloString } = require('../functions/utility')
 
 const buildEmbed = async ({
   playerParam,
