@@ -50,11 +50,16 @@ const getGameOption = (interaction) => {
   return interaction.options?._hoistedOptions?.filter(o => o.name === 'game')[0]?.value ?? defaultGame
 }
 
+const getCurrentEloString = (playerLastStats) => {
+  return `${playerLastStats['Current Elo']} (-${playerLastStats.eloToPrev}/+${playerLastStats.eloToNext})`
+}
+
 module.exports = {
   generateOption,
   updateDefaultOption,
   setOptionDefault,
   isInteractionSubcommandEqual,
   getInteractionOption,
-  getGameOption
+  getGameOption,
+  getCurrentEloString
 }

@@ -68,7 +68,7 @@ const buildEmbed = async ({
       { name: 'Games', value: `${playerStats.lifetime.Matches} (${playerStats.lifetime['Win Rate %']}% Win)`, inline: true },
       { name: 'K/D', value: playerStats.lifetime['Average K/D Ratio'], inline: true },
       { name: 'HS', value: `${playerStats.lifetime['Average Headshots %']}%`, inline: true },
-      { name: 'Elo', value: playerLastStats['Current Elo'] ?? faceitElo.toString(), inline: true },
+      { name: 'Elo', value: getCurrentEloString(playerLastStats), inline: true },
       { name: `:flag_${playerCountry.toLowerCase()}:`, value: ladderCountry.position.toString(), inline: true },
       { name: `:flag_${playerRegion.toLowerCase()}:`, value: ladderRegion.position.toString(), inline: true }
     )

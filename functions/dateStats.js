@@ -6,7 +6,7 @@ const CustomTypeFunc = require('../functions/customType')
 const { getPagination, getMaxPage, getPageSlice } = require('./pagination')
 const { getStats } = require('./apiHandler')
 const { getTranslation } = require('../languages/setup')
-const { generateOption, setOptionDefault, getInteractionOption } = require('./utility')
+const { generateOption, setOptionDefault, getInteractionOption, getCurrentEloString } = require('./utility')
 
 const getDates = async (playerHistory, getDay) => {
   const dates = new Map()
@@ -93,7 +93,7 @@ const getCardWithInfo = async ({
     .addFields(...head,
       { name: 'Highest Elo', value: playerLastStats['Highest Elo'].toString(), inline: true },
       { name: 'Lowest Elo', value: playerLastStats['Lowest Elo'].toString(), inline: true },
-      { name: 'Current Elo', value: playerLastStats['Current Elo'].toString(), inline: true },
+      { name: 'Current Elo', value: getCurrentEloString(playerLastStats), inline: true },
       { name: 'Games', value: `${playerLastStats.games} (${playerLastStats.winrate.toFixed(2)}% Win)`, inline: true },
       {
         name: 'Elo Gain',
