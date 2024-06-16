@@ -20,7 +20,7 @@ const Graph = require('../functions/graph')
 const errorCard = require('../templates/errorCard')
 const successCard = require('../templates/successCard')
 const Interaction = require('../database/interaction')
-const { getInteractionOption, getGameOption } = require('../functions/utility')
+const { getInteractionOption, getGameOption, getCurrentEloString } = require('../functions/utility')
 
 const getOptions = () => {
   const options = structuredClone(Options.stats)
@@ -152,7 +152,7 @@ const sendCardWithInfo = async (
       ...head,
       { name: 'Highest Elo', value: playerLastStats['Highest Elo'].toString(), inline: true },
       { name: 'Lowest Elo', value: playerLastStats['Lowest Elo'].toString(), inline: true },
-      { name: 'Current Elo', value: playerLastStats['Current Elo'].toString(), inline: true },
+      { name: 'Current Elo', value: getCurrentEloString(playerLastStats), inline: true },
       { name: 'Games', value: `${playerLastStats.games} (${playerLastStats.winrate.toFixed(2)}% Win)`, inline: true },
       {
         name: 'Elo Gain',
