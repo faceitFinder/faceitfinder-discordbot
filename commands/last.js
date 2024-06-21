@@ -52,20 +52,22 @@ const getMatchItems = async (interaction, playerDatas, steamDatas, playerHistory
         card.addFields({ name: 'round', value: `${i + 1}/${matchStats.length}` })
 
       mapThumbnail = `./images/maps/${mapName}.jpg`
+      const entriesWR = Math.ceil((roundStats.i22 / roundStats.i21) * 100).toFixed(0)
 
       card.setAuthor({ name: playerDatas.nickname, iconURL: playerDatas.avatar || null, url: `https://www.faceit.com/en/players/${playerDatas.nickname}` })
         .setDescription(`[Steam](https://steamcommunity.com/profiles/${playerDatas.games[game].game_player_id}), [Game Lobby](https://www.faceit.com/en/${game}/room/${matchId}/scoreboard)`)
         .addFields({ name: 'Score', value: roundStats.i18, inline: true },
-          { name: 'Map', value: mapName, inline: true },
-          { name: 'Status', value: result ? emojis.won.balise : emojis.lost.balise, inline: true },
+          { name: 'Date', value: new Date(roundStats.date).toDateString(), inline: true },
+          { name: 'Elo Gain', value: isNaN(eloGain) ? '0' : eloGain > 0 ? `+${eloGain}` : eloGain.toString(), inline: true },
           { name: 'K/D', value: roundStats.c2, inline: true },
-          { name: 'HS', value: `${roundStats.c4}%`, inline: true },
-          { name: 'MVPs', value: roundStats.i9, inline: true },
+          { name: 'K/R', value: roundStats.c3, inline: true },
+          { name: 'HS', value: `${roundStats.i13} (${roundStats.c4}%)`, inline: true },
           { name: 'Kills', value: roundStats.i6, inline: true },
           { name: 'Deaths', value: roundStats.i8, inline: true },
           { name: 'Assists', value: roundStats.i7, inline: true },
-          { name: 'Elo Gain', value: isNaN(eloGain) ? '0' : eloGain > 0 ? `+${eloGain}` : eloGain.toString(), inline: true },
-          { name: 'Date', value: new Date(roundStats.date).toDateString(), inline: true })
+          { name: 'Damages', value: roundStats.i20, inline: true },
+          { name: 'ADR', value: roundStats.c10, inline: true },
+          { name: 'Entries (WR)', value: `${roundStats.i21} (${entriesWR}%)`, inline: true },)
         .setThumbnail(`attachment://${faceitElo}${i}.png`)
         .setImage(`attachment://${mapName}.jpg`)
         .setColor(result ? color.won : color.lost)
@@ -105,7 +107,7 @@ const sendCardWithInfo = async (
   mapName ??= ''
 
   maxMatch = maxMatch < 1 ? 0 : maxMatch
-  
+
   let {
     playerDatas,
     steamDatas,
