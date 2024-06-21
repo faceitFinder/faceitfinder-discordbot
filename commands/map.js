@@ -69,12 +69,12 @@ const buildEmbed = async (interaction, playerId, map, mode, game) => {
         { name: 'K/D', value: (parseFloat(m.stats['Kills']) / parseFloat(m.stats['Deaths']))?.toFixed(2), inline: true },
         { name: 'Kills', value: m.stats['Kills'], inline: true },
         { name: 'Deaths', value: m.stats['Deaths'], inline: true },
-        { name: 'Average K/D', value: m.stats['Average K/D Ratio'], inline: true },
-        { name: 'Average HS', value: `${m.stats['Average Headshots %']}%`, inline: true },
-        { name: 'Average MVPs', value: m.stats['Average MVPs'], inline: true },
-        { name: 'Average Kills', value: m.stats['Average Kills'], inline: true },
-        { name: 'Average Deaths', value: m.stats['Average Deaths'], inline: true },
-        { name: 'Average Assists', value: m.stats['Average Assists'], inline: true })
+        { name: 'Avg K/D', value: m.stats['Average K/D Ratio'], inline: true },
+        { name: 'Avg K/R', value: m.stats['Average K/R Ratio'], inline: true },
+        { name: 'Avg HS', value: `${m.stats['Average Headshots %']}%`, inline: true },
+        { name: 'Avg Kills', value: m.stats['Average Kills'], inline: true },
+        { name: 'Avg Deaths', value: m.stats['Average Deaths'], inline: true },
+        { name: 'Avg Assists', value: m.stats['Average Assists'], inline: true })
       .setColor(color.levels[game][faceitLevel].color)
       .setFooter({ text: `Steam: ${steamDatas?.personaname || steamDatas}`, iconURL: 'attachment://game.png' })
       .setImage(`attachment://${map}.jpg`)

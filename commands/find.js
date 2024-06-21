@@ -21,6 +21,7 @@ const errorCard = require('../templates/errorCard')
 const successCard = require('../templates/successCard')
 const Interaction = require('../database/interaction')
 const { getInteractionOption, getGameOption, getCurrentEloString } = require('../functions/utility')
+const { generateDateStatsFields } = require('../functions/dateStats')
 
 const getOptions = () => {
   const options = structuredClone(Options.stats)
@@ -148,34 +149,7 @@ const sendCardWithInfo = async (
     .setAuthor({ name: playerDatas.nickname, iconURL: playerDatas.avatar || null, url: `https://www.faceit.com/en/players/${playerDatas.nickname}` })
     .setDescription(`[Steam](https://steamcommunity.com/profiles/${playerDatas.games[game].game_player_id}), [Faceit](https://www.faceit.com/en/players/${playerDatas.nickname})`)
     .setThumbnail(`attachment://${faceitLevel}level.png`)
-    .addFields(
-      ...head,
-      { name: 'Highest Elo', value: playerLastStats['Highest Elo'].toString(), inline: true },
-      { name: 'Lowest Elo', value: playerLastStats['Lowest Elo'].toString(), inline: true },
-      { name: 'Current Elo', value: getCurrentEloString(playerLastStats), inline: true },
-      { name: 'Games', value: `${playerLastStats.games} (${playerLastStats.winrate.toFixed(2)}% Win)`, inline: true },
-      {
-        name: 'Elo Gain',
-        value: isNaN(playerLastStats.eloGain) ?
-          '0'
-          : playerLastStats.eloGain > 0 ?
-            `+${playerLastStats.eloGain}`
-            : playerLastStats.eloGain.toString(),
-        inline: true
-      },
-      { name: 'Average MVPs', value: playerLastStats['Average MVPs'].toFixed(2), inline: true },
-      { name: 'K/D', value: playerLastStats.kd.toFixed(2), inline: true },
-      { name: 'Kills', value: playerLastStats.kills.toString(), inline: true },
-      { name: 'Deaths', value: playerLastStats.deaths.toString(), inline: true },
-      { name: 'Average K/D', value: playerLastStats['Average K/D'].toFixed(2), inline: true },
-      { name: 'Average K/R', value: playerLastStats['Average K/R'].toFixed(2), inline: true },
-      { name: 'Average HS', value: `${playerLastStats['Average HS'].toFixed(2)}%`, inline: true },
-      { name: 'Average Kills', value: playerLastStats['Average Kills'].toFixed(2), inline: true },
-      { name: 'Average Deaths', value: playerLastStats['Average Deaths'].toFixed(2), inline: true },
-      { name: 'Average Assists', value: playerLastStats['Average Assists'].toFixed(2), inline: true },
-      { name: 'Red K/D', value: playerLastStats['Red K/D'].toString(), inline: true },
-      { name: 'Orange K/D', value: playerLastStats['Orange K/D'].toString(), inline: true },
-      { name: 'Green K/D', value: playerLastStats['Green K/D'].toString(), inline: true })
+    .addFields(...generateDateStatsFields(playerLastStats, head))
     .setImage(`attachment://${playerId}graph.png`)
     .setColor(color.levels[game][faceitLevel].color)
     .setFooter({ text: `Steam: ${steamDatas?.personaname || steamDatas}`, iconURL: 'attachment://game.png' })
