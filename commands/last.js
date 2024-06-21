@@ -53,6 +53,7 @@ const getMatchItems = async (interaction, playerDatas, steamDatas, playerHistory
 
       mapThumbnail = `./images/maps/${mapName}.jpg`
       const entriesWR = Math.ceil((roundStats.i22 / roundStats.i21) * 100).toFixed(0)
+      const entries = roundStats.i21 ? `${roundStats.i21} (${entriesWR}%)` : 'N/A'
 
       card.setAuthor({ name: playerDatas.nickname, iconURL: playerDatas.avatar || null, url: `https://www.faceit.com/en/players/${playerDatas.nickname}` })
         .setDescription(`[Steam](https://steamcommunity.com/profiles/${playerDatas.games[game].game_player_id}), [Game Lobby](https://www.faceit.com/en/${game}/room/${matchId}/scoreboard)`)
@@ -65,9 +66,9 @@ const getMatchItems = async (interaction, playerDatas, steamDatas, playerHistory
           { name: 'Kills', value: roundStats.i6, inline: true },
           { name: 'Deaths', value: roundStats.i8, inline: true },
           { name: 'Assists', value: roundStats.i7, inline: true },
-          { name: 'Damages', value: roundStats.i20, inline: true },
-          { name: 'ADR', value: roundStats.c10, inline: true },
-          { name: 'Entries (WR)', value: `${roundStats.i21} (${entriesWR}%)`, inline: true },)
+          { name: 'Damages', value: roundStats?.i20 ?? 'N/A', inline: true },
+          { name: 'ADR', value: roundStats?.c10 ?? 'N/A', inline: true },
+          { name: 'Entries (WR)', value: entries, inline: true },)
         .setThumbnail(`attachment://${faceitElo}${i}.png`)
         .setImage(`attachment://${mapName}.jpg`)
         .setColor(result ? color.won : color.lost)
