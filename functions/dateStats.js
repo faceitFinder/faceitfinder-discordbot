@@ -218,6 +218,8 @@ const getFromTo = (interaction, nameFrom = 'from_date', nameTo = 'to_date') => {
 }
 
 const generateDateStatsFields = (playerLastStats, head) => {
+  const entries = playerLastStats['Average Entries'] ? `${playerLastStats['Average Entries']} (${playerLastStats['Average Entries WR']}%)` : 'N/A'
+
   return [
     ...head,
     { name: 'Highest Elo', value: playerLastStats['Highest Elo'].toString(), inline: true },
@@ -243,9 +245,9 @@ const generateDateStatsFields = (playerLastStats, head) => {
     { name: 'Avg Kills', value: playerLastStats['Average Kills'].toFixed(2), inline: true },
     { name: 'Avg Deaths', value: playerLastStats['Average Deaths'].toFixed(2), inline: true },
     { name: 'Avg Assists', value: playerLastStats['Average Assists'].toFixed(2), inline: true },
-    { name: 'Avg Damages', value: playerLastStats['Average Damages'].toString(), inline: true },
-    { name: 'Avg ADR', value: playerLastStats['Average ADR'].toString(), inline: true },
-    { name: 'Avg Entries (WR)', value: `${playerLastStats['Average Entries']} (${playerLastStats['Average Entries WR']}%)`, inline: true },
+    { name: 'Avg Damages', value: playerLastStats['Average Damages']?.toString() ?? 'N/A', inline: true },
+    { name: 'Avg ADR', value: playerLastStats['Average ADR']?.toString() ?? 'N/A', inline: true },
+    { name: 'Avg Entries (WR)', value: entries, inline: true },
     { name: 'Red K/D', value: playerLastStats['Red K/D'].toString(), inline: true },
     { name: 'Orange K/D', value: playerLastStats['Orange K/D'].toString(), inline: true },
     { name: 'Green K/D', value: playerLastStats['Green K/D'].toString(), inline: true },
