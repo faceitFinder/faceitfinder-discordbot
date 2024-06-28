@@ -5,7 +5,7 @@
   "donate": "https://www.buymeacoffee.com/IDams",
   "github": "https://github.com/JustDams/faceitFinder",
   "prefix": ".ff",
-  "invite": "https://discord.com/oauth2/authorize?client_id=838088031222235197&permissions=275280873472&scope=bot%20applications.commands",
+  "invite": "https://discord.faceitfinder.app",
   "vote": "https://top.gg/bot/838088031222235197/vote",
   "join": "https://discord.gg/uPAdfvfuTP",
   "oauth2": "https://faceitfinder.app/api/auth/discord/login",
