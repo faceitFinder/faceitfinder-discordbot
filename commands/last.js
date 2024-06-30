@@ -52,7 +52,8 @@ const getMatchItems = async (interaction, playerDatas, steamDatas, playerHistory
         card.addFields({ name: 'round', value: `${i + 1}/${matchStats.length}` })
 
       mapThumbnail = `./images/maps/${mapName}.jpg`
-      const entriesWR = Math.ceil((roundStats.i22 / roundStats.i21) * 100).toFixed(0)
+      let entriesWR = Math.ceil((roundStats.i22 / roundStats.i21) * 100).toFixed(0)
+      entriesWR = isNaN(entriesWR) ? 0 : entriesWR
       const entries = roundStats.i21 ? `${roundStats.i21} (${entriesWR}%)` : 'N/A'
 
       card.setAuthor({ name: playerDatas.nickname, iconURL: playerDatas.avatar || null, url: `https://www.faceit.com/en/players/${playerDatas.nickname}` })
