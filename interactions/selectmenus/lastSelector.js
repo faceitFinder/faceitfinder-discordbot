@@ -39,8 +39,6 @@ module.exports = {
         values.matchId,
         values.currentPage,
         values.map,
-        'lastSelector',
-        'pageLast',
         values.maxMatch,
         values.game
       )

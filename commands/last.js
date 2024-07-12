@@ -1,4 +1,4 @@
-const { color, emojis } = require('../config.json')
+const { color, emojis, defaultGame } = require('../config.json')
 const Discord = require('discord.js')
 const fs = require('fs')
 const Graph = require('../functions/graph')
@@ -8,8 +8,9 @@ const { getCardsConditions } = require('../functions/commands')
 const { getPagination, getPageSlice, getMaxPage } = require('../functions/pagination')
 const { getMapOption } = require('../functions/map')
 const { getTranslations, getTranslation } = require('../languages/setup')
-const { getStats } = require('../functions/apiHandler')
+const { getStats, getMatchStats } = require('../functions/apiHandler')
 const { generateOption, getInteractionOption, getGameOption } = require('../functions/utility')
+const { buildButtons } = require('../functions/customType')
 
 const getLevelFromElo = (elo, game) => {
   const colorLevel = Object.entries(color.levels[game]).filter(e => {
@@ -89,21 +90,53 @@ const getMatchItems = async (interaction, playerDatas, steamDatas, playerHistory
   }
 }
 
+const getPlayersComponents = async (interaction, matchId, playerHistory, selectedUser, game = defaultGame) => {
+  const selectedMatch = playerHistory.filter(e => e.matchId === matchId).at(0)
+  const selectedMatchStats = await getMatchStats(selectedMatch.matchId)
+  const selectedRound = selectedMatchStats.at(0)
+  const alliesTypes = selectedRound.teams.find(e => e.teamId === selectedMatch.teamId).players.map(e => {
+    return {
+      name: e.nickname,
+      emoji: null,
+      style: Discord.ButtonStyle.Success,
+      playerId: e.playerId,
+    }
+  })
+  const enemiesTypes = selectedRound.teams.find(e => e.teamId !== selectedMatch.teamId).players.map(e => {
+    return {
+      name: e.nickname,
+      emoji: null,
+      style: Discord.ButtonStyle.Danger,
+      playerId: e.playerId,
+    }
+  })
+  const components = []
+  const teamsTypes = [alliesTypes, enemiesTypes]
+
+  await Promise.all(teamsTypes.map(async e => await buildButtons(
+    interaction,
+    { userId: interaction.user.id, id: 'uLPS', game, selectedMatchStats, matchId },
+    e,
+    e.find(e => e.playerId === selectedUser)))).then(e => e.forEach(e => components.push(new Discord.ActionRowBuilder().addComponents(...e))))
+
+  return components
+}
+
 const sendCardWithInfo = async (
   interaction,
   playerParam,
   matchId = null,
   page = 0,
   mapName = null,
-  lastSelectorId = 'lastSelector',
-  pageId = 'pageLast',
   maxMatch = null,
   game = null,
   previousValues = {}
 ) => {
+  const lastSelectorId = 'lastSelector', pageId = 'pageLast'
   const map = getInteractionOption(interaction, 'map')
   game ??= getGameOption(interaction)
   maxMatch = getInteractionOption(interaction, 'match_number') ?? maxMatch ?? 25
+
   if (map) mapName = map
   mapName ??= ''
 
@@ -128,7 +161,7 @@ const sendCardWithInfo = async (
     playerName: playerDatas.nickname,
   }), interaction.locale)
 
-  return getLastCard({
+  const lastCard = await getLastCard({
     interaction,
     mapName,
     maxMatch: maxMatch ?? playerLastStats.games,
@@ -142,6 +175,10 @@ const sendCardWithInfo = async (
     game,
     previousValues
   })
+  const playersComponents = await getPlayersComponents(interaction, lastCard.matchId, playerHistory, playerDatas.player_id, game)
+  lastCard.components.push(...playersComponents)
+
+  return lastCard
 }
 
 const getLastCard = async ({
@@ -216,6 +253,7 @@ const getLastCard = async ({
   return {
     ...matchItems,
     components,
+    matchId
   }
 }
 
@@ -256,3 +294,4 @@ module.exports = {
 module.exports.sendCardWithInfo = sendCardWithInfo
 module.exports.getMatchItems = getMatchItems
 module.exports.getLastCard = getLastCard
+module.exports.getPlayersComponents = getPlayersComponents

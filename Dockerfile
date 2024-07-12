@@ -4,8 +4,6 @@ ARG APP=/usr/src/app
 
 ENV NODE_ENV=
 ENV TOKEN=
-ENV FACEIT_TOKEN=
-ENV STEAM_TOKEN=
 ENV TOPGG_TOKEN=
 
 RUN apt-get update && apt-get install -y \

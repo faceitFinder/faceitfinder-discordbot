@@ -25,8 +25,6 @@ module.exports = {
       null,
       json.targetPage,
       json.map,
-      'lastSelector',
-      'pageLast',
       json.maxMatch,
       json.game
     )
