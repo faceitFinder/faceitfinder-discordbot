@@ -11,6 +11,7 @@
   "oauth2": "https://faceitfinder.app/api/auth/discord/login",
   "unlinkVerified": "https://faceitfinder.app/profile/settings",
   "logChannel": "1120786737636048976",
+  "logGuild": "882210656328228895",
   "itemByPage": 25,
   "color": {
     "primary": "#14578c",

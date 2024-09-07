@@ -246,14 +246,21 @@ module.exports = {
     if (!playerParam) return errorCard('error.command.faceitDatasNotFound', interaction.locale)
 
     const playerAimed = playerParam.playerDatas.player_id
+    const searchForCurrentUser = currentPlayer ? currentPlayer.faceitId !== playerAimed : false
     let teamIncluded, faceitIncluded, steamIncluded
 
     teamIncluded = await Promise.all((await getUsers(interaction, 5, null, null, true, false))
       .map(async e => e.param))
-    faceitIncluded = (await getUsers(interaction, 5 - teamIncluded.length, null, 'faceit_parameters', false, false))
+    faceitIncluded = (await getUsers(interaction, 5 - teamIncluded.length, null, 'faceit_parameters', false, false).catch(() => []))
       .map(e => e.param)
-    steamIncluded = (await getUsers(interaction, 5 - faceitIncluded.length, 'steam_parameters', null, false, false))
+    steamIncluded = (await getUsers(interaction, 5 - faceitIncluded.length, 'steam_parameters', null, false, false).catch(() => []))
       .map(e => e.param)
+
+    // In case we don't have any parameters, we add the current user to the list if he's not the player aimed
+    if (!faceitIncluded.length && !steamIncluded.length && searchForCurrentUser) {
+      faceitIncluded = (await getUsers(interaction, 5, null, 'faceit_parameters', false, true)).map(e => e.param)
+      steamIncluded = (await getUsers(interaction, 5 - faceitIncluded.length, 'steam_parameters', null, true)).map(e => e.param)
+    }
 
     if (!teamIncluded.length && !faceitIncluded.length && !steamIncluded.length)
       throw getTranslation('error.command.atLeastOneParameter', interaction.locale, {
