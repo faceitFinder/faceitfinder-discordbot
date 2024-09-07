@@ -7,6 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
     "dev": "nodemon --trace-warnings bot.js",
+    "register-roles": "node ./scripts/register_roles.js",
+    "check-guild": "node ./scripts/check_guild.js",
     "lint": "eslint --ext .js .",
     "lint-and-fix": "eslint --fix --ext .js ."
   },
