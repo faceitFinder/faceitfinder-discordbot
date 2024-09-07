@@ -9,7 +9,7 @@ const { getInteractionOption } = require('../functions/utility')
 const sendCardWithInfo = async (interaction) => {
   const discordId = interaction.user.id
 
-  if (await User.getVerified(discordId)) {
+  if ((await User.getVerified(discordId)).length) {
     return errorCard(getTranslation('error.user.unlink.verified', interaction.locale))
   }
 
