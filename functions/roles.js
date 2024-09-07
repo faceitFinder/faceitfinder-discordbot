@@ -1,7 +1,9 @@
-const { defaultGame } = require('../config.json')
+const { defaultGame, logChannel, logGuild } = require('../config.json')
 const GuildCustomRole = require('../database/guildCustomRole')
 const User = require('../database/user')
 const { getStats } = require('./apiHandler')
+
+const REMOVE = 'REMOVE', ADD = 'ADD'
 
 const getRoleIds = (guildRoles) => Object.keys(Object.entries(guildRoles)[2][1])
   .filter(e => e.startsWith('level')).map(e => guildRoles[e])
@@ -38,12 +40,21 @@ const setupRoles = async (client, user, guildId, remove) => {
     if (user.nickname) await member.edit({ nick: playerDatas.nickname }).catch(() => null)
 
     roles.forEach(async (role) => {
-      const removeRole = remove || playerElo < role.eloMin || playerElo > role.eloMax
+      const removeRole =  playerElo < role.eloMin || playerElo > role.eloMax
       const roleId = role.roleId
       const rolesFit = member.roles.resolve(roleId)
 
-      if (removeRole || !rolesFit) await member.roles.remove(roleId).catch((err) => handleRoleErrors(err, role))
-      if (!removeRole && !rolesFit) await member.roles.add(roleId).catch((err) => handleRoleErrors(err, role))
+      // Remove role if it doesn't fit the criteria and the role is assigned or if the remove flag is set
+      if ((removeRole && rolesFit) || remove)
+        await member.roles.remove(roleId)
+          .then(e => logRoleUpdate(client, member, role, guildDatas, playerElo, REMOVE))
+          .catch((err) => handleRoleErrors(err, role))
+
+      // Add role if it fits the criteria and the role isn't already assigned
+      if (!removeRole && !rolesFit)
+        await member.roles.add(roleId)
+          .then(e => logRoleUpdate(client, member, role, guildDatas, playerElo, ADD))
+          .catch((err) => handleRoleErrors(err, role))
     })
   })
 }
@@ -67,6 +78,25 @@ const updateRoles = async (client, discordId, guildId, remove = false) => {
 
 const handleRoleErrors = (err, role) => {
   if (err.status === '404') GuildCustomRole.remove(role.guildId, role.roleId)
+}
+
+const logRoleUpdate = (client, member, role, guildDatas, playerElo, action) => {
+  console.log(role)
+  client.guilds.fetch(logGuild)
+    .then(guild => guild.channels.fetch(logChannel))
+    .then(channel => channel.send({
+      content: `
+\`\`\`js
+Guild: ${guildDatas.name} (${guildDatas.id})
+User: ${member.user.tag} (${member.user.id})
+Date: ${new Date().toLocaleString('fr-FR', { timeZone: 'Europe/Paris', timeStyle: 'short', dateStyle: 'long' })}
+Role: ${role.roleId} - Elo: ${role.eloMin} - ${role.eloMax}
+Elo: ${playerElo}
+Action: ${action}
+\`\`\`
+      `,
+    }))
+    .catch(console.error)
 }
 
 module.exports = {

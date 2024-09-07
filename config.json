@@ -10,7 +10,8 @@
   "join": "https://discord.gg/uPAdfvfuTP",
   "oauth2": "https://faceitfinder.app/api/auth/discord/login",
   "unlinkVerified": "https://faceitfinder.app/profile/settings",
-  "logChannel": "1120786737636048976",
+  "logChannel": "1148676898180841604",
+  "logGuild": "882210656328228895",
   "itemByPage": 25,
   "color": {
     "primary": "#14578c",
