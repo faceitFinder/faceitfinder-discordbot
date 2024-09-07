@@ -65,7 +65,7 @@ const updateRoles = async (client, discordId, guildId, remove = false) => {
   if (discordId) {
     user = [await User.get(discordId)].flat()
     if (user.length > 1) user = user.filter(e => e.guildId === guildId)
-    guildId = user.at(0).guildId
+    guildId = user.at(0)?.guildId
   }
 
   if (guildId) guilds = [guildId].flat()
