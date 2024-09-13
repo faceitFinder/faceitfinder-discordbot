@@ -2,7 +2,8 @@ const DateStats = require('../functions/dateStats')
 const { getCardsConditions } = require('../functions/commands')
 const Options = require('../templates/options')
 const { getTranslation, getTranslations } = require('../languages/setup')
-const { getGameOption } = require('../functions/utility')
+const { getGameOption, getInteractionOption } = require('../functions/utility')
+const { getMapOption } = require('../functions/map')
 
 const getMonday = date => {
   const week = [6, 0, 1, 2, 3, 4, 5]
@@ -26,8 +27,9 @@ const formatLabel = (from, to, locale) => {
   return [new Date(from).toDateString(), '-', new Date(new Date(to).setHours(-24)).toDateString()].join(' ')
 }
 
-const sendCardWithInfo = async (interaction, playerParam, page = 0, game = null, type = null, defaultOption = 0) => {
+const sendCardWithInfo = async (interaction, playerParam, page = 0, game = null, type = null, defaultOption = 0, map = null) => {
   game ??= getGameOption(interaction)
+  map ??= getInteractionOption(interaction, 'map') ?? ''
 
   return DateStats.generateDatasForCard({
     interaction,
@@ -39,16 +41,20 @@ const sendCardWithInfo = async (interaction, playerParam, page = 0, game = null,
     formatLabel,
     selectTranslationString: 'strings.selectWeek',
     type,
-    defaultOption
+    defaultOption,
+    map
   })
 }
 
 module.exports = {
   name: 'weekstats',
-  options: Options.stats,
+  options: [
+    ...Options.stats,
+    getMapOption()
+  ],
   description: getTranslation('command.weekstats.description', 'en-US'),
   descriptionLocalizations: getTranslations('command.weekstats.description'),
-  usage: Options.usage,
+  usage: `${Options.usage} <map>`,
   example: 'steam_parameters: justdams',
   type: 'stats',
   async execute(interaction) {
