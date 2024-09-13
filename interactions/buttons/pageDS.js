@@ -33,7 +33,9 @@ module.exports = {
         { param: json.playerId, faceitId: true },
         json.targetPage,
         json.game,
-        json.chartType
+        json.chartTypen,
+        0,
+        json.map
       )
   }
 }

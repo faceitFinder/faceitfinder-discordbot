@@ -16,7 +16,7 @@ axios.put(url, body, {
     Authorization: `Bot ${process.env.TOKEN}`,
   },
 }).then((res) => {
-  console.log(res.data)
+  console.info(res.data)
 }).catch((err) => {
   console.error(err)
 })

@@ -13,7 +13,7 @@ client.on('ready', async () => {
   const guild = await client.guilds.fetch(guildId)
 
   if (!guild) return
-  console.log('Guild found:', guild.name)
+  console.info('Guild found:', guild.name)
 
   await updateRoles(client, null, guildId)
 })
