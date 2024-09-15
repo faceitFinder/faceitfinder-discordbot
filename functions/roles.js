@@ -81,7 +81,6 @@ const handleRoleErrors = (err, role) => {
 }
 
 const logRoleUpdate = (client, member, role, guildDatas, playerElo, action) => {
-  console.log(role)
   client.guilds.fetch(logGuild)
     .then(guild => guild.channels.fetch(logChannel))
     .then(channel => channel.send({

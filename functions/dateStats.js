@@ -79,7 +79,7 @@ const getCardWithInfo = async ({
     name: 'From - To', value: [new Date(startDate).toDateString(), '\n', new Date(endDateToRealTimeStamp).toDateString()].join(' '),
     inline: !!map
   })
-  else head.push({ name: 'From', value: new Date(startDate).toDateString(), inline: false })
+  else head.push({ name: 'From', value: new Date(startDate).toDateString(), inline: !!map })
   if (map) head.push({ name: 'Map', value: map, inline: true }, { name: '\u200b', value: '\u200b', inline: true })
 
   const card = new Discord.EmbedBuilder()
@@ -120,7 +120,8 @@ const generateDatasForCard = async ({
   formatLabel,
   selectTranslationString,
   type,
-  defaultOption = 0
+  defaultOption = 0,
+  map = ''
 }) => {
   type ??= CustomType.TYPES.ELO
 
@@ -130,7 +131,8 @@ const generateDatasForCard = async ({
   } = await getStats({
     playerParam,
     matchNumber: 0,
-    game
+    game,
+    map
   })
 
   if (!playerHistory.length) throw getTranslation('error.user.noMatches', interaction.locale, {
@@ -141,7 +143,6 @@ const generateDatasForCard = async ({
   const optionsValues = []
   const dates = await getDates(playerHistory, functionToGetDates)
   const maxMatch = 0
-  const map = ''
 
   dates.forEach(date => {
     const {

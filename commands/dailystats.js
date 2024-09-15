@@ -2,7 +2,8 @@ const DateStats = require('../functions/dateStats')
 const { getCardsConditions } = require('../functions/commands')
 const Options = require('../templates/options')
 const { getTranslations, getTranslation } = require('../languages/setup')
-const { getGameOption } = require('../functions/utility')
+const { getGameOption, getInteractionOption } = require('../functions/utility')
+const { getMapOption } = require('../functions/map')
 
 const getDay = date => {
   date = new Date(date)
@@ -24,8 +25,9 @@ const formatLabel = (from, to) => {
   return new Date(from).toDateString()
 }
 
-const sendCardWithInfo = async (interaction, playerParam, page = 0, game = null, type = null, defaultOption = 0) => {
+const sendCardWithInfo = async (interaction, playerParam, page = 0, game = null, type = null, defaultOption = 0, map = null) => {
   game ??= getGameOption(interaction)
+  map ??= getInteractionOption(interaction, 'map') ?? ''
 
   return DateStats.generateDatasForCard({
     interaction,
@@ -37,16 +39,20 @@ const sendCardWithInfo = async (interaction, playerParam, page = 0, game = null,
     formatLabel,
     selectTranslationString: 'strings.selectDate',
     type,
-    defaultOption
+    defaultOption,
+    map
   })
 }
 
 module.exports = {
   name: 'dailystats',
-  options: Options.stats,
+  options: [
+    ...Options.stats,
+    getMapOption()
+  ],
   description: getTranslation('command.dailystats.description', 'en-US'),
   descriptionLocalizations: getTranslations('command.dailystats.description'),
-  usage: Options.usage,
+  usage: `${Options.usage} <map>`,
   example: 'steam_parameters: justdams',
   type: 'stats',
   async execute(interaction) {
