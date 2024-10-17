@@ -24,8 +24,6 @@ const getAll = () => GuildCustomRole.find({}).exec()
 
 const getOne = (guildId, roleId) => GuildCustomRole.findOne({ guildId: guildId, roleId: roleId }).exec()
 
-const getOneWithElo = (guildId, roleId, eloMin, eloMax) => GuildCustomRole.findOne({ guildId, roleId, eloMin, eloMax }).exec()
-
 const getRolesOf = (guildId) => GuildCustomRole.find({ guildId: guildId }).exec()
 
 module.exports = {
@@ -34,6 +32,5 @@ module.exports = {
   getOne,
   getAll,
   getRolesOf,
-  removeAll,
-  getOneWithElo
+  removeAll
 }
