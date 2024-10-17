@@ -275,6 +275,7 @@ module.exports = {
       descriptionLocalizations: getTranslations('options.setupEloRoles'),
       type: Discord.ApplicationCommandOptionType.Subcommand,
       slash: true,
+      premium: true,
       options: [
         {
           name: 'role_name',

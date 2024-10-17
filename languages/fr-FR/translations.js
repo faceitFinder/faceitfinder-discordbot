@@ -123,6 +123,7 @@ base.strings.donate = 'Soutenir le projet';
 base.strings.fullHistory = 'Historique complet';
 base.strings.verifyDescription = `Hey {discord}, afin de vérifier ton compte faceit cliques sur le lien ci-dessous !\n${oauth2}\nUne fois ton compte vérifié, tu pourras obtenir le rôle lié, et plus encore !`;
 base.strings.verify = 'Vérification';
+base.strings.premiumDesc = 'Cette fonctionnalité est réservée aux guildes premium. Afin de profiter de cette fonctionnalité, fais évoluer ta guilde en premium en cliquant sur le bouton ci-dessous !';
 base.error.user.missing = 'Il semblerait qu\'un des utilisateurs soit introuvable.';
 base.error.user.compareSame = 'Vous ne pouvez pas comparer le même utilisateur.';
 base.error.user.excluded = 'Vous ne pouvez pas exclure un utilisateur que vous avez déjà inclus.';

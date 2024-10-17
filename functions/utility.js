@@ -1,6 +1,6 @@
 const { emojis, defaultGame } = require('../config')
 const Interaction = require('../database/interaction')
-const { StringSelectMenuOptionBuilder, StringSelectMenuComponent } = require('discord.js')
+const { StringSelectMenuOptionBuilder, StringSelectMenuComponent, EntitlementManager } = require('discord.js')
 
 const generateOption = async (interaction, { values, label, description, emoji = null, defaultOption = false }) => {
   const customId = (await Interaction.create(Object.assign({}, values, {
@@ -54,6 +54,12 @@ const getCurrentEloString = (playerLastStats) => {
   return `${playerLastStats['Current Elo']} (-${playerLastStats.eloToPrev}/+${playerLastStats.eloToNext})`
 }
 
+const getActiveGuildsEntitlements = async (client) => {
+  const entitlements = await new EntitlementManager(client).fetch()
+  const activeGuildEntitlements = entitlements.filter(e => e.isActive() && e.isGuildSubscription())
+  return activeGuildEntitlements
+}
+
 module.exports = {
   generateOption,
   updateDefaultOption,
@@ -61,5 +67,6 @@ module.exports = {
   isInteractionSubcommandEqual,
   getInteractionOption,
   getGameOption,
-  getCurrentEloString
+  getCurrentEloString,
+  getActiveGuildsEntitlements
 }

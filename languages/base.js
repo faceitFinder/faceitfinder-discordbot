@@ -159,6 +159,7 @@ module.exports = {
     fullHistory: '',
     verifyDescription: '',
     verify: '',
+    premiumDesc: '',
   },
   error: {
     user: {

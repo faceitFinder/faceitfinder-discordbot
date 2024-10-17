@@ -2,6 +2,7 @@ const { defaultGame, logChannel, logGuild } = require('../config.json')
 const GuildCustomRole = require('../database/guildCustomRole')
 const User = require('../database/user')
 const { getStats } = require('./apiHandler')
+const { getActiveGuildsEntitlements } = require('./utility')
 
 const REMOVE = 'REMOVE', ADD = 'ADD'
 
@@ -40,9 +41,9 @@ const setupRoles = async (client, user, guildId, remove) => {
     if (user.nickname) await member.edit({ nick: playerDatas.nickname }).catch(() => null)
 
     roles.forEach(async (role) => {
-      const removeRole =  playerElo < role.eloMin || playerElo > role.eloMax
+      const removeRole = playerElo < role.eloMin || playerElo > role.eloMax
       const roleId = role.roleId
-      const rolesFit = member.roles.resolve(roleId)
+      const rolesFit = !!member.roles.resolve(roleId)
 
       // Remove role if it doesn't fit the criteria and the role is assigned or if the remove flag is set
       if ((removeRole && rolesFit) || remove)
@@ -98,7 +99,13 @@ Action: ${action}
     .catch(console.error)
 }
 
+const updateSubscribedGuilds = async (client) => {
+  const activeGuildEntitlements = await getActiveGuildsEntitlements(client)
+  updateRoles(client, null, activeGuildEntitlements.map(e => e.guildId))
+}
+
 module.exports = {
   updateRoles,
-  getRoleIds
+  getRoleIds,
+  updateSubscribedGuilds,
 }
