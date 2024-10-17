@@ -75,7 +75,7 @@ module.exports = {
      */
     setInterval(() => {
       updateSubscribedGuilds(client)
-    }, 1000 * 60 * 60 * 24) // 24 hours
+    }, 1000 * 60 * 60)
 
     /**
      * Update the guild count
