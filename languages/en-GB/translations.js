@@ -123,6 +123,7 @@ base.strings.donate = 'Support the project'
 base.strings.fullHistory = 'Full history'
 base.strings.verifyDescription = `Hey {discord}, to verify your faceit account click on the link below!\n${oauth2}\nOnce you have verified your account, you will be able to get the linked role, and more !`
 base.strings.verify = 'Verification'
+base.strings.premiumDesc = 'This feature is only available for premium guilds. Become a premium guild by clicking on the button below'
 base.error.user.missing = 'It seems like there is a user missing'
 base.error.user.compareSame = 'You can\'t compare the same user'
 base.error.user.excluded = 'You can\'t exclude a player you are searching for'

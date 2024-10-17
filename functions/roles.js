@@ -1,12 +1,26 @@
-const { defaultGame, logChannel, logGuild } = require('../config.json')
+const { defaultGame, logChannel, logGuild, color } = require('../config.json')
 const GuildCustomRole = require('../database/guildCustomRole')
+const GuildRoles = require('../database/guildRoles')
 const User = require('../database/user')
 const { getStats } = require('./apiHandler')
+const { getActiveGuildsEntitlements } = require('./utility')
 
 const REMOVE = 'REMOVE', ADD = 'ADD'
 
 const getRoleIds = (guildRoles) => Object.keys(Object.entries(guildRoles)[2][1])
   .filter(e => e.startsWith('level')).map(e => guildRoles[e])
+
+const getCustomRoles = async (guildId) => {
+  const roleIds = getRoleIds(await GuildRoles.getRolesOf(guildId))
+  return Object.entries(color.levels[defaultGame]).map(([level, range], index) => {
+    return {
+      guildId: guildId,
+      roleId: roleIds[index],
+      eloMin: range.min,
+      eloMax: range.max
+    }
+  })
+}
 
 const setupRoles = async (client, user, guildId, remove) => {
   const guildDatas = await client.guilds.fetch(guildId)
@@ -15,7 +29,8 @@ const setupRoles = async (client, user, guildId, remove) => {
   if (user && user.length > 0) members = [await guildDatas.members.fetch({ user: user.at(0).discordId, cache: false }).catch(() => null)]
   else members = await guildDatas.members.fetch({ cache: false })
 
-  const roles = await GuildCustomRole.getRolesOf(guildDatas.id)
+  const activeGuildSubscriptions = await getActiveGuildsEntitlements(client)
+  const roles = activeGuildSubscriptions.has(guildDatas.id) ? await GuildCustomRole.getRolesOf(guildDatas.id) : await getCustomRoles(guildDatas.id)
 
   members?.forEach(async (member) => {
     if (!member?.user) return
@@ -40,9 +55,9 @@ const setupRoles = async (client, user, guildId, remove) => {
     if (user.nickname) await member.edit({ nick: playerDatas.nickname }).catch(() => null)
 
     roles.forEach(async (role) => {
-      const removeRole =  playerElo < role.eloMin || playerElo > role.eloMax
+      const removeRole = playerElo < role.eloMin || playerElo > role.eloMax
       const roleId = role.roleId
-      const rolesFit = member.roles.resolve(roleId)
+      const rolesFit = !!member.roles.resolve(roleId)
 
       // Remove role if it doesn't fit the criteria and the role is assigned or if the remove flag is set
       if ((removeRole && rolesFit) || remove)
@@ -98,7 +113,13 @@ Action: ${action}
     .catch(console.error)
 }
 
+const updateSubscribedGuilds = async (client) => {
+  const activeGuildEntitlements = await getActiveGuildsEntitlements(client)
+  updateRoles(client, null, activeGuildEntitlements.map(e => e.guildId))
+}
+
 module.exports = {
   updateRoles,
-  getRoleIds
+  getRoleIds,
+  updateSubscribedGuilds,
 }

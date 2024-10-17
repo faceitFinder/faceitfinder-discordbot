@@ -295,5 +295,8 @@
     "de_anubis": "Anubis"
   },
   "maxLengthTeamName": 14,
-  "defaultGame": "cs2"
+  "defaultGame": "cs2",
+  "skus": {
+    "guild": "1166703251610140712"
+  }
 }
