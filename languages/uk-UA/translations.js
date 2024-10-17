@@ -120,6 +120,7 @@ base.strings.pagination = {
 };
 base.strings.donate = 'Підтримайте проект';
 base.strings.fullHistory = 'Повна історія';
+base.strings.premiumDesc = 'Ця функція доступна лише для преміум гільдій. Станьте преміум гільдією, натиснувши на кнопку нижче.';
 base.error.user.missing = 'Здається, відсутній користувач';
 base.error.user.compareSame = 'Ви не можете порівняти того самого користувача';
 base.error.user.excluded = 'Ви не можете виключити гравця, якого шукаєте';

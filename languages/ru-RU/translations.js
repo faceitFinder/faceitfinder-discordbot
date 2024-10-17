@@ -120,6 +120,7 @@ base.strings.pagination = {
 };
 base.strings.donate = 'Поддержать проект';
 base.strings.fullHistory = 'Полная история';
+base.error.user.noParameters = 'Эта функция доступна только для премиум-гильдий. Станьте премиум-гильдией, нажав на кнопку ниже.';
 base.error.user.missing = 'Похоже, что один или несколько пользователей отсутствуют';
 base.error.user.compareSame = 'Вы не можете сравнить одного и того же пользователя';
 base.error.user.excluded = 'Вы не можете исключить игрока, которого ищете';
