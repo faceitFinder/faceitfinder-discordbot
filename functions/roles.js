@@ -11,7 +11,11 @@ const getRoleIds = (guildRoles) => Object.keys(Object.entries(guildRoles)[2][1])
   .filter(e => e.startsWith('level')).map(e => guildRoles[e])
 
 const getCustomRoles = async (guildId) => {
-  const roleIds = getRoleIds(await GuildRoles.getRolesOf(guildId))
+  const roles = await GuildRoles.get(guildId)
+
+  if (!roles) return
+
+  const roleIds = getRoleIds(roles)
   return Object.entries(color.levels[defaultGame]).map(([level, range], index) => {
     return {
       guildId: guildId,
@@ -31,6 +35,8 @@ const setupRoles = async (client, user, guildId, remove) => {
 
   const activeGuildSubscriptions = await getActiveGuildsEntitlements(client)
   const roles = activeGuildSubscriptions.has(guildDatas.id) ? await GuildCustomRole.getRolesOf(guildDatas.id) : await getCustomRoles(guildDatas.id)
+
+  if (!roles) return
 
   members?.forEach(async (member) => {
     if (!member?.user) return
