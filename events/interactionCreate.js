@@ -6,7 +6,7 @@ const { getTranslation } = require('../languages/setup')
 const errorHandler = require('../functions/error')
 const Interaction = require('../database/interaction')
 const { updateCard } = require('../templates/loadingCard')
-const { getActiveGuildsEntitlements } = require('../functions/utility')
+const { currentGuildIsPremium } = require('../functions/utility')
 const premiumCard = require('../templates/premiumCard')
 const { creator } = require('../config')
 
@@ -34,6 +34,8 @@ const expiredInteraction = (interaction) => {
 module.exports = {
   name: 'interactionCreate',
   async execute(interaction) {
+    if (!!parseInt(process.env.TEST) && interaction.user.id !== creator) return
+
     /**
      * Checking if the user is temporary banned
      * when the interaction is command or context menu
@@ -148,13 +150,13 @@ module.exports = {
      */
     else if (interaction.client.commands.has(interaction.commandName)) {
       const command = interaction.client.commands.get(interaction.commandName)
-      const premiumGuilds = await getActiveGuildsEntitlements(interaction.client)
       const currentSubCommand = command.options
         .filter(option =>
           option.type === ApplicationCommandOptionType.Subcommand && option.premium && option.name === interaction.options.getSubcommand()
         )
+      const isPremium = await currentGuildIsPremium(interaction.client, interaction.guildId)
 
-      if (currentSubCommand.length > 0 && !premiumGuilds.has(interaction.guildId)) {
+      if (currentSubCommand.length > 0 && !isPremium) {
         interaction.deferReply({ ephemeral: true })
           .then(() => {
             interaction.followUp({

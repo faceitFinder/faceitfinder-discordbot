@@ -3,7 +3,7 @@ const GuildCustomRole = require('../database/guildCustomRole')
 const GuildRoles = require('../database/guildRoles')
 const User = require('../database/user')
 const { getStats } = require('./apiHandler')
-const { getActiveGuildsEntitlements } = require('./utility')
+const { getActiveGuildsEntitlements, currentGuildIsPremium } = require('./utility')
 
 const REMOVE = 'REMOVE', ADD = 'ADD'
 
@@ -32,8 +32,8 @@ const setupRoles = async (client, user, guildId, remove) => {
   if (user && user.length > 0) members = [await guildDatas.members.fetch({ user: user.at(0).discordId, cache: false }).catch(() => null)]
   else members = await guildDatas.members.fetch({ cache: false })
 
-  const activeGuildSubscriptions = await getActiveGuildsEntitlements(client)
-  const roles = activeGuildSubscriptions.has(guildDatas.id) ? await GuildCustomRole.getRolesOf(guildDatas.id) : await getCustomRoles(guildDatas.id)
+  const isPremium = await currentGuildIsPremium(client, guildId)
+  const roles = isPremium ? await GuildCustomRole.getRolesOf(guildDatas.id) : await getCustomRoles(guildDatas.id)
   if (!roles) return
 
   members?.forEach(async (member) => {
