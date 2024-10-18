@@ -12,7 +12,6 @@ const getRoleIds = (guildRoles) => Object.keys(Object.entries(guildRoles)[2][1])
 
 const getCustomRoles = async (guildId) => {
   const roles = await GuildRoles.get(guildId)
-
   if (!roles) return
 
   const roleIds = getRoleIds(roles)
@@ -35,7 +34,6 @@ const setupRoles = async (client, user, guildId, remove) => {
 
   const activeGuildSubscriptions = await getActiveGuildsEntitlements(client)
   const roles = activeGuildSubscriptions.has(guildDatas.id) ? await GuildCustomRole.getRolesOf(guildDatas.id) : await getCustomRoles(guildDatas.id)
-
   if (!roles) return
 
   members?.forEach(async (member) => {
