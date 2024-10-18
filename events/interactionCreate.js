@@ -154,7 +154,7 @@ module.exports = {
         .deferReply({ ephemeral: command.ephemeral })
         .then(async () => {
           const premiumSubCommand = command.options
-              .filter(option => option.type === ApplicationCommandOptionType.Subcommand && option.premium && option.name === interaction.options.getSubcommand())
+            .filter(option => option.type === ApplicationCommandOptionType.Subcommand && option.premium && option.name === interaction.options.getSubcommand())
           const isPremium = await currentGuildIsPremium(interaction.client, interaction.guildId)
 
           if (premiumSubCommand.length > 0 && !isPremium) {
