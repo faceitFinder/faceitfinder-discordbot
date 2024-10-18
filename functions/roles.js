@@ -11,7 +11,7 @@ const getRoleIds = (guildRoles) => Object.keys(Object.entries(guildRoles)[2][1])
   .filter(e => e.startsWith('level')).map(e => guildRoles[e])
 
 const getCustomRoles = async (guildId) => {
-  const roles = await GuildRoles.get(guildId)
+  const roles = await GuildRoles.getRolesOf(guildId)
   if (!roles) return
 
   const roleIds = getRoleIds(roles)
