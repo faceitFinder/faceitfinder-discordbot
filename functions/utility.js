@@ -60,6 +60,12 @@ const getActiveGuildsEntitlements = async (client) => {
   return activeGuildEntitlements
 }
 
+const currentGuildIsPremium = async (client, guildId) => {
+  const premiumGuilds = await getActiveGuildsEntitlements(client)
+  const isPremium = premiumGuilds.map(g => g.guildId).includes(guildId)
+  return isPremium
+}  
+
 module.exports = {
   generateOption,
   updateDefaultOption,
@@ -68,5 +74,6 @@ module.exports = {
   getInteractionOption,
   getGameOption,
   getCurrentEloString,
-  getActiveGuildsEntitlements
+  getActiveGuildsEntitlements,
+  currentGuildIsPremium
 }
