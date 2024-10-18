@@ -157,13 +157,11 @@ module.exports = {
       if (currentSubCommand.length > 0 && !premiumGuilds.has(interaction.guildId)) {
         interaction.deferReply({ ephemeral: true })
           .then(() => {
-            interaction.channel.send({
+            interaction.followUp({
               content: ' ',
               ...premiumCard(interaction.locale),
-            })
-              .catch((error) => errorHandler(interaction, error))
-          })
-          .catch((error) => errorHandler(interaction, error))
+            }).catch((error) => errorHandler(interaction, error))
+          }).catch((error) => errorHandler(interaction, error))
       } else {
         interaction
           .deferReply({ ephemeral: command.ephemeral })
