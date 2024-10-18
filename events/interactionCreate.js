@@ -155,34 +155,37 @@ module.exports = {
         .then(async () => {
           const premiumSubCommand = command.options
             .filter(option => option.type === ApplicationCommandOptionType.Subcommand && option.premium && option.name === interaction.options.getSubcommand())
-          const isPremium = await currentGuildIsPremium(interaction.client, interaction.guildId)
 
-          if (premiumSubCommand.length > 0 && !isPremium) {
-            interaction.followUp({
-              ephemeral: true,
-              content: ' ',
-              ...premiumCard(interaction.locale),
-            }).catch((error) => errorHandler(interaction, error))
-          } else {
-            CommandsStats.create(interaction.commandName, 'command', interaction)
-            command?.execute(interaction)
-              .then(resp => {
-                if (Array.isArray(resp)) {
-                  resp
-                    .forEach(r => interaction
-                      .followUp(r)
-                      .catch((error) => errorHandler(interaction, error)))
-                } else {
-                  interaction
-                    .followUp(resp)
-                    .catch((error) => errorHandler(interaction, error))
-                }
-              })
-              .catch(err => {
-                console.error(err)
-                errorInteraction(interaction, err, getTranslation('error.execution.command', interaction.locale))
-              })
+          if (premiumSubCommand.length > 0) {
+            const isPremium = await currentGuildIsPremium(interaction.client, interaction.guildId)
+            if (!isPremium) {
+              interaction.followUp({
+                ephemeral: true,
+                content: ' ',
+                ...premiumCard(interaction.locale),
+              }).catch((error) => errorHandler(interaction, error))
+              return
+            }
           }
+          
+          CommandsStats.create(interaction.commandName, 'command', interaction)
+          command?.execute(interaction)
+            .then(resp => {
+              if (Array.isArray(resp)) {
+                resp
+                  .forEach(r => interaction
+                    .followUp(r)
+                    .catch((error) => errorHandler(interaction, error)))
+              } else {
+                interaction
+                  .followUp(resp)
+                  .catch((error) => errorHandler(interaction, error))
+              }
+            })
+            .catch(err => {
+              console.error(err)
+              errorInteraction(interaction, err, getTranslation('error.execution.command', interaction.locale))
+            })
         })
         .catch((error) => errorHandler(interaction, error))
     }
