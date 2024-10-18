@@ -26,7 +26,9 @@ const getCustomRoles = async (guildId) => {
 }
 
 const setupRoles = async (client, user, guildId, remove) => {
-  const guildDatas = await client.guilds.fetch(guildId)
+  const guildDatas = await client.guilds.fetch(guildId).catch(() => null)
+  if (!guildDatas) return
+
   let members
 
   if (user && user.length > 0) members = [await guildDatas.members.fetch({ user: user.at(0).discordId, cache: false }).catch(() => null)]
@@ -118,7 +120,7 @@ Action: ${action}
 }
 
 const updateSubscribedGuilds = async (client) => {
-  const activeGuildEntitlements = await getActiveGuildsEntitlements(client)
+  const activeGuildEntitlements = await getActiveGuildsEntitlements(client, true)
   updateRoles(client, null, activeGuildEntitlements.map(e => e.guildId))
 }
 

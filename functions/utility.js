@@ -54,9 +54,9 @@ const getCurrentEloString = (playerLastStats) => {
   return `${playerLastStats['Current Elo']} (-${playerLastStats.eloToPrev}/+${playerLastStats.eloToNext})`
 }
 
-const getActiveGuildsEntitlements = async (client) => {
-  const entitlements = await new EntitlementManager(client).fetch()
-  const activeGuildEntitlements = entitlements.filter(e => e.isActive() && e.isGuildSubscription())
+const getActiveGuildsEntitlements = async (client, renewCache = false) => {
+  if (renewCache) client.entitlements = await new EntitlementManager(client).fetch()
+  const activeGuildEntitlements = client.entitlements.filter(e => e.isActive() && e.isGuildSubscription())
   return activeGuildEntitlements
 }
 
@@ -64,7 +64,7 @@ const currentGuildIsPremium = async (client, guildId) => {
   const premiumGuilds = await getActiveGuildsEntitlements(client)
   const isPremium = premiumGuilds.map(g => g.guildId).includes(guildId)
   return isPremium
-}  
+}
 
 module.exports = {
   generateOption,
