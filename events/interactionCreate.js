@@ -150,24 +150,20 @@ module.exports = {
      */
     else if (interaction.client.commands.has(interaction.commandName)) {
       const command = interaction.client.commands.get(interaction.commandName)
-      const currentSubCommand = command.options
-        .filter(option =>
-          option.type === ApplicationCommandOptionType.Subcommand && option.premium && option.name === interaction.options.getSubcommand()
-        )
-      const isPremium = await currentGuildIsPremium(interaction.client, interaction.guildId)
+      interaction
+        .deferReply({ ephemeral: command.ephemeral })
+        .then(async () => {
+          const premiumSubCommand = command.options
+            .filter(option => option.type === ApplicationCommandOptionType.Subcommand && option.premium && option.name === interaction.options.getSubcommand())
+          const isPremium = await currentGuildIsPremium(interaction.client, interaction.guildId)
 
-      if (currentSubCommand.length > 0 && !isPremium) {
-        interaction.deferReply({ ephemeral: true })
-          .then(() => {
+          if (premiumSubCommand.length > 0 && !isPremium) {
             interaction.followUp({
+              ephemeral: true,
               content: ' ',
               ...premiumCard(interaction.locale),
             }).catch((error) => errorHandler(interaction, error))
-          }).catch((error) => errorHandler(interaction, error))
-      } else {
-        interaction
-          .deferReply({ ephemeral: command.ephemeral })
-          .then(() => {
+          } else {
             CommandsStats.create(interaction.commandName, 'command', interaction)
             command?.execute(interaction)
               .then(resp => {
@@ -186,9 +182,9 @@ module.exports = {
                 console.error(err)
                 errorInteraction(interaction, err, getTranslation('error.execution.command', interaction.locale))
               })
-          })
-          .catch((error) => errorHandler(interaction, error))
-      }
+          }
+        })
+        .catch((error) => errorHandler(interaction, error))
     }
   }
 }
