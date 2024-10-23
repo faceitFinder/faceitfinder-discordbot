@@ -22,7 +22,6 @@ const PORT = process.env.EXPRESS_PORT || 3001
 app.put('/users/:id/roles', async (req, res) => {
   const { id } = req.params
   const { remove } = req.query
-  console.log(remove)
   await updateRoles(client, id, null, remove === 'true')
 
   res.status(200).send()
