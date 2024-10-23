@@ -11,6 +11,8 @@ services:
       - ./node_modules:/usr/src/app/node_modules
     environment:
       - NODE_ENV=dev
+    ports:
+      - '3001:3001'
     env_file:
       - .env
     networks:
