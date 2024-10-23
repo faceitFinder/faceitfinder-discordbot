@@ -71,8 +71,8 @@ const setupRoles = async (client, user, guildId, remove) => {
           .then(e => logRoleUpdate(client, member, role, guildDatas, playerElo, REMOVE))
           .catch((err) => handleRoleErrors(err, role))
 
-      // Add role if it fits the criteria and the role isn't already assigned
-      if (!removeRole && !rolesFit)
+      // Add role if it fits the criteria and the role isn't already assigned and the remove flag isn't set
+      if ((!removeRole && !rolesFit) && !remove)
         await member.roles.add(roleId)
           .then(e => logRoleUpdate(client, member, role, guildDatas, playerElo, ADD))
           .catch((err) => handleRoleErrors(err, role))
