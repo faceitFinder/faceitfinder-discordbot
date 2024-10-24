@@ -46,7 +46,9 @@ const setupRoles = async (client, user, guildId, remove) => {
     else if (user.length > 1) user = user.filter(e => e.guildId === guildDatas.id)
 
     user = user.flat().at(0)
-
+    
+    if (!user || !user.faceitId) return
+    
     const playerParam = { param: user.faceitId, faceitId: true }
     const stats = await getStats({ playerParam, game: defaultGame, matchNumber: 1 }).catch(() => null)
 
