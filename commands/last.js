@@ -73,14 +73,14 @@ const getMatchItems = async (interaction, playerDatas, steamDatas, playerHistory
           // { name: 'Entries (WR)', value: entries, inline: true },
         )
         .setThumbnail(`attachment://${faceitElo}${i}.png`)
-        .setImage(`attachment://${mapName}.jpg`)
+        .setImage(`attachment://${mapName}${i}.jpg`)
         .setColor(result ? color.won : color.lost)
-        .setFooter({ text: `Steam: ${steamDatas?.personaname || steamDatas}`, iconURL: 'attachment://game.png' })
+        .setFooter({ text: `Steam: ${steamDatas?.personaname || steamDatas}`, iconURL: `attachment://game${i}.png` })
 
       if (fs.existsSync(mapThumbnail))
         filesAtt.push(
-          new Discord.AttachmentBuilder(mapThumbnail, { name: `${mapName}.jpg` }),
-          new Discord.AttachmentBuilder(`images/${game}.png`, { name: 'game.png' })
+          new Discord.AttachmentBuilder(mapThumbnail, { name: `${mapName}${i}.jpg` }),
+          new Discord.AttachmentBuilder(`images/${game}.png`, { name: `game${i}.png` })
         )
 
       cards.push(card)
