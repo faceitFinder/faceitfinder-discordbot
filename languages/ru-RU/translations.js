@@ -77,7 +77,7 @@ base.strings.messageProcessing = 'Ваш запрос обрабатываетс
 base.strings.error = 'Ошибка';
 base.strings.info = 'Информация';
 base.strings.compare = 'Сравнение {playerName1} и {playerName2}';
-base.strings.matchPlayed = 'Сыграно {matchNumber} матчей';
+base.strings.matchPlayed = '{matchNumber} сыгранных матчей';
 base.strings.selectDate = 'Выберите дату';
 base.strings.helpInfo = 'Информация о команде **{command}** \n `<>` = Необязательно, `[]` = Обязательно, `{}` = Обязательно, если не привязан профиль';
 base.strings.noOptions = 'Эта команда не требует параметров';
