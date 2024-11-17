@@ -45,6 +45,7 @@ const buildEmbed = async (interaction, playerId, map, mode, game) => {
     playerName: playerDatas.nickname,
   }), interaction.locale)
 
+  const totalMatches = playerStats.segments.reduce((acc, e) => acc + parseInt(e.stats.Matches), 0)
   const cards = playerMapStats.map(m => {
     if (fs.existsSync(mapThumbnail)) filesAtt.push(new Discord.AttachmentBuilder(mapThumbnail, { name: `${map}.jpg` }))
 
@@ -55,8 +56,8 @@ const buildEmbed = async (interaction, playerId, map, mode, game) => {
       .addFields({ name: 'Map', value: map, inline: true },
         { name: 'Mode', value: mode, inline: true },
         { name: '\u200b', value: '\u200b', inline: true },
-        { name: 'Games', value: m.stats.Matches.toString(), inline: true },
-        { name: 'Winrate', value: `${parseFloat(m.stats['Win Rate %']).toFixed(2)}%`, inline: true },
+        { name: 'Games', value: `${m.stats.Matches} (${parseFloat(m.stats['Win Rate %']).toFixed(2)}% Win)`, inline: true },
+        { name: 'Play Rate', value: `${((m.stats.Matches / totalMatches) * 100).toFixed(2)}%`, inline: true },
         {
           name: 'Elo Gain',
           value: isNaN(playerLastStats.eloGain) ?
@@ -108,8 +109,9 @@ const sendCardWithInfo = async (interaction, playerParam, map = null, mode = nul
 
   const playerId = playerDatas.player_id
   let content = getTranslation('strings.selectMapDescription', interaction.locale, { playerName: playerDatas.nickname })
-
   let options = []
+  const totalMatches = playerStats.segments.reduce((acc, e) => acc + parseInt(e.stats.Matches), 0)
+
   await Promise.all(playerStats.segments.map(async (e) => {
     e.label = game === 'cs2' ? maps[e.label] : e.label
     const label = `${e.label} ${e.mode}`
@@ -122,13 +124,14 @@ const sendCardWithInfo = async (interaction, playerParam, map = null, mode = nul
     }
 
     if (!options.filter(e => e.data.label === label).length > 0) {
+      const playRate = ((e.stats.Matches / totalMatches) * 100).toFixed(2)
       const customId = (await Interaction.create(values)).id
       const option = new Discord.StringSelectMenuOptionBuilder()
         .setLabel(label)
         .setDescription(
           getTranslation(
             'strings.matchPlayed',
-            interaction.locale, { matchNumber: `${e.stats.Matches} (${e.stats['Win Rate %']}%)` }
+            interaction.locale, { matchNumber: `Win: ${e.stats['Win Rate %']}% - PlayRate: ${playRate}% - ${e.stats.Matches}` }
           )
         )
         .setValue(customId)
