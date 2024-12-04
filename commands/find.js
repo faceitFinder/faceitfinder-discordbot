@@ -158,7 +158,7 @@ const sendCardWithInfo = async (
 
   const values = {
     userId: interaction.user.id,
-    maxMatch: 0,
+    maxMatch: matchNumber,
     playerId,
     map,
     page,
