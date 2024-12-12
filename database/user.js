@@ -1,25 +1,37 @@
 const User = require('./models/userModel')
 
-const create = (discordId, steamId) => {
+const create = (discordId, faceitId, guildId, nickname) => {
   const newUser = new User({
     discordId: discordId,
-    steamId: steamId
+    faceitId: faceitId,
+    guildId: guildId,
+    nickname: nickname,
+    verified: false,
   })
 
-  newUser.save((err) => {
-    if (err) console.error(err)
-  })
+  newUser.save()
 }
 
-const get = async (discordId) => await User.findOne({ discordId: discordId }).exec()
+const get = (discordId) => User.find({ discordId: discordId }).exec()
 
-const remove = async (discordId) => await User.deleteOne({ discordId: discordId }).exec()
+const getWithGuild = (discordId, guildId = null) => User.findOne({ discordId: discordId, guildId: guildId }).exec()
 
-const exists = async (discordId) => (await get(discordId))
+const remove = (discordId, guildId = null) => guildId ?
+  User.deleteOne({ discordId: discordId, guildId: guildId }).exec() :
+  User.deleteMany({ discordId: discordId }).exec()
 
-const update = async (discordId, steamId) => await User.updateOne({ discordId: discordId }, { steamId: steamId }).exec()
+const exists = (discordId, guildId = null) => getWithGuild(discordId, guildId)
 
-const count = async () => await User.countDocuments({})
+const update = (discordId, faceitId, guildId = null, nickname) => User.updateOne(
+  { discordId: discordId, guildId: guildId },
+  { faceitId: faceitId, nickname: nickname, verified: false }
+).exec()
+
+const getAll = () => User.find({}).exec()
+
+const count = () => User.countDocuments({})
+
+const getVerified = (discordId) => User.find({ discordId: discordId, verified: true }).exec()
 
 module.exports = {
   create,
@@ -27,5 +39,8 @@ module.exports = {
   exists,
   update,
   count,
-  remove
+  remove,
+  getAll,
+  getWithGuild,
+  getVerified,
 }

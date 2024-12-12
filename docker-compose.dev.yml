@@ -1,0 +1,45 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    restart: always
+    entrypoint: /bin/sh -c "cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && yarn dev"
+    volumes:
+      - .:/usr/src/app
+      - ./node_modules:/usr/src/app/node_modules
+    environment:
+      - NODE_ENV=dev
+    ports:
+      - '3001:3001'
+    env_file:
+      - .env
+    networks:
+      - app
+
+  mongodb:
+    image: mongo:7.0.14
+    container_name: faceitfinder_mongodb
+    restart: always
+    hostname: mongodb
+    ports:
+      - '27017:27017'
+    command: [ --auth ]
+    volumes:
+      - ~/mongo-volume:/data/db
+    env_file:
+      - .env.mongodb
+    networks:
+      - app
+
+  api:
+    image: justdams/faceitfinder-api:latest
+    restart: always
+    container_name: faceitfinder_api
+    env_file:
+      - .env
+    networks:
+      - app
+
+networks:
+  app:

@@ -1,73 +1,153 @@
 const { color } = require('../config.json')
 const path = require('path')
 const Canvas = require('canvas')
+const CustomType = require('../templates/customType')
+const Chart = require('chart.js/auto')
+const { getTranslation } = require('../languages/setup')
 
-const generateCanvas = async (elo = null, matchHistory, playerElo, maxMatch = 20) => {
-  if (elo === null)
-    try { elo = await getElo(maxMatch, matchHistory, playerElo) }
-    catch (error) { throw error }
-  if (elo.length === 0) throw 'No match found on this date'
-
-  elo.reverse()
-
-  const padding = 100
-  const width = padding * (elo.length + 1)
-  const height = Math.max(...elo) - Math.min(...elo) + padding * 2
-
-  const canvas = Canvas.createCanvas(width, height)
-  const ctx = canvas.getContext('2d')
-
-  /**
-   * Background
-   */
-  ctx.clearRect(0, 0, width, height);
-  ctx.fillStyle = '#2f3136'
-  ctx.fillRect(0, 0, width, height)
-
-  ctx.globalCompositeOperation = 'source-over'
-  ctx.strokeStyle = '#383838'
-  ctx.lineWidth = 5
-
-  ctx.globalCompositeOperation = 'source-over'
-
-  /**
-   * Grid
-   */
-  for (let i = 0; i < elo.length + 1; i++) {
-    ctx.beginPath()
-    ctx.moveTo(padding * i, 0)
-    ctx.lineTo(padding * i, height)
-    ctx.stroke()
-  }
-
-  ctx.globalCompositeOperation = 'source-over'
-
-  /**
-   * Elo bar
-   */
-  elo.forEach((current, i) => {
-    const prev = elo[i - 1] === undefined ? current : elo[i - 1]
-    const coordinatesStart = { x: padding * i, y: Math.max(...elo) - elo[i - 1] + padding }
-    const coordinatesEnd = { x: padding * (i + 1), y: Math.max(...elo) - current + padding }
-    const [level, values] = Object.entries(color.levels).filter(fc => current >= fc[1].min && current <= fc[1].max)[0]
-
-    ctx.font = '30px sans-serif'
-    ctx.lineWidth = 5
-    ctx.fillStyle = values.color
-    ctx.strokeStyle = getColors(prev, current, ctx, coordinatesStart, coordinatesEnd)
-
-    ctx.beginPath()
-    ctx.moveTo(coordinatesStart.x, coordinatesStart.y)
-    ctx.lineTo(coordinatesEnd.x, coordinatesEnd.y)
-    ctx.stroke()
-
-    ctx.fillText(current, padding * i + padding / 1.5, height)
+const generateChart = (locale, playerName, matchHistory, maxMatch = 20, type = CustomType.TYPES.ELO, game) => {
+  const datas = []
+  const types = type.name.split('-').map(e => {
+    return CustomType.getType(e.trim())
   })
 
-  return canvas
+  datas.push(...types.map(type => [type, getGraph(locale, playerName, type, matchHistory, maxMatch).reverse()]))
+
+  const labels = matchHistory.map(match => new Date(match.date).toLocaleString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  }))
+
+  return getChart(datas, labels.slice(0, maxMatch).reverse(), getClassicDatasets, datas.length > 1, game)
 }
 
-const getRankImage = async (faceitLevel, faceitElo, size) => {
+const getChart = (datasets, labels, datasetFunc, displayY1, game) => {
+  const canvas = Canvas.createCanvas(600, 400)
+  const ctx = canvas.getContext('2d')
+
+  const color = '#c9d1d9', gridColor = '#3c3c3c'
+  const yAxisBase = {
+    border: {
+      width: 1,
+    },
+    grid: {
+      color: gridColor,
+    },
+    ticks: {
+      beginAtZero: false,
+      color: color,
+    }
+  }
+
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: datasets.map((datas, i) => datasetFunc(datas, i, ctx, game)),
+    },
+    options: {
+      scales: {
+        y0: {
+          display: true,
+          position: 'left',
+          ...yAxisBase
+        },
+        y1: {
+          display: displayY1,
+          position: 'right',
+          ...yAxisBase
+        },
+        x: {
+          grid: {
+            color: gridColor,
+          },
+          ticks: {
+            color: color,
+          }
+        }
+      },
+      plugins: {
+        legend: {
+          labels: {
+            color: color,
+            borderWidth: 1,
+          }
+        }
+      }
+    },
+    plugins: [{
+      beforeDraw: (chart) => {
+        const ctx = chart.canvas.getContext('2d')
+        ctx.save()
+        ctx.globalCompositeOperation = 'source-over'
+        ctx.fillStyle = '#2f3136'
+        ctx.fillRect(0, 0, chart.width, chart.height)
+        ctx.restore()
+      }
+    }],
+  })
+
+  return canvas.toBuffer()
+}
+
+const getClassicDatasets = (datas, i, ctx, game) => {
+  const [type, data] = datas
+  return {
+    label: type.name,
+    data: data,
+    fill: i === 0,
+    yAxisID: `y${i}`,
+    borderColor: (segment) => {
+      if (segment.raw) return colorFilter(type.color[game] ?? type.color, segment.raw).color
+    },
+    pointBackgroundColor: (segment) => {
+      if (segment.raw) return colorFilter(type.color[game] ?? type.color, segment.raw).color
+    },
+    spanGaps: true,
+    segment: {
+      borderColor: (segment) => {
+        if (segment.p0.skip || segment.p1.skip) return 'rgb(0,0,0,0.2)'
+        const prev = segment.p0, current = segment.p1
+
+        ctx.strokeStyle = getGradient(prev, current, ctx, type, game)
+        ctx.lineWidth = 2
+        ctx.beginPath()
+        ctx.moveTo(prev.x, prev.y)
+        ctx.lineTo(current.x, current.y)
+        ctx.stroke()
+
+        return 'transparent'
+      },
+      borderDash: (segment) => segment.p0.skip || segment.p1.skip ? [6, 6] : undefined,
+      borderWidth: 1,
+    }
+  }
+}
+
+const getCompareDatasets = (datas, i, ctx, game) => {
+  const [nickname, type, playerColor, data] = [...datas]
+  return {
+    label: nickname,
+    data: data,
+    fill: i === 0,
+    yAxisID: 'y0',
+    pointBackgroundColor: playerColor,
+    borderColor: playerColor,
+    segment: {
+      borderDash: (segment) => segment.p0.skip || segment.p1.skip ? [6, 6] : undefined,
+      borderColor: (segment) => {
+        if (segment.p0.skip || segment.p1.skip) return 'rgb(0,0,0,0.2)'
+      }
+    },
+    borderWidth: 2,
+    spanGaps: true
+  }
+}
+
+const getRankImage = async (faceitLevel, faceitElo = null, size, game) => {
+  faceitElo ??= color.levels[game]['3'].min
+
   const space = 6,
     maxWidth = size - space,
     height = 4,
@@ -86,14 +166,14 @@ const getRankImage = async (faceitLevel, faceitElo, size) => {
   ctx.fillStyle = ctx.strokeStyle = '#1f1f22'
   ctx = roundRect(ctx, x, y, maxWidth, height, space)
 
-  const range = color.levels[faceitLevel],
-    width = faceitLevel === 10 ? maxWidth : (maxWidth * (faceitElo - range.min) / (range.max - range.min))
+  const range = color.levels[game][faceitLevel],
+    width = parseInt(faceitLevel) === 10 ? maxWidth : (maxWidth * (faceitElo - range.min) / (range.max - range.min))
 
   ctx.globalCompositeOperation = 'source-over'
-  ctx.fillStyle = ctx.strokeStyle = color.levels[faceitLevel].color
+  ctx.fillStyle = ctx.strokeStyle = color.levels[game][faceitLevel].color
   ctx = roundRect(ctx, x, y, width, height, space)
 
-  return canvas
+  return canvas.toBuffer()
 }
 
 const roundRect = (ctx, x, y, w, h, r) => {
@@ -111,42 +191,45 @@ const roundRect = (ctx, x, y, w, h, r) => {
   return ctx
 }
 
-const getColors = (prev, current, ctx, coordinatesStart, coordinatesEnd) => {
-  const gradient = ctx.createLinearGradient(coordinatesStart.x, coordinatesStart.y, coordinatesEnd.x, coordinatesEnd.y)
-  const [prevLevel, prevValues] = Object.entries(color.levels).filter(fc => prev >= fc[1].min && prev <= fc[1].max)[0]
+const getElo = (maxMatch, matchHistory) => matchHistory.map(e => e?.elo).slice(0, maxMatch)
 
-  if (current >= prevValues.min && current <= prevValues.max) gradient.addColorStop(0, prevValues.color)
-  else if (current > prevValues.max) {
-    gradient.addColorStop(0, prevValues.color)
-    gradient.addColorStop(0.5, color.levels[parseInt(prevLevel) + 1].color)
-  } else if (current < prevValues.min) {
-    gradient.addColorStop(0.5, prevValues.color)
-    gradient.addColorStop(1, color.levels[parseInt(prevLevel) - 1].color)
-  }
+const getEloGain = (maxMatch, matchHistory) => matchHistory.map(e => e?.eloGain).slice(0, maxMatch)
 
+const getKD = (maxMatch, matchHistory) => matchHistory.map(e => e?.c2).slice(0, maxMatch)
+
+const getGradient = (prev, current, ctx, type, game) => {
+  const gradient = ctx.createLinearGradient(prev.x, prev.y, current.x, current.y)
+  gradient.addColorStop(0, colorFilter(type.color[game] ?? type.color, prev.raw).color)
+  gradient.addColorStop(1, colorFilter(type.color[game] ?? type.color, current.raw).color)
   return gradient
 }
 
-const getElo = async (maxMatch, matchHistory, playerElo, checkElo = 1) => {
-  const currentElo = { elo: playerElo }
+const colorFilter = (colors, value) => {
+  return Object.entries(colors)
+    .filter(color => parseFloat(value) >= parseFloat(color[1].min) && parseFloat(value) <= parseFloat(color[1].max))
+    .at(0)
+    .at(1)
+}
 
-  if (matchHistory.length > 0 && checkElo) {
-    if (matchHistory[0].elo === undefined)
-      matchHistory[0] = currentElo
-    else if (matchHistory[0].elo != playerElo)
-      matchHistory.unshift(currentElo)
-  } else if (matchHistory.length === 0) throw 'Couldn\'t get today matches'
-
-  const elo = Array.from(matchHistory, e => e.elo)
-  elo.reverse().forEach((e, i) => {
-    if (e === undefined && elo[i - 1] !== undefined) elo[i] = elo[i - 1]
+const getGraph = (locale, playerName, type, matchHistory, maxMatch) => {
+  if (!matchHistory.length > 0) throw getTranslation('error.user.noMatches', locale, {
+    playerName: playerName
   })
 
-  return elo.filter(e => e !== undefined).reverse().slice(0, maxMatch)
+  switch (CustomType.getType(type.name)) {
+  case CustomType.TYPES.ELO: return getElo(maxMatch, matchHistory)
+  case CustomType.TYPES.KD: return getKD(maxMatch, matchHistory)
+  default: break
+  }
 }
 
 module.exports = {
-  generateCanvas,
+  generateChart,
   getRankImage,
   getElo,
+  getKD,
+  getChart,
+  getGraph,
+  getCompareDatasets,
+  getEloGain
 }

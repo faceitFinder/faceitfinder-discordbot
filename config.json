@@ -1,65 +1,150 @@
 {
   "name": "FaceitFinder",
   "creator": "275395358316560384",
+  "webapp": "https://faceitfinder.app/",
+  "donate": "https://www.buymeacoffee.com/IDams",
   "github": "https://github.com/JustDams/faceitFinder",
   "prefix": ".ff",
-  "invite": "https://discord.com/api/oauth2/authorize?client_id=838088031222235197&permissions=2147534848&redirect_uri=https%3A%2F%2Fdiscordapp.com%2Fapi%2Foauth2%2Fauthorize&scope=applications.commands%20bot",
+  "invite": "https://discord.faceitfinder.app",
   "vote": "https://top.gg/bot/838088031222235197/vote",
   "join": "https://discord.gg/uPAdfvfuTP",
+  "oauth2": "https://faceitfinder.app/api/auth/discord/login",
+  "unlinkVerified": "https://faceitfinder.app/profile/settings",
+  "logChannel": "1120786737636048976",
+  "logGuild": "882210656328228895",
+  "itemByPage": 25,
   "color": {
     "primary": "#14578c",
     "won": "#64AC30",
     "lost": "#AD4142",
+    "players": {
+      "1": "#662E9B",
+      "2": "#EE6055",
+      "3": "#43BCCD",
+      "4": "#4EE478",
+      "5": "#F8B062"
+    },
     "levels": {
+      "csgo": {
+        "1": {
+          "min": 0,
+          "max": 800,
+          "color": "#eeeeee"
+        },
+        "2": {
+          "min": 801,
+          "max": 950,
+          "color": "#1ce300"
+        },
+        "3": {
+          "min": 951,
+          "max": 1100,
+          "color": "#1ce300"
+        },
+        "4": {
+          "min": 1101,
+          "max": 1250,
+          "color": "#ffc800"
+        },
+        "5": {
+          "min": 1251,
+          "max": 1400,
+          "color": "#ffc800"
+        },
+        "6": {
+          "min": 1401,
+          "max": 1550,
+          "color": "#ffc800"
+        },
+        "7": {
+          "min": 1551,
+          "max": 1700,
+          "color": "#ffc800"
+        },
+        "8": {
+          "min": 1701,
+          "max": 1850,
+          "color": "#fe630a"
+        },
+        "9": {
+          "min": 1851,
+          "max": 2000,
+          "color": "#fe630a"
+        },
+        "10": {
+          "min": 2001,
+          "max": 100000,
+          "color": "#d91a00"
+        }
+      },
+      "cs2": {
+        "1": {
+          "min": 100,
+          "max": 500,
+          "color": "#eeeeee"
+        },
+        "2": {
+          "min": 501,
+          "max": 750,
+          "color": "#1ce300"
+        },
+        "3": {
+          "min": 751,
+          "max": 900,
+          "color": "#1ce300"
+        },
+        "4": {
+          "min": 901,
+          "max": 1050,
+          "color": "#ffc800"
+        },
+        "5": {
+          "min": 1051,
+          "max": 1200,
+          "color": "#ffc800"
+        },
+        "6": {
+          "min": 1201,
+          "max": 1350,
+          "color": "#ffc800"
+        },
+        "7": {
+          "min": 1351,
+          "max": 1530,
+          "color": "#ffc800"
+        },
+        "8": {
+          "min": 1531,
+          "max": 1750,
+          "color": "#fe630a"
+        },
+        "9": {
+          "min": 1751,
+          "max": 2000,
+          "color": "#fe630a"
+        },
+        "10": {
+          "min": 2001,
+          "max": 100000,
+          "color": "#d91a00"
+        }
+      }
+    },
+    "kd": {
       "1": {
-        "min": 0,
-        "max": 800,
-        "color": "#eeeeee"
+        "min": -100000,
+        "max": 0.49,
+        "color": "#D71D20"
       },
       "2": {
-        "min": 801,
-        "max": 950,
-        "color": "#1ce300"
+        "min": 0.5,
+        "max": 0.99,
+        "color": "#F8961E"
       },
       "3": {
-        "min": 951,
-        "max": 1100,
-        "color": "#1ce300"
-      },
-      "4": {
-        "min": 1101,
-        "max": 1250,
-        "color": "#ffc800"
-      },
-      "5": {
-        "min": 1251,
-        "max": 1400,
-        "color": "#ffc800"
-      },
-      "6": {
-        "min": 1401,
-        "max": 1550,
-        "color": "#ffc800"
-      },
-      "7": {
-        "min": 1551,
-        "max": 1700,
-        "color": "#ffc800"
-      },
-      "8": {
-        "min": 1701,
-        "max": 1850,
-        "color": "#fe630a"
-      },
-      "9": {
-        "min": 1851,
-        "max": 2000,
-        "color": "#fe630a"
-      },
-      "10": {
-        "min": 2001,
-        "max": 100000,
-        "color": "#d91a00"
+        "min": 1.0,
+        "max": 10000,
+        "color": "#6B9B46"
       }
     },
     "error": "#770000"
@@ -74,6 +159,144 @@
       "name": "lost",
       "id": "885455779044401192",
       "balise": "<:lost:885455779044401192>"
+    },
+    "better": {
+      "name": "better",
+      "id": "991622480483586108",
+      "balise": "<:better:991622480483586108>"
+    },
+    "worse": {
+      "name": "worse",
+      "id": "991622670263267358",
+      "balise": "<:worse:991622670263267358>"
+    },
+    "even": {
+      "name": "even",
+      "id": "991622876614623275",
+      "balise": "<:even:991622876614623275>"
+    },
+    "maps": {
+      "de_vertigo": {
+        "name": "de_vertigo",
+        "id": "986939217290612776",
+        "balise": "<:de_vertigo:986939217290612776>"
+      },
+      "de_ancient": {
+        "name": "de_ancient",
+        "id": "986939233283498004",
+        "balise": "<:de_ancient:986939233283498004>"
+      },
+      "de_nuke": {
+        "name": "de_nuke",
+        "id": "986939223938572348",
+        "balise": "<:de_nuke:986939223938572348>"
+      },
+      "de_cache": {
+        "name": "de_cache",
+        "id": "986939234881531927",
+        "balise": "<:de_cache:986939234881531927>"
+      },
+      "de_dust2": {
+        "name": "de_dust2",
+        "id": "986939229445697546",
+        "balise": "<:de_dust2:986939229445697546>"
+      },
+      "de_cbble": {
+        "name": "de_cbble",
+        "id": "986939231454773279",
+        "balise": "<:de_cbble:986939231454773279>"
+      },
+      "de_inferno": {
+        "name": "de_inferno",
+        "id": "986939227017207838",
+        "balise": "<:de_inferno:986939227017207838>"
+      },
+      "de_mirage": {
+        "name": "de_mirage",
+        "id": "986939225440124978",
+        "balise": "<:de_mirage:986939225440124978>"
+      },
+      "de_overpass": {
+        "name": "de_overpass",
+        "id": "986939221434589195",
+        "balise": "<:de_overpass:986939221434589195>"
+      },
+      "de_train": {
+        "name": "de_train",
+        "id": "986939219295498290",
+        "balise": "<:de_train:986939219295498290>"
+      },
+      "de_anubis": {
+        "name": "de_anubis",
+        "id": "1050088011016192020",
+        "balise": "<:de_anubis:1050088011016192020>"
+      }
+    },
+    "select": {
+      "name": "select",
+      "id": "918877215901483048",
+      "balise": "<:select:918877215901483048>"
     }
+  },
+  "languages": {
+    "en-US": "en-US",
+    "en-GB": "en-GB",
+    "bg": "bg-BG",
+    "zh-CN": "zh-CN",
+    "zh-TW": "zh-TW",
+    "hr": "hr-HR",
+    "cs": "cs-CZ",
+    "da": "da-DK",
+    "nl": "nl-NL",
+    "fi": "fi-FI",
+    "fr": "fr-FR",
+    "de": "de-DE",
+    "el": "el-GR",
+    "hi": "hi-IN",
+    "hu": "hu-HU",
+    "it": "it-IT",
+    "ja": "ja-JP",
+    "ko": "ko-KR",
+    "lt": "lt-LT",
+    "no": "no-NO",
+    "pl": "pl-PL",
+    "pt-BR": "pt-BR",
+    "ro": "ro-RO",
+    "ru": "ru-RU",
+    "es-ES": "es-ES",
+    "sv-SE": "sv-SE",
+    "th": "th-TH",
+    "tr": "tr-TR",
+    "uk": "uk-UA",
+    "vi": "vi-VN"
+  },
+  "maps": {
+    "Vertigo": "de_vertigo",
+    "Ancient": "de_ancient",
+    "Nuke": "de_nuke",
+    "Cache": "de_cache",
+    "Dust2": "de_dust2",
+    "Cobblestone": "de_cbble",
+    "Inferno": "de_inferno",
+    "Mirage": "de_mirage",
+    "Overpass": "de_overpass",
+    "Train": "de_train",
+    "Anubis": "de_anubis",
+    "de_vertigo": "Vertigo",
+    "de_ancient": "Ancient",
+    "de_nuke": "Nuke",
+    "de_cache": "Cache",
+    "de_dust2": "Dust2",
+    "de_cbble": "Cobblestone",
+    "de_inferno": "Inferno",
+    "de_mirage": "Mirage",
+    "de_overpass": "Overpass",
+    "de_train": "Train",
+    "de_anubis": "Anubis"
+  },
+  "maxLengthTeamName": 14,
+  "defaultGame": "cs2",
+  "skus": {
+    "guild": "1166703251610140712"
   }
 }

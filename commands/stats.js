@@ -1,110 +1,141 @@
 const { color } = require('../config.json')
 const Discord = require('discord.js')
-const Canvas = require('canvas')
-const RegexFun = require('../functions/regex')
-const Steam = require('../functions/steam')
-const Player = require('../functions/player')
 const Graph = require('../functions/graph')
-const Match = require('../functions/match')
-const Ladder = require('../functions/ladder')
-const errorCard = require('../templates/errorCard')
+const CustomType = require('../templates/customType')
+const { buildButtonsGraph } = require('../functions/customType')
+const Options = require('../templates/options')
 const { getCardsConditions } = require('../functions/commands')
+const { getTranslation, getTranslations } = require('../languages/setup')
+const { getStats, getLadder } = require('../functions/apiHandler')
+const { getGameOption, getCurrentEloString } = require('../functions/utility')
 
-const sendCardWithInfos = async (message, steamParam) => {
-  try {
-    const steamId = await Steam.getId(steamParam)
-    const steamDatas = await Steam.getDatas(steamId)
-    const playerId = await Player.getId(steamId)
-    const playerDatas = await Player.getDatas(playerId)
-    const playerStats = await Player.getStats(playerId)
-    const playerHistory = await Match.getMatchElo(playerId, 20)
-    const faceitElo = playerDatas.games.csgo.faceit_elo
-    const graphCanvas = await Graph.generateCanvas(null, playerHistory, faceitElo)
+const buildEmbed = async ({
+  playerParam,
+  game,
+  type = CustomType.TYPES.ELO,
+  locale
+}) => {
+  const maxMatch = 20
+  const {
+    playerDatas,
+    steamDatas,
+    playerStats,
+    playerHistory,
+    playerLastStats
+  } = await getStats({
+    playerParam,
+    matchNumber: maxMatch,
+    checkElo: 1,
+    game
+  })
 
-    const playerCountry = playerDatas.country
-    const playerRegion = playerDatas.games.csgo.region
+  const playerId = playerDatas.player_id
+  const playerCountry = playerDatas.country
+  const playerRegion = playerDatas.games[game].region
+  const buttonValues = {
+    id: 'uSG',
+    playerId,
+    game
+  }
 
-    const ladderCountry = await Ladder.getDatas(playerId, playerRegion, playerCountry)
-    const ladderRegion = await Ladder.getDatas(playerId, playerRegion)
+  const ladderCountry = await getLadder({
+    playerParam,
+    region: playerRegion,
+    country: playerCountry,
+    game
+  })
 
-    const faceitLevel = playerDatas.games.csgo.skill_level
-    const size = 40
+  const ladderRegion = await getLadder({
+    playerParam,
+    region: playerRegion,
+    game
+  })
 
-    const rankImageCanvas = await Graph.getRankImage(faceitLevel, faceitElo, size)
+  const faceitElo = playerDatas.games[game].faceit_elo
+  const faceitLevel = playerDatas.games[game].skill_level
+  const size = 40
+  const rankImageCanvas = await Graph.getRankImage(faceitLevel, faceitElo, size, game)
 
-    const card = new Discord.MessageEmbed()
-      .setAuthor(playerDatas.nickname, playerDatas.avatar, `https://www.faceit.com/fr/players/${playerDatas.nickname}`)
-      .setTitle('Steam')
-      .setURL(steamDatas.profileurl)
-      .setThumbnail(`attachment://${faceitLevel}level.png`)
-      .addFields({ name: 'Games', value: `${playerStats.lifetime.Matches} (${playerStats.lifetime['Win Rate %']}% Win)`, inline: true },
-        { name: 'K/D', value: playerStats.lifetime['Average K/D Ratio'], inline: true },
-        { name: 'HS', value: `${playerStats.lifetime['Average Headshots %']}%`, inline: true },
-        { name: 'Elo', value: faceitElo.toString(), inline: true },
-        { name: `:flag_${playerCountry}:`, value: ladderCountry.position.toString(), inline: true },
-        { name: `:flag_${playerRegion.toLowerCase()}:`, value: ladderRegion.position.toString(), inline: true })
-      .setImage(`attachment://${steamId}graph.png`)
-      .setColor(color.levels[faceitLevel].color)
-      .setFooter(`Steam: ${steamDatas.personaname}`)
+  const card = new Discord.EmbedBuilder()
+    .setAuthor({
+      name: playerDatas.nickname,
+      iconURL: playerDatas.avatar || null,
+      url: `https://www.faceit.com/en/players/${playerDatas.nickname}`
+    })
+    .setDescription(`[Steam](https://steamcommunity.com/profiles/${playerDatas.games[game].game_player_id}), [Faceit](https://www.faceit.com/en/players/${playerDatas.nickname})`)
+    .setThumbnail(`attachment://${faceitLevel}level.png`)
+    .addFields(
+      { name: 'Games', value: `${playerStats.lifetime.Matches} (${playerStats.lifetime['Win Rate %']}% Win)`, inline: true },
+      { name: 'K/D', value: playerStats.lifetime['Average K/D Ratio'], inline: true },
+      { name: 'HS', value: `${playerStats.lifetime['Average Headshots %']}%`, inline: true },
+      { name: 'Elo', value: getCurrentEloString(playerLastStats), inline: true },
+      { name: `:flag_${playerCountry.toLowerCase()}:`, value: ladderCountry.position.toString(), inline: true },
+      { name: `:flag_${playerRegion.toLowerCase()}:`, value: ladderRegion.position.toString(), inline: true }
+    )
+    .setColor(color.levels[game][faceitLevel].color)
+    .setFooter({ text: `Steam: ${steamDatas?.personaname || steamDatas}`, iconURL: 'attachment://game.png' })
 
-    return {
-      embeds: [card],
-      files: [
-        new Discord.MessageAttachment(graphCanvas.toBuffer(), `${steamId}graph.png`),
-        new Discord.MessageAttachment(rankImageCanvas.toBuffer(), `${faceitLevel}level.png`)
-      ]
-    }
-  } catch (error) {
-    console.log(error)
-    return errorCard(error)
+
+  const files = [
+    new Discord.AttachmentBuilder(rankImageCanvas, { name: `${faceitLevel}level.png` }),
+    new Discord.AttachmentBuilder(`images/${game}.png`, { name: 'game.png' })
+  ]
+
+  if (playerHistory.length > 0) {
+    const graphBuffer = Graph.generateChart(locale, playerDatas.nickname, playerHistory, maxMatch, type, game)
+    files.push(new Discord.AttachmentBuilder(graphBuffer, { name: 'graph.png' }))
+    card.setImage('attachment://graph.png')
+  }
+
+  return {
+    card,
+    files,
+    buttonValues,
+    historyLength: playerHistory.length
+  }
+}
+
+const sendCardWithInfo = async (interaction, playerParam) => {
+  const game = getGameOption(interaction)
+  const {
+    card,
+    files,
+    buttonValues,
+    historyLength
+  } = await buildEmbed({
+    playerParam,
+    game,
+    locale: interaction.locale
+  })
+
+  let components = []
+
+  if (historyLength) {
+    components.push(new Discord.ActionRowBuilder().addComponents(await buildButtonsGraph(interaction, buttonValues)))
+  }
+
+  return {
+    content: ' ',
+    embeds: [card],
+    files: files,
+    components
   }
 }
 
 module.exports = {
   name: 'stats',
-  aliasses: ['stats', 's'],
-  options: [
-    {
-      name: 'user_steam_id',
-      description: 'Steam id of a user.',
-      required: false,
-      type: 3
-    },
-    {
-      name: 'user_custom_steam_id',
-      description: 'Custom steam id of a user.',
-      required: false,
-      type: 3
-    },
-    {
-      name: 'steam_profile_link',
-      description: 'Url of a steam profile.',
-      required: false,
-      type: 3
-    },
-    {
-      name: 'csgo_status',
-      description: 'The result of the "status" command in CS:GO that contains the user part.',
-      required: false,
-      type: 3
-    },
-    {
-      name: 'user_mention',
-      description: 'Mention a user that has linked his profile to the bot.',
-      required: false,
-      type: 6,
-      slash: true
-    }
-  ],
-  description: "Displays general stats of the user(s) given, including a graph that show the elo evolution.",
-  slashDescription: "Displays general stats of the @ user, including a graph that show the elo evolution.",
-  usage: 'one of the options',
+  options: Options.stats,
+  description: getTranslation('command.stats.description', 'en-US'),
+  descriptionLocalizations: getTranslations('command.stats.description'),
+  usage: Options.usage,
   type: 'stats',
-  async execute(message, args) {
-    const steamIds = RegexFun.findSteamUIds(message.content)
-    const params = []
-    await args.forEach(async e => { params.push(e.split('/').filter(e => e).pop()) })
-
-    return await getCardsConditions(message.mentions.users, steamIds, params, message, sendCardWithInfos)
+  async execute(interaction) {
+    return getCardsConditions({
+      interaction,
+      fn: sendCardWithInfo
+    })
   }
 }
+
+module.exports.sendCardWithInfo = sendCardWithInfo
+module.exports.buildEmbed = buildEmbed

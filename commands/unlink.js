@@ -1,38 +1,48 @@
-const { color } = require('../config.json')
 const Discord = require('discord.js')
 const User = require('../database/user')
+const { updateRoles } = require('../functions/roles')
+const { getTranslation, getTranslations } = require('../languages/setup')
 const errorCard = require('../templates/errorCard')
+const successCard = require('../templates/successCard')
+const { getInteractionOption } = require('../functions/utility')
 
-const sendCardWithInfos = async (message) => {
-  try {
-    const discordId = message.author.id
-    if (await User.exists(discordId)) {
-      await User.remove(discordId)
+const sendCardWithInfo = async (interaction) => {
+  const discordId = interaction.user.id
 
-      return {
-        embeds: [
-          new Discord.MessageEmbed()
-            .setColor(color.primary)
-            .setDescription(`Your account has been unlinked.`)
-        ]
-      }
-    }
-    else return errorCard('Your account is not linked to a user.')
-
-  } catch (error) {
-    console.log(error)
-    return errorCard(error)
+  if ((await User.getVerified(discordId)).length) {
+    return errorCard(getTranslation('error.user.unlink.verified', interaction.locale))
   }
+
+  if (await User.exists(discordId) || getInteractionOption(interaction, 'global')) {
+    await updateRoles(interaction.client, discordId, null, true)
+    return successCard(getTranslation('success.command.unlink.global', interaction.locale), interaction.locale)
+  } else if (await User.exists(discordId, interaction.guild.id)) {
+    await updateRoles(interaction.client, discordId, interaction.guild.id, true)
+    return successCard(getTranslation('success.command.unlink.server', interaction.locale), interaction.locale)
+  }
+
+  else return errorCard(getTranslation('error.user.notLinked', interaction.locale, {
+    discord: `<@${discordId}>`
+  }))
 }
 
 module.exports = {
   name: 'unlink',
-  aliasses: ['unlink'],
-  options: [],
-  description: `Unlink your steam id to the discord bot.`,
+  options: [
+    {
+      name: 'global',
+      description: getTranslation('options.globalUnlink', 'en-US'),
+      descriptionLocalizations: getTranslations('options.globalUnlink'),
+      required: false,
+      type: Discord.ApplicationCommandOptionType.Boolean,
+      slash: true
+    }
+  ],
+  description: getTranslation('command.unlink.description', 'en-US'),
+  descriptionLocalizations: getTranslations('command.unlink.description'),
   usage: '',
   type: 'utility',
-  async execute(message, args) {
-    return await sendCardWithInfos(message)
+  async execute(interaction) {
+    return sendCardWithInfo(interaction)
   }
 }

@@ -1,77 +1,66 @@
-const Discord = require('discord.js')
-const Steam = require('../functions/steam')
-const Player = require('../functions/player')
-const errorCard = require('../templates/errorCard')
+const DateStats = require('../functions/dateStats')
 const { getCardsConditions } = require('../functions/commands')
+const Options = require('../templates/options')
+const { getTranslations, getTranslation } = require('../languages/setup')
+const { getGameOption, getInteractionOption } = require('../functions/utility')
+const { getMapOption } = require('../functions/map')
 
-const sendCardWithInfos = async (message, steamParam) => {
-  try {
-    const steamId = await Steam.getId(steamParam)
-    const playerId = await Player.getId(steamId)
-    const playerDatas = await Player.getDatas(playerId)
+const getDay = date => {
+  date = new Date(date)
+  date.setHours(0, 0, 0, 0)
+  return date.getTime()
+}
 
-    const options = []
-    const dates = []
-    const maxMatch = 85
+const formatFromToDates = (date, locale) => {
+  const from = new Date(date.date)
+  const to = new Date(date.date).setHours(24)
 
-    const playerHistory = await Player.getHistory(playerId, maxMatch)
-
-    for (const e of playerHistory.items) {
-      const matchDate = new Date(e.finished_at * 1000).setHours(0, 0, 0, 0)
-      if (!dates.filter(e => e === matchDate).length > 0) dates.push(matchDate)
-    }
-
-    dates.sort().reverse().every((d, k) => {
-      if (k <= 24) {
-        options.push({
-          label: new Date(d).toDateString(),
-          value: JSON.stringify({
-            s: steamId,
-            f: d,
-            t: new Date(d).setHours(24),
-            u: message.author.id,
-            m: maxMatch
-          })
-        })
-        return true
-      } else return false
-    })
-
-    if (options.length === 0) return errorCard(`Couldn\'t get today matches of ${playerDatas.nickname}`)
-    const row = new Discord.MessageActionRow()
-      .addComponents(
-        new Discord.MessageSelectMenu()
-          .setCustomId('dateStatsSelector')
-          .setPlaceholder('No dates selected')
-          .addOptions(options))
-
-    return {
-      content: `Select one of the following dates to get the stats related (${playerDatas.nickname})`,
-      components: [row]
-    }
-  } catch (error) {
-    console.log(error)
-    return errorCard(error)
+  return {
+    from: from.getTime(),
+    to: to
   }
+}
+
+const formatLabel = (from, to) => {
+  return new Date(from).toDateString()
+}
+
+const sendCardWithInfo = async (interaction, playerParam, page = 0, game = null, type = null, defaultOption = 0, map = null) => {
+  game ??= getGameOption(interaction)
+  map ??= getInteractionOption(interaction, 'map') ?? ''
+
+  return DateStats.generateDatasForCard({
+    interaction,
+    playerParam,
+    page,
+    game,
+    functionToGetDates: getDay,
+    formatFromToDates,
+    formatLabel,
+    selectTranslationString: 'strings.selectDate',
+    type,
+    defaultOption,
+    map
+  })
 }
 
 module.exports = {
   name: 'dailystats',
-  aliasses: ['dailystats', 'ds'],
   options: [
-    {
-      name: 'user_mention',
-      description: 'Mention a user that has linked his profile to the bot.',
-      required: false,
-      type: 6,
-      slash: true
-    }
+    ...Options.stats,
+    getMapOption()
   ],
-  description: "Displays your stats of the choosen day or the stats of the user(s) given. With elo graph of the day.",
-  slashDescription: "Displays your stats of the choosen day or the stats of the @ user. With elo graph of the day.",
-  usage: '',
+  description: getTranslation('command.dailystats.description', 'en-US'),
+  descriptionLocalizations: getTranslations('command.dailystats.description'),
+  usage: `${Options.usage} <map>`,
+  example: 'steam_parameters: justdams',
   type: 'stats',
-  async execute(message, args) {
-    return await getCardsConditions(message.mentions.users, [], [], message, sendCardWithInfos)
+  async execute(interaction) {
+    return getCardsConditions({
+      interaction,
+      fn: sendCardWithInfo
+    })
   }
 }
+
+module.exports.sendCardWithInfo = sendCardWithInfo

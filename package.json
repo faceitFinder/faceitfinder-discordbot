@@ -1,11 +1,16 @@
 {
   "name": "faceitfinder",
-  "version": "4.4.44",
+  "version": "6.9.7",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js"
+    "start": "node index.js",
+    "dev": "nodemon --trace-warnings bot.js",
+    "register-roles": "node ./scripts/register_roles.js",
+    "check-guild": "node ./scripts/check_guild.js",
+    "lint": "eslint --ext .js .",
+    "lint-and-fix": "eslint --fix --ext .js ."
   },
   "repository": {
     "type": "git",
@@ -18,15 +23,21 @@
   },
   "homepage": "https://github.com/JustDams/faceitFinder#readme",
   "dependencies": {
-    "@discordjs/rest": "^0.1.0-canary.0",
-    "big.js": "^6.1.1",
-    "canvas": "^2.8.0",
-    "discord-api-types": "^0.23.1",
-    "discord.js": "^13.1.0",
-    "dotenv": "^8.2.0",
-    "mongoose": "^5.13.7",
-    "node-fetch": "^2.6.1",
-    "nodemon": "^2.0.7",
-    "topgg-autoposter": "^2.0.0"
+    "@discordjs/rest": "^2.2.0",
+    "@top-gg/sdk": "^3.1.6",
+    "axios": "^1.6.8",
+    "axios-retry": "^4.1.0",
+    "big.js": "^6.2.1",
+    "cache-manager": "^5.4.0",
+    "canvas": "^2.11.2",
+    "chart.js": "^4.4.2",
+    "discord-api-types": "^0.37.76",
+    "discord.js": "^14.16.2",
+    "express": "^4.21.1",
+    "mongoose": "^8.2.3"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "nodemon": "^3.1.0"
   }
 }

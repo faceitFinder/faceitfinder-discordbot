@@ -1,88 +1,68 @@
-const Discord = require('discord.js')
-const Steam = require('../functions/steam')
-const Player = require('../functions/player')
-const errorCard = require('../templates/errorCard')
+const DateStats = require('../functions/dateStats')
 const { getCardsConditions } = require('../functions/commands')
+const Options = require('../templates/options')
+const { getTranslation, getTranslations } = require('../languages/setup')
+const { getGameOption, getInteractionOption } = require('../functions/utility')
+const { getMapOption } = require('../functions/map')
 
-const week = [6, 0, 1, 2, 3, 4, 5]
+const getMonday = date => {
+  const week = [6, 0, 1, 2, 3, 4, 5]
 
-const getMonday = (x) => {
-  const a = new Date(x)
-  a.setHours(0, 0, 0, 0)
-  return new Date(a.setDate(a.getDate() - week[a.getDay()]))
+  date = new Date(date)
+  date.setHours(0, 0, 0, 0)
+  return new Date(date.setDate(date.getDate() - week[date.getDay()])).getTime()
 }
 
-const sendCardWithInfos = async (message, steamParam) => {
-  try {
-    const steamId = await Steam.getId(steamParam)
-    const playerId = await Player.getId(steamId)
-    const playerDatas = await Player.getDatas(playerId)
+const formatFromToDates = (date) => {
+  const from = new Date(date.date)
+  const to = new Date(from).setDate(from.getDate() + 7)
 
-    const options = []
-    const dates = []
-    const maxMatch = 85
-
-    const playerHistory = await Player.getHistory(playerId, maxMatch)
-
-    for (const e of playerHistory.items) {
-      const monday = getMonday(e.finished_at * 1000).getTime()
-      if (!dates.filter(e => e === monday).length > 0) dates.push(monday)
-    }
-
-    dates.sort().reverse().every((monday, k) => {
-      if (k <= 24) {
-        const mondayDate = new Date(monday)
-        const to = new Date(mondayDate.setDate(mondayDate.getDate() + 7))
-
-        options.push({
-          label: [new Date(monday).toDateString(), '-', new Date(to.setHours(-24)).toDateString()].join(' '),
-          value: JSON.stringify({
-            s: steamId,
-            f: monday,
-            t: to.setHours(24),
-            u: message.author.id,
-            m: maxMatch
-          })
-        })
-        return true
-      } else return false
-    })
-
-    if (options.length === 0) return errorCard(`Couldn\'t get today matches of ${playerDatas.nickname}`)
-    const row = new Discord.MessageActionRow()
-      .addComponents(
-        new Discord.MessageSelectMenu()
-          .setCustomId('dateStatsSelector')
-          .setPlaceholder('No dates selected')
-          .addOptions(options))
-
-    return {
-      content: `Select one of the following dates to get the stats related (${playerDatas.nickname})`,
-      components: [row]
-    }
-  } catch (error) {
-    console.log(error)
-    return errorCard(error)
+  return {
+    from: from.getTime(),
+    to: to
   }
+}
+
+const formatLabel = (from, to, locale) => {
+  return [new Date(from).toDateString(), '-', new Date(new Date(to).setHours(-24)).toDateString()].join(' ')
+}
+
+const sendCardWithInfo = async (interaction, playerParam, page = 0, game = null, type = null, defaultOption = 0, map = null) => {
+  game ??= getGameOption(interaction)
+  map ??= getInteractionOption(interaction, 'map') ?? ''
+
+  return DateStats.generateDatasForCard({
+    interaction,
+    playerParam,
+    page,
+    game,
+    functionToGetDates: getMonday,
+    formatFromToDates,
+    formatLabel,
+    selectTranslationString: 'strings.selectWeek',
+    type,
+    defaultOption,
+    map
+  })
 }
 
 module.exports = {
   name: 'weekstats',
-  aliasses: ['weekstats', 'ws'],
   options: [
-    {
-      name: 'user_mention',
-      description: 'Mention a user that has linked his profile to the bot.',
-      required: false,
-      type: 6,
-      slash: true
-    }
+    ...Options.stats,
+    getMapOption()
   ],
-  description: "Displays your stats of the choosen week or the stats of the user(s) given. With elo graph of the week.",
-  slashDescription: "Displays your stats of the choosen week or the stats of the @ user. With elo graph of the week.",
-  usage: '',
+  description: getTranslation('command.weekstats.description', 'en-US'),
+  descriptionLocalizations: getTranslations('command.weekstats.description'),
+  usage: `${Options.usage} <map>`,
+  example: 'steam_parameters: justdams',
   type: 'stats',
-  async execute(message, args) {
-    return await getCardsConditions(message.mentions.users, [], [], message, sendCardWithInfos)
+  async execute(interaction) {
+    return getCardsConditions({
+      interaction,
+      fn: sendCardWithInfo
+    })
   }
 }
+
+module.exports.sendCardWithInfo = sendCardWithInfo

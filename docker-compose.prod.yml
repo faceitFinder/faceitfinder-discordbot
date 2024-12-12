@@ -1,0 +1,43 @@
+services:
+  app:
+    image: justdams/faceitfinder-discordbot:latest
+    restart: on-failure
+    container_name: faceitfinder_prod
+    command: npm start
+    links:
+      - mongodb
+    environment:
+      - NODE_ENV=prod
+    env_file:
+      - .env
+    networks:
+      - app
+
+  mongodb:
+    image: mongo:7.0.14
+    container_name: faceitfinder_mongodb
+    hostname: mongodb
+    ports:
+      - '27017:27017'
+    command: [ --auth ]
+    volumes:
+      - ~/mongo-volume:/data/db
+    env_file:
+      - .env.mongodb
+    networks:
+      - app
+
+  api:
+    image: justdams/faceitfinder-api:latest
+    restart: always
+    container_name: faceitfinder_api
+    command: npm start
+    environment:
+      - NODE_ENV=prod
+    env_file:
+      - .env
+    networks:
+      - app
+
+networks:
+  app:

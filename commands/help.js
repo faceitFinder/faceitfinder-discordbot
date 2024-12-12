@@ -1,64 +1,88 @@
-const { prefix, name, color } = require('../config.json')
+const { name, color } = require('../config.json')
 const Discord = require('discord.js')
 const fs = require('fs')
 const errorCard = require('../templates/errorCard')
+const { getTranslations, getTranslation } = require('../languages/setup')
+const { getInteractionOption } = require('../functions/utility')
 
-const getCommands = (card) => {
-  const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'))
-  const commands = []
-  const types = []
+const getCommandsList = () => {
+  return fs.readdirSync('./commands')
+    .filter(file => file.endsWith('.js') && !file.startsWith('help'))
+    .map(cf => require(`./${cf}`))
+}
 
-  commandFiles.forEach(cf => commands.push(require(`./${cf}`)))
-  commands.forEach(c => { if (!types.includes(c.type)) types.push(c.type) })
+const getCommands = (card, lang) => {
+  const commands = getCommandsList()
+  const types = [...new Set(commands.map(c => c.type))]
+
   types.forEach(t => {
     let value = ''
-    commands.forEach(c => { if (c.type === t) value += `\`${prefix} ${c.name}\` ` })
-    card.addField(t, value)
+    commands.forEach(c => { if (c.type === t) value += `\`${c.name}\` ` })
+    card.addFields({ name: getTranslation(`strings.${t}`, lang), value: value })
   })
 
   return { embeds: [card] }
 }
 
-const getCommandsHelp = (commandName, card) => {
+const getCommandsHelp = (commandName, card, lang) => {
   try { command = require(`./${commandName}.js`) }
-  catch { return errorCard('Command not found') }
+  catch {
+    return errorCard(getTranslation('error.command.notFound', lang, {
+      command: commandName
+    }), lang)
+  }
 
   let optionsDesc = ''
 
-  command.options.forEach(o => { optionsDesc += `\`${o.name}\`: ${o.description}\n` })
+  command.options.forEach(o => {
+    let desc = o.descriptionLocalizations[lang] || o.description
+    if (desc) optionsDesc += `\`${o.name}\`: ${desc}\n`
+  })
 
-  card.setDescription(`Informations about the ${command.name} command`)
-    .addFields({ name: 'Aliases', value: command.aliasses.join(', ') },
-      { name: 'Description', value: command.description },
-      { name: 'Options', value: optionsDesc.length > 0 ? optionsDesc : 'This command do not required options' },
-      { name: 'Usage', value: `${prefix}${command.name} ${command.usage}` })
+  card.setDescription(getTranslation('strings.helpInfo', lang, {
+    command: command.name
+  }))
+    .addFields({ name: getTranslation('strings.description', lang), value: command.descriptionLocalizations[lang] || command.description },
+      { name: getTranslation('strings.options', lang), value: optionsDesc.length > 0 ? optionsDesc : getTranslation('strings.noOptions', lang) },
+      { name: getTranslation('strings.usage', lang), value: `\`/${command.name} ${command.usage}\`` })
+
+  if (command?.example) card.addFields({ name: getTranslation('strings.example', lang), value: `\`/${command.name} ${command.example}\`` })
 
   return { embeds: [card] }
 }
 
 module.exports = {
   name: 'help',
-  aliasses: ['help', 'h'],
   options: [
     {
       name: 'command',
-      description: 'One of the command name.',
+      description: getTranslation('options.commandName', 'en-US'),
+      descriptionLocalizations: getTranslations('options.commandName'),
       required: false,
-      type: 3,
-      slash: true
+      type: Discord.ApplicationCommandOptionType.String,
+      slash: true,
+      choices: [
+        ...getCommandsList().map(c => {
+          if (c?.name) return { name: c.name, value: c.name }
+        }).filter(c => c !== undefined)
+      ]
     }
   ],
-  description: 'Display the command list.',
-  usage: 'command name',
+  description: getTranslation('command.help.description', 'en-US'),
+  descriptionLocalizations: getTranslations('command.help.description'),
+  ephemeral: true,
+  usage: '<command>',
   type: 'system',
-  async execute(message, args) {
-    const helpCard = new Discord.MessageEmbed()
-      .setColor(color.primary)
-      .setTitle('Commands')
-      .setDescription(`\`${prefix}help {command}\` for more info on a specific command`)
-      .setFooter(`${name} Help`)
+  async execute(interaction) {
+    const command = getInteractionOption(interaction, 'command')?.trim().split(' ')[0]
 
-    if (args.length === 0) return await getCommands(helpCard)
-    else return await getCommandsHelp(args[0], helpCard)
+    const helpCard = new Discord.EmbedBuilder()
+      .setColor(color.primary)
+      .setTitle(getTranslation('strings.help', interaction.locale))
+      .setDescription(getTranslation('strings.helpDescription', interaction.locale))
+      .setFooter({ text: `${name} ${getTranslation('strings.help', interaction.locale)}` })
+
+    if (command) return getCommandsHelp(command, helpCard, interaction.locale)
+    else return getCommands(helpCard, interaction.locale)
   }
 }

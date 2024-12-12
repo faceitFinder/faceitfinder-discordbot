@@ -1,62 +1,123 @@
-const { color } = require('../config.json')
+const { defaultGame } = require('../config.json')
 const Discord = require('discord.js')
-const Player = require('../functions/player')
-const Steam = require('../functions/steam')
-const RegexFun = require('../functions/regex')
 const User = require('../database/user')
-const errorCard = require('../templates/errorCard')
 const { getCardsConditions } = require('../functions/commands')
+const successCard = require('../templates/successCard')
+const { updateRoles } = require('../functions/roles')
+const errorCard = require('../templates/errorCard')
+const { getTranslations, getTranslation } = require('../languages/setup')
+const { getStats } = require('../functions/apiHandler')
+const { getInteractionOption } = require('../functions/utility')
 
-const sendCardWithInfos = async (message, steamParam) => {
-  try {
-    const steamId = await Steam.getId(steamParam)
-    const playerId = await Player.getId(steamId)
-    const playerDatas = await Player.getDatas(playerId)
-    const discordId = message.author.id
+const sendCardWithInfo = async (interaction, playerParam) => {
+  const discordId = interaction.user.id
+  const discordUserId = getInteractionOption(interaction, 'discord_user')
+  const nickname = getInteractionOption(interaction, 'nickname')
+  const lang = interaction.locale
 
-    await User.exists(discordId) ? await User.update(discordId, steamId) : User.create(discordId, steamId)
+  if (discordUserId) {
+    const guild = await interaction.guild.fetch()
+    return guild.members.fetch(discordUserId)
+      .then(async (member) => {
+        const discordUserId = member.user.id
 
-    return {
-      embeds: [
-        new Discord.MessageEmbed()
-          .setColor(color.primary)
-          .setDescription(`Your account has been linked to ${playerDatas.nickname}`)
-      ]
-    }
+        if (!interaction.member.permissions.has('ManageRoles') && discordUserId !== discordId)
+          return errorCard('error.user.permissions.manageRoles', lang)
+        else if (member.user.bot) return errorCard('error.user.noBotLink', lang)
 
-  } catch (error) {
-    console.log(error)
-    return errorCard(error)
+        const exists = await User.getWithGuild(discordUserId, null)
+        if (exists)
+          return errorCard(getTranslation('error.user.globalLink', lang, {
+            discord: `<@${discordUserId}>`
+          }), lang)
+
+        return link(interaction, playerParam, discordUserId, guild.id, nickname)
+      })
+      .catch(() => errorCard('error.user.notFound', lang))
   }
+
+  return link(interaction, playerParam, discordId, null, nickname)
+}
+
+const link = async (interaction, playerParam, discordId, guildId = null, nickname) => {
+  const user = await User.exists(discordId, guildId)
+  if (!!user?.verified) return errorCard('error.user.unlink.verified', interaction.locale)
+
+  const {
+    playerDatas
+  } = await getStats({
+    playerParam,
+    matchNumber: 1,
+    game: defaultGame,
+  })
+
+  const playerId = playerDatas.player_id
+
+  if (guildId) await User.remove(discordId)
+
+  user ?
+    User.update(discordId, playerId, guildId, nickname || user.nickname) :
+    User.create(discordId, playerId, guildId, nickname || false)
+
+  if (await User.get(discordId)) updateRoles(interaction.client, discordId, guildId)
+
+  return successCard(getTranslation('success.command.link', interaction.locale, {
+    playerName: playerDatas.nickname,
+    discord: `<@${discordId}>`
+  }, interaction.locale))
 }
 
 module.exports = {
   name: 'link',
-  aliasses: ['link'],
   options: [
     {
-      name: 'user_steam_parameter',
-      description: 'Steam id / custom steam id / url of a steam profile / csgo status users part',
-      required: true,
-      type: 3,
+      name: 'steam_parameter',
+      description: getTranslation('options.steamParameter', 'en-US'),
+      descriptionLocalizations: getTranslations('options.steamParameter'),
+      required: false,
+      type: Discord.ApplicationCommandOptionType.String,
+      slash: true
+    },
+    {
+      name: 'faceit_parameter',
+      description: getTranslation('options.faceitParameter', 'en-US'),
+      descriptionLocalizations: getTranslations('options.faceitParameter'),
+      required: false,
+      type: Discord.ApplicationCommandOptionType.String,
+      slash: true
+    },
+    {
+      name: 'discord_user',
+      description: getTranslation('options.discordUserLink', 'en-US'),
+      descriptionLocalizations: getTranslations('options.discordUserLink'),
+      required: false,
+      type: Discord.ApplicationCommandOptionType.User,
+      slash: true
+    },
+    {
+      name: 'nickname',
+      description: getTranslation('options.nicknameLink', 'en-US'),
+      descriptionLocalizations: getTranslations('options.nicknameLink'),
+      required: false,
+      type: Discord.ApplicationCommandOptionType.Boolean,
       slash: true
     }
   ],
-  description: `Link steam id to the discord user, to get your stats directly (no parameters needed).`,
-  usage: 'one of the options',
+  description: getTranslation('command.link.description', 'en-US'),
+  descriptionLocalizations: getTranslations('command.link.description'),
+  usage: '[<steam_parameter> <faceit_parameter>] <discord_user> <nickname>',
+  example: 'steam_parameter: justdams',
   type: 'utility',
-  async execute(message, args) {
-    const steamId = RegexFun.findSteamUIds(message.content)
-    try {
-      [args[0].split('/').filter(e => e).pop()]
-
-      return await getCardsConditions([],
-        steamId.length > 0 ? [steamId[0]] : [],
-        [args[0].split('/').filter(e => e).pop()],
-        message,
-        sendCardWithInfos)
-    } catch (e) {
-      return errorCard(`A parameter is missing, do \`.ffhelp link\` to see how the command works.`)
-    }
+  async execute(interaction) {
+    return getCardsConditions({
+      interaction,
+      fn: sendCardWithInfo,
+      maxUser: 1,
+      steam: 'steam_parameter',
+      faceit: 'faceit_parameter',
+      searchTeam: false,
+      searchCurrentUser: false,
+      required: true
+    })
   }
 }

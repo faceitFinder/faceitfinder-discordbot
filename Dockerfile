@@ -1,13 +1,27 @@
-FROM node:latest
+FROM node:21
 
-ENV APP /usr/src/app
+ARG APP=/usr/src/app
 
-RUN mkdir -p $APP
+ENV NODE_ENV=
+ENV TOKEN=
+ENV FACEIT_TOKEN=
+ENV STEAM_TOKEN=
+ENV TOPGG_TOKEN=
+
+RUN apt-get update && apt-get install -y \
+  build-essential \
+  libcairo2-dev \
+  libpango1.0-dev \
+  libjpeg-dev \
+  libgif-dev \
+  librsvg2-dev
+
 WORKDIR $APP
+COPY package.json .
+COPY yarn.lock .
 
-COPY package.json $APP
-RUN npm install
+RUN yarn install
 
-COPY . $APP
+COPY . .
 
-CMD ["npm", "start"]
+CMD ["yarn", "start"]
