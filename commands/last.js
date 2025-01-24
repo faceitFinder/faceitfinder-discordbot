@@ -69,7 +69,7 @@ const getMatchItems = async (interaction, playerDatas, steamDatas, playerHistory
           { name: 'Assists', value: roundStats.i7, inline: true },
           // Removed from faceit endpoint used by the api
           // { name: 'Damages', value: roundStats?.i20 ?? 'N/A', inline: true },
-          // { name: 'ADR', value: roundStats?.c10 ?? 'N/A', inline: true },
+          { name: 'ADR', value: roundStats?.c10 ?? 'N/A', inline: true },
           // { name: 'Entries (WR)', value: entries, inline: true },
         )
         .setThumbnail(`attachment://${faceitElo}${i}.png`)
