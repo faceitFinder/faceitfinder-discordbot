@@ -246,9 +246,8 @@ const generateDateStatsFields = (playerLastStats, head) => {
     { name: 'Avg Kills', value: playerLastStats['Average Kills'].toFixed(2), inline: true },
     { name: 'Avg Deaths', value: playerLastStats['Average Deaths'].toFixed(2), inline: true },
     { name: 'Avg Assists', value: playerLastStats['Average Assists'].toFixed(2), inline: true },
-    // Removed from faceit endpoint used by the api
     // { name: 'Avg Damages', value: playerLastStats['Average Damages']?.toString() ?? 'N/A', inline: true },
-    // { name: 'Avg ADR', value: playerLastStats['Average ADR']?.toString() ?? 'N/A', inline: true },
+    { name: 'Avg ADR', value: playerLastStats['Average ADR']?.toString() ?? 'N/A', inline: false },
     // { name: 'Avg Entries (WR)', value: entries, inline: true },
     { name: 'Red K/D', value: playerLastStats['Red K/D'].toString(), inline: true },
     { name: 'Orange K/D', value: playerLastStats['Orange K/D'].toString(), inline: true },
