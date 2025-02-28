@@ -150,24 +150,25 @@ module.exports = {
      */
     else if (interaction.client.commands.has(interaction.commandName)) {
       const command = interaction.client.commands.get(interaction.commandName)
-      interaction
-        .deferReply({ ephemeral: command.ephemeral })
-        .then(async () => {
-          const premiumSubCommand = command.options
-            .filter(option => option.type === ApplicationCommandOptionType.Subcommand && option.premium && option.name === interaction.options.getSubcommand())
+      const subCommand = command.options
+        .filter(option => option.type === ApplicationCommandOptionType.Subcommand && option.name === interaction.options.getSubcommand())
+        .shift()
 
-          if (premiumSubCommand.length > 0) {
+      interaction
+        .deferReply({ ephemeral: command.ephemeral ?? subCommand?.ephemeral })
+        .then(async () => {
+          const premiumSubCommand = subCommand?.premium
+          if (premiumSubCommand) {
             const isPremium = await currentGuildIsPremium(interaction.client, interaction.guildId)
             if (!isPremium) {
               interaction.followUp({
-                ephemeral: true,
                 content: ' ',
                 ...premiumCard(interaction.locale),
               }).catch((error) => errorHandler(interaction, error))
               return
             }
           }
-          
+
           CommandsStats.create(interaction.commandName, 'command', interaction)
           command?.execute(interaction)
             .then(resp => {

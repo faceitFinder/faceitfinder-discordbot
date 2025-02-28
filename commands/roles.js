@@ -7,6 +7,7 @@ const successCard = require('../templates/successCard')
 const { updateRoles, getRoleIds } = require('../functions/roles')
 const { getTranslations, getTranslation } = require('../languages/setup')
 const { isInteractionSubcommandEqual, getInteractionOption } = require('../functions/utility')
+const { ephemeral } = require('./team')
 
 const SETUP = 'setup'
 const GENERATE = 'generate'
@@ -226,6 +227,7 @@ module.exports = {
       descriptionLocalizations: getTranslations('options.setupRoles'),
       type: Discord.ApplicationCommandOptionType.Subcommand,
       slash: true,
+      ephemeral: true,
       options: [
         ...Array(10).fill('').map((k, i) => {
           return {
@@ -252,6 +254,7 @@ module.exports = {
       descriptionLocalizations: getTranslations('options.generateRoles'),
       type: Discord.ApplicationCommandOptionType.Subcommand,
       slash: true,
+      ephemeral: true,
       options: [
         {
           name: 'remove_old',
@@ -267,7 +270,8 @@ module.exports = {
       description: getTranslation('options.removeRoles', 'en-US'),
       descriptionLocalizations: getTranslations('options.removeRoles'),
       type: Discord.ApplicationCommandOptionType.Subcommand,
-      slash: true
+      slash: true,
+      ephemeral: true
     },
     {
       name: SETUP_ELO,
@@ -276,6 +280,7 @@ module.exports = {
       type: Discord.ApplicationCommandOptionType.Subcommand,
       slash: true,
       premium: true,
+      ephemeral: true,
       options: [
         {
           name: 'role_name',
@@ -317,6 +322,7 @@ module.exports = {
       descriptionLocalizations: getTranslations('options.removeEloRole'),
       type: Discord.ApplicationCommandOptionType.Subcommand,
       slash: true,
+      ephemeral: true,
       options: [
         {
           name: 'role',
