@@ -159,7 +159,14 @@ module.exports = {
         .then(async () => {
           const premiumSubCommand = subCommand?.premium
           if (premiumSubCommand) {
-            const isPremium = await currentGuildIsPremium(interaction.client, interaction.guildId, true)
+            let isPremium = false
+            // Check if the guild is premium from cache
+            isPremium = await currentGuildIsPremium(interaction.client, interaction.guildId)
+
+            // If guild is not premium, renew the cache and check again
+            // This is to avoid a cache miss when the guild subscribes before the automatic cache update
+            if (!isPremium) isPremium = await currentGuildIsPremium(interaction.client, interaction.guildId, true)
+
             if (!isPremium) {
               interaction.followUp({
                 content: ' ',
