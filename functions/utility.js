@@ -60,8 +60,8 @@ const getActiveGuildsEntitlements = async (client, renewCache = false) => {
   return activeGuildEntitlements
 }
 
-const currentGuildIsPremium = async (client, guildId) => {
-  const premiumGuilds = await getActiveGuildsEntitlements(client)
+const currentGuildIsPremium = async (client, guildId, renewCache = false) => {
+  const premiumGuilds = await getActiveGuildsEntitlements(client, renewCache)
   const isPremium = premiumGuilds?.map(g => g.guildId).includes(guildId)
   return isPremium
 }
