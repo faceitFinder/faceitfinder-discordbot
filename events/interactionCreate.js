@@ -150,8 +150,12 @@ module.exports = {
      */
     else if (interaction.client.commands.has(interaction.commandName)) {
       const command = interaction.client.commands.get(interaction.commandName)
+      const subCommand = command.options
+        .filter(option => option.type === ApplicationCommandOptionType.Subcommand && option.name === interaction.options.getSubcommand())
+        .shift()
+
       interaction
-        .deferReply({ ephemeral: command.ephemeral })
+        .deferReply({ ephemeral: command.ephemeral ?? subCommand?.ephemeral })
         .then(async () => {
           const premiumSubCommand = subCommand?.premium
           if (premiumSubCommand) {
