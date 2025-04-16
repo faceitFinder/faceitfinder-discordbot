@@ -159,7 +159,7 @@ module.exports = {
         .then(async () => {
           const premiumSubCommand = subCommand?.premium
           if (premiumSubCommand) {
-            const isPremium = await currentGuildIsPremium(interaction.client, interaction.guildId)
+            const isPremium = await currentGuildIsPremium(interaction.client, interaction.guildId, true)
             if (!isPremium) {
               interaction.followUp({
                 content: ' ',
