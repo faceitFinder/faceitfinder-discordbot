@@ -165,14 +165,13 @@ module.exports = {
 
             if (!isPremium) {
               interaction.followUp({
-                ephemeral: true,
                 content: ' ',
                 ...premiumCard(interaction.locale),
               }).catch((error) => errorHandler(interaction, error))
               return
             }
           }
-          
+
           CommandsStats.create(interaction.commandName, 'command', interaction)
           command?.execute(interaction)
             .then(resp => {
