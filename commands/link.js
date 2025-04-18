@@ -17,23 +17,20 @@ const sendCardWithInfo = async (interaction, playerParam) => {
 
   if (discordUserId) {
     const guild = await interaction.guild.fetch()
-    return guild.members.fetch(discordUserId)
-      .then(async (member) => {
-        const discordUserId = member.user.id
+    let member = null
+    try { member = await guild.members.fetch(discordUserId) } catch { throw 'error.user.notFound' }
 
-        if (!interaction.member.permissions.has('ManageRoles') && discordUserId !== discordId)
-          return errorCard('error.user.permissions.manageRoles', lang)
-        else if (member.user.bot) return errorCard('error.user.noBotLink', lang)
+    if (!interaction.member.permissions.has('ManageRoles') && discordUserId !== discordId)
+      return errorCard('error.user.permissions.manageRoles', lang)
+    else if (member.user.bot) return errorCard('error.user.noBotLink', lang)
 
-        const exists = await User.getWithGuild(discordUserId, null)
-        if (exists)
-          return errorCard(getTranslation('error.user.globalLink', lang, {
-            discord: `<@${discordUserId}>`
-          }), lang)
+    const exists = await User.getWithGuild(discordUserId, null)
+    if (exists)
+      return errorCard(getTranslation('error.user.globalLink', lang, {
+        discord: `<@${discordUserId}>`
+      }), lang)
 
-        return link(interaction, playerParam, discordUserId, guild.id, nickname)
-      })
-      .catch(() => errorCard('error.user.notFound', lang))
+    return link(interaction, playerParam, discordUserId, guild.id, nickname)
   }
 
   return link(interaction, playerParam, discordId, null, nickname)
