@@ -27,6 +27,11 @@ app.put('/users/:id/roles', async (req, res) => {
   res.status(200).send()
 })
 
+app.get('/guilds', async (req, res) => {
+  const guilds = client.guilds.cache
+  res.status(200).json(guilds)
+})
+
 app.listen(PORT, () => {
   console.log(`🐉 API server is running on port ${PORT}`)
 })
