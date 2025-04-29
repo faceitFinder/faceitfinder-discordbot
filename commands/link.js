@@ -50,7 +50,7 @@ const link = async (interaction, playerParam, discordId, guildId = null, nicknam
 
   const playerId = playerDatas.player_id
 
-  if (guildId) await User.remove(discordId)
+  if (guildId) await User.remove(discordId, null, false)
 
   user ?
     User.update(discordId, playerId, guildId, nickname || user.nickname) :
