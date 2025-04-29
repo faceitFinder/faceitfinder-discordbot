@@ -16,7 +16,7 @@ const get = (discordId) => User.find({ discordId: discordId }).exec()
 
 const getWithGuild = (discordId, guildId = null) => User.findOne({ discordId: discordId, guildId: guildId }).exec()
 
-const remove = (discordId, guildId = null) => guildId ?
+const remove = (discordId, guildId = null, all = true) => guildId || !guildId && !all ?
   User.deleteOne({ discordId: discordId, guildId: guildId }).exec() :
   User.deleteMany({ discordId: discordId }).exec()
 
