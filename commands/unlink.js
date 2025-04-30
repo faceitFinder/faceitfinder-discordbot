@@ -42,6 +42,7 @@ module.exports = {
   descriptionLocalizations: getTranslations('command.unlink.description'),
   usage: '',
   type: 'utility',
+  ephemeral: true,
   async execute(interaction) {
     return sendCardWithInfo(interaction)
   }
