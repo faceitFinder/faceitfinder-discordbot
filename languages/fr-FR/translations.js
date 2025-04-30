@@ -1,5 +1,5 @@
 /* eslint-disable semi */
-const { maxLengthTeamName, invite, join, oauth2, unlinkVerified } = require('../../config.json');
+const { maxLengthTeamName, invite, join, oauth2, unlinkVerified, linkVerified } = require('../../config.json');
 const base = structuredClone(require('../base'));
 base.command.compare.description = 'Comparer les statistiques des 2 joueurs.';
 base.command.dailystats.description = 'Obtenir les statistiques du jour sélectionné, accompagné d\'un graphique de l\'évolution de l\'elo.';
@@ -143,6 +143,7 @@ base.error.user.globalLink = '{discord} est déjà associé à un compte faceit 
 base.error.user.notFound = 'L\'utilisateur demandé n\'est pas présent sur ce serveur.';
 base.error.user.mapNotPlayed = 'Le joueur **{playerName}** n\'a pas joué cette carte.';
 base.error.user.unlink.verified = `Votre compte est vérifié, vous devez supprimer l\'association sur le site web, cliquez sur le lien ci-dessous pour le faire\n${unlinkVerified}`;
+base.error.user.link.verified.other = `Ce compte est vérifié, l'utilisateur devra sélectionner la guilde sur le site pour la lier\n${linkVerified}`
 base.error.execution.command = 'Une erreur est survenue lors de l\'exécution de la commande.';
 base.error.execution.selectmenu = 'Une erreur est survenue lors de l\'exécution du menu déroulant.';
 base.error.execution.button = 'Une erreur est survenue lors de l\'exécution du bouton.';
