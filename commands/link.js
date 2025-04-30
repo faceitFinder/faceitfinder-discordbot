@@ -37,9 +37,15 @@ const sendCardWithInfo = async (interaction, playerParam) => {
 }
 
 const link = async (interaction, playerParam, discordId, guildId = null, nickname) => {
-  const user = await User.exists(discordId, guildId)
-  if (!!user?.verified) return errorCard('error.user.unlink.verified', interaction.locale)
+  const verified = await User.getVerified(discordId)
+  if (verified.length > 0) { 
+    const error = interaction.user.id === discordId ?
+      'error.user.unlink.verified' :
+      'error.user.link.verified.other'
+    return errorCard(error, interaction.locale) 
+  }
 
+  const user = await User.exists(discordId, guildId)
   const {
     playerDatas
   } = await getStats({
@@ -49,7 +55,6 @@ const link = async (interaction, playerParam, discordId, guildId = null, nicknam
   })
 
   const playerId = playerDatas.player_id
-
   if (guildId) await User.remove(discordId, null, false)
 
   user ?
@@ -105,6 +110,7 @@ module.exports = {
   usage: '[<steam_parameter> <faceit_parameter>] <discord_user> <nickname>',
   example: 'steam_parameter: justdams',
   type: 'utility',
+  ephemeral: true,
   async execute(interaction) {
     return getCardsConditions({
       interaction,

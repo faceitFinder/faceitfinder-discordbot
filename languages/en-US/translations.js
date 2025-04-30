@@ -1,5 +1,5 @@
 /* eslint-disable semi */
-const { maxLengthTeamName, invite, join, oauth2, unlinkVerified } = require('../../config.json')
+const { maxLengthTeamName, invite, join, oauth2, unlinkVerified, linkVerified } = require('../../config.json')
 const base = structuredClone(require('../base'))
 base.command.compare.description = 'Compare both user stats'
 base.command.dailystats.description = 'Displays the stats of the chosen day, with elo graph of the day'
@@ -11,6 +11,7 @@ base.command.join.description = 'Get the link to join the community server of th
 base.command.last.description = 'Get the stats of last game'
 base.command.laststats.description = 'Displays the stats of the x last match, with elo graph of the X last match'
 base.command.link.description = 'Link a faceit profile to the discord user, to get your stats directly (no parameters needed)'
+base.command.verify.description = 'Verify your faceit account'
 base.command.map.description = 'Displays the stats of the chosen map'
 base.command.monthstats.description = 'Displays the stats of the chosen month, with elo graph of the month'
 base.command.roles.description = 'Ranks are updated every hour and when you get your stats'
@@ -119,8 +120,10 @@ base.strings.pagination = {
   last: 'Last Page'
 }
 base.strings.donate = 'Support the project'
+base.strings.translation = 'Help with the translation'
 base.strings.fullHistory = 'Full history'
-base.strings.premiumDesc = 'This feature is only available for premium guilds. Become a premium guild by clicking on the button below'
+base.strings.verifyDescription = `Hey {discord}, to verify your faceit account click on the link below!\n${oauth2}\nOnce you have verified your account, you will be able to get the linked role, and more !`
+base.strings.verify = 'Verification'
 base.error.user.missing = 'It seems like there is a user missing'
 base.error.user.compareSame = 'You can\'t compare the same user'
 base.error.user.excluded = 'You can\'t exclude a player you are searching for'
@@ -143,6 +146,8 @@ base.error.user.noBotLink = 'Sorry, but bots aren\'t really my type'
 base.error.user.globalLink = '{discord} already has a global link'
 base.error.user.notFound = 'The requested user is not on this server'
 base.error.user.mapNotPlayed = 'The player **{playerName}** hasn\'t played on this map'
+base.error.user.unlink.verified = `Since your account is verified, you have to unlink your account on the website, click on the link below to do so\n${unlinkVerified}`
+base.error.user.link.verified.other = `This account is verified, the user will have to select the guild on the website to link it\n${linkVerified}`
 base.error.execution.command = 'An error occurred while executing the command'
 base.error.execution.selectmenu = 'An error occurred while executing the select menu'
 base.error.execution.button = 'An error occurred while executing the button'
@@ -186,8 +191,4 @@ base.success.command.unlink = {
 base.success.command.link = '{discord} has been linked to **{playerName}**'
 base.success.command.setupEloRoles = 'The elo role has been generated successfully'
 base.success.command.removeRole = 'The role has been removed successfully'
-base.command.verify.description = 'Verify your faceit account'
-base.strings.verifyDescription = `Hey {discord}, to verify your faceit account click on the link below!\n${oauth2}\nOnce you have verified your account, you will be able to get the linked role, and more !`
-base.strings.verify = 'Verification'
-base.error.user.unlink.verified = `Since your account is verified, you have to unlink your account on the website, click on the link below to do so\n${unlinkVerified}`
 module.exports = base

@@ -1,5 +1,5 @@
 /* eslint-disable semi */
-const { maxLengthTeamName, invite, join, oauth2, unlinkVerified } = require('../../config.json');
+const { maxLengthTeamName, invite, join, oauth2, unlinkVerified, linkVerified } = require('../../config.json');
 const base = structuredClone(require('../base'));
 base.command.compare.description = 'Сравнить статистику обоих пользователей';
 base.command.dailystats.description = 'Отобразить статистику с графиком эло за указанный день';
@@ -186,4 +186,5 @@ base.command.verify.description = 'Подтвердите ваш аккаунт 
 base.strings.verifyDescription = `Привет {discord}, чтобы подтвердить ваш аккаунт Faceit, нажмите на ссылку ниже!\n${oauth2}\nПосле подтверждения вашего аккаунта, вы сможете получить привязанную роль и многое другое!`
 base.strings.verify = 'Подтверждение'
 base.error.user.unlink.verified = `Поскольку ваш аккаунт подтвержден, вам необходимо отвязать ваш аккаунт на веб-сайте. Нажмите на ссылку ниже, чтобы сделать это.\n${unlinkVerified}`
+base.error.user.link.verified.other = `Этот аккаунт подтверждён, пользователю нужно выбрать гильдию на сайте, чтобы связать её\n${linkVerified}`
 module.exports = base;

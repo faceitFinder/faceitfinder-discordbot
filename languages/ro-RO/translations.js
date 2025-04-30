@@ -1,5 +1,5 @@
 /* eslint-disable semi */
-const { maxLengthTeamName, invite, join, oauth2, unlinkVerified } = require('../../config.json');
+const { maxLengthTeamName, invite, join, oauth2, unlinkVerified, linkVerified } = require('../../config.json');
 const base = structuredClone(require('../base'));
 base.command.compare.description = 'Compara statisticile a doi jucători';
 base.command.dailystats.description = 'Vezi statisticile unei zile, cu graficul elo al zilei';
@@ -183,7 +183,8 @@ base.success.command.link = '{discord} a fost asociat cu **{playerName}**';
 base.success.command.setupEloRoles = 'The elo role has been generated successfully';
 base.success.command.removeRole = 'The role has been removed successfully';
 base.command.verify.description = 'Verifică-ți contul Faceit'
-base.strings.verifyDescription = 'Hey {discord}, pentru a-ți verifica contul Faceit, apasă pe link-ul de mai jos!\n${oauth2}\nDupă ce ți-ai verificat contul, vei putea obține rolul asociat și multe altele!'
+base.strings.verifyDescription = `Hey {discord}, pentru a-ți verifica contul Faceit, apasă pe link-ul de mai jos!\n${oauth2}\nDupă ce ți-ai verificat contul, vei putea obține rolul asociat și multe altele!`
 base.strings.verify = 'Verificare'
-base.error.user.unlink.verified = 'Deoarece contul tău este verificat, trebuie să-ți deconectezi contul pe site-ul web, apasă pe link-ul de mai jos pentru a face acest lucru\n${unlinkVerified}'
+base.error.user.unlink.verified = `Deoarece contul tău este verificat, trebuie să-ți deconectezi contul pe site-ul web, apasă pe link-ul de mai jos pentru a face acest lucru\n${unlinkVerified}`
+base.error.user.link.verified.other`Acest cont este verificat, utilizatorul va trebui să selecteze breasla pe site pentru a o conecta\n${linkVerified}`
 module.exports = base;

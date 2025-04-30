@@ -1,5 +1,5 @@
 /* eslint-disable semi */
-const { maxLengthTeamName, invite, join, oauth2, unlinkVerified } = require('../../config.json');
+const { maxLengthTeamName, invite, join, oauth2, unlinkVerified, linkVerified } = require('../../config.json');
 const base = structuredClone(require('../base'));
 base.command.compare.description = 'Vergleiche beide User Statistiken';
 base.command.dailystats.description = 'Zeigt die Statistiken des ausgewählten Tages mit der Elo-Grafik des Tages an.';
@@ -143,6 +143,7 @@ base.error.user.globalLink = '{discord} hat schon einen Globalen-Link';
 base.error.user.notFound = 'Der angefragte User ist nicht auf dem Server';
 base.error.user.mapNotPlayed = 'Der Spieler **{playerName}**, hat noch nicht auf dieser Karte gespielt';
 base.error.user.unlink.verified = `Da Ihr Konto verifiziert ist, müssen Sie Ihr Konto auf der Website trennen. Klicken Sie auf den unten stehenden Link, um dies zu tun\n${unlinkVerified}`;
+base.error.user.link.verified.other = `Dieses Konto ist verifiziert, der Benutzer muss die Gilde auf der Website auswählen, um sie zu verknüpfen\n${linkVerified}`;
 base.error.execution.command = 'Es ist ein Fehler aufgetreten, während der Befehl ausgeführt wurde';
 base.error.execution.selectmenu = 'Es ist ein Fehler aufgetreten, während das Auswahlfeld ausgeführt wurde';
 base.error.execution.button = 'Es ist ein Fehler aufgetreten, während des Drückens des Knopfes';
