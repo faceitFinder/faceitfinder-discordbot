@@ -185,7 +185,12 @@ module.exports = {
       mapNotPlayed: '',
       unlink: {
         verified: '',
-      }
+      },
+      link: {
+        verified: {
+          other: '',
+        },
+      },
     },
     execution: {
       command: '',
