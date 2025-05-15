@@ -21,7 +21,7 @@ Processing is lawful if at least one legal basis applies, including consent, con
 
 ### 3.1 Data Collected
 
-Data collected includes Discord user and guild IDs, Faceit IDs. This data is only collected during voluntary user actions and can be deleted using provided buttons under the profile settings section.
+Data collected includes Discord user, role and guild IDs, Faceit IDs. This data is only collected during voluntary user actions and can be deleted using provided buttons under the profile settings section.
 
 ### 3.2 Data Hosting
 
