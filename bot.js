@@ -15,23 +15,27 @@ fs.readdirSync('./events').filter(file => file.endsWith('.js')).forEach(async (f
 // Start the bot
 client.login(process.env.TOKEN)
 
-// start the API
-const app = express()
-const PORT = process.env.EXPRESS_PORT || 3001
+try {
+  // start the API
+  const app = express()
+  const PORT = process.env.EXPRESS_PORT || 3001
 
-app.put('/users/:id/roles', async (req, res) => {
-  const { id } = req.params
-  const { remove } = req.query
-  await updateRoles(client, id, null, remove === 'true')
+  app.put('/users/:id/roles', async (req, res) => {
+    const { id } = req.params
+    const { remove } = req.query
+    await updateRoles(client, id, null, remove === 'true')
 
-  res.status(200).send()
-})
+    res.status(200).send()
+  })
 
-app.get('/guilds', async (req, res) => {
-  const guilds = client.guilds.cache
-  res.status(200).json(guilds)
-})
+  app.get('/guilds', async (req, res) => {
+    const guilds = client.guilds.cache
+    res.status(200).json(guilds)
+  })
 
-app.listen(PORT, () => {
-  console.log(`🐉 API server is running on port ${PORT}`)
-})
+  app.listen(PORT, () => {
+    console.log(`🐉 API server is running on port ${PORT}`)
+  })
+} catch (error) {
+  console.error('Failed to start the API server:', error)
+}
