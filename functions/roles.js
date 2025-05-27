@@ -89,25 +89,36 @@ const setupRoles = async (client, user, guildId, remove) => {
   }
 }
 
-const updateRoles = async (client, discordId, guildId, remove = false) => {
+const updateRoles = async (client, discordId, guildIds, remove = false) => {
   let user, guilds
+  guildIds = [guildIds].flat().filter(e => e)
 
   if (discordId) {
     user = [await User.get(discordId)].flat()
     if (user.length > 1) {
-      user = user.filter(e => guildId ? [guildId].flat().includes(e.guildId) : true)
+      user = user.filter(e => guildIds.length ? guildIds.includes(e.guildId) : true)
     }
-    guildId = user.map(e => e.guildId).filter((e, i, a) => a.indexOf(e) === i)
+    guilds = user.map(e => e.guildId).filter((e, i, a) => a.indexOf(e) === i).filter(e => e)
   }
 
-  if (guildId) guilds = [guildId].flat()
-  else guilds = (await GuildCustomRole.getAll()).map(e => e.guildId).filter((e, i, a) => a.indexOf(e) === i)
+  if (!guilds.length) guilds = (await GuildCustomRole.getAll()).map(e => e.guildId).filter((e, i, a) => a.indexOf(e) === i)
 
   console.info(`Updating roles for ${guilds.length} guilds, user: ${discordId}, remove: ${remove}`)
 
-  Promise.all(guilds.map(async guild => await setupRoles(client, user, guild, remove).catch(console.error)))
-    .then(() => { if (remove) User.remove(discordId, guildId) })
-    .catch(console.error)
+  Promise.all(guilds.map(async guildId => {
+    await setupRoles(client, user, guildId, remove).catch(console.error)
+    return guildId
+  })).then((guildIdsProcessed) => {
+    if (remove) {
+      if (!guildIds.length) User.remove(discordId, null, true)
+        .then(() => console.info(`User ${discordId} removed from all guilds`))
+      else {
+        guildIdsProcessed.forEach(guildId => {
+          User.remove(discordId, guildId).then(() => console.info(`User ${discordId} removed from guild: ${guildId}`))
+        })
+      }
+    }
+  }).catch(console.error)
 }
 
 const logRoleUpdate = (client, member, role, guildDatas, playerElo, action) => {
