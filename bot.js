@@ -3,7 +3,8 @@ const fs = require('fs')
 const express = require('express')
 const AntiSpam = require('./templates/antispam')
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildMessages] })
-const { updateRoles } = require('./functions/roles')
+const { updateRoles, updateSubscribedGuilds } = require('./functions/roles')
+const { guildCount } = require('./functions/client')
 
 client.antispam = new AntiSpam()
 
@@ -12,10 +13,21 @@ fs.readdirSync('./events').filter(file => file.endsWith('.js')).forEach(async (f
   client.on(event.name, (...args) => { event.execute(...args) })
 })
 
-// Start the bot
-client.login(process.env.TOKEN)
+client.once('ready', async (client) => {
+  if (client.shard.ids[0] !== client.shard.count - 1) return
 
-try {
+  /**
+   * Initialize the automatic role assignment
+   */
+  setInterval(() => {
+    updateSubscribedGuilds(client)
+  }, 1000 * 60 * 60)
+
+  /**
+   * Update the guild count
+   */
+  guildCount(client)
+
   // start the API
   const app = express()
   const PORT = process.env.EXPRESS_PORT || 3001
@@ -36,6 +48,17 @@ try {
   app.listen(PORT, () => {
     console.log(`🐉 API server is running on port ${PORT}`)
   })
-} catch (error) {
-  console.error('Failed to start the API server:', error)
+})
+
+// Start the bot
+client.login(process.env.TOKEN)
+
+const shutdown = async () => {
+  console.log(`Shard ${client.shard?.ids[0] ?? '0'} is shutting down...`)
+  await client.destroy()
+  process.exit(0)
 }
+
+process.on('SIGINT', shutdown)
+process.on('SIGTERM', shutdown)
+process.on('SIGUSR2', shutdown)

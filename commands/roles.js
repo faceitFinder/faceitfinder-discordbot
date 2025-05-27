@@ -41,7 +41,6 @@ const setupRoles = async (interaction) => {
     .setAuthor({ name: name, iconURL: 'attachment://logo.png' })
     .setFooter({ text: `${name} ${getTranslation('strings.info', interaction.locale)}` })
 
-
   rolesFields.reverse().forEach((v, i) => card.addFields({ name: `Level ${10 - i}`, value: v, inline: true }))
 
   if (error === 0) {

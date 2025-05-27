@@ -1,10 +1,8 @@
 const Discord = require('discord.js')
 const mongo = require('../database/mongo')
 const fs = require('fs')
-const { guildCount } = require('../functions/client')
 const { REST } = require('@discordjs/rest')
 const { Routes } = require('discord-api-types/v9')
-const { updateSubscribedGuilds } = require('../functions/roles')
 
 module.exports = {
   name: 'ready',
@@ -69,18 +67,6 @@ module.exports = {
         client[folder].set(i.name, i)
       })
     })
-
-    /**
-     * Initialize the automatic role assignment
-     */
-    setInterval(() => {
-      updateSubscribedGuilds(client)
-    }, 1000 * 60 * 60)
-
-    /**
-     * Update the guild count
-     */
-    guildCount(client)
 
     /**
      * Setup / commands
