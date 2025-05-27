@@ -10,7 +10,7 @@ const REMOVE = 'REMOVE', ADD = 'ADD'
 const getRoleIds = (guildRoles) => Object.keys(Object.entries(guildRoles)[2][1])
   .filter(e => e.startsWith('level')).map(e => guildRoles[e])
 
-const getCustomRoles = async (guildId) => {
+const getRoles = async (guildId) => {
   const roles = await GuildRoles.getRolesOf(guildId)
   if (!roles) return
 
@@ -26,60 +26,67 @@ const getCustomRoles = async (guildId) => {
 }
 
 const setupRoles = async (client, user, guildId, remove) => {
-  const guildDatas = await client.guilds.fetch(guildId).catch(() => null)
-  if (!guildDatas) return
+  const guild = await client.guilds.fetch(guildId).catch(() => null)
+  if (!guild) return console.warn(`Guild with ID ${guildId} not found`)
 
-  let members
+  user = [user].flat().filter(e => e).filter(e => e.guildId === guild.id || !e.guildId)?.at(0)
 
-  if (user && user.length > 0) members = [await guildDatas.members.fetch({ user: user.at(0).discordId, cache: false }).catch(() => null)]
-  else members = await guildDatas.members.fetch({ cache: false })
+  console.info(`Setting up roles for guild: ${guild.name} (${guild.id})`)
 
-  const isPremium = await currentGuildIsPremium(client, guildId)
-  const roles = isPremium ? await GuildCustomRole.getRolesOf(guildDatas.id) : await getCustomRoles(guildDatas.id)
-  if (!roles) return
+  const isPremium = await currentGuildIsPremium(guildId)
+  const roles = isPremium ? await GuildCustomRole.getRolesOf(guild.id) : await getRoles(guild.id)
+  if (!roles?.length) return console.warn(`No roles found for guild: ${guild.name} (${guild.id})`)
 
-  members?.forEach(async (member) => {
-    if (!member?.user) return
+  console.info(`Found ${roles.length} roles for guild: ${guild.name} (${guild.id})`)
+
+  const members = await client.shard.broadcastEval(async (c, { guildId, user }) => {
+    const g = await c.guilds.fetch(guildId).catch(() => null)
+    if (!g || c.shard.ids[0] !== g.shardId) return []
+
+    const members = await g.members.fetch({ cache: false }).catch(() => [])
+    return members.filter(m => m.user && !m.user.bot).map(m => ({
+      id: m.id,
+      user: { id: m.user.id, username: m.user.username, tag: m.user.tag },
+      roles: m.roles.cache.map(r => r.id),
+      nickname: m.nickname,
+    })).filter(m => user ? m.user.id === user.discordId : true)
+  }, { context: { guildId, user } }).then(res => res.flat())
+
+  console.info(`Found ${members.length} members in guild: ${guild.name} (${guild.id})`)
+
+  for (const member of members) {
     let user = await User.get(member.user.id)
+    if (!(user.length > 0)) continue
 
-    if (!(user.length > 0)) return
-    else if (user.length > 1) user = user.filter(e => e.guildId === guildDatas.id)
-
+    if (user.length > 1) user = user.filter(e => e.guildId === guild.id)
     user = user.flat().at(0)
-    
-    if (!user || !user.faceitId) return
-    
+    if (!user?.faceitId) continue
+
+    console.info(`Processing user: ${member.user.username} (${member.user.id}) in guild: ${guild.name} (${guild.id})`)
+
     const playerParam = { param: user.faceitId, faceitId: true }
     const stats = await getStats({ playerParam, game: defaultGame, matchNumber: 1 }).catch(() => null)
+    if (!stats?.playerDatas?.games?.[defaultGame]) continue
+    const playerElo = stats.playerDatas.games[defaultGame].faceit_elo
 
-    if (!stats) return
+    if (user.nickname) {
+      await guild.members.fetch(member.id).then(m => m.setNickname(stats.playerDatas.nickname)
+        .catch((error) => console.error(`Failed to set nickname for ${member.user.tag} in guild ${guild.name}:`, error)))
+    }
 
-    const playerDatas = stats.playerDatas
-
-    if (!playerDatas?.games[defaultGame]) return
-
-    const playerElo = playerDatas.games[defaultGame].faceit_elo
-
-    if (user.nickname) await member.edit({ nick: playerDatas.nickname }).catch(() => null)
-
-    roles.forEach(async (role) => {
+    for (const role of roles) {
       const removeRole = playerElo < role.eloMin || playerElo > role.eloMax
-      const roleId = role.roleId
-      const rolesFit = !!member.roles.resolve(roleId)
+      const hasRole = member.roles.includes(role.roleId)
 
-      // Remove role if it doesn't fit the criteria and the role is assigned or if the remove flag is set
-      if ((removeRole && rolesFit) || remove)
-        await member.roles.remove(roleId)
-          .then(e => logRoleUpdate(client, member, role, guildDatas, playerElo, REMOVE))
-          .catch((err) => handleRoleErrors(err, role))
-
-      // Add role if it fits the criteria and the role isn't already assigned and the remove flag isn't set
-      if ((!removeRole && !rolesFit) && !remove)
-        await member.roles.add(roleId)
-          .then(e => logRoleUpdate(client, member, role, guildDatas, playerElo, ADD))
-          .catch((err) => handleRoleErrors(err, role))
-    })
-  })
+      if ((removeRole && hasRole) || remove) {
+        await guild.members.fetch(member.id).then(m => m.roles.remove(role.roleId).catch(() => null))
+        logRoleUpdate(client, member, role, guild, playerElo, REMOVE)
+      } else if (!removeRole && !hasRole && !remove) {
+        await guild.members.fetch(member.id).then(m => m.roles.add(role.roleId).catch(() => null))
+        logRoleUpdate(client, member, role, guild, playerElo, ADD)
+      }
+    }
+  }
 }
 
 const updateRoles = async (client, discordId, guildId, remove = false) => {
@@ -87,20 +94,20 @@ const updateRoles = async (client, discordId, guildId, remove = false) => {
 
   if (discordId) {
     user = [await User.get(discordId)].flat()
-    if (user.length > 1) user = user.filter(e => e.guildId === guildId)
-    guildId = user.at(0)?.guildId
+    if (user.length > 1) {
+      user = user.filter(e => guildId ? [guildId].flat().includes(e.guildId) : true)
+    }
+    guildId = user.map(e => e.guildId).filter((e, i, a) => a.indexOf(e) === i)
   }
 
   if (guildId) guilds = [guildId].flat()
   else guilds = (await GuildCustomRole.getAll()).map(e => e.guildId).filter((e, i, a) => a.indexOf(e) === i)
 
+  console.info(`Updating roles for ${guilds.length} guilds, user: ${discordId}, remove: ${remove}`)
+
   Promise.all(guilds.map(async guild => await setupRoles(client, user, guild, remove).catch(console.error)))
     .then(() => { if (remove) User.remove(discordId, guildId) })
     .catch(console.error)
-}
-
-const handleRoleErrors = (err, role) => {
-  if (err.status === '404') GuildCustomRole.remove(role.guildId, role.roleId)
 }
 
 const logRoleUpdate = (client, member, role, guildDatas, playerElo, action) => {
