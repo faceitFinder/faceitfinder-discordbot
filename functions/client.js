@@ -1,5 +1,4 @@
 const { Api } = require('@top-gg/sdk')
-const { ActivityType } = require('discord.js')
 
 const guildCount = async (client) => {
   const guildsSize = await client.shard.fetchClientValues('guilds.cache.size')
