@@ -90,7 +90,7 @@ const setupRoles = async (client, user, guildId, remove) => {
 }
 
 const updateRoles = async (client, discordId, guildIds, remove = false) => {
-  let user, guilds
+  let user, guilds = []
   guildIds = [guildIds].flat().filter(e => e)
 
   if (discordId) {
