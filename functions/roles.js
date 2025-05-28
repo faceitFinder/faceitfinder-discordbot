@@ -31,13 +31,9 @@ const setupRoles = async (client, user, guildId, remove) => {
 
   user = [user].flat().filter(e => e).filter(e => e.guildId === guild.id || !e.guildId)?.at(0)
 
-  console.info(`Setting up roles for guild: ${guild.name} (${guild.id})`)
-
   const isPremium = await currentGuildIsPremium(guildId)
   const roles = isPremium ? await GuildCustomRole.getRolesOf(guild.id) : await getRoles(guild.id)
   if (!roles?.length) return console.warn(`No roles found for guild: ${guild.name} (${guild.id})`)
-
-  console.info(`Found ${roles.length} roles for guild: ${guild.name} (${guild.id})`)
 
   const members = await client.shard.broadcastEval(async (c, { guildId, user }) => {
     const g = await c.guilds.fetch(guildId).catch(() => null)
@@ -52,8 +48,6 @@ const setupRoles = async (client, user, guildId, remove) => {
     })).filter(m => user ? m.user.id === user.discordId : true)
   }, { context: { guildId, user } }).then(res => res.flat())
 
-  console.info(`Found ${members.length} members in guild: ${guild.name} (${guild.id})`)
-
   for (const member of members) {
     let user = await User.get(member.user.id)
     if (!(user.length > 0)) continue
@@ -61,8 +55,6 @@ const setupRoles = async (client, user, guildId, remove) => {
     if (user.length > 1) user = user.filter(e => e.guildId === guild.id)
     user = user.flat().at(0)
     if (!user?.faceitId) continue
-
-    console.info(`Processing user: ${member.user.username} (${member.user.id}) in guild: ${guild.name} (${guild.id})`)
 
     const playerParam = { param: user.faceitId, faceitId: true }
     const stats = await getStats({ playerParam, game: defaultGame, matchNumber: 1 }).catch(() => null)
@@ -101,7 +93,10 @@ const updateRoles = async (client, discordId, guildIds, remove = false) => {
     guilds = user.map(e => e.guildId).filter((e, i, a) => a.indexOf(e) === i).filter(e => e)
   }
 
-  if (!guilds.length) guilds = (await GuildCustomRole.getAll()).map(e => e.guildId).filter((e, i, a) => a.indexOf(e) === i)
+  if (!guilds.length) {
+    if (guildIds?.length) guilds = guildIds
+    else guilds = (await GuildCustomRole.getAll()).map(e => e.guildId).filter((e, i, a) => a.indexOf(e) === i)
+  }
 
   console.info(`Updating roles for ${guilds.length} guilds, user: ${discordId}, remove: ${remove}`)
 
@@ -141,7 +136,12 @@ Action: ${action}
 
 const updateSubscribedGuilds = async (client) => {
   const activeGuildEntitlements = await getActiveGuildsEntitlements(client, true)
-  updateRoles(client, null, activeGuildEntitlements.map(e => e.guildId))
+  const premiumGuildIds = activeGuildEntitlements.map(e => e.guildId).filter((e, i, a) => a.indexOf(e) === i)
+  if (!premiumGuildIds?.length) {
+    console.warn('No active guild entitlements found, skipping role update')
+    return
+  }
+  updateRoles(client, null, premiumGuildIds)
 }
 
 module.exports = {
