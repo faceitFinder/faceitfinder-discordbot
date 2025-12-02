@@ -88,9 +88,9 @@ const buildDefaultMapEmbed = async (interaction, playerId, game, mode, types = n
   }
 }
 
-const buildEmbed = async (interaction, playerId, map, mode, game) => {
+const buildEmbed = async (interaction, playerId, map, mode, game, types = null) => {
   if (!map) return
-  if (map === ALL) return buildDefaultMapEmbed(interaction, playerId, game, mode)
+  if (map === ALL) return buildDefaultMapEmbed(interaction, playerId, game, mode, types)
 
   const {
     playerDatas,
@@ -167,7 +167,7 @@ const buildEmbed = async (interaction, playerId, map, mode, game) => {
   }
 }
 
-const sendCardWithInfo = async (interaction, playerParam, map = ALL, mode = null, game = null) => {
+const sendCardWithInfo = async (interaction, playerParam, map = ALL, mode = null, game = null, types = null) => {
   map ??= getInteractionOption(interaction, 'map')
   game ??= getGameOption(interaction)
   mode ??= '5v5'
@@ -249,7 +249,7 @@ const sendCardWithInfo = async (interaction, playerParam, map = ALL, mode = null
   ]
 
   if (map) {
-    const resp = await buildEmbed(interaction, playerId, map, mode, game)
+    const resp = await buildEmbed(interaction, playerId, map, mode, game, types)
     embeds = resp.embeds
     files = resp.files
     if (resp.components) components.push(...resp.components)

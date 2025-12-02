@@ -1,5 +1,5 @@
 const CommandsStats = require('../../database/commandsStats')
-const { buildDefaultMapEmbed } = require('../../commands/map')
+const { buildDefaultMapEmbed, sendCardWithInfo } = require('../../commands/map')
 const { getCardByUserType } = require('../../templates/loadingCard')
 const { TYPES } = require('../../templates/customType')
 const Discord = require('discord.js')
@@ -12,12 +12,8 @@ module.exports = {
   name: 'mapRadarChartButtons',
   async execute(interaction, json, newUser = false) {
     CommandsStats.create('map', `button - ${json.type.name}`, interaction)
-    
-    getCardByUserType(newUser, interaction)
 
-    if (newUser) {
-      return buildDefaultMapEmbed(interaction, json.playerId, json.game, json.mode)
-    }
+    getCardByUserType(newUser, interaction)
 
     let types = json.types || [
       TYPES.MATCHES,
@@ -36,7 +32,7 @@ module.exports = {
 
     const clickedTypeName = json.type.name
     const typesToDisable = typeRelations[clickedTypeName] || []
-    
+
     const activeCountBefore = types.filter(t => t.style === Discord.ButtonStyle.Success).length
     const clickedType = types.find(t => t.name === clickedTypeName)
     const isCurrentlyActive = clickedType?.style === Discord.ButtonStyle.Success
@@ -59,7 +55,18 @@ module.exports = {
       }
       return t
     })
-    
+
+    if (newUser) {
+      return await sendCardWithInfo(
+        interaction,
+        { param: json.playerId, faceitId: true },
+        json.map,
+        json.mode,
+        json.game,
+        types
+      )
+    }
+
     const activeCountAfter = types.filter(t => t.style === Discord.ButtonStyle.Success).length
     if (activeCountAfter === 0) {
       types = types.map(t => {
@@ -80,10 +87,10 @@ module.exports = {
 
     const selectMapRow = interaction.message.components.at(0)
 
-    const buttonRow = interaction.message.components.find(row => 
+    const buttonRow = interaction.message.components.find(row =>
       row.components.some(btn => btn.customId === interaction.customId)
     )
-    
+
     if (buttonRow) {
       buttonRow.components.forEach(btn => Interaction.deleteOne(btn.customId))
     }
