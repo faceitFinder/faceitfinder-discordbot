@@ -148,6 +148,62 @@
         "color": "#6B9B46"
       }
     },
+    "charts": {
+      "text": "#c9d1d9",
+      "grid": "#3c3c3c",
+      "background": "#2f3136",
+      "radarCategories": {
+        "Play Rate %": {
+          "border": "rgb(167, 139, 250)",
+          "background": "rgba(167, 139, 250, 0.2)",
+          "labelColor": "rgb(167, 139, 250)",
+          "labelBackgroundColor": "#1f2937"
+        },
+        "Win Rate %": {
+          "border": "rgb(34, 197, 94)",
+          "background": "rgba(34, 197, 94, 0.2)",
+          "showPointLabels": true,
+          "labelColor": "rgb(34, 197, 94)",
+          "labelBackgroundColor": "#1f2937",
+          "threshold": {
+            "colors": {
+              "1": {
+                "min": 0,
+                "max": 29.99,
+                "borderColor": "rgb(239, 68, 68)",
+                "backgroundColor": "rgba(239, 68, 68, 0.2)"
+              },
+              "2": {
+                "min": 30,
+                "max": 49.99,
+                "borderColor": "rgb(251, 191, 36)",
+                "backgroundColor": "rgba(251, 191, 36, 0.2)"
+              },
+              "3": {
+                "min": 50,
+                "max": 100,
+                "borderColor": "rgb(34, 197, 94)",
+                "backgroundColor": "rgba(34, 197, 94, 0.2)"
+              }
+            }
+          }
+        },
+        "Elo Gain": {
+          "gridLines": [
+            {
+              "value": 0,
+              "color": "#94a3b8",
+              "lineWidth": 0.5
+            }
+          ],
+          "border": "rgb(59, 130, 246)",
+          "background": "rgba(59, 130, 246, 0.2)",
+          "showPointLabels": true,
+          "labelColor": "rgb(59, 130, 246)",
+          "labelBackgroundColor": "#1f2937"
+        }
+      }
+    },
     "error": "#770000"
   },
   "emojis": {

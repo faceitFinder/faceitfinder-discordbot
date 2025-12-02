@@ -28,12 +28,15 @@ const generateButtons = async (interaction, values, type, disabledType = null) =
     userId: interaction.user.id
   }))).id
 
-  return new ButtonBuilder()
+  const button = new ButtonBuilder()
     .setCustomId(customId)
     .setLabel(name)
-    .setEmoji(type.emoji)
     .setStyle(type.style)
     .setDisabled(type.name === disabledType?.name)
+
+  if (type.emoji) button.setEmoji(type.emoji)
+
+  return button
 }
 
 const updateButtons = (components, type, jsonData = null) => {
@@ -41,8 +44,12 @@ const updateButtons = (components, type, jsonData = null) => {
     button = button.toJSON()
     const id = button.custom_id
 
-    if (jsonData) updateOptionsType(id, CustomType.getTypeFromEmoji(button.emoji.name), jsonData)
-    else Interaction.updateOne(id)
+    if (jsonData && button.emoji?.name) {
+      const foundType = CustomType.getTypeFromEmoji(button.emoji.name)
+      if (foundType) updateOptionsType(id, foundType, jsonData)
+    } else if (!jsonData) {
+      Interaction.updateOne(id)
+    }
 
     const buttonBuilder = new ButtonBuilder()
       .setCustomId(id)

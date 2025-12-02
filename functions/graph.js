@@ -6,37 +6,35 @@ const Chart = require('chart.js/auto')
 const { getTranslation } = require('../languages/setup')
 
 const generateChart = (locale, playerName, matchHistory, maxMatch = 20, type = CustomType.TYPES.ELO, game) => {
-  const datas = []
-  const types = type.name.split('-').map(e => {
-    return CustomType.getType(e.trim())
-  })
-
-  datas.push(...types.map(type => [type, getGraph(locale, playerName, type, matchHistory, maxMatch).reverse()]))
-
-  const labels = matchHistory.map(match => new Date(match.date).toLocaleString('en-US', {
+  const types = type.name.split('-').map(e => CustomType.getType(e.trim()))
+  const slicedHistory = matchHistory.slice(0, maxMatch).reverse()
+  
+  const datas = types.map(type => [type, getGraph(locale, playerName, type, matchHistory, maxMatch).reverse()])
+  
+  const dateFormatter = new Intl.DateTimeFormat('en-US', {
     month: 'short',
     day: 'numeric',
     year: 'numeric'
-  }))
+  })
+  const labels = slicedHistory.map(match => dateFormatter.format(new Date(match.date)))
 
-  return getChart(datas, labels.slice(0, maxMatch).reverse(), getClassicDatasets, datas.length > 1, game)
+  return getChart(datas, labels, getClassicDatasets, datas.length > 1, game)
 }
 
 const getChart = (datasets, labels, datasetFunc, displayY1, game) => {
   const canvas = Canvas.createCanvas(600, 400)
   const ctx = canvas.getContext('2d')
 
-  const color = '#c9d1d9', gridColor = '#3c3c3c'
   const yAxisBase = {
     border: {
       width: 1,
     },
     grid: {
-      color: gridColor,
+      color: color.charts.grid,
     },
     ticks: {
       beginAtZero: false,
-      color: color,
+      color: color.charts.text,
     }
   }
 
@@ -60,17 +58,17 @@ const getChart = (datasets, labels, datasetFunc, displayY1, game) => {
         },
         x: {
           grid: {
-            color: gridColor,
+            color: color.charts.grid,
           },
           ticks: {
-            color: color,
+            color: color.charts.text,
           }
         }
       },
       plugins: {
         legend: {
           labels: {
-            color: color,
+            color: color.charts.text,
             borderWidth: 1,
           }
         }
@@ -81,7 +79,7 @@ const getChart = (datasets, labels, datasetFunc, displayY1, game) => {
         const ctx = chart.canvas.getContext('2d')
         ctx.save()
         ctx.globalCompositeOperation = 'source-over'
-        ctx.fillStyle = '#2f3136'
+        ctx.fillStyle = color.charts.background
         ctx.fillRect(0, 0, chart.width, chart.height)
         ctx.restore()
       }
@@ -93,16 +91,32 @@ const getChart = (datasets, labels, datasetFunc, displayY1, game) => {
 
 const getClassicDatasets = (datas, i, ctx, game) => {
   const [type, data] = datas
+  const colorConfig = type.color[game] ?? type.color
+  
+  const colorCache = new Map()
+  const defaultColor = Object.values(colorConfig)[0]?.color || '#ffffff'
+  
+  const pointColors = data.map(value => {
+    if (value == null) return null
+    if (colorCache.has(value)) return colorCache.get(value)
+    const config = colorFilter(colorConfig, value)
+    const color = config?.color || defaultColor
+    colorCache.set(value, color)
+    return color
+  })
+
   return {
     label: type.name,
     data: data,
     fill: i === 0,
     yAxisID: `y${i}`,
     borderColor: (segment) => {
-      if (segment.raw) return colorFilter(type.color[game] ?? type.color, segment.raw).color
+      if (segment.raw == null) return undefined
+      return pointColors[segment.dataIndex] || defaultColor
     },
     pointBackgroundColor: (segment) => {
-      if (segment.raw) return colorFilter(type.color[game] ?? type.color, segment.raw).color
+      if (segment.raw == null) return undefined
+      return pointColors[segment.dataIndex] || defaultColor
     },
     spanGaps: true,
     segment: {
@@ -110,7 +124,7 @@ const getClassicDatasets = (datas, i, ctx, game) => {
         if (segment.p0.skip || segment.p1.skip) return 'rgb(0,0,0,0.2)'
         const prev = segment.p0, current = segment.p1
 
-        ctx.strokeStyle = getGradient(prev, current, ctx, type, game)
+        ctx.strokeStyle = getGradient(prev, current, ctx, type, game, colorCache)
         ctx.lineWidth = 2
         ctx.beginPath()
         ctx.moveTo(prev.x, prev.y)
@@ -191,24 +205,61 @@ const roundRect = (ctx, x, y, w, h, r) => {
   return ctx
 }
 
-const getElo = (maxMatch, matchHistory) => matchHistory.map(e => e?.elo).slice(0, maxMatch)
+const getElo = (maxMatch, matchHistory) => {
+  const sliced = matchHistory.slice(0, maxMatch)
+  return sliced.map(e => e?.elo)
+}
 
-const getEloGain = (maxMatch, matchHistory) => matchHistory.map(e => e?.eloGain).slice(0, maxMatch)
+const getEloGain = (maxMatch, matchHistory) => {
+  const sliced = matchHistory.slice(0, maxMatch)
+  return sliced.map(e => e?.eloGain)
+}
 
-const getKD = (maxMatch, matchHistory) => matchHistory.map(e => e?.c2).slice(0, maxMatch)
+const getKD = (maxMatch, matchHistory) => {
+  const sliced = matchHistory.slice(0, maxMatch)
+  return sliced.map(e => e?.c2)
+}
 
-const getGradient = (prev, current, ctx, type, game) => {
+const getGradient = (prev, current, ctx, type, game, colorCache) => {
   const gradient = ctx.createLinearGradient(prev.x, prev.y, current.x, current.y)
-  gradient.addColorStop(0, colorFilter(type.color[game] ?? type.color, prev.raw).color)
-  gradient.addColorStop(1, colorFilter(type.color[game] ?? type.color, current.raw).color)
+  const colorConfig = type.color[game] ?? type.color
+  const defaultColor = Object.values(colorConfig)[0]?.color || '#ffffff'
+  
+  let prevColor, currentColor
+  if (colorCache) {
+    if (!colorCache.has(prev.raw)) {
+      const config = colorFilter(colorConfig, prev.raw)
+      prevColor = config?.color || defaultColor
+      colorCache.set(prev.raw, prevColor)
+    } else {
+      prevColor = colorCache.get(prev.raw) || defaultColor
+    }
+    
+    if (!colorCache.has(current.raw)) {
+      const config = colorFilter(colorConfig, current.raw)
+      currentColor = config?.color || defaultColor
+      colorCache.set(current.raw, currentColor)
+    } else {
+      currentColor = colorCache.get(current.raw) || defaultColor
+    }
+  } else {
+    prevColor = colorFilter(colorConfig, prev.raw)?.color || defaultColor
+    currentColor = colorFilter(colorConfig, current.raw)?.color || defaultColor
+  }
+  
+  gradient.addColorStop(0, prevColor)
+  gradient.addColorStop(1, currentColor)
   return gradient
 }
 
 const colorFilter = (colors, value) => {
-  return Object.entries(colors)
-    .filter(color => parseFloat(value) >= parseFloat(color[1].min) && parseFloat(value) <= parseFloat(color[1].max))
-    .at(0)
-    .at(1)
+  const numValue = parseFloat(value)
+  for (const [, config] of Object.entries(colors)) {
+    if (numValue >= parseFloat(config.min) && numValue <= parseFloat(config.max)) {
+      return config
+    }
+  }
+  return null
 }
 
 const getGraph = (locale, playerName, type, matchHistory, maxMatch) => {
@@ -223,6 +274,274 @@ const getGraph = (locale, playerName, type, matchHistory, maxMatch) => {
   }
 }
 
+const getMapRadarChart = (segments, types) => {
+  const canvas = Canvas.createCanvas(600, 600)
+  const ctx = canvas.getContext('2d')
+  const datasetsKeys = types.map(e => e.name)
+  const labels = segments.map(e => e.label)
+
+  const categoryConfigs = new Map()
+  datasetsKeys.forEach(key => {
+    categoryConfigs.set(key, color.charts.radarCategories[key] || {})
+  })
+
+  const thresholdLinesMap = new Map()
+  const seenThresholdValues = new Set()
+  datasetsKeys.forEach(key => {
+    const threshold = categoryConfigs.get(key)?.threshold
+    if (!threshold) return
+    const lines = threshold.lines || (threshold.value ? [{ value: threshold.value, lineWidth: threshold.lineWidth || 2, lineColor: threshold.lineColor || '#6b7280' }] : [])
+    lines.forEach(line => {
+      if (!seenThresholdValues.has(line.value)) {
+        seenThresholdValues.add(line.value)
+        thresholdLinesMap.set(line.value, { ...line, thresholdConfig: threshold })
+      }
+    })
+  })
+
+  const customGridLinesMap = new Map()
+  const seenGridValues = new Set()
+  datasetsKeys.forEach(key => {
+    const gridLines = categoryConfigs.get(key)?.gridLines || []
+    gridLines.forEach(line => {
+      if (!seenGridValues.has(line.value)) {
+        seenGridValues.add(line.value)
+        customGridLinesMap.set(line.value, line)
+      }
+    })
+  })
+
+  const getGridLineColor = (tickValue) => {
+    const customLine = customGridLinesMap.get(tickValue)
+    if (customLine) return customLine.color || color.charts.grid
+    
+    const thresholdLine = thresholdLinesMap.get(tickValue)
+    if (thresholdLine) return thresholdLine.lineColor || '#6b7280'
+    
+    return color.charts.grid
+  }
+
+  const getGridLineWidth = (tickValue) => {
+    const customLine = customGridLinesMap.get(tickValue)
+    if (customLine) return customLine.lineWidth || 2
+    
+    const thresholdLine = thresholdLinesMap.get(tickValue)
+    if (thresholdLine) return thresholdLine.lineWidth || 3
+    
+    return 1
+  }
+
+  const getColorFromThreshold = (value, threshold, defaultColor) => {
+    if (!threshold?.colors) return defaultColor
+    
+    const numValue = parseFloat(value) || 0
+    const colorConfig = Object.values(threshold.colors).find(c => 
+      numValue >= parseFloat(c.min) && numValue <= parseFloat(c.max)
+    )
+    
+    return colorConfig?.borderColor || defaultColor
+  }
+
+  const getPointColorsFromThreshold = (value, threshold, defaultColor) => {
+    if (!threshold?.colors) return { border: defaultColor, background: defaultColor }
+    
+    const numValue = parseFloat(value) || 0
+    const colorConfig = Object.values(threshold.colors).find(c => 
+      numValue >= parseFloat(c.min) && numValue <= parseFloat(c.max)
+    )
+    
+    return colorConfig 
+      ? { border: colorConfig.borderColor, background: colorConfig.backgroundColor }
+      : { border: defaultColor, background: defaultColor }
+  }
+
+  const segmentColorsCache = new Map()
+  
+  const datasets = datasetsKeys.map(key => {
+    const categoryConfig = categoryConfigs.get(key)
+    const threshold = categoryConfig.threshold
+    const defaultColor = categoryConfig.border
+    const data = segments.map(e => e.stats[key])
+
+    if (!threshold) {
+      return {
+        label: key,
+        data,
+        backgroundColor: categoryConfig.background,
+        borderColor: defaultColor,
+        borderWidth: 2,
+        pointBackgroundColor: defaultColor,
+        pointBorderColor: defaultColor
+      }
+    }
+
+    const pointColors = data.map(value => {
+      const numValue = parseFloat(value) || 0
+      return getPointColorsFromThreshold(numValue, threshold, defaultColor)
+    })
+
+    const segmentColors = data.map((value, index) => {
+      const nextValue = data[(index + 1) % data.length]
+      const cacheKey = `${key}:${value}:${nextValue}`
+      if (segmentColorsCache.has(cacheKey)) {
+        return segmentColorsCache.get(cacheKey)
+      }
+      const colors = {
+        prev: getColorFromThreshold(value, threshold, defaultColor),
+        next: getColorFromThreshold(nextValue, threshold, defaultColor)
+      }
+      segmentColorsCache.set(cacheKey, colors)
+      return colors
+    })
+
+    return {
+      label: key,
+      data,
+      backgroundColor: categoryConfig.background,
+      borderColor: 'transparent',
+      borderWidth: 2,
+      pointBackgroundColor: pointColors.map(c => c.background),
+      pointBorderColor: pointColors.map(c => c.border),
+      _segmentColors: segmentColors
+    }
+  })
+
+  const labelConfigs = new Map()
+  datasetsKeys.forEach(key => {
+    const config = categoryConfigs.get(key)
+    if (config?.showPointLabels) {
+      labelConfigs.set(key, {
+        labelColor: config.labelColor || color.charts.text,
+        labelBackgroundColor: config.labelBackgroundColor || color.charts.background,
+        threshold: config.threshold,
+        defaultColor: config.border
+      })
+    }
+  })
+
+  new Chart(ctx, {
+    type: 'radar',
+    data: {
+      labels,
+      datasets
+    },
+    options: {
+      scales: {
+        r: {
+          grid: {
+            color: (context) => getGridLineColor(context.tick.value),
+            lineWidth: (context) => getGridLineWidth(context.tick.value)
+          },
+          ticks: {
+            color: color.charts.text,
+            backdropColor: color.charts.background,
+          },
+          backgroundColor: color.charts.background,
+          pointLabels: {
+            display: true,
+            font: {
+              size: 16
+            },
+            color: color.charts.text,
+            padding: 10
+          }
+        }
+      },
+      plugins: {
+        legend: {
+          labels: {
+            color: color.charts.text,
+            borderWidth: 2,
+          }
+        },
+        tooltip: {
+          enabled: true
+        }
+      }
+    },
+    plugins: [{
+      id: 'radarGradient',
+      afterDatasetsDraw: (chart) => {
+        const ctx = chart.ctx
+        ctx.save()
+        
+        chart.data.datasets.forEach((dataset, datasetIndex) => {
+          if (!dataset._segmentColors) return
+          
+          const meta = chart.getDatasetMeta(datasetIndex)
+          const segmentColors = dataset._segmentColors
+          
+          for (let i = 0; i < meta.data.length; i++) {
+            const current = meta.data[i]
+            const next = meta.data[(i + 1) % meta.data.length]
+            const colors = segmentColors[i]
+
+            const gradient = ctx.createLinearGradient(current.x, current.y, next.x, next.y)
+            gradient.addColorStop(0, colors.prev)
+            gradient.addColorStop(1, colors.next)
+            
+            ctx.strokeStyle = gradient
+            ctx.lineWidth = 2
+            ctx.beginPath()
+            ctx.moveTo(current.x, current.y)
+            ctx.lineTo(next.x, next.y)
+            ctx.stroke()
+          }
+        })
+        
+        ctx.restore()
+      }
+    }, {
+      id: 'pointLabels',
+      afterDatasetsDraw: (chart) => {
+        const ctx = chart.ctx
+        ctx.save()
+        ctx.font = 'bold 12px sans-serif'
+        ctx.textAlign = 'center'
+        ctx.textBaseline = 'middle'
+        
+        chart.data.datasets.forEach((dataset, datasetIndex) => {
+          const labelConfig = labelConfigs.get(dataset.label)
+          if (!labelConfig) return
+
+          const { labelColor, labelBackgroundColor, threshold, defaultColor } = labelConfig
+          const meta = chart.getDatasetMeta(datasetIndex)
+          
+          meta.data.forEach((point, pointIndex) => {
+            const value = dataset.data[pointIndex]
+            if (value == null) return
+            
+            let pointLabelColor = labelColor
+            if (threshold?.colors) {
+              pointLabelColor = getColorFromThreshold(value, threshold, defaultColor || labelColor)
+            }
+            
+            const angle = point.angle
+            const x = point.x + Math.cos(angle) * 25
+            const y = point.y + Math.sin(angle) * 25
+            
+            const formattedValue = typeof value === 'number' ? value.toFixed(1) : String(value)
+            const metrics = ctx.measureText(formattedValue)
+            const width = metrics.width + 10
+            const rx = x - width / 2
+            const ry = y - 9
+
+            ctx.fillStyle = labelBackgroundColor
+            roundRect(ctx, rx, ry, width, 18, 4)
+
+            ctx.fillStyle = pointLabelColor
+            ctx.fillText(formattedValue, x, y)
+          })
+        })
+        
+        ctx.restore()
+      }
+    }]
+  })
+
+  return canvas.toBuffer()
+}
+
 module.exports = {
   generateChart,
   getRankImage,
@@ -231,5 +550,6 @@ module.exports = {
   getChart,
   getGraph,
   getCompareDatasets,
-  getEloGain
+  getEloGain,
+  getMapRadarChart
 }
