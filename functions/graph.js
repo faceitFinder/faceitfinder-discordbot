@@ -205,11 +205,20 @@ const roundRect = (ctx, x, y, w, h, r) => {
   return ctx
 }
 
-const getElo = (maxMatch, matchHistory) => matchHistory.map(e => e?.elo).slice(0, maxMatch)
+const getElo = (maxMatch, matchHistory) => {
+  const sliced = matchHistory.slice(0, maxMatch)
+  return sliced.map(e => e?.elo)
+}
 
-const getEloGain = (maxMatch, matchHistory) => matchHistory.map(e => e?.eloGain).slice(0, maxMatch)
+const getEloGain = (maxMatch, matchHistory) => {
+  const sliced = matchHistory.slice(0, maxMatch)
+  return sliced.map(e => e?.eloGain)
+}
 
-const getKD = (maxMatch, matchHistory) => matchHistory.map(e => e?.c2).slice(0, maxMatch)
+const getKD = (maxMatch, matchHistory) => {
+  const sliced = matchHistory.slice(0, maxMatch)
+  return sliced.map(e => e?.c2)
+}
 
 const getGradient = (prev, current, ctx, type, game, colorCache) => {
   const gradient = ctx.createLinearGradient(prev.x, prev.y, current.x, current.y)
@@ -322,6 +331,17 @@ const getMapRadarChart = (segments, types) => {
     return 1
   }
 
+  const getColorFromThreshold = (value, threshold, defaultColor) => {
+    if (!threshold?.colors) return defaultColor
+    
+    const numValue = parseFloat(value) || 0
+    const colorConfig = Object.values(threshold.colors).find(c => 
+      numValue >= parseFloat(c.min) && numValue <= parseFloat(c.max)
+    )
+    
+    return colorConfig?.borderColor || defaultColor
+  }
+
   const getPointColorsFromThreshold = (value, threshold, defaultColor) => {
     if (!threshold?.colors) return { border: defaultColor, background: defaultColor }
     
@@ -335,42 +355,18 @@ const getMapRadarChart = (segments, types) => {
       : { border: defaultColor, background: defaultColor }
   }
 
-  const getRadarGradient = (prev, current, ctx, threshold, defaultColor) => {
-    if (!threshold?.colors) {
-      const gradient = ctx.createLinearGradient(prev.x, prev.y, current.x, current.y)
-      gradient.addColorStop(0, defaultColor)
-      gradient.addColorStop(1, defaultColor)
-      return gradient
-    }
-
-    const prevValue = parseFloat(prev.raw) || 0
-    const currentValue = parseFloat(current.raw) || 0
-    
-    const prevColorConfig = Object.values(threshold.colors).find(c => 
-      prevValue >= parseFloat(c.min) && prevValue <= parseFloat(c.max)
-    )
-    const currentColorConfig = Object.values(threshold.colors).find(c => 
-      currentValue >= parseFloat(c.min) && currentValue <= parseFloat(c.max)
-    )
-
-    const prevColor = prevColorConfig?.borderColor || defaultColor
-    const currentColor = currentColorConfig?.borderColor || defaultColor
-
-    const gradient = ctx.createLinearGradient(prev.x, prev.y, current.x, current.y)
-    gradient.addColorStop(0, prevColor)
-    gradient.addColorStop(1, currentColor)
-    return gradient
-  }
-
+  const segmentColorsCache = new Map()
+  
   const datasets = datasetsKeys.map(key => {
     const categoryConfig = categoryConfigs.get(key)
     const threshold = categoryConfig.threshold
     const defaultColor = categoryConfig.border
+    const data = segments.map(e => e.stats[key])
 
     if (!threshold) {
       return {
         label: key,
-        data: segments.map(e => e.stats[key]),
+        data,
         backgroundColor: categoryConfig.background,
         borderColor: defaultColor,
         borderWidth: 2,
@@ -379,19 +375,34 @@ const getMapRadarChart = (segments, types) => {
       }
     }
 
-    const pointColors = segments.map(e => {
-      const value = parseFloat(e.stats[key]) || 0
-      return getPointColorsFromThreshold(value, threshold, defaultColor)
+    const pointColors = data.map(value => {
+      const numValue = parseFloat(value) || 0
+      return getPointColorsFromThreshold(numValue, threshold, defaultColor)
+    })
+
+    const segmentColors = data.map((value, index) => {
+      const nextValue = data[(index + 1) % data.length]
+      const cacheKey = `${key}:${value}:${nextValue}`
+      if (segmentColorsCache.has(cacheKey)) {
+        return segmentColorsCache.get(cacheKey)
+      }
+      const colors = {
+        prev: getColorFromThreshold(value, threshold, defaultColor),
+        next: getColorFromThreshold(nextValue, threshold, defaultColor)
+      }
+      segmentColorsCache.set(cacheKey, colors)
+      return colors
     })
 
     return {
       label: key,
-      data: segments.map(e => e.stats[key]),
+      data,
       backgroundColor: categoryConfig.background,
       borderColor: 'transparent',
       borderWidth: 2,
       pointBackgroundColor: pointColors.map(c => c.background),
-      pointBorderColor: pointColors.map(c => c.border)
+      pointBorderColor: pointColors.map(c => c.border),
+      _segmentColors: segmentColors
     }
   })
 
@@ -455,33 +466,19 @@ const getMapRadarChart = (segments, types) => {
         ctx.save()
         
         chart.data.datasets.forEach((dataset, datasetIndex) => {
-          const categoryConfig = categoryConfigs.get(dataset.label)
-          const threshold = categoryConfig?.threshold
-          if (!threshold?.colors) return
+          if (!dataset._segmentColors) return
           
-          const defaultColor = categoryConfig.border
           const meta = chart.getDatasetMeta(datasetIndex)
+          const segmentColors = dataset._segmentColors
           
           for (let i = 0; i < meta.data.length; i++) {
             const current = meta.data[i]
             const next = meta.data[(i + 1) % meta.data.length]
-            
-            const prevValue = parseFloat(dataset.data[i]) || 0
-            const nextValue = parseFloat(dataset.data[(i + 1) % dataset.data.length]) || 0
-            
-            const prevColorConfig = Object.values(threshold.colors).find(c => 
-              prevValue >= parseFloat(c.min) && prevValue <= parseFloat(c.max)
-            )
-            const nextColorConfig = Object.values(threshold.colors).find(c => 
-              nextValue >= parseFloat(c.min) && nextValue <= parseFloat(c.max)
-            )
-
-            const prevColor = prevColorConfig?.borderColor || defaultColor
-            const nextColor = nextColorConfig?.borderColor || defaultColor
+            const colors = segmentColors[i]
 
             const gradient = ctx.createLinearGradient(current.x, current.y, next.x, next.y)
-            gradient.addColorStop(0, prevColor)
-            gradient.addColorStop(1, nextColor)
+            gradient.addColorStop(0, colors.prev)
+            gradient.addColorStop(1, colors.next)
             
             ctx.strokeStyle = gradient
             ctx.lineWidth = 2
@@ -516,11 +513,7 @@ const getMapRadarChart = (segments, types) => {
             
             let pointLabelColor = labelColor
             if (threshold?.colors) {
-              const numValue = parseFloat(value) || 0
-              const colorConfig = Object.values(threshold.colors).find(c => 
-                numValue >= parseFloat(c.min) && numValue <= parseFloat(c.max)
-              )
-              pointLabelColor = colorConfig?.borderColor || defaultColor || labelColor
+              pointLabelColor = getColorFromThreshold(value, threshold, defaultColor || labelColor)
             }
             
             const angle = point.angle
