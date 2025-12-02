@@ -166,18 +166,6 @@
           "labelColor": "rgb(34, 197, 94)",
           "labelBackgroundColor": "#1f2937",
           "threshold": {
-            "lines": [
-              {
-                "value": 30,
-                "lineWidth": 0.5,
-                "lineColor": "rgb(148, 163, 184)"
-              },
-              {
-                "value": 50,
-                "lineWidth": 0.5,
-                "lineColor": "rgb(148, 163, 184)"
-              }
-            ],
             "colors": {
               "1": {
                 "min": 0,
