@@ -6,20 +6,19 @@ const Chart = require('chart.js/auto')
 const { getTranslation } = require('../languages/setup')
 
 const generateChart = (locale, playerName, matchHistory, maxMatch = 20, type = CustomType.TYPES.ELO, game) => {
-  const datas = []
-  const types = type.name.split('-').map(e => {
-    return CustomType.getType(e.trim())
-  })
-
-  datas.push(...types.map(type => [type, getGraph(locale, playerName, type, matchHistory, maxMatch).reverse()]))
-
-  const labels = matchHistory.map(match => new Date(match.date).toLocaleString('en-US', {
+  const types = type.name.split('-').map(e => CustomType.getType(e.trim()))
+  const slicedHistory = matchHistory.slice(0, maxMatch).reverse()
+  
+  const datas = types.map(type => [type, getGraph(locale, playerName, type, matchHistory, maxMatch).reverse()])
+  
+  const dateFormatter = new Intl.DateTimeFormat('en-US', {
     month: 'short',
     day: 'numeric',
     year: 'numeric'
-  }))
+  })
+  const labels = slicedHistory.map(match => dateFormatter.format(new Date(match.date)))
 
-  return getChart(datas, labels.slice(0, maxMatch).reverse(), getClassicDatasets, datas.length > 1, game)
+  return getChart(datas, labels, getClassicDatasets, datas.length > 1, game)
 }
 
 const getChart = (datasets, labels, datasetFunc, displayY1, game) => {
@@ -92,16 +91,32 @@ const getChart = (datasets, labels, datasetFunc, displayY1, game) => {
 
 const getClassicDatasets = (datas, i, ctx, game) => {
   const [type, data] = datas
+  const colorConfig = type.color[game] ?? type.color
+  
+  const colorCache = new Map()
+  const defaultColor = Object.values(colorConfig)[0]?.color || '#ffffff'
+  
+  const pointColors = data.map(value => {
+    if (value == null) return null
+    if (colorCache.has(value)) return colorCache.get(value)
+    const config = colorFilter(colorConfig, value)
+    const color = config?.color || defaultColor
+    colorCache.set(value, color)
+    return color
+  })
+
   return {
     label: type.name,
     data: data,
     fill: i === 0,
     yAxisID: `y${i}`,
     borderColor: (segment) => {
-      if (segment.raw) return colorFilter(type.color[game] ?? type.color, segment.raw).color
+      if (segment.raw == null) return undefined
+      return pointColors[segment.dataIndex] || defaultColor
     },
     pointBackgroundColor: (segment) => {
-      if (segment.raw) return colorFilter(type.color[game] ?? type.color, segment.raw).color
+      if (segment.raw == null) return undefined
+      return pointColors[segment.dataIndex] || defaultColor
     },
     spanGaps: true,
     segment: {
@@ -109,7 +124,7 @@ const getClassicDatasets = (datas, i, ctx, game) => {
         if (segment.p0.skip || segment.p1.skip) return 'rgb(0,0,0,0.2)'
         const prev = segment.p0, current = segment.p1
 
-        ctx.strokeStyle = getGradient(prev, current, ctx, type, game)
+        ctx.strokeStyle = getGradient(prev, current, ctx, type, game, colorCache)
         ctx.lineWidth = 2
         ctx.beginPath()
         ctx.moveTo(prev.x, prev.y)
@@ -196,18 +211,46 @@ const getEloGain = (maxMatch, matchHistory) => matchHistory.map(e => e?.eloGain)
 
 const getKD = (maxMatch, matchHistory) => matchHistory.map(e => e?.c2).slice(0, maxMatch)
 
-const getGradient = (prev, current, ctx, type, game) => {
+const getGradient = (prev, current, ctx, type, game, colorCache) => {
   const gradient = ctx.createLinearGradient(prev.x, prev.y, current.x, current.y)
-  gradient.addColorStop(0, colorFilter(type.color[game] ?? type.color, prev.raw).color)
-  gradient.addColorStop(1, colorFilter(type.color[game] ?? type.color, current.raw).color)
+  const colorConfig = type.color[game] ?? type.color
+  const defaultColor = Object.values(colorConfig)[0]?.color || '#ffffff'
+  
+  let prevColor, currentColor
+  if (colorCache) {
+    if (!colorCache.has(prev.raw)) {
+      const config = colorFilter(colorConfig, prev.raw)
+      prevColor = config?.color || defaultColor
+      colorCache.set(prev.raw, prevColor)
+    } else {
+      prevColor = colorCache.get(prev.raw) || defaultColor
+    }
+    
+    if (!colorCache.has(current.raw)) {
+      const config = colorFilter(colorConfig, current.raw)
+      currentColor = config?.color || defaultColor
+      colorCache.set(current.raw, currentColor)
+    } else {
+      currentColor = colorCache.get(current.raw) || defaultColor
+    }
+  } else {
+    prevColor = colorFilter(colorConfig, prev.raw)?.color || defaultColor
+    currentColor = colorFilter(colorConfig, current.raw)?.color || defaultColor
+  }
+  
+  gradient.addColorStop(0, prevColor)
+  gradient.addColorStop(1, currentColor)
   return gradient
 }
 
 const colorFilter = (colors, value) => {
-  return Object.entries(colors)
-    .filter(color => parseFloat(value) >= parseFloat(color[1].min) && parseFloat(value) <= parseFloat(color[1].max))
-    .at(0)
-    .at(1)
+  const numValue = parseFloat(value)
+  for (const [, config] of Object.entries(colors)) {
+    if (numValue >= parseFloat(config.min) && numValue <= parseFloat(config.max)) {
+      return config
+    }
+  }
+  return null
 }
 
 const getGraph = (locale, playerName, type, matchHistory, maxMatch) => {
