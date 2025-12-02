@@ -1,6 +1,6 @@
 const noMention = require('../templates/noMention')
 const errorCard = require('../templates/errorCard')
-const { InteractionType, ApplicationCommandOptionType } = require('discord.js')
+const { InteractionType, ApplicationCommandOptionType, MessageFlags } = require('discord.js')
 const CommandsStats = require('../database/commandsStats')
 const { getTranslation } = require('../languages/setup')
 const errorHandler = require('../functions/error')
@@ -51,7 +51,7 @@ module.exports = {
      */
     else if (!interaction.channel.permissionsFor(interaction.client.user).has('ViewChannel')) {
       interaction
-        .deferReply({ ephemeral: true })
+        .deferReply({ flags: [MessageFlags.Ephemeral] })
         .then(() => {
           interaction
             .followUp({
@@ -89,7 +89,7 @@ module.exports = {
           .catch((error) => errorHandler(interaction, error))
       } else {
         interaction
-          .deferReply({ ephemeral: true })
+          .deferReply({ flags: [MessageFlags.Ephemeral] })
           .then(() => {
             CommandsStats.create(interaction.customId, 'selectmenu', interaction)
             interactionSelectMenu?.execute(interaction, json, true)
@@ -122,7 +122,7 @@ module.exports = {
               .catch(err => errorInteraction(interaction, err, getTranslation('error.execution.button', interaction.locale)))
           }).catch((error) => errorHandler(interaction, error))
       } else {
-        interaction.deferReply({ ephemeral: true }).then(() => {
+        interaction.deferReply({ flags: [MessageFlags.Ephemeral] }).then(() => {
           interactionButton?.execute(interaction, json, true)
             .then(e => interaction.editReply(noMention(e)).catch((error) => errorHandler(interaction, error)))
             .catch(err => errorInteraction(interaction, err, getTranslation('error.execution.button', interaction.locale)))
@@ -155,7 +155,7 @@ module.exports = {
         .shift()
 
       interaction
-        .deferReply({ ephemeral: command.ephemeral ?? subCommand?.ephemeral })
+        .deferReply({ flags: (command.ephemeral ?? subCommand?.ephemeral) ? [MessageFlags.Ephemeral] : [] })
         .then(async () => {
           const premiumSubCommand = subCommand?.premium
           if (premiumSubCommand) {
@@ -169,6 +169,7 @@ module.exports = {
 
             if (!isPremium) {
               interaction.followUp({
+                flags: [MessageFlags.Ephemeral],
                 content: ' ',
                 ...premiumCard(interaction.locale),
               }).catch((error) => errorHandler(interaction, error))

@@ -5,7 +5,7 @@ const { REST } = require('@discordjs/rest')
 const { Routes } = require('discord-api-types/v9')
 
 module.exports = {
-  name: 'ready',
+  name: 'clientReady',
   async execute(client) {
     console.info('🚀 Bot started!')
     mongo().then(() => { console.info('🧱 Connected to mongo') }).catch(console.error)
