@@ -185,6 +185,9 @@ base.success.command.removeRole = 'The role has been removed successfully';
 base.command.verify.description = 'Verifică-ți contul Faceit'
 base.strings.verifyDescription = `Hey {discord}, pentru a-ți verifica contul Faceit, apasă pe link-ul de mai jos!\n${oauth2}\nDupă ce ți-ai verificat contul, vei putea obține rolul asociat și multe altele!`
 base.strings.verify = 'Verificare'
+base.strings.allMaps = 'Toate hărțile'
+// Radar chart 
+base.strings.allMapsDescription = 'Previzualizare statistici diferite hărți'
 base.error.user.unlink.verified = `Deoarece contul tău este verificat, trebuie să-ți deconectezi contul pe site-ul web, apasă pe link-ul de mai jos pentru a face acest lucru\n${unlinkVerified}`
 base.error.user.link.verified.other`Acest cont este verificat, utilizatorul va trebui să selecteze breasla pe site pentru a o conecta\n${linkVerified}`
 module.exports = base;

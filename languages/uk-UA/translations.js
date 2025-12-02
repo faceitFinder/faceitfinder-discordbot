@@ -185,6 +185,9 @@ base.success.command.removeRole = 'Роль успішно видалено';
 base.command.verify.description = 'Перевірте свій обліковий запис Faceit'
 base.strings.verifyDescription = `Привіт {discord}, щоб підтвердити свій обліковий запис Faceit, натисніть на посилання нижче!\n${oauth2}\nПісля підтвердження вашого облікового запису ви зможете отримати зв'язану роль та більше!`
 base.strings.verify = 'Верифікація'
+base.strings.allMaps = 'Всі карти'
+// Radar chart 
+base.strings.allMapsDescription = 'Попередній перегляд статистики різних карт'
 base.error.user.unlink.verified = `Оскільки ваш обліковий запис підтверджений, вам потрібно роз'єднати обліковий запис на веб-сайті, натисніть на посилання нижче, щоб це зробити\n${unlinkVerified}`
 base.error.user.link.verified.other = `Цей обліковий запис підтверджено, користувач має вибрати гільдію на сайті, щоб пов’язати її\n${linkVerified}`
 module.exports = base;
