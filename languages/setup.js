@@ -12,6 +12,10 @@ const getTranslations = (key, replace) => {
   return languageObject
 }
 
+const getStrings = (key, languageConf) => key.split('.').reduce((acc, cur) => acc[cur], languageConf)
+
+const getStringFromConf = (key, languageConf) => keyReg.test(key) ? getStrings(key, languageConf) : languageConf[key]
+
 const getTranslation = (key, language, replace) => {
   let languageConf
   language = languages[language] || 'en-US'
@@ -19,14 +23,12 @@ const getTranslation = (key, language, replace) => {
 
   try {
     languageConf = require(`./${language}/translations`)
-    string = languageConf[key]
-    if (!string.length) throw new Error('Empty string')
+    string = getStringFromConf(key, languageConf)
+    if (!string || !string.length) throw new Error('Empty string')
   } catch (error) {
     languageConf = require('./en-US/translations')
-    string = languageConf[key]
+    string = getStringFromConf(key, languageConf)
   }
-
-  if (keyReg.test(key)) string = getStrings(key, languageConf)
 
   if (replace) Object.keys(replace).forEach(key => {
     let value = replace[key].toString()
@@ -36,8 +38,6 @@ const getTranslation = (key, language, replace) => {
 
   return string
 }
-
-const getStrings = (key, languageConf) => key.split('.').reduce((acc, cur) => acc[cur], languageConf)
 
 module.exports = {
   getTranslations,
