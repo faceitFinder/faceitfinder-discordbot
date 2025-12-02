@@ -32,7 +32,7 @@
     "canvas": "^2.11.2",
     "chart.js": "^4.4.2",
     "discord-api-types": "^0.37.76",
-    "discord.js": "^14.16.2",
+    "discord.js": "^14.25.1",
     "express": "^4.21.1",
     "mongoose": "^8.2.3"
   },
