@@ -226,86 +226,112 @@ const getMapRadarChart = (segments, types) => {
   const canvas = Canvas.createCanvas(600, 600)
   const ctx = canvas.getContext('2d')
   const datasetsKeys = types.map(e => e.name)
+  const labels = segments.map(e => e.label)
 
-  const thresholdLines = datasetsKeys
-    .flatMap(key => {
-      const threshold = color.charts.radarCategories[key]?.threshold
-      if (!threshold) return []
-      const lines = threshold.lines || (threshold.value ? [{ value: threshold.value, lineWidth: threshold.lineWidth || 2, lineColor: threshold.lineColor || '#6b7280' }] : [])
-      return lines.map(line => ({ ...line, categoryKey: key, thresholdConfig: threshold }))
+  const categoryConfigs = new Map()
+  datasetsKeys.forEach(key => {
+    categoryConfigs.set(key, color.charts.radarCategories[key] || {})
+  })
+
+  const thresholdLinesMap = new Map()
+  const seenThresholdValues = new Set()
+  datasetsKeys.forEach(key => {
+    const threshold = categoryConfigs.get(key)?.threshold
+    if (!threshold) return
+    const lines = threshold.lines || (threshold.value ? [{ value: threshold.value, lineWidth: threshold.lineWidth || 2, lineColor: threshold.lineColor || '#6b7280' }] : [])
+    lines.forEach(line => {
+      if (!seenThresholdValues.has(line.value)) {
+        seenThresholdValues.add(line.value)
+        thresholdLinesMap.set(line.value, { ...line, thresholdConfig: threshold })
+      }
     })
-    .filter((line, index, self) =>
-      index === self.findIndex(l => l.value === line.value)
-    )
+  })
 
-  const customGridLines = datasetsKeys
-    .flatMap(key => color.charts.radarCategories[key]?.gridLines || [])
-    .filter((line, index, self) =>
-      index === self.findIndex(l => l.value === line.value)
-    )
-
-  const getThresholdConfig = (tickValue) => {
-    return thresholdLines.find(t => t.value === tickValue)
-  }
-
-  const getGridLineProperty = (tickValue, property, defaultCustomValue, defaultThresholdValue, fallbackValue) => {
-    const customLine = customGridLines.find(line => line.value === tickValue)
-    if (customLine) {
-      return customLine[property] || defaultCustomValue
-    }
-    const thresholdLine = getThresholdConfig(tickValue)
-    if (thresholdLine) {
-      const thresholdProperty = property === 'color' ? 'lineColor' : property
-      return thresholdLine[thresholdProperty] || defaultThresholdValue
-    }
-    return fallbackValue
-  }
+  const customGridLinesMap = new Map()
+  const seenGridValues = new Set()
+  datasetsKeys.forEach(key => {
+    const gridLines = categoryConfigs.get(key)?.gridLines || []
+    gridLines.forEach(line => {
+      if (!seenGridValues.has(line.value)) {
+        seenGridValues.add(line.value)
+        customGridLinesMap.set(line.value, line)
+      }
+    })
+  })
 
   const getGridLineColor = (tickValue) => {
-    return getGridLineProperty(tickValue, 'color', color.charts.grid, '#6b7280', color.charts.grid)
+    const customLine = customGridLinesMap.get(tickValue)
+    if (customLine) return customLine.color || color.charts.grid
+    
+    const thresholdLine = thresholdLinesMap.get(tickValue)
+    if (thresholdLine) return thresholdLine.lineColor || '#6b7280'
+    
+    return color.charts.grid
   }
 
   const getGridLineWidth = (tickValue) => {
-    return getGridLineProperty(tickValue, 'lineWidth', 2, 3, 1)
+    const customLine = customGridLinesMap.get(tickValue)
+    if (customLine) return customLine.lineWidth || 2
+    
+    const thresholdLine = thresholdLinesMap.get(tickValue)
+    if (thresholdLine) return thresholdLine.lineWidth || 3
+    
+    return 1
   }
 
-  const getPointColorFromThreshold = (value, threshold, defaultColor) => {
-    if (!threshold || !threshold.colors) return defaultColor
+  const getPointColorsFromThreshold = (value, threshold, defaultColor) => {
+    if (!threshold?.colors) return { border: defaultColor, background: defaultColor }
     
+    const numValue = parseFloat(value) || 0
     const colorConfig = Object.values(threshold.colors).find(c => 
-      parseFloat(value) >= parseFloat(c.min) && parseFloat(value) <= parseFloat(c.max)
+      numValue >= parseFloat(c.min) && numValue <= parseFloat(c.max)
     )
     
-    return colorConfig ? colorConfig.borderColor : defaultColor
-  }
-
-  const getPointBackgroundColorFromThreshold = (value, threshold, defaultColor) => {
-    if (!threshold || !threshold.colors) return defaultColor
-    
-    const colorConfig = Object.values(threshold.colors).find(c => 
-      parseFloat(value) >= parseFloat(c.min) && parseFloat(value) <= parseFloat(c.max)
-    )
-    
-    return colorConfig ? colorConfig.backgroundColor : defaultColor
+    return colorConfig 
+      ? { border: colorConfig.borderColor, background: colorConfig.backgroundColor }
+      : { border: defaultColor, background: defaultColor }
   }
 
   const datasets = datasetsKeys.map(key => {
-    const categoryConfig = color.charts.radarCategories[key] || {}
+    const categoryConfig = categoryConfigs.get(key)
     const threshold = categoryConfig.threshold
+    const defaultColor = categoryConfig.border
+
+    if (!threshold) {
+      return {
+        label: key,
+        data: segments.map(e => e.stats[key]),
+        backgroundColor: categoryConfig.background,
+        borderColor: defaultColor,
+        borderWidth: 2,
+        pointBackgroundColor: defaultColor,
+        pointBorderColor: defaultColor
+      }
+    }
+
+    const pointColors = segments.map(e => {
+      const value = parseFloat(e.stats[key]) || 0
+      return getPointColorsFromThreshold(value, threshold, defaultColor)
+    })
 
     return {
       label: key,
       data: segments.map(e => e.stats[key]),
       backgroundColor: categoryConfig.background,
-      borderColor: categoryConfig.border,
+      borderColor: defaultColor,
       borderWidth: 2,
-      pointBackgroundColor: threshold ? segments.map(e => {
-        const value = parseFloat(e.stats[key]) || 0
-        return getPointBackgroundColorFromThreshold(value, threshold, categoryConfig.border)
-      }) : categoryConfig.border,
-      pointBorderColor: segments.map(e => {
-        const value = parseFloat(e.stats[key]) || 0
-        return getPointColorFromThreshold(value, threshold, categoryConfig.border)
+      pointBackgroundColor: pointColors.map(c => c.background),
+      pointBorderColor: pointColors.map(c => c.border)
+    }
+  })
+
+  const labelConfigs = new Map()
+  datasetsKeys.forEach(key => {
+    const config = categoryConfigs.get(key)
+    if (config?.showPointLabels) {
+      labelConfigs.set(key, {
+        labelColor: config.labelColor || color.charts.text,
+        labelBackgroundColor: config.labelBackgroundColor || color.charts.background
       })
     }
   })
@@ -313,8 +339,8 @@ const getMapRadarChart = (segments, types) => {
   new Chart(ctx, {
     type: 'radar',
     data: {
-      labels: segments.map(e => e.label),
-      datasets: datasets
+      labels,
+      datasets
     },
     options: {
       scales: {
@@ -360,34 +386,28 @@ const getMapRadarChart = (segments, types) => {
         ctx.textBaseline = 'middle'
         
         chart.data.datasets.forEach((dataset, datasetIndex) => {
-          const categoryConfig = color.charts.radarCategories[dataset.label] || {}
-          const showLabels = categoryConfig.showPointLabels || false
-          
-          if (!showLabels) return
-          
-          const labelColor = categoryConfig.labelColor || color.charts.text
-          const labelBackgroundColor = categoryConfig.labelBackgroundColor || color.charts.background
+          const labelConfig = labelConfigs.get(dataset.label)
+          if (!labelConfig) return
 
+          const { labelColor, labelBackgroundColor } = labelConfig
           const meta = chart.getDatasetMeta(datasetIndex)
+          
           meta.data.forEach((point, pointIndex) => {
             const value = dataset.data[pointIndex]
-            if (value === null || value === undefined) return
+            if (value == null) return
             
             const angle = point.angle
             const x = point.x + Math.cos(angle) * 25
             const y = point.y + Math.sin(angle) * 25
             
-            const formattedValue = typeof value === 'number' ? value.toFixed(1) : value
-            
+            const formattedValue = typeof value === 'number' ? value.toFixed(1) : String(value)
             const metrics = ctx.measureText(formattedValue)
             const width = metrics.width + 10
-            const height = 18
-            const r = 4
             const rx = x - width / 2
-            const ry = y - height / 2
+            const ry = y - 9
 
             ctx.fillStyle = labelBackgroundColor
-            roundRect(ctx, rx, ry, width, height, r)
+            roundRect(ctx, rx, ry, width, 18, 4)
 
             ctx.fillStyle = labelColor
             ctx.fillText(formattedValue, x, y)
