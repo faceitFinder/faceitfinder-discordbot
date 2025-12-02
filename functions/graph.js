@@ -226,13 +226,87 @@ const getMapRadarChart = (segments, types) => {
   const canvas = Canvas.createCanvas(600, 600)
   const ctx = canvas.getContext('2d')
   const datasetsKeys = types.map(e => e.name)
+
+  const thresholdLines = datasetsKeys
+    .flatMap(key => {
+      const threshold = color.charts.radarCategories[key]?.threshold
+      if (!threshold) return []
+      const lines = threshold.lines || (threshold.value ? [{ value: threshold.value, lineWidth: threshold.lineWidth || 2, lineColor: threshold.lineColor || '#6b7280' }] : [])
+      return lines.map(line => ({ ...line, categoryKey: key, thresholdConfig: threshold }))
+    })
+    .filter((line, index, self) =>
+      index === self.findIndex(l => l.value === line.value)
+    )
+
+  const customGridLines = datasetsKeys
+    .flatMap(key => color.charts.radarCategories[key]?.gridLines || [])
+    .filter((line, index, self) =>
+      index === self.findIndex(l => l.value === line.value)
+    )
+
+  const getThresholdConfig = (tickValue) => {
+    return thresholdLines.find(t => t.value === tickValue)
+  }
+
+  const getGridLineProperty = (tickValue, property, defaultCustomValue, defaultThresholdValue, fallbackValue) => {
+    const customLine = customGridLines.find(line => line.value === tickValue)
+    if (customLine) {
+      return customLine[property] || defaultCustomValue
+    }
+    const thresholdLine = getThresholdConfig(tickValue)
+    if (thresholdLine) {
+      const thresholdProperty = property === 'color' ? 'lineColor' : property
+      return thresholdLine[thresholdProperty] || defaultThresholdValue
+    }
+    return fallbackValue
+  }
+
+  const getGridLineColor = (tickValue) => {
+    return getGridLineProperty(tickValue, 'color', color.charts.grid, '#6b7280', color.charts.grid)
+  }
+
+  const getGridLineWidth = (tickValue) => {
+    return getGridLineProperty(tickValue, 'lineWidth', 2, 3, 1)
+  }
+
+  const getPointColorFromThreshold = (value, threshold, defaultColor) => {
+    if (!threshold || !threshold.colors) return defaultColor
+    
+    const colorConfig = Object.values(threshold.colors).find(c => 
+      parseFloat(value) >= parseFloat(c.min) && parseFloat(value) <= parseFloat(c.max)
+    )
+    
+    return colorConfig ? colorConfig.borderColor : defaultColor
+  }
+
+  const getPointBackgroundColorFromThreshold = (value, threshold, defaultColor) => {
+    if (!threshold || !threshold.colors) return defaultColor
+    
+    const colorConfig = Object.values(threshold.colors).find(c => 
+      parseFloat(value) >= parseFloat(c.min) && parseFloat(value) <= parseFloat(c.max)
+    )
+    
+    return colorConfig ? colorConfig.backgroundColor : defaultColor
+  }
+
   const datasets = datasetsKeys.map(key => {
+    const categoryConfig = color.charts.radarCategories[key] || {}
+    const threshold = categoryConfig.threshold
+
     return {
       label: key,
       data: segments.map(e => e.stats[key]),
-      backgroundColor: color.charts.radarCategories[key].background,
-      borderColor: color.charts.radarCategories[key].border,
-      borderWidth: 2
+      backgroundColor: categoryConfig.background,
+      borderColor: categoryConfig.border,
+      borderWidth: 2,
+      pointBackgroundColor: threshold ? segments.map(e => {
+        const value = parseFloat(e.stats[key]) || 0
+        return getPointBackgroundColorFromThreshold(value, threshold, categoryConfig.border)
+      }) : categoryConfig.border,
+      pointBorderColor: segments.map(e => {
+        const value = parseFloat(e.stats[key]) || 0
+        return getPointColorFromThreshold(value, threshold, categoryConfig.border)
+      })
     }
   })
 
@@ -246,7 +320,8 @@ const getMapRadarChart = (segments, types) => {
       scales: {
         r: {
           grid: {
-            color: color.charts.grid,
+            color: (context) => getGridLineColor(context.tick.value),
+            lineWidth: (context) => getGridLineWidth(context.tick.value)
           },
           ticks: {
             color: color.charts.text,
@@ -269,9 +344,59 @@ const getMapRadarChart = (segments, types) => {
             color: color.charts.text,
             borderWidth: 2,
           }
+        },
+        tooltip: {
+          enabled: true
         }
       }
-    }
+    },
+    plugins: [{
+      id: 'pointLabels',
+      afterDatasetsDraw: (chart) => {
+        const ctx = chart.ctx
+        ctx.save()
+        ctx.font = 'bold 12px sans-serif'
+        ctx.textAlign = 'center'
+        ctx.textBaseline = 'middle'
+        
+        chart.data.datasets.forEach((dataset, datasetIndex) => {
+          const categoryConfig = color.charts.radarCategories[dataset.label] || {}
+          const showLabels = categoryConfig.showPointLabels || false
+          
+          if (!showLabels) return
+          
+          const labelColor = categoryConfig.labelColor || color.charts.text
+          const labelBackgroundColor = categoryConfig.labelBackgroundColor || color.charts.background
+
+          const meta = chart.getDatasetMeta(datasetIndex)
+          meta.data.forEach((point, pointIndex) => {
+            const value = dataset.data[pointIndex]
+            if (value === null || value === undefined) return
+            
+            const angle = point.angle
+            const x = point.x + Math.cos(angle) * 25
+            const y = point.y + Math.sin(angle) * 25
+            
+            const formattedValue = typeof value === 'number' ? value.toFixed(1) : value
+            
+            const metrics = ctx.measureText(formattedValue)
+            const width = metrics.width + 10
+            const height = 18
+            const r = 4
+            const rx = x - width / 2
+            const ry = y - height / 2
+
+            ctx.fillStyle = labelBackgroundColor
+            roundRect(ctx, rx, ry, width, height, r)
+
+            ctx.fillStyle = labelColor
+            ctx.fillText(formattedValue, x, y)
+          })
+        })
+        
+        ctx.restore()
+      }
+    }]
   })
 
   return canvas.toBuffer()

@@ -24,12 +24,14 @@ module.exports = {
 
     const {
       embeds,
-      files
+      files,
+      components: embedComponents
     } = await buildEmbed(interaction, playerId, map, mode, game)
 
     optionsComponent.components.at(0).data.disabled = false
     components = [
       optionsComponent,
+      ...(embedComponents || [])
     ]
 
     return {

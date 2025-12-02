@@ -9,8 +9,8 @@ module.exports.TYPES = {
   PREV: { name: 'strings.pagination.prev', emoji: '◀', style: ButtonStyle.Primary, translate: true },
   LAST: { name: 'strings.pagination.last', emoji: '⏭', style: ButtonStyle.Primary, translate: true },
   FIRST: { name: 'strings.pagination.first', emoji: '⏮', style: ButtonStyle.Primary, translate: true },
-  MATCHES: { name: 'Matches', style: ButtonStyle.Success, translate: false },
-  WINRATE: { name: 'Win Rate %', style: ButtonStyle.Success, translate: false },
+  MATCHES: { name: 'Play Rate %', style: ButtonStyle.Success, translate: false },
+  WINS: { name: 'Win Rate %', style: ButtonStyle.Success, translate: false },
   ELO_GAIN: { name: 'Elo Gain', style: ButtonStyle.Success, translate: false },
 }
 

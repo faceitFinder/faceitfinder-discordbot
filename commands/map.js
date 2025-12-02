@@ -15,10 +15,10 @@ const { TYPES } = require('../templates/customType')
 
 const ALL = 'all'
 
-const buildDefaultMapEmbed = async (interaction, playerId, game, mode, types = null) => {
+const buildDefaultMapEmbed = async (interaction, playerId, game, mode, types = null, disabledType = null) => {
   types ??= [
     TYPES.MATCHES,
-    TYPES.WINRATE,
+    TYPES.WINS,
     {
       ...TYPES.ELO_GAIN,
       style: Discord.ButtonStyle.Secondary
@@ -45,7 +45,7 @@ const buildDefaultMapEmbed = async (interaction, playerId, game, mode, types = n
   const size = 40
   const filesAtt = []
   const values = {
-    id: 'mapRadarChartSelector',
+    id: 'mapRadarChartButtons',
     playerId,
     userId: interaction.user.id,
     game,
@@ -54,14 +54,16 @@ const buildDefaultMapEmbed = async (interaction, playerId, game, mode, types = n
     types
   }
 
-  const buttons = await Promise.all(types.map(t => generateButtons(interaction, values, t)))
+  const buttons = await Promise.all(types.map(t => generateButtons(interaction, values, t, disabledType)))
 
   const rankImageCanvas = await Graph.getRankImage(faceitLevel, faceitElo, size, game)
+  const totalMatches = playerStats.segments.reduce((acc, e) => acc + parseInt(e.stats.Matches), 0)
   playerStats.segments.forEach(s => {
     const eloGain = playerHistory
       .filter(h => (h.i1 === maps[s.label] || h.i1 === s.label) && s.mode === mode && h.gameMode === s.mode)
       .map(h => h.eloGain).filter(h => h).reduce((acc, h) => acc + h, 0)
 
+    s.stats['Play Rate %'] = ((s.stats.Matches / totalMatches) * 100).toFixed(2)
     s.stats['Elo Gain'] = eloGain
   })
   playerStats.segments.sort((a, b) => a.label.localeCompare(b.label))
@@ -287,3 +289,4 @@ module.exports = {
 
 module.exports.sendCardWithInfo = sendCardWithInfo
 module.exports.buildEmbed = buildEmbed
+module.exports.buildDefaultMapEmbed = buildDefaultMapEmbed
