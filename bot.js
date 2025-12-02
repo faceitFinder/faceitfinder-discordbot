@@ -13,7 +13,7 @@ fs.readdirSync('./events').filter(file => file.endsWith('.js')).forEach(async (f
   client.on(event.name, (...args) => { event.execute(...args) })
 })
 
-client.once('ready', async (client) => {
+client.once('clientReady', async (client) => {
   if (client.shard.ids[0] !== client.shard.count - 1) return
 
   /**

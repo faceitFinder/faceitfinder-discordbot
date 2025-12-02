@@ -123,6 +123,9 @@ base.strings.donate = 'Unterstütze das Projekt';
 base.strings.fullHistory = 'Kompletter Verlauf';
 base.strings.verifyDescription = `Hey {discord}, um Ihr Faceit-Konto zu verifizieren, klicken Sie auf den untenstehenden Link!\n${oauth2}\nSobald Sie Ihr Konto verifiziert haben, können Sie die verknüpfte Rolle erhalten und mehr!`;
 base.strings.verify = 'Überprüfung';
+base.strings.allMaps = 'Alle Maps';
+// Radar chart 
+base.strings.allMapsDescription = 'Vorschau der Statistiken verschiedener Maps';
 base.strings.premiumDesc = 'Diese Funktion ist nur für Premium-Gilden verfügbar. Werden Sie eine Premium-Gilde, indem Sie auf die Schaltfläche unten klicken.';
 base.error.user.missing = 'Es scheint, als fehle ein User';
 base.error.user.compareSame = 'Du kannst nicht den gleichen User vergleichen';

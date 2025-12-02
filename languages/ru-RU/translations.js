@@ -185,6 +185,9 @@ base.success.command.removeRole = 'Роль была успешно удален
 base.command.verify.description = 'Подтвердите ваш аккаунт Faceit'
 base.strings.verifyDescription = `Привет {discord}, чтобы подтвердить ваш аккаунт Faceit, нажмите на ссылку ниже!\n${oauth2}\nПосле подтверждения вашего аккаунта, вы сможете получить привязанную роль и многое другое!`
 base.strings.verify = 'Подтверждение'
+base.strings.allMaps = 'Все карты'
+// Radar chart 
+base.strings.allMapsDescription = 'Предварительный просмотр статистики различных карт'
 base.error.user.unlink.verified = `Поскольку ваш аккаунт подтвержден, вам необходимо отвязать ваш аккаунт на веб-сайте. Нажмите на ссылку ниже, чтобы сделать это.\n${unlinkVerified}`
 base.error.user.link.verified.other = `Этот аккаунт подтверждён, пользователю нужно выбрать гильдию на сайте, чтобы связать её\n${linkVerified}`
 module.exports = base;
