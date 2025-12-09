@@ -79,9 +79,7 @@ const getUsers = async (
   }
 
   if (faceitParameters) {
-    parameters.push(...faceitParameters.map(nickname => nickname.split('/').filter(e => e).pop()).map(e => {
-      return { param: e }
-    }))
+    parameters.push(...faceitParameters.map(e => ({ param: e })))
   }
 
   if (steamParameters) {
@@ -90,12 +88,7 @@ const getUsers = async (
       .map(e => { return { param: e, steam: true } })
 
     if (steamIds.length > 0) parameters.push(...steamIds)
-    else parameters.push(...steamParameters?.replace(/\s+/g, ' ').split(' ').map(e => {
-      return {
-        param: e,
-        steam: true,
-      }
-    }))
+    else parameters.push(...steamParameters?.replace(/\s+/g, ' ').split(' ').map(e => ({ param: e, steam: true })))
   }
 
   if (parameters.length === 0 && currentUser && searchCurrentUser) {
@@ -109,7 +102,7 @@ const getUsers = async (
     params = params.concat(
       res.length > 0 ?
         res.map(r => { return { param: r, discord: true, verified: !!e?.verified } }) :
-        { param: e.param.split('/').filter(e => e).pop(), steam: e.steam, discord: e.discord, faceitId: e.faceitId, verified: !!e?.verified }
+        { param: e.param.split('?')[0].split('/').filter(Boolean).pop(), steam: e.steam, discord: e.discord, faceitId: e.faceitId, verified: !!e?.verified }
     )
   })
 
