@@ -1,7 +1,3 @@
-// eslint.config.js (Flat Config CommonJS)
-const js = require('@eslint/js')
-const globals = require('globals')
-
 module.exports = [
   js.configs.recommended,
   {
