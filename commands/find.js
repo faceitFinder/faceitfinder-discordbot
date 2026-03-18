@@ -25,39 +25,45 @@ const { generateDateStatsFields } = require('../functions/dateStats')
 
 const getOptions = () => {
   const options = structuredClone(Options.stats)
-  options.push({
-    name: 'player_aimed',
-    description: getTranslation('options.playerAimed', 'en-US'),
-    descriptionLocalizations: getTranslations('options.playerAimed'),
-    required: false,
-    type: ApplicationCommandOptionType.String,
-    slash: true
-  }, getMapOption(), {
-    name: 'excluded_steam_parameters',
-    description: getTranslation('options.excludedSteamParameters', 'en-US'),
-    descriptionLocalizations: getTranslations('options.excludedSteamParameters'),
-    required: false,
-    type: ApplicationCommandOptionType.String,
-    slash: true
-  }, {
-    name: 'excluded_faceit_parameters',
-    description: getTranslation('options.excludedFaceitParameters', 'en-US'),
-    descriptionLocalizations: getTranslations('options.excludedFaceitParameters'),
-    required: false,
-    type: ApplicationCommandOptionType.String,
-    slash: true
-  }, {
-    name: 'match_number',
-    description: getTranslation('options.matchNumber', 'en-US', {
-      default: 'strings.fullHistory'
-    }),
-    descriptionLocalizations: getTranslations('options.matchNumber', {
-      default: 'strings.fullHistory'
-    }),
-    required: false,
-    type: ApplicationCommandOptionType.Integer,
-    slash: true
-  })
+  options.push(
+    {
+      name: 'player_aimed',
+      description: getTranslation('options.playerAimed', 'en-US'),
+      descriptionLocalizations: getTranslations('options.playerAimed'),
+      required: false,
+      type: ApplicationCommandOptionType.String,
+      slash: true
+    },
+    getMapOption(),
+    {
+      name: 'excluded_steam_parameters',
+      description: getTranslation('options.excludedSteamParameters', 'en-US'),
+      descriptionLocalizations: getTranslations('options.excludedSteamParameters'),
+      required: false,
+      type: ApplicationCommandOptionType.String,
+      slash: true
+    },
+    {
+      name: 'excluded_faceit_parameters',
+      description: getTranslation('options.excludedFaceitParameters', 'en-US'),
+      descriptionLocalizations: getTranslations('options.excludedFaceitParameters'),
+      required: false,
+      type: ApplicationCommandOptionType.String,
+      slash: true
+    },
+    {
+      name: 'match_number',
+      description: getTranslation('options.matchNumber', 'en-US', {
+        default: 'strings.fullHistory'
+      }),
+      descriptionLocalizations: getTranslations('options.matchNumber', {
+        default: 'strings.fullHistory'
+      }),
+      required: false,
+      type: ApplicationCommandOptionType.Integer,
+      slash: true
+    }
+  )
 
   return options
 }
@@ -122,7 +128,7 @@ const sendCardWithInfo = async (
   const faceitElo = playerDatas.games[game].faceit_elo
   const size = 40
   const graphBuffer = generateChart(
-    interaction,
+    interaction.locale,
     playerDatas.nickname,
     playerHistory,
     playerLastStats.games,
