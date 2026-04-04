@@ -24,9 +24,12 @@ const getMatchItems = async (interaction, playerDatas, steamDatas, playerHistory
   const cards = []
   const faceitElo = playerDatas.games[game].faceit_elo
   const matchStats = playerHistory.filter(e => e.matchId === matchId)
+  const playerParam = { param: playerDatas.player_id, faceitId: true }
+  const playerRegion = playerDatas.games[game].region
 
-  if (cards.length === 0)
-    matchStats.forEach(async (roundStats, i) => {
+  if (cards.length === 0) {
+    for (let i = 0; i < matchStats.length; i++) {
+      const roundStats = matchStats[i];
       const card = new Discord.EmbedBuilder()
       const mapName = roundStats.i1
       const result = Math.max(...roundStats.i18.split('/').map(Number)) === parseInt(roundStats.c5)
@@ -34,12 +37,7 @@ const getMatchItems = async (interaction, playerDatas, steamDatas, playerHistory
       const level = getLevelFromElo(roundStats.elo, game)
 
       if (level !== undefined) {
-        const rankImageCanvas = await Graph.getRankImage(
-          level,
-          roundStats.elo,
-          size,
-          game
-        )
+        const rankImageCanvas = await Graph.getRankImage(level, roundStats.elo, size, game, playerParam, playerRegion)
         filesAtt.push(new Discord.AttachmentBuilder(rankImageCanvas, { name: `${faceitElo}${i}.png` }))
       }
 
@@ -77,14 +75,16 @@ const getMatchItems = async (interaction, playerDatas, steamDatas, playerHistory
         .setColor(result ? color.won : color.lost)
         .setFooter({ text: `Steam: ${steamDatas?.personaname || steamDatas}`, iconURL: `attachment://game${i}.png` })
 
-      if (fs.existsSync(mapThumbnail))
+      if (fs.existsSync(mapThumbnail)) {
         filesAtt.push(
           new Discord.AttachmentBuilder(mapThumbnail, { name: `${mapName}${i}.jpg` }),
           new Discord.AttachmentBuilder(`images/${game}.png`, { name: `game${i}.png` })
         )
+      }
 
       cards.push(card)
-    })
+    }
+  }
 
   return {
     embeds: cards,

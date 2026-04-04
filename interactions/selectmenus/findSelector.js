@@ -33,6 +33,7 @@ module.exports = {
     const activePlayer = players?.components.findIndex((c) => c.data.disabled)
     const excludedPlayers = interaction.message.components.at(3)
     const playerStatsCard = interaction.message.embeds.filter(e => e.data.image.url.includes('graph'))?.at(0)
+    const playerLevelAttachement = playerStatsCard.data.thumbnail
 
     updateDefaultOption(optionsComponents, interaction.values[0], false)
     getCardByUserType(newUser, interaction)
@@ -75,8 +76,12 @@ module.exports = {
     const messageItems = await updateEmbedMessage(interaction, values.playerId, values.matchId, values.game)
 
     if (playerStatsCard) {
-      messageItems.files.push(new Discord.AttachmentBuilder(values.graphBuffer.buffer, { name: `${values.playerId}graph.png` }))
+      messageItems.files.push(...[
+        new Discord.AttachmentBuilder(values.graphBuffer.buffer, { name: `${values.playerId}graph.png` }),
+        new Discord.AttachmentBuilder(values.rankImageCanvas.buffer, { name: `${values.playerId}rank.png` }),
+      ])
       playerStatsCard.data.image = { url: `attachment://${values.playerId}graph.png` }
+      playerStatsCard.data.thumbnail = { url: `attachment://${values.playerId}rank.png` }
       messageItems.embeds.unshift(playerStatsCard)
     }
 

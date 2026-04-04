@@ -1,16 +1,19 @@
-const { color } = require('../config.json')
+const { color, challenger } = require('../config.json')
 const path = require('path')
 const Canvas = require('canvas')
 const CustomType = require('../templates/customType')
 const Chart = require('chart.js/auto')
 const { getTranslation } = require('../languages/setup')
+const { getLadder } = require('./apiHandler')
+
+const CHALLENGER = 'challenger'
 
 const generateChart = (locale, playerName, matchHistory, maxMatch = 20, type = CustomType.TYPES.ELO, game) => {
   const types = type.name.split('-').map(e => CustomType.getType(e.trim()))
   const slicedHistory = matchHistory.slice(0, maxMatch).reverse()
-  
+
   const datas = types.map(type => [type, getGraph(locale, playerName, type, matchHistory, maxMatch).reverse()])
-  
+
   const dateFormatter = new Intl.DateTimeFormat('en-US', {
     month: 'short',
     day: 'numeric',
@@ -92,10 +95,10 @@ const getChart = (datasets, labels, datasetFunc, displayY1, game) => {
 const getClassicDatasets = (datas, i, ctx, game) => {
   const [type, data] = datas
   const colorConfig = type.color[game] ?? type.color
-  
+
   const colorCache = new Map()
   const defaultColor = Object.values(colorConfig)[0]?.color || '#ffffff'
-  
+
   const pointColors = data.map(value => {
     if (value == null) return null
     if (colorCache.has(value)) return colorCache.get(value)
@@ -159,35 +162,48 @@ const getCompareDatasets = (datas, i, ctx, game) => {
   }
 }
 
-const getRankImage = async (faceitLevel, faceitElo = null, size, game) => {
+const getRankImage = async (faceitLevel, faceitElo = null, size, game, playerParam, playerRegion) => {
+  let ladderRegion = { position: challenger.top + 1 }
+  if (faceitLevel >= 10) {
+    ladderRegion = await getLadder({ playerParam, region: playerRegion, game })
+  }
+
+  const isChallenger = ladderRegion.position <= challenger.top
+  const isTop3 = ladderRegion.position <= 3
   faceitElo ??= color.levels[game]['3'].min
 
-  const space = 6,
-    maxWidth = size - space,
-    height = 4,
-    x = space * .6,
-    y = size + space * 1.2,
-    canvas = Canvas.createCanvas(size, y + height + 1),
-    image = await Canvas.loadImage(path.resolve(__dirname, `../images/faceit/faceit${faceitLevel}.svg`))
-
+  const faceitExt = isChallenger ? `${CHALLENGER}${isTop3 ? ladderRegion.position : ''}` : faceitLevel
+  const image = await Canvas.loadImage(path.resolve(__dirname, `../images/faceit/faceit${faceitExt}.svg`))
   image.height = image.width = size
 
-  let ctx = canvas.getContext('2d')
+  if (!isChallenger) {
+    const space = 6
+    const maxWidth = size - space
+    const height = 4
+    const x = space * 0.6
+    const y = size + space * 1.2
 
-  ctx.drawImage(image, 0, 0)
-  ctx.lineWidth = space
-  ctx.globalCompositeOperation = 'source-over'
-  ctx.fillStyle = ctx.strokeStyle = '#1f1f22'
-  ctx = roundRect(ctx, x, y, maxWidth, height, space)
+    const canvas = Canvas.createCanvas(size, y + height + 1)
+    let ctx = canvas.getContext('2d')
 
-  const range = color.levels[game][faceitLevel],
-    width = parseInt(faceitLevel) === 10 ? maxWidth : (maxWidth * (faceitElo - range.min) / (range.max - range.min))
+    if (parseInt(faceitLevel) < 10) {
+      ctx.lineWidth = space
+      ctx.globalCompositeOperation = 'source-over'
+      ctx.fillStyle = ctx.strokeStyle = '#1f1f22'
+      ctx = roundRect(ctx, x, y, maxWidth, height, space)
 
-  ctx.globalCompositeOperation = 'source-over'
-  ctx.fillStyle = ctx.strokeStyle = color.levels[game][faceitLevel].color
-  ctx = roundRect(ctx, x, y, width, height, space)
+      const range = color.levels[game][faceitLevel]
+      const width = maxWidth * (faceitElo - range.min) / (range.max - range.min)
 
-  return canvas.toBuffer()
+      ctx.fillStyle = ctx.strokeStyle = color.levels[game][faceitLevel].color
+      ctx = roundRect(ctx, x, y, width, height, space)
+    }
+
+    ctx.drawImage(image, 0, 0)
+    return canvas.toBuffer()
+  }
+
+  return getChallengerRankImage(ladderRegion, size, image)
 }
 
 const roundRect = (ctx, x, y, w, h, r) => {
@@ -224,7 +240,7 @@ const getGradient = (prev, current, ctx, type, game, colorCache) => {
   const gradient = ctx.createLinearGradient(prev.x, prev.y, current.x, current.y)
   const colorConfig = type.color[game] ?? type.color
   const defaultColor = Object.values(colorConfig)[0]?.color || '#ffffff'
-  
+
   let prevColor, currentColor
   if (colorCache) {
     if (!colorCache.has(prev.raw)) {
@@ -234,7 +250,7 @@ const getGradient = (prev, current, ctx, type, game, colorCache) => {
     } else {
       prevColor = colorCache.get(prev.raw) || defaultColor
     }
-    
+
     if (!colorCache.has(current.raw)) {
       const config = colorFilter(colorConfig, current.raw)
       currentColor = config?.color || defaultColor
@@ -246,7 +262,7 @@ const getGradient = (prev, current, ctx, type, game, colorCache) => {
     prevColor = colorFilter(colorConfig, prev.raw)?.color || defaultColor
     currentColor = colorFilter(colorConfig, current.raw)?.color || defaultColor
   }
-  
+
   gradient.addColorStop(0, prevColor)
   gradient.addColorStop(1, currentColor)
   return gradient
@@ -268,9 +284,9 @@ const getGraph = (locale, playerName, type, matchHistory, maxMatch) => {
   })
 
   switch (CustomType.getType(type.name)) {
-  case CustomType.TYPES.ELO: return getElo(maxMatch, matchHistory)
-  case CustomType.TYPES.KD: return getKD(maxMatch, matchHistory)
-  default: break
+    case CustomType.TYPES.ELO: return getElo(maxMatch, matchHistory)
+    case CustomType.TYPES.KD: return getKD(maxMatch, matchHistory)
+    default: break
   }
 }
 
@@ -314,49 +330,48 @@ const getMapRadarChart = (segments, types) => {
   const getGridLineColor = (tickValue) => {
     const customLine = customGridLinesMap.get(tickValue)
     if (customLine) return customLine.color || color.charts.grid
-    
+
     const thresholdLine = thresholdLinesMap.get(tickValue)
     if (thresholdLine) return thresholdLine.lineColor || '#6b7280'
-    
+
     return color.charts.grid
   }
 
   const getGridLineWidth = (tickValue) => {
     const customLine = customGridLinesMap.get(tickValue)
     if (customLine) return customLine.lineWidth || 2
-    
+
     const thresholdLine = thresholdLinesMap.get(tickValue)
     if (thresholdLine) return thresholdLine.lineWidth || 3
-    
+
     return 1
   }
 
   const getColorFromThreshold = (value, threshold, defaultColor) => {
     if (!threshold?.colors) return defaultColor
-    
+
     const numValue = parseFloat(value) || 0
-    const colorConfig = Object.values(threshold.colors).find(c => 
+    const colorConfig = Object.values(threshold.colors).find(c =>
       numValue >= parseFloat(c.min) && numValue <= parseFloat(c.max)
     )
-    
+
     return colorConfig?.borderColor || defaultColor
   }
 
   const getPointColorsFromThreshold = (value, threshold, defaultColor) => {
     if (!threshold?.colors) return { border: defaultColor, background: defaultColor }
-    
+
     const numValue = parseFloat(value) || 0
-    const colorConfig = Object.values(threshold.colors).find(c => 
+    const colorConfig = Object.values(threshold.colors).find(c =>
       numValue >= parseFloat(c.min) && numValue <= parseFloat(c.max)
     )
-    
-    return colorConfig 
+
+    return colorConfig
       ? { border: colorConfig.borderColor, background: colorConfig.backgroundColor }
       : { border: defaultColor, background: defaultColor }
   }
 
   const segmentColorsCache = new Map()
-  
   const datasets = datasetsKeys.map(key => {
     const categoryConfig = categoryConfigs.get(key)
     const threshold = categoryConfig.threshold
@@ -464,13 +479,13 @@ const getMapRadarChart = (segments, types) => {
       afterDatasetsDraw: (chart) => {
         const ctx = chart.ctx
         ctx.save()
-        
+
         chart.data.datasets.forEach((dataset, datasetIndex) => {
           if (!dataset._segmentColors) return
-          
+
           const meta = chart.getDatasetMeta(datasetIndex)
           const segmentColors = dataset._segmentColors
-          
+
           for (let i = 0; i < meta.data.length; i++) {
             const current = meta.data[i]
             const next = meta.data[(i + 1) % meta.data.length]
@@ -479,7 +494,7 @@ const getMapRadarChart = (segments, types) => {
             const gradient = ctx.createLinearGradient(current.x, current.y, next.x, next.y)
             gradient.addColorStop(0, colors.prev)
             gradient.addColorStop(1, colors.next)
-            
+
             ctx.strokeStyle = gradient
             ctx.lineWidth = 2
             ctx.beginPath()
@@ -488,7 +503,7 @@ const getMapRadarChart = (segments, types) => {
             ctx.stroke()
           }
         })
-        
+
         ctx.restore()
       }
     }, {
@@ -499,27 +514,27 @@ const getMapRadarChart = (segments, types) => {
         ctx.font = 'bold 12px sans-serif'
         ctx.textAlign = 'center'
         ctx.textBaseline = 'middle'
-        
+
         chart.data.datasets.forEach((dataset, datasetIndex) => {
           const labelConfig = labelConfigs.get(dataset.label)
           if (!labelConfig) return
 
           const { labelColor, labelBackgroundColor, threshold, defaultColor } = labelConfig
           const meta = chart.getDatasetMeta(datasetIndex)
-          
+
           meta.data.forEach((point, pointIndex) => {
             const value = dataset.data[pointIndex]
             if (value == null) return
-            
+
             let pointLabelColor = labelColor
             if (threshold?.colors) {
               pointLabelColor = getColorFromThreshold(value, threshold, defaultColor || labelColor)
             }
-            
+
             const angle = point.angle
             const x = point.x + Math.cos(angle) * 25
             const y = point.y + Math.sin(angle) * 25
-            
+
             const formattedValue = typeof value === 'number' ? value.toFixed(1) : String(value)
             const metrics = ctx.measureText(formattedValue)
             const width = metrics.width + 10
@@ -533,11 +548,55 @@ const getMapRadarChart = (segments, types) => {
             ctx.fillText(formattedValue, x, y)
           })
         })
-        
+
         ctx.restore()
       }
     }]
   })
+
+  return canvas.toBuffer()
+}
+
+const getChallengerRankImage = (ladderRegion, size, image) => {
+  const rankText = `#${ladderRegion.position}`
+  const fontSize = Math.round(size * 0.30)
+  const iconZoneSize = Math.round(size * 0.9)
+  const paddingLeft = Math.round(size * 0.16)
+  const paddingRight = Math.round(size * 0.12)
+  const gap = Math.round(size * 0.08)
+  const badgeHeight = size
+  const badgeRadius = badgeHeight / 2
+  const font = `bold ${fontSize}px sans-serif`
+  const tmpCtx = Canvas.createCanvas(0, 0).getContext('2d')
+  tmpCtx.font = font
+  const textWidth = Math.ceil(tmpCtx.measureText(rankText).width)
+  const badgeWidth = paddingLeft + textWidth + gap + iconZoneSize + paddingRight
+
+  const canvas = Canvas.createCanvas(badgeWidth, badgeHeight)
+  const ctx = canvas.getContext('2d')
+
+  // Background
+  ctx.fillStyle = challenger.color[ladderRegion.position] ?? challenger.color.default
+  roundRect(ctx, 0, 0, badgeWidth, badgeHeight, badgeRadius)
+
+  // Gloss effect
+  const gloss = ctx.createLinearGradient(0, 0, 0, badgeHeight * 0.55)
+  gloss.addColorStop(0, 'rgba(255, 255, 255, 0.28)')
+  gloss.addColorStop(0.5, 'rgba(255, 255, 255, 0.06)')
+  gloss.addColorStop(1, 'rgba(255, 255, 255, 0)')
+
+  ctx.fillStyle = gloss
+  roundRect(ctx, 0, 0, badgeWidth, badgeHeight, badgeRadius)
+
+  // Rank
+  const iconX = badgeWidth - paddingRight - iconZoneSize
+  const iconY = (badgeHeight - iconZoneSize) / 2
+  ctx.font = font
+  ctx.fillStyle = '#121212'
+  ctx.textAlign = 'left'
+  ctx.textBaseline = 'middle'
+  ctx.fillText(rankText, paddingLeft, badgeHeight / 2 + 1)
+  ctx.drawImage(image, iconX, iconY, iconZoneSize, iconZoneSize)
 
   return canvas.toBuffer()
 }

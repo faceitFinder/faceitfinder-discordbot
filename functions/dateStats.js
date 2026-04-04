@@ -32,6 +32,7 @@ const getCardWithInfo = async ({
   const endDate = values.to || new Date().setHours(+24)
   const map = values.map ?? ''
   const game = values.game ?? defaultGame
+  const playerParam = { param: playerId, faceitId: true }
 
   const {
     playerDatas,
@@ -39,10 +40,7 @@ const getCardWithInfo = async ({
     playerHistory,
     playerLastStats
   } = await getStats({
-    playerParam: {
-      param: playerId,
-      faceitId: true
-    },
+    playerParam,
     matchNumber: values.maxMatch,
     startDate,
     endDate,
@@ -57,6 +55,7 @@ const getCardWithInfo = async ({
 
   const faceitLevel = playerDatas.games[game].skill_level
   const faceitElo = playerDatas.games[game].faceit_elo
+  const playerRegion = playerDatas.games[game].region
   const size = 40
 
   const graphBuffer = Graph.generateChart(
@@ -68,7 +67,7 @@ const getCardWithInfo = async ({
     game
   )
 
-  const rankImageCanvas = await Graph.getRankImage(faceitLevel, faceitElo, size, game)
+  const rankImageCanvas = await Graph.getRankImage(faceitLevel, faceitElo, size, game, playerParam, playerRegion)
   const endDateToRealTimeStamp = new Date(endDate).setHours(-24)
 
   const head = []

@@ -19,7 +19,7 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR $CACHE
 COPY package.json .
-# COPY yarn.lock .
+COPY yarn.lock .
 
 RUN yarn install
 
