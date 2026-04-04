@@ -54,7 +54,7 @@ const buildEmbed = async ({
   const faceitElo = playerDatas.games[game].faceit_elo
   const faceitLevel = playerDatas.games[game].skill_level
   const size = 40
-  const rankImageCanvas = await Graph.getRankImage(faceitLevel, faceitElo, size, game)
+  const rankImageCanvas = await Graph.getRankImage(faceitLevel, faceitElo, size, game, playerParam, playerRegion)
 
   const card = new Discord.EmbedBuilder()
     .setAuthor({

@@ -126,6 +126,7 @@ const sendCardWithInfo = async (
   const playerId = playerDatas.player_id
   const faceitLevel = playerDatas.games[game].skill_level
   const faceitElo = playerDatas.games[game].faceit_elo
+  const playerRegion = playerDatas.games[game].region
   const size = 40
   const graphBuffer = generateChart(
     interaction.locale,
@@ -140,7 +141,7 @@ const sendCardWithInfo = async (
   includedPlayers = includedPlayers.filter((v, i, a) => a.indexOf(v) === i)
   excludedPlayers = excludedPlayers.filter((v, i, a) => a.indexOf(v) === i)
 
-  const rankImageCanvas = await Graph.getRankImage(faceitLevel, faceitElo, size, game)
+  const rankImageCanvas = await Graph.getRankImage(faceitLevel, faceitElo, size, game, playerParam, playerRegion)
   const head = []
 
   head.push({
@@ -172,7 +173,8 @@ const sendCardWithInfo = async (
     includedPlayers,
     excludedPlayers,
     matchId,
-    graphBuffer
+    graphBuffer,
+    rankImageCanvas
   }
 
   const {

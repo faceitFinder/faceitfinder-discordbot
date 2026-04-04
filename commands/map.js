@@ -26,15 +26,13 @@ const buildDefaultMapEmbed = async (interaction, playerId, game, mode, types = n
   ]
 
   const matchNumber = types.find(t => t.name === TYPES.ELO_GAIN.name)?.style === Discord.ButtonStyle.Secondary ? 20 : 0
+  const playerParam = { param: playerId, faceitId: true, }
   const {
     playerDatas,
     playerStats,
     playerHistory
   } = await getStats({
-    playerParam: {
-      param: playerId,
-      faceitId: true,
-    },
+    playerParam,
     matchNumber,
     checkElo: true,
     game
@@ -42,6 +40,7 @@ const buildDefaultMapEmbed = async (interaction, playerId, game, mode, types = n
 
   const faceitLevel = playerDatas.games[game].skill_level
   const faceitElo = playerDatas.games[game].faceit_elo
+  const playerRegion = playerDatas.games[game].region
   const size = 40
   const filesAtt = []
   const values = {
@@ -56,7 +55,7 @@ const buildDefaultMapEmbed = async (interaction, playerId, game, mode, types = n
 
   const buttons = await Promise.all(types.map(t => generateButtons(interaction, values, t, disabledType)))
 
-  const rankImageCanvas = await Graph.getRankImage(faceitLevel, faceitElo, size, game)
+  const rankImageCanvas = await Graph.getRankImage(faceitLevel, faceitElo, size, game, playerParam, playerRegion)
   const totalMatches = playerStats.segments.reduce((acc, e) => acc + parseInt(e.stats.Matches), 0)
   playerStats.segments.forEach(s => {
     const eloGain = playerHistory
@@ -92,16 +91,14 @@ const buildEmbed = async (interaction, playerId, map, mode, game, types = null) 
   if (!map) return
   if (map === ALL) return buildDefaultMapEmbed(interaction, playerId, game, mode, types)
 
+  const playerParam = { param: playerId, faceitId: true }
   const {
     playerDatas,
     playerStats,
     steamDatas,
     playerLastStats,
   } = await getStats({
-    playerParam: {
-      param: playerId,
-      faceitId: true,
-    },
+    playerParam,
     matchNumber: 0,
     checkElo: true,
     map,
@@ -110,10 +107,11 @@ const buildEmbed = async (interaction, playerId, map, mode, game, types = null) 
 
   const faceitLevel = playerDatas.games[game].skill_level
   const faceitElo = playerDatas.games[game].faceit_elo
+  const playerRegion = playerDatas.games[game].region
   const size = 40
   const filesAtt = []
 
-  const rankImageCanvas = await Graph.getRankImage(faceitLevel, faceitElo, size, game)
+  const rankImageCanvas = await Graph.getRankImage(faceitLevel, faceitElo, size, game, playerParam, playerRegion)
   filesAtt.push(new Discord.AttachmentBuilder(rankImageCanvas, { name: 'level.png' }))
 
   const mapThumbnail = `./images/maps/${map}.jpg`
