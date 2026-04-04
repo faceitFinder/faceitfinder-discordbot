@@ -9,8 +9,8 @@
     "dev": "nodemon --trace-warnings index.js",
     "register-roles": "node ./scripts/register_roles.js",
     "check-guild": "node ./scripts/check_guild.js",
-    "lint": "eslint --ext .js .",
-    "lint-and-fix": "eslint --fix --ext .js ."
+    "lint": "eslint .",
+    "lint-and-fix": "eslint . --fix"
   },
   "repository": {
     "type": "git",

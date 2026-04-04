@@ -284,9 +284,9 @@ const getGraph = (locale, playerName, type, matchHistory, maxMatch) => {
   })
 
   switch (CustomType.getType(type.name)) {
-    case CustomType.TYPES.ELO: return getElo(maxMatch, matchHistory)
-    case CustomType.TYPES.KD: return getKD(maxMatch, matchHistory)
-    default: break
+  case CustomType.TYPES.ELO: return getElo(maxMatch, matchHistory)
+  case CustomType.TYPES.KD: return getKD(maxMatch, matchHistory)
+  default: break
   }
 }
 

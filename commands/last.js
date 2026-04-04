@@ -29,7 +29,7 @@ const getMatchItems = async (interaction, playerDatas, steamDatas, playerHistory
 
   if (cards.length === 0) {
     for (let i = 0; i < matchStats.length; i++) {
-      const roundStats = matchStats[i];
+      const roundStats = matchStats[i]
       const card = new Discord.EmbedBuilder()
       const mapName = roundStats.i1
       const result = Math.max(...roundStats.i18.split('/').map(Number)) === parseInt(roundStats.c5)
