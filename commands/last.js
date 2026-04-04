@@ -37,7 +37,7 @@ const getMatchItems = async (interaction, playerDatas, steamDatas, playerHistory
       const level = getLevelFromElo(roundStats.elo, game)
 
       if (level !== undefined) {
-        const rankImageCanvas = await Graph.getRankImage(level, roundStats.elo, size, game, playerParam, playerRegion)
+        const rankImageCanvas = await Graph.getRankImage(level, roundStats.elo, size, game, playerParam, playerRegion, roundStats.matchId)
         filesAtt.push(new Discord.AttachmentBuilder(rankImageCanvas, { name: `${faceitElo}${i}.png` }))
       }
 

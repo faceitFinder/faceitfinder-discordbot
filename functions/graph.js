@@ -4,7 +4,8 @@ const { createCanvas, loadImage } = require('canvas')
 const CustomType = require('../templates/customType')
 const Chart = require('chart.js/auto')
 const { getTranslation } = require('../languages/setup')
-const { getLadder } = require('./apiHandler')
+const { getLadder, getMatch } = require('./apiHandler')
+const { match } = require('assert')
 
 const CHALLENGER = 'challenger'
 
@@ -162,10 +163,15 @@ const getCompareDatasets = (datas, i, ctx, game) => {
   }
 }
 
-const getRankImage = async (faceitLevel, faceitElo = null, size, game, playerParam, playerRegion) => {
+const getRankImage = async (faceitLevel, faceitElo = null, size, game, playerParam, playerRegion, matchId = null) => {
   let ladderRegion = { position: challenger.top + 1 }
   if (faceitLevel >= 10) {
-    ladderRegion = await getLadder({ playerParam, region: playerRegion, game })
+    if (matchId !== null) {
+      const { playerMatch } = await getMatch({ playerParam, matchId })
+      ladderRegion = { position: playerMatch.player.regionalRank }
+    } else {
+      ladderRegion = await getLadder({ playerParam, region: playerRegion, game })
+    }
   }
 
   const isChallenger = ladderRegion.position <= challenger.top
@@ -284,9 +290,9 @@ const getGraph = (locale, playerName, type, matchHistory, maxMatch) => {
   })
 
   switch (CustomType.getType(type.name)) {
-  case CustomType.TYPES.ELO: return getElo(maxMatch, matchHistory)
-  case CustomType.TYPES.KD: return getKD(maxMatch, matchHistory)
-  default: break
+    case CustomType.TYPES.ELO: return getElo(maxMatch, matchHistory)
+    case CustomType.TYPES.KD: return getKD(maxMatch, matchHistory)
+    default: break
   }
 }
 
