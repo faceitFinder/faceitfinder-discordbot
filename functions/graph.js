@@ -1,6 +1,6 @@
 const { color, challenger } = require('../config.json')
 const path = require('path')
-const Canvas = require('canvas')
+const { createCanvas, loadImage } = require('canvas')
 const CustomType = require('../templates/customType')
 const Chart = require('chart.js/auto')
 const { getTranslation } = require('../languages/setup')
@@ -25,7 +25,7 @@ const generateChart = (locale, playerName, matchHistory, maxMatch = 20, type = C
 }
 
 const getChart = (datasets, labels, datasetFunc, displayY1, game) => {
-  const canvas = Canvas.createCanvas(600, 400)
+  const canvas = createCanvas(600, 400)
   const ctx = canvas.getContext('2d')
 
   const yAxisBase = {
@@ -279,7 +279,7 @@ const colorFilter = (colors, value) => {
 }
 
 const getGraph = (locale, playerName, type, matchHistory, maxMatch) => {
-  if (!matchHistory.length > 0) throw getTranslation('error.user.noMatches', locale, {
+  if (!(matchHistory.length > 0)) throw getTranslation('error.user.noMatches', locale, {
     playerName: playerName
   })
 
@@ -291,7 +291,7 @@ const getGraph = (locale, playerName, type, matchHistory, maxMatch) => {
 }
 
 const getMapRadarChart = (segments, types) => {
-  const canvas = Canvas.createCanvas(600, 600)
+  const canvas = createCanvas(600, 600)
   const ctx = canvas.getContext('2d')
   const datasetsKeys = types.map(e => e.name)
   const labels = segments.map(e => e.label)

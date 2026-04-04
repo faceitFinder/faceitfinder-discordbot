@@ -23,21 +23,21 @@
   },
   "homepage": "https://github.com/JustDams/faceitFinder#readme",
   "dependencies": {
-    "@discordjs/rest": "^2.2.0",
+    "@discordjs/rest": "^2.6.0",
     "@top-gg/sdk": "^3.1.6",
-    "axios": "^1.6.8",
-    "axios-retry": "^4.1.0",
-    "big.js": "^6.2.1",
-    "cache-manager": "^5.4.0",
-    "canvas": "^2.11.2",
-    "chart.js": "^4.4.2",
-    "discord-api-types": "^0.37.76",
+    "axios": "^1.13.6",
+    "axios-retry": "^4.5.0",
+    "big.js": "^7.0.1",
+    "canvas": "^3.2.1",
+    "chart.js": "^4.5.1",
+    "discord-api-types": "^0.38.42",
     "discord.js": "^14.25.1",
-    "express": "^4.21.1",
-    "mongoose": "^8.2.3"
+    "express": "^5.2.1",
+    "mongoose": "^9.3.1"
   },
   "devDependencies": {
-    "eslint": "^8.57.0",
-    "nodemon": "^3.1.0"
+    "eslint": "^10.0.3",
+    "globals": "^17.4.0",
+    "nodemon": "^3.1.14"
   }
 }

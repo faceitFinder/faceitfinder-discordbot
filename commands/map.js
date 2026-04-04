@@ -165,8 +165,8 @@ const buildEmbed = async (interaction, playerId, map, mode, game, types = null) 
   }
 }
 
-const sendCardWithInfo = async (interaction, playerParam, map = ALL, mode = null, game = null, types = null) => {
-  map ??= getInteractionOption(interaction, 'map')
+const sendCardWithInfo = async (interaction, playerParam, map = null, mode = null, game = null, types = null) => {
+  map ??= getInteractionOption(interaction, 'map') ?? ALL
   game ??= getGameOption(interaction)
   mode ??= '5v5'
   let embeds = []
@@ -202,7 +202,7 @@ const sendCardWithInfo = async (interaction, playerParam, map = ALL, mode = null
     .setLabel(getTranslation('strings.allMaps', interaction.locale))
     .setDescription(getTranslation('strings.allMapsDescription', interaction.locale))
     .setValue(defaultId)
-    .setDefault(true)
+    .setDefault(map === ALL)
   options.push(defaultOption)
 
   const totalMatches = playerStats.segments.reduce((acc, e) => acc + parseInt(e.stats.Matches), 0)
