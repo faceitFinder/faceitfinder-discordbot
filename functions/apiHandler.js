@@ -86,8 +86,26 @@ const getFind = async ({
     })
 }
 
+const getMatch = async ({
+  playerParam,
+  matchId
+}) => {
+  const {
+    faceit,
+    steam,
+    id
+  } = formatParam(playerParam)
+  return axios.get(`${process.env.API_URL}/api/match/${matchId}?faceit=${faceit}&steam=${steam}&id=${id}`)
+    .then(res => res.data)
+    .catch(e => {
+      console.error(e.response.status, e.response.statusText, e.response.config.url)
+      throw e.response.data.error
+    })
+}
+
 module.exports = {
   getStats,
   getFind,
-  getLadder
+  getLadder,
+  getMatch
 }
