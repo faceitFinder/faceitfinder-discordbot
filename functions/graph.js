@@ -173,7 +173,7 @@ const getRankImage = async (faceitLevel, faceitElo = null, size, game, playerPar
   faceitElo ??= color.levels[game]['3'].min
 
   const faceitExt = isChallenger ? `${CHALLENGER}${isTop3 ? ladderRegion.position : ''}` : faceitLevel
-  const image = await Canvas.loadImage(path.resolve(__dirname, `../images/faceit/faceit${faceitExt}.svg`))
+  const image = await loadImage(path.resolve(__dirname, `../images/faceit/faceit${faceitExt}.svg`))
   image.height = image.width = size
 
   if (!isChallenger) {
@@ -183,7 +183,7 @@ const getRankImage = async (faceitLevel, faceitElo = null, size, game, playerPar
     const x = space * 0.6
     const y = size + space * 1.2
 
-    const canvas = Canvas.createCanvas(size, y + height + 1)
+    const canvas = createCanvas(size, y + height + 1)
     let ctx = canvas.getContext('2d')
 
     if (parseInt(faceitLevel) < 10) {
@@ -567,12 +567,12 @@ const getChallengerRankImage = (ladderRegion, size, image) => {
   const badgeHeight = size
   const badgeRadius = badgeHeight / 2
   const font = `bold ${fontSize}px sans-serif`
-  const tmpCtx = Canvas.createCanvas(0, 0).getContext('2d')
+  const tmpCtx = createCanvas(0, 0).getContext('2d')
   tmpCtx.font = font
   const textWidth = Math.ceil(tmpCtx.measureText(rankText).width)
   const badgeWidth = paddingLeft + textWidth + gap + iconZoneSize + paddingRight
 
-  const canvas = Canvas.createCanvas(badgeWidth, badgeHeight)
+  const canvas = createCanvas(badgeWidth, badgeHeight)
   const ctx = canvas.getContext('2d')
 
   // Background
