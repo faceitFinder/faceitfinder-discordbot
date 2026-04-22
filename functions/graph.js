@@ -174,7 +174,7 @@ const getRankImage = async (faceitLevel, faceitElo = null, size, game, playerPar
     }
   }
 
-  const isChallenger = ladderRegion.position <= challenger.top
+  const isChallenger = ladderRegion.position <= challenger.top && ladderRegion.position > 0
   const isTop3 = ladderRegion.position <= 3
   faceitElo ??= color.levels[game]['3'].min
 
