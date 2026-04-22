@@ -65,9 +65,9 @@ const getMatchItems = async (interaction, playerDatas, steamDatas, playerHistory
           { name: 'Kills', value: roundStats.i6, inline: true },
           { name: 'Deaths', value: roundStats.i8, inline: true },
           { name: 'Assists', value: roundStats.i7, inline: true },
-          { name: 'Avg Rating', value: roundStats.faceitRating?.toFixed(2) ?? 'N/A', inline: true },
-          { name: 'Avg Rating CT', value: roundStats.faceitRatingCT?.toFixed(2) ?? 'N/A', inline: true },
-          { name: 'Avg Rating T', value: roundStats.faceitRatingT?.toFixed(2) ?? 'N/A', inline: true },
+          { name: 'Rating', value: roundStats.faceitRating?.toFixed(2) ?? 'N/A', inline: true },
+          { name: 'Rating CT', value: roundStats.faceitRatingCT?.toFixed(2) ?? 'N/A', inline: true },
+          { name: 'Rating T', value: roundStats.faceitRatingT?.toFixed(2) ?? 'N/A', inline: true },
           // Removed from faceit endpoint used by the api
           // { name: 'Damages', value: roundStats?.i20 ?? 'N/A', inline: true },
           { name: 'ADR', value: roundStats?.c10 ?? 'N/A', inline: true },
