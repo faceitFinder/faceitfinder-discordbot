@@ -1,5 +1,5 @@
 /* eslint-disable semi */
-const { maxLengthTeamName, invite, join, oauth2, unlinkVerified, linkVerified } = require('../../config.json');
+const { maxLengthTeamName, invite, join, oauth2, unlinkVerified, linkVerified, defaultMatchNumber } = require('../../config.json');
 const base = structuredClone(require('../base'));
 base.command.compare.description = 'Сравнить статистику обоих пользователей';
 base.command.dailystats.description = 'Отобразить статистику с графиком эло за указанный день';
@@ -14,7 +14,7 @@ base.command.link.description = 'Связать профиль Faceit с Discord
 base.command.map.description = 'Показать статистику по указанной карте';
 base.command.monthstats.description = 'Отобразить статистику с графиком эло за указанный месяц';
 base.command.roles.description = 'Ранги обновляются каждый час и тогда, когда вы пытаетесь получить свою статистику';
-base.command.stats.description = 'Отобразить общую статистику с графиком эло за последние 20 игр';
+base.command.stats.description = `Отобразить общую статистику с графиком эло за последние ${defaultMatchNumber} игр`;
 base.command.team.description = 'Создать команду и добавить в неё до 5 пользователей (кол-во команд ограничено уч. записью Discord)';
 base.command.unlink.description = 'Отвязать аккаунт Faceit от Discord';
 base.command.vote.description = 'Получить ссылку на страницу для голосования за бота на top.gg';

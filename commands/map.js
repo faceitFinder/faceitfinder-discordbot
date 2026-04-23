@@ -1,4 +1,4 @@
-const { emojis, itemByPage, color, maps } = require('../config.json')
+const { emojis, itemByPage, color, maps, defaultMatchNumber } = require('../config.json')
 const fs = require('fs')
 const Discord = require('discord.js')
 const Options = require('../templates/options')
@@ -25,7 +25,7 @@ const buildDefaultMapEmbed = async (interaction, playerId, game, mode, types = n
     }
   ]
 
-  const matchNumber = types.find(t => t.name === TYPES.ELO_GAIN.name)?.style === Discord.ButtonStyle.Secondary ? 20 : 0
+  const matchNumber = types.find(t => t.name === TYPES.ELO_GAIN.name)?.style === Discord.ButtonStyle.Secondary ? defaultMatchNumber : 0
   const playerParam = { param: playerId, faceitId: true, }
   const {
     playerDatas,

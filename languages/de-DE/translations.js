@@ -1,5 +1,5 @@
 /* eslint-disable semi */
-const { maxLengthTeamName, invite, join, oauth2, unlinkVerified, linkVerified } = require('../../config.json');
+const { maxLengthTeamName, invite, join, oauth2, unlinkVerified, linkVerified, defaultMatchNumber } = require('../../config.json');
 const base = structuredClone(require('../base'));
 base.command.compare.description = 'Vergleiche beide User Statistiken';
 base.command.dailystats.description = 'Zeigt die Statistiken des ausgewählten Tages mit der Elo-Grafik des Tages an.';
@@ -15,7 +15,7 @@ base.command.verify.description = 'Verifizieren Faceit-Konto';
 base.command.map.description = 'Zeigt die Statistiken von einer ausgewählten Karte an';
 base.command.monthstats.description = 'Zeigt die Statistiken von einem ausgewählten Monat mit einem Grafen an';
 base.command.roles.description = 'Ränge sind jede Stunde aktualisiert und wenn du deine Statistiken abfragst';
-base.command.stats.description = 'Zeigt allgemeine Statistiken mit der Elo-Grafik der letzten 20 Spiele an';
+base.command.stats.description = `Zeigt allgemeine Statistiken mit der Elo-Grafik der letzten ${defaultMatchNumber} Spiele an`;
 base.command.team.description = 'Erstelle ein Team mit maximal 5 Usern (Limitiert auf ein Team pro Discord-Account)';
 base.command.unlink.description = 'Trenne deine FACEIT ID vom Discord-Bot';
 base.command.vote.description = 'Erhalte den Link, um für den Bot auf top.gg zu voten';

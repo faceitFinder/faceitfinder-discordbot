@@ -1,5 +1,5 @@
 const Discord = require('discord.js')
-const { color, emojis, defaultGame, maps } = require('../config.json')
+const { color, emojis, defaultGame, maps, defaultMatchNumber } = require('../config.json')
 const { getUsers } = require('../functions/commands')
 const CustomTypeFunc = require('../functions/customType')
 const CustomType = require('../templates/customType')
@@ -71,7 +71,7 @@ const getInitPlayersDatas = ({
 const buildEmbed = async ({
   player1,
   player2,
-  maxMatch = 20,
+  maxMatch = defaultMatchNumber,
   map,
   type,
   game = defaultGame,
@@ -304,7 +304,7 @@ const sendCardWithInfo = async (
   map = null,
   game = null
 ) => {
-  const defaultMaxMatch = 20
+  const defaultMaxMatch = defaultMatchNumber
 
   game ??= getGameOption(interaction)
   maxMatch ??= getInteractionOption(interaction, 'match_number') ?? defaultMaxMatch
@@ -347,10 +347,10 @@ module.exports = {
     {
       name: 'match_number',
       description: getTranslation('options.matchNumber', 'en-US', {
-        default: '20'
+        default: defaultMatchNumber
       }),
       descriptionLocalizations: getTranslations('options.matchNumber', {
-        default: '20'
+        default: defaultMatchNumber
       }),
       required: false,
       type: Discord.ApplicationCommandOptionType.Integer,

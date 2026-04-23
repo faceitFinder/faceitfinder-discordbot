@@ -6,7 +6,7 @@ const {
   ButtonStyle,
   ActionRowBuilder
 } = require('discord.js')
-const { color } = require('../config.json')
+const { color, defaultMatchNumber } = require('../config.json')
 const Options = require('../templates/options')
 const { getUsers } = require('../functions/commands')
 const { getMapOption } = require('../functions/map')
@@ -224,7 +224,7 @@ module.exports = {
   description: getTranslation('command.find.description', 'en-US'),
   descriptionLocalizations: getTranslations('command.find.description'),
   usage: '{player_aimed} [<steam_parameters> <faceit_parameters> <team>] <map> <excluded_steam_parameters> <excluded_faceit_parameters> <match_number>',
-  example: 'player_aimed: justdams steam_parameters: weder77 faceit_parameters: sheraw excluded_faceit_parameters: KanzakiR3D map: Vertigo match_number: 20',
+  example: `player_aimed: justdams steam_parameters: weder77 faceit_parameters: sheraw excluded_faceit_parameters: KanzakiR3D map: Vertigo match_number: ${defaultMatchNumber}`,
   type: 'stats',
   async execute(interaction) {
     let currentPlayer = await User.getWithGuild(interaction.user.id, null)

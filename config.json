@@ -362,6 +362,7 @@
   },
   "maxLengthTeamName": 14,
   "defaultGame": "cs2",
+  "defaultMatchNumber": 30,
   "skus": {
     "guild": "1166703251610140712"
   }

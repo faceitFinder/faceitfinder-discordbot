@@ -1,4 +1,4 @@
-const { color } = require('../config.json')
+const { color, defaultMatchNumber } = require('../config.json')
 const Discord = require('discord.js')
 const Graph = require('../functions/graph')
 const CustomType = require('../templates/customType')
@@ -15,7 +15,7 @@ const buildEmbed = async ({
   type = CustomType.TYPES.ELO,
   locale
 }) => {
-  const maxMatch = 20
+  const maxMatch = defaultMatchNumber
   const {
     playerDatas,
     steamDatas,

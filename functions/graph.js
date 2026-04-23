@@ -1,15 +1,14 @@
-const { color, challenger } = require('../config.json')
+const { color, challenger, defaultMatchNumber } = require('../config.json')
 const path = require('path')
 const { createCanvas, loadImage } = require('canvas')
 const CustomType = require('../templates/customType')
 const Chart = require('chart.js/auto')
 const { getTranslation } = require('../languages/setup')
 const { getLadder, getMatch } = require('./apiHandler')
-const { match } = require('assert')
 
 const CHALLENGER = 'challenger'
 
-const generateChart = (locale, playerName, matchHistory, maxMatch = 20, type = CustomType.TYPES.ELO, game) => {
+const generateChart = (locale, playerName, matchHistory, maxMatch = defaultMatchNumber, type = CustomType.TYPES.ELO, game) => {
   const types = type.name.split('-').map(e => CustomType.getType(e.trim()))
   const slicedHistory = matchHistory.slice(0, maxMatch).reverse()
 

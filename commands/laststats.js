@@ -8,6 +8,7 @@ const { getTranslations, getTranslation } = require('../languages/setup')
 const { getStats } = require('../functions/apiHandler')
 const { buildButtonsGraph } = require('../functions/customType')
 const { getInteractionOption, getGameOption } = require('../functions/utility')
+const { defaultMatchNumber } = require('../config.json')
 
 const buildButtons = async (interaction, values, type) => [
   new ActionRowBuilder()
@@ -20,7 +21,7 @@ const sendCardWithInfo = async (interaction, playerParam, type = CustomType.TYPE
   let { from, to } = DateStats.getFromTo(interaction)
 
   const map = getInteractionOption(interaction, 'map')
-  const maxMatch = getInteractionOption(interaction, 'match_number') ?? 20
+  const maxMatch = getInteractionOption(interaction, 'match_number') ?? defaultMatchNumber
   const game = getGameOption(interaction)
 
   const {
@@ -62,10 +63,10 @@ const getOptions = () => {
   options.push({
     name: 'match_number',
     description: getTranslation('options.matchNumber', 'en-US', {
-      default: '20'
+      default: defaultMatchNumber
     }),
     descriptionLocalizations: getTranslations('options.matchNumber', {
-      default: '20'
+      default: defaultMatchNumber
     }),
     required: false,
     type: ApplicationCommandOptionType.Integer,
