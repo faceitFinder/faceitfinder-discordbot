@@ -1,5 +1,6 @@
 const axios = require('axios')
 const axiosRetry = require('axios-retry').default
+const { defaultMatchNumber } = require('../config.json')
 
 axiosRetry(axios, { retries: 3 })
 
@@ -34,7 +35,7 @@ const getLadder = async ({
 
 const getStats = async ({
   playerParam,
-  matchNumber = 20,
+  matchNumber = defaultMatchNumber,
   checkElo = 1,
   map = '',
   startDate = '',

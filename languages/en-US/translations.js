@@ -1,5 +1,5 @@
 /* eslint-disable semi */
-const { maxLengthTeamName, invite, join, oauth2, unlinkVerified, linkVerified } = require('../../config.json')
+const { maxLengthTeamName, invite, join, oauth2, unlinkVerified, linkVerified, defaultMatchNumber } = require('../../config.json')
 const base = structuredClone(require('../base'))
 base.command.compare.description = 'Compare both user stats'
 base.command.dailystats.description = 'Displays the stats of the chosen day, with elo graph of the day'
@@ -15,7 +15,7 @@ base.command.verify.description = 'Verify your faceit account'
 base.command.map.description = 'Displays the stats of the chosen map'
 base.command.monthstats.description = 'Displays the stats of the chosen month, with elo graph of the month'
 base.command.roles.description = 'Ranks are updated every hour and when you get your stats'
-base.command.stats.description = 'Displays general stats, with elo graph of the 20 last games'
+base.command.stats.description = `Displays general stats, with elo graph of the ${defaultMatchNumber} last games`
 base.command.team.description = 'Create a team and link up to 5 users to it (limited to 1 team by discord account)'
 base.command.unlink.description = 'Unlink your faceit id from the discord bot'
 base.command.vote.description = 'Get the link to vote for the bot on top.gg'
