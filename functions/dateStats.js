@@ -7,6 +7,7 @@ const { getPagination, getMaxPage, getPageSlice } = require('./pagination')
 const { getStats, getSeasons } = require('./apiHandler')
 const { getTranslation } = require('../languages/setup')
 const { generateOption, setOptionDefault, getInteractionOption, getCurrentEloString, getGameOption } = require('./utility')
+const errorCard = require('../templates/errorCard')
 
 const getDates = async (playerHistory, getDay) => {
   const dates = new Map()
@@ -49,62 +50,78 @@ const getCardWithInfo = async ({
     game
   })
 
-  if (!playerLastStats.games) throw getTranslation('error.user.noMatches', interaction.locale, {
-    playerName: playerDatas.nickname
-  })
+  const embeds = []
+  const files = []
 
-  const faceitLevel = playerDatas.games[game].skill_level
-  const faceitElo = playerDatas.games[game].faceit_elo
-  const playerRegion = playerDatas.games[game].region
-  const size = 40
+  if (!playerLastStats.games) {
+    const error = errorCard(getTranslation('error.user.noMatches', interaction.locale, { playerName: playerDatas.nickname }), interaction.locale)
+    embeds.push(...error.embeds)
+    files.push(...error.files)
+  } else {
+    const faceitLevel = playerDatas.games[game].skill_level
+    const faceitElo = playerDatas.games[game].faceit_elo
+    const playerRegion = playerDatas.games[game].region
+    const size = 40
 
-  const graphBuffer = Graph.generateChart(
-    interaction.locale,
-    playerDatas.nickname,
-    playerHistory,
-    playerLastStats.games + (CustomType.getType(type.name) === CustomType.TYPES.ELO),
-    type,
-    game
-  )
+    const graphBuffer = Graph.generateChart(
+      interaction.locale,
+      playerDatas.nickname,
+      playerHistory,
+      playerLastStats.games + (CustomType.getType(type.name) === CustomType.TYPES.ELO),
+      type,
+      game
+    )
 
-  const rankImageCanvas = await Graph.getRankImage(faceitLevel, faceitElo, size, game, playerParam, playerRegion)
-  const endDateToRealTimeStamp = new Date(endDate).setHours(-24)
+    const rankImageCanvas = await Graph.getRankImage(faceitLevel, faceitElo, size, game, playerParam, playerRegion)
+    const endDateToRealTimeStamp = new Date(endDate).setHours(-24)
 
-  const head = []
+    const head = []
 
-  if (updateStartDate) startDate = new Date(playerLastStats.from).getTime()
+    if (updateStartDate) startDate = new Date(playerLastStats.from).getTime()
+    if (values.seasonNumber) head.push({ name: 'Season', value: values.seasonNumber.toString(), inline: true })
 
-  if (startDate !== endDateToRealTimeStamp) head.push({
-    name: 'From - To', value: [new Date(startDate).toDateString(), '\n', new Date(endDateToRealTimeStamp).toDateString()].join(' '),
-    inline: !!map
-  })
-  else head.push({ name: 'From', value: new Date(startDate).toDateString(), inline: !!map })
-  if (map) head.push({ name: 'Map', value: map, inline: true }, { name: '\u200b', value: '\u200b', inline: true })
+    if (values.seasonNumber == null) {
+      console.log('From-to')
+      if (startDate !== endDateToRealTimeStamp) head.push({
+        name: 'From - To', value: [new Date(startDate).toDateString(), '\n', new Date(endDateToRealTimeStamp).toDateString()].join(' '),
+        inline: true
+      })
+      else head.push({ name: 'From', value: new Date(startDate).toDateString(), inline: true })
+    }
 
-  const card = new Discord.EmbedBuilder()
-    .setAuthor({
-      name: playerDatas.nickname,
-      iconURL: playerDatas.avatar || null,
-      url: `https://www.faceit.com/en/players/${playerDatas.nickname}`
-    })
-    .setDescription(`[Steam](https://steamcommunity.com/profiles/${playerDatas.games[game].game_player_id}), [Faceit](https://www.faceit.com/en/players/${playerDatas.nickname})`)
-    .setThumbnail(`attachment://${faceitLevel}level.png`)
-    .addFields(...generateDateStatsFields(playerLastStats, head))
-    .setImage(`attachment://${values.playerId}graph.png`)
-    .setColor(color.levels[game][faceitLevel].color)
-    .setFooter({ text: `Steam: ${steamDatas?.personaname || steamDatas}`, iconURL: 'attachment://game.png' })
+    if (map) head.push({ name: 'Map', value: map, inline: true })
+    if (head.length < 3 && head.length > 0) {
+      const missing = Math.max(0, 3 - head.length)
+      for (let i = 0; i < missing; i++) head.push({ name: '\u200b', value: '\u200b', inline: true });
+    }
 
-  const files = [
-    new Discord.AttachmentBuilder(graphBuffer, { name: `${values.playerId}graph.png` }),
-    new Discord.AttachmentBuilder(rankImageCanvas, { name: `${faceitLevel}level.png` }),
-    new Discord.AttachmentBuilder(`images/${game}.png`, { name: 'game.png' })
-  ]
+    const card = new Discord.EmbedBuilder()
+      .setAuthor({
+        name: playerDatas.nickname,
+        iconURL: playerDatas.avatar || null,
+        url: `https://www.faceit.com/en/players/${playerDatas.nickname}`
+      })
+      .setDescription(`[Steam](https://steamcommunity.com/profiles/${playerDatas.games[game].game_player_id}), [Faceit](https://www.faceit.com/en/players/${playerDatas.nickname})`)
+      .setThumbnail(`attachment://${faceitLevel}level.png`)
+      .addFields(...generateDateStatsFields(playerLastStats, head))
+      .setImage(`attachment://${values.playerId}graph.png`)
+      .setColor(color.levels[game][faceitLevel].color)
+      .setFooter({ text: `Steam: ${steamDatas?.personaname || steamDatas}`, iconURL: 'attachment://game.png' })
+
+    embeds.push(card)
+
+    files.push(...[
+      new Discord.AttachmentBuilder(graphBuffer, { name: `${values.playerId}graph.png` }),
+      new Discord.AttachmentBuilder(rankImageCanvas, { name: `${faceitLevel}level.png` }),
+      new Discord.AttachmentBuilder(`images/${game}.png`, { name: 'game.png' })
+    ])
+  }
 
   return {
     from: startDate,
     to: endDate,
     content: '',
-    embeds: [card],
+    embeds,
     files
   }
 }
@@ -217,7 +234,7 @@ const getFromTo = async (interaction, nameFrom = 'from_date', nameTo = 'to_date'
 
   if (getGameOption(interaction) == 'cs2') {
     const seasonNumber = parseInt(getInteractionOption(interaction, nameSeason))
-    if (seasonNumber !== NaN) {
+    if (!isNaN(seasonNumber)) {
       const seasons = await getSeasons()
       const selectedSeason = seasons.payload.cs2.seasons.find(e => e.number === seasonNumber)
 
