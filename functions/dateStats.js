@@ -92,7 +92,7 @@ const getCardWithInfo = async ({
     if (map) head.push({ name: 'Map', value: map, inline: true })
     if (head.length < 3 && head.length > 0) {
       const missing = Math.max(0, 3 - head.length)
-      for (let i = 0; i < missing; i++) head.push({ name: '\u200b', value: '\u200b', inline: true });
+      for (let i = 0; i < missing; i++) head.push({ name: '\u200b', value: '\u200b', inline: true })
     }
 
     const card = new Discord.EmbedBuilder()
