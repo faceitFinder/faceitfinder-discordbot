@@ -71,6 +71,7 @@ base.options.setupEloRoles = 'Erstellt eine Rolle, die den Usern basierend auf d
 base.options.removeEloRole = 'Entfernt die ausgewählte Rolle vom Server';
 base.options.eloRole = '@Rolle';
 base.options.gameParameter = 'Spiel, von dem die Statistiken abgerufen werden sollen (Standard: CS2).';
+base.options.season = 'Eine bestimmte Saison auswählen. Nur CS2.';
 base.strings.selectTeam = 'Wähle ein Team aus';
 base.strings.infoTeam = 'Erhalte Informationen über das Team {teamName}';
 base.strings.voteDescription = 'Hey, {discord}! Du kannst auf top.gg voten, um mir beim Wachsen zu helfen';

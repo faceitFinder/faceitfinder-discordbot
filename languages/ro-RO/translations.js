@@ -70,6 +70,7 @@ base.options.setupEloRoles = 'Generează un rol care va fi atribuit utilizatoril
 base.options.removeEloRole = 'Ștergeți rolul selectat';
 base.options.eloRole = '@rol';
 base.options.gameParameter = 'Jocul de la care se obțin statisticile (implicit: CS2)';
+base.options.season = 'Selectează un sezon specific. Doar CS2.';
 base.strings.selectTeam = 'Selectează o echipa';
 base.strings.infoTeam = 'Obține informații legate despre echipa {teamName}';
 base.strings.voteDescription = 'Hey, {discord}! Poți sa ma votezi pe top.gg!';

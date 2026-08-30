@@ -70,6 +70,7 @@ base.options.setupEloRoles = 'Генерирует роль, которая бу
 base.options.removeEloRole = 'Удаляет выбранную роль с сервера';
 base.options.eloRole = '@роль';
 base.options.gameParameter = 'Игра, из которой извлекается статистика (по умолчанию: CS2)';
+base.options.season = 'Выберите конкретный сезон. Только CS2.';
 base.strings.selectTeam = 'Выбрать команду';
 base.strings.infoTeam = 'Получить информацию о команде {teamName}';
 base.strings.voteDescription = 'Эй, {discord}! Проголосуй за меня на top.gg, чтобы помочь мне развиться';

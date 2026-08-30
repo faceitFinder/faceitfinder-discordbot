@@ -104,6 +104,7 @@ module.exports = {
     removeEloRole: '',
     eloRole: '',
     gameParameter: '',
+    season: ''
   },
   strings: {
     selectTeam: '',

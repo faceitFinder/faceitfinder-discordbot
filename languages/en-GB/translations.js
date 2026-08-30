@@ -71,6 +71,7 @@ base.options.setupEloRoles = 'Generates a role that will be assign to the users 
 base.options.removeEloRole = 'Removes the selected role from the server'
 base.options.eloRole = '@role'
 base.options.gameParameter = 'Game to get the stats from (Default: CS2)'
+base.options.season = 'Select a specific season. CS2 only.'
 base.strings.selectTeam = 'Select a team'
 base.strings.infoTeam = 'Get info about the team {teamName}'
 base.strings.voteDescription = 'Hey, {discord}! You can vote on top.gg to help me grow'
