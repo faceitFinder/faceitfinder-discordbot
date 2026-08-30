@@ -35,18 +35,30 @@ const setupRoles = async (client, user, guildId, remove) => {
   const roles = isPremium ? await GuildCustomRole.getRolesOf(guild.id) : await getRoles(guild.id)
   if (!roles?.length) return console.warn(`No roles found for guild: ${guild.name} (${guild.id})`)
 
-  const members = await client.shard.broadcastEval(async (c, { guildId, user }) => {
-    const g = await c.guilds.fetch(guildId).catch(() => null)
-    if (!g || c.shard.ids[0] !== g.shardId) return []
-
-    const members = await g.members.fetch({ cache: false }).catch(() => [])
+  const fetchMembers = async () => {
+    const members = await guild.members.fetch({ cache: false }).catch(() => [])
     return members.filter(m => m.user && !m.user.bot).map(m => ({
       id: m.id,
       user: { id: m.user.id, username: m.user.username, tag: m.user.tag },
       roles: m.roles.cache.map(r => r.id),
       nickname: m.nickname,
     })).filter(m => user ? m.user.id === user.discordId : true)
-  }, { context: { guildId, user } }).then(res => res.flat())
+  }
+
+  const members = client.shard
+    ? await client.shard.broadcastEval(async (c, { guildId, user }) => {
+      const g = await c.guilds.fetch(guildId).catch(() => null)
+      if (!g || c.shard.ids[0] !== g.shardId) return []
+
+      const members = await g.members.fetch({ cache: false }).catch(() => [])
+      return members.filter(m => m.user && !m.user.bot).map(m => ({
+        id: m.id,
+        user: { id: m.user.id, username: m.user.username, tag: m.user.tag },
+        roles: m.roles.cache.map(r => r.id),
+        nickname: m.nickname,
+      })).filter(m => user ? m.user.id === user.discordId : true)
+    }, { context: { guildId, user } }).then(res => res.flat())
+    : await fetchMembers()
 
   for (const member of members) {
     let user = await User.get(member.user.id)

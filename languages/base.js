@@ -59,6 +59,9 @@ module.exports = {
     },
     yearstats: {
       description: '',
+    },
+    seasonstats: {
+      description: '',
     }
   },
   options: {
@@ -104,6 +107,7 @@ module.exports = {
     removeEloRole: '',
     eloRole: '',
     gameParameter: '',
+    season: ''
   },
   strings: {
     selectTeam: '',
@@ -147,6 +151,7 @@ module.exports = {
     year: '',
     selectYear: '',
     selectMonth: '',
+    selectSeason: '',
     loading: '',
     pagination: {
       next: '',

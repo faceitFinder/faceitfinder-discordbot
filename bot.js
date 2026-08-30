@@ -14,7 +14,7 @@ fs.readdirSync('./events').filter(file => file.endsWith('.js')).forEach(async (f
 })
 
 client.once('clientReady', async (client) => {
-  if (client.shard.ids[0] !== client.shard.count - 1) return
+  if (client.shard && client.shard.ids[0] !== client.shard.count - 1) return
 
   /**
    * Initialize the automatic role assignment

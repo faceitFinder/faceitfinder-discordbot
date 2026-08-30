@@ -1,5 +1,7 @@
-const { ApplicationCommandOptionType } = require('discord.js')
+const { ApplicationCommandOptionType, Application } = require('discord.js')
 const { getTranslations, getTranslation } = require('../languages/setup')
+const { getSeasons } = require('../functions/apiHandler')
+const { currentSeason } = require('../config.json')
 
 const gameOption = {
   name: 'game',
@@ -67,13 +69,31 @@ const dateRange = [
   }
 ]
 
+const season = {
+  name: 'season',
+  description: getTranslation('options.season', 'en-US'),
+  descriptionLocalizations: getTranslations('options.season'),
+  required: false,
+  type: ApplicationCommandOptionType.Number,
+  slash: true,
+  choices: Array.from({ length: currentSeason }, (_, i) => i + 1).map(season => {
+    return {
+      name: `Season ${season}`,
+      value: season
+    }
+  })
+}
+
 const usage = '{<steam_parameters> <faceit_parameters> <team>}'
 const dateRangeUsage = '<from_date> <to_date>'
+const seasonUsage = '<season>'
 
 module.exports = {
   stats,
   usage,
   dateRange,
   dateRangeUsage,
-  gameOption
+  gameOption,
+  season,
+  seasonUsage,
 }

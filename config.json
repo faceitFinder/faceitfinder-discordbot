@@ -212,7 +212,7 @@
       "1": "#ffd336",
       "2": "#def5ff",
       "3": "#ff7236",
-      "default":"#e80128"
+      "default": "#e80128"
     }
   },
   "emojis": {
@@ -365,5 +365,6 @@
   "defaultMatchNumber": 30,
   "skus": {
     "guild": "1166703251610140712"
-  }
+  },
+  "currentSeason": 9
 }
