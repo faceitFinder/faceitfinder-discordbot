@@ -104,9 +104,22 @@ const getMatch = async ({
     })
 }
 
+const getSeasons = async (
+  game = ''
+) => {
+  const response = axios.get(`${process.env.API_URL}/api/seasons?game=${game}`)
+    .then(res => res.data)
+    .catch(e => {
+      console.error(e.response.status, e.response.statusText, e.response.config.url)
+      throw e.response.data.error
+    })
+  return response
+}
+
 module.exports = {
   getStats,
   getFind,
   getLadder,
-  getMatch
+  getMatch,
+  getSeasons,
 }

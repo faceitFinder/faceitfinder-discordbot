@@ -4,9 +4,9 @@ const Graph = require('./graph')
 const CustomType = require('../templates/customType')
 const CustomTypeFunc = require('../functions/customType')
 const { getPagination, getMaxPage, getPageSlice } = require('./pagination')
-const { getStats } = require('./apiHandler')
+const { getStats, getSeasons } = require('./apiHandler')
 const { getTranslation } = require('../languages/setup')
-const { generateOption, setOptionDefault, getInteractionOption, getCurrentEloString } = require('./utility')
+const { generateOption, setOptionDefault, getInteractionOption, getCurrentEloString, getGameOption } = require('./utility')
 
 const getDates = async (playerHistory, getDay) => {
   const dates = new Map()
@@ -210,11 +210,24 @@ const generateDatasForCard = async ({
   return resp
 }
 
-const getFromTo = (interaction, nameFrom = 'from_date', nameTo = 'to_date') => {
-  const from = new Date(getInteractionOption(interaction, nameFrom)?.trim())
-  const to = new Date(getInteractionOption(interaction, nameTo)?.trim())
+const getFromTo = async (interaction, nameFrom = 'from_date', nameTo = 'to_date', nameSeason = 'season') => {
+  let from = new Date(getInteractionOption(interaction, nameFrom)?.trim())
+  let to = new Date(getInteractionOption(interaction, nameTo)?.trim())
+  let allSeason = false
 
-  return { from: new Date(from).getTime() || 0, to: new Date(to).getTime() || new Date().setHours(+24) }
+  if (getGameOption(interaction) == 'cs2') {
+    const seasonNumber = parseInt(getInteractionOption(interaction, nameSeason))
+    if (seasonNumber !== NaN) {
+      const seasons = await getSeasons()
+      const selectedSeason = seasons.payload.cs2.seasons.find(e => e.number === seasonNumber)
+
+      from = selectedSeason.from
+      to = selectedSeason.to
+      allSeason = true
+    }
+  }
+
+  return { from: new Date(from).getTime() || 0, to: new Date(to).getTime() || new Date().setHours(+24), allSeason }
 }
 
 const generateDateStatsFields = (playerLastStats, head) => {

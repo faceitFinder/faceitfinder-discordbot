@@ -18,10 +18,10 @@ const buildButtons = async (interaction, values, type) => [
 ]
 
 const sendCardWithInfo = async (interaction, playerParam, type = CustomType.TYPES.ELO) => {
-  let { from, to } = DateStats.getFromTo(interaction)
+  let { from, to, allSeason } = await DateStats.getFromTo(interaction)
 
   const map = getInteractionOption(interaction, 'map')
-  const maxMatch = getInteractionOption(interaction, 'match_number') ?? defaultMatchNumber
+  const maxMatch = getInteractionOption(interaction, 'match_number') ?? allSeason ? 0 : defaultMatchNumber
   const game = getGameOption(interaction)
 
   const {
@@ -60,18 +60,23 @@ const sendCardWithInfo = async (interaction, playerParam, type = CustomType.TYPE
 
 const getOptions = () => {
   const options = structuredClone(Options.stats)
-  options.push({
-    name: 'match_number',
-    description: getTranslation('options.matchNumber', 'en-US', {
-      default: defaultMatchNumber
-    }),
-    descriptionLocalizations: getTranslations('options.matchNumber', {
-      default: defaultMatchNumber
-    }),
-    required: false,
-    type: ApplicationCommandOptionType.Integer,
-    slash: true,
-  }, getMapOption(), ...Options.dateRange)
+  options.push(
+    {
+      name: 'match_number',
+      description: getTranslation('options.matchNumber', 'en-US', {
+        default: defaultMatchNumber
+      }),
+      descriptionLocalizations: getTranslations('options.matchNumber', {
+        default: defaultMatchNumber
+      }),
+      required: false,
+      type: ApplicationCommandOptionType.Integer,
+      slash: true,
+    },
+    getMapOption(),
+    ...Options.dateRange,
+    Options.season
+  )
 
   return options
 }
@@ -81,7 +86,7 @@ module.exports = {
   options: getOptions(),
   description: getTranslation('command.laststats.description', 'en-US'),
   descriptionLocalizations: getTranslations('command.laststats.description'),
-  usage: `${Options.usage} <match_number> <map> ${Options.dateRangeUsage}`,
+  usage: `${Options.usage} <match_number> <map> ${Options.dateRangeUsage} ${Options.seasonUsage}`,
   example: 'steam_parameters: justdams match_number: 1000 from_date: 01/01/2022 to_date: 01/01/2023',
   type: 'stats',
   async execute(interaction) {
