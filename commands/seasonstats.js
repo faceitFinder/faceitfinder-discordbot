@@ -42,7 +42,7 @@ const sendCardWithInfo = async (
 
   for (const season of seasons.sort((a, b) => b.number - a.number)) {
     const from = new Date(season.from).getTime()
-    const to = new Date(season.to)?.getTime() || new Date().setDate(+24)
+    const to = new Date(season.to)?.getTime() || new Date().setHours(+24)
 
     optionsValues.push({
       label: `Season ${season.number}`,
