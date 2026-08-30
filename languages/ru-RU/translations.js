@@ -20,6 +20,7 @@ base.command.unlink.description = 'Отвязать аккаунт Faceit от D
 base.command.vote.description = 'Получить ссылку на страницу для голосования за бота на top.gg';
 base.command.weekstats.description = 'Отобразить статистику с графиком эло за указанную неделю';
 base.command.yearstats.description = 'Отобразить статистику с графиком эло за указанный год';
+base.command.seasonstats.description = 'Отобразить статистику с графиком эло за указанный сезон'
 base.options.matchNumber = 'Количество отображаемых матчей. По умолчанию: {default}';
 base.options.steamParameter = 'steamID / Персональный steamID / Ссылка на профиль Steam / @username / CSGO status';
 base.options.faceitParameter = 'Никнейм на Faceit / @username / Ссылка на профиль Faceit';
@@ -112,6 +113,7 @@ base.strings.selectWeek = 'Выберите неделю';
 base.strings.year = 'Год';
 base.strings.selectYear = 'Выберите год';
 base.strings.selectMonth = 'Выберите месяц';
+base.strings.selectSeason = 'Выберите сезон'
 base.strings.loading = 'Загрузка';
 base.strings.pagination = {
   prev: 'Предыдущая страница',

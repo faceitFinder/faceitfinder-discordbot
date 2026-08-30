@@ -59,6 +59,9 @@ module.exports = {
     },
     yearstats: {
       description: '',
+    },
+    seasonstats: {
+      description: '',
     }
   },
   options: {
@@ -148,6 +151,7 @@ module.exports = {
     year: '',
     selectYear: '',
     selectMonth: '',
+    selectSeason: '',
     loading: '',
     pagination: {
       next: '',

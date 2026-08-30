@@ -20,6 +20,7 @@ base.command.unlink.description = 'Відв\'яжіть свій faceit id ві�
 base.command.vote.description = 'Отримайте посилання, щоб проголосувати за бота на top.gg';
 base.command.weekstats.description = 'Відображає статистику обраного тижня з ело-графіком тижня';
 base.command.yearstats.description = 'Відображає статистику обраного року з ело-графіком цього року';
+base.command.seasonstats.description = 'Відображає статистику обраного сезону з ело-графіком сезону'
 base.options.matchNumber = 'Кількість матчів для відображення. За замовчуванням: {default}';
 base.options.steamParameter = 'steamID / steam звичай ID / steam URL профілю / @користувач / CSGO статус';
 base.options.faceitParameter = 'faceit псевдонім / @користувач / faceit URL профілю';
@@ -112,6 +113,7 @@ base.strings.selectWeek = 'Виберіть тиждень';
 base.strings.year = 'Рік';
 base.strings.selectYear = 'Виберіть рік';
 base.strings.selectMonth = 'Виберіть місяць';
+base.strings.selectSeason = 'Виберіть сезон'
 base.strings.loading = 'Завантаження';
 base.strings.pagination = {
   prev: 'Попередня сторінка',

@@ -21,6 +21,7 @@ base.command.unlink.description = 'Trenne deine FACEIT ID vom Discord-Bot';
 base.command.vote.description = 'Erhalte den Link, um für den Bot auf top.gg zu voten';
 base.command.weekstats.description = 'Zeigt die Statistiken der ausgewählten Woche mit der Elo-Grafik der Woche an.';
 base.command.yearstats.description = 'Zeigt die Statistiken eines ausgewählten Jahres, mit dem Elo-Graf des Jahres an';
+base.command.seasonstats.description = 'Zeigt die Statistiken der ausgewählten Saison mit dem Elo-Graf der Saison an'
 base.options.matchNumber = 'Anzahl der anzuzeigenden Spiele. Standard: {default}';
 base.options.steamParameter = 'SteamID / Steam custom ID / steam Profil URL / @user / CSGO Status';
 base.options.faceitParameter = 'FACEIT Nickname / @user / FACEIT Profil-URL';
@@ -113,6 +114,7 @@ base.strings.selectWeek = 'Wähle eine Woche aus';
 base.strings.year = 'Jahr';
 base.strings.selectYear = 'Wähle ein Jahr aus';
 base.strings.selectMonth = 'Wähle einen Monat aus';
+base.strings.selectSeason = 'Wähle eine Saison aus'
 base.strings.loading = 'Laden';
 base.strings.pagination = {
   prev: 'Vorherige Seite',

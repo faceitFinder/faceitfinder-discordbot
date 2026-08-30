@@ -21,6 +21,7 @@ base.command.unlink.description = 'Supprimer l\'association entre votre compte d
 base.command.vote.description = 'Obtenir le lien pour voter pour le bot sur top.gg.';
 base.command.weekstats.description = 'Obtenir les statistiques de la semaine sélectionnée, accompagné d\'un graphique d\'évolution de l\'elo.';
 base.command.yearstats.description = 'Obtenir les statistiques de l\'année sélectionnée, accompagné d\'un graphique d\'évolution de l\'elo.';
+base.command.seasonstats.description = 'Obtenir les statistiques de la saison sélectionnée, accompagné d\'un graphique d\'évolution de l\'elo.'
 base.options.matchNumber = 'Nombre de parties à afficher, par défaut : {default}.';
 base.options.steamParameter = 'steamID / steamID personnalisé / url profil steam / @utilisateur / status CSGO.';
 base.options.faceitParameter = 'pseudo faceit / @utilisateur / url profil faceit.';
@@ -113,6 +114,7 @@ base.strings.selectWeek = 'Sélectionner une semaine.';
 base.strings.year = 'Année';
 base.strings.selectYear = 'Sélectionner une année.';
 base.strings.selectMonth = 'Sélectionner un mois.';
+base.strings.selectSeason = 'Sélectionner une saison.'
 base.strings.loading = 'Chargement';
 base.strings.pagination = {
   prev: 'Page Précédente',

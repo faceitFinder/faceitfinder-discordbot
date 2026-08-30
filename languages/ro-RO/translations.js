@@ -20,6 +20,7 @@ base.command.unlink.description = 'Unlink your faceit id from the discord bot';
 base.command.vote.description = 'Get the link to vote for the bot on top.gg';
 base.command.weekstats.description = 'Afișează statisticile săptămânii alese, cu graficul elo al săptămânii';
 base.command.yearstats.description = 'Afișează statisticile din anul ales, cu graficul elo al anului.';
+base.command.seasonstats.description = 'Displays the stats of the chosen season, with elo graph of the season'
 base.options.matchNumber = 'Numărul de meciuri care trebuie afișate. Implicit: {default}';
 base.options.steamParameter = 'steamID / steam custom ID / steam profile url / @user / CSGO status';
 base.options.faceitParameter = 'faceit nickname / @user / faceit profile url';
@@ -112,6 +113,7 @@ base.strings.selectWeek = 'Select a week';
 base.strings.year = 'Year';
 base.strings.selectYear = 'Select a year';
 base.strings.selectMonth = 'Select a month';
+base.strings.selectSeason = 'Select a season'
 base.strings.loading = 'Loading';
 base.strings.pagination = {
   prev: 'Previous Page',
