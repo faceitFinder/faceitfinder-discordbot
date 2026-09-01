@@ -81,7 +81,6 @@ const getCardWithInfo = async ({
     if (values.seasonNumber) head.push({ name: 'Season', value: values.seasonNumber.toString(), inline: true })
 
     if (values.seasonNumber == null) {
-      console.log('From-to')
       if (startDate !== endDateToRealTimeStamp) head.push({
         name: 'From - To', value: [new Date(startDate).toDateString(), '\n', new Date(endDateToRealTimeStamp).toDateString()].join(' '),
         inline: true
