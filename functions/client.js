@@ -17,8 +17,9 @@ const guildCount = async (client) => {
   // Send datas to top.gg
   if (process.env.TOPGG_TOKEN) {
     const api = new Api(process.env.TOPGG_TOKEN)
-    api.postStats({
+    api.postMetrics({
       serverCount: guildsSize,
+      shardCount: client.shard ? client.shard.count : 1,
     }).catch(console.error)
   }
 }
