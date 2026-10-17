@@ -85,17 +85,16 @@ const generateRoles = async (interaction) => {
   await removeRoles(interaction, getInteractionOption(interaction, 'remove_old'))
   const roles = []
 
+  // roles[level - 1]: a role Discord refused to create leaves a hole instead of shifting the next levels
   for (let i = 10; i >= 1; i--) {
     await interaction.guild.roles.create({
       name: `Level ${i}`,
       color: color.levels[defaultGame][i].color,
       permissions: []
     })
-      .then(e => roles.push(e.id))
+      .then(e => { roles[i - 1] = e.id })
       .catch(console.error)
   }
-
-  roles.reverse()
 
   await GuildRoles.remove(interaction.guild.id)
   GuildRoles.create(
@@ -160,7 +159,7 @@ const removeRoles = async (interaction, removeOnGuild) => {
 
     await GuildRoles.remove(interaction.guild.id)
 
-    roles.forEach(async e => {
+    roles.filter(Boolean).forEach(async e => {
       await GuildCustomRole.remove(interaction.guild.id, e)
     })
   }

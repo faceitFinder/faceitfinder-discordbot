@@ -4,12 +4,25 @@ const { defaultMatchNumber } = require('../config.json')
 
 axiosRetry(axios, { retries: 3 })
 
+const API_ERROR = 'error.execution.command'
+
 const formatParam = (playerParam) => {
   return {
     faceit: !playerParam.steam && !playerParam.faceitId ? playerParam.param : '',
     steam: playerParam.steam ? playerParam.param : '',
     id: playerParam.faceitId ? playerParam.param : ''
   }
+}
+
+// Values typed by users (nicknames, steam links...) must stay inside their query parameter
+const toQuery = (params) => new URLSearchParams(
+  Object.entries(params).flatMap(([key, value]) => [value].flat().map(v => [key, v ?? '']))
+).toString()
+
+// e.response is undefined when the API cannot be reached (container down, timeout...)
+const handleError = (e) => {
+  console.error(e.response?.status ?? e.code, e.response?.statusText ?? e.message, e.config?.url)
+  throw e.response?.data?.error ?? API_ERROR
 }
 
 const getLadder = async ({
@@ -24,12 +37,11 @@ const getLadder = async ({
     id
   } = formatParam(playerParam)
 
-  return axios.get(`${process.env.API_URL}/api/ladder?faceit=${faceit}&steam=${steam}&id=${id}&region=${region}&country=${country}&game=${game}`)
+  return axios.get(`${process.env.API_URL}/api/ladder?${toQuery({ faceit, steam, id, region, country, game })}`)
     .then(res => res.data)
     .catch(e => {
-      if (e.response.status === 404) return { position: 'N/A' }
-      console.error(e.response.status, e.response.statusText, e.response.config.url)
-      throw e.response.data.error
+      if (!e.response || e.response.status === 404) return { position: 'N/A' }
+      return handleError(e)
     })
 }
 
@@ -48,12 +60,9 @@ const getStats = async ({
     id
   } = formatParam(playerParam)
 
-  return axios.get(`${process.env.API_URL}/api/stats/${matchNumber}?faceit=${faceit}&steam=${steam}&id=${id}&checkElo=${checkElo}&map=${map}&startDate=${startDate}&endDate=${endDate}&game=${game}`)
+  return axios.get(`${process.env.API_URL}/api/stats/${encodeURIComponent(matchNumber)}?${toQuery({ faceit, steam, id, checkElo, map, startDate, endDate, game })}`)
     .then(res => res.data)
-    .catch(e => {
-      console.error(e.response.status, e.response.statusText, e.response.config.url)
-      throw e.response.data.error
-    })
+    .catch(handleError)
 }
 
 const getFind = async ({
@@ -74,17 +83,24 @@ const getFind = async ({
     steam,
     id
   } = formatParam(playerParam)
-  const faceitIncludedParam = faceitIncluded.join('&faceitIncluded=')
-  const steamIncludedParam = steamIncluded.join('&steamIncluded=')
-  const faceitExcludedParam = faceitExcluded.join('&faceitExcluded=')
-  const steamExcludedParam = steamExcluded.join('&steamExcluded=')
 
-  return axios.get(`${process.env.API_URL}/api/find?faceit=${faceit}&steam=${steam}&id=${id}&matchNumber=${matchNumber}&checkElo=${checkElo}&map=${map}&startDate=${startDate}&endDate=${endDate}&steamIncluded=${steamIncludedParam}&faceitIncluded=${faceitIncludedParam}&faceitExcluded=${faceitExcludedParam}&steamExcluded=${steamExcludedParam}&game=${game}`)
+  return axios.get(`${process.env.API_URL}/api/find?${toQuery({
+    faceit,
+    steam,
+    id,
+    matchNumber,
+    checkElo,
+    map,
+    startDate,
+    endDate,
+    steamIncluded,
+    faceitIncluded,
+    faceitExcluded,
+    steamExcluded,
+    game
+  })}`)
     .then(res => res.data)
-    .catch(e => {
-      console.error(e.response.status, e.response.statusText, e.response.config.url)
-      throw e.response.data.error
-    })
+    .catch(handleError)
 }
 
 const getMatch = async ({
@@ -96,23 +112,17 @@ const getMatch = async ({
     steam,
     id
   } = formatParam(playerParam)
-  return axios.get(`${process.env.API_URL}/api/match/${matchId}?faceit=${faceit}&steam=${steam}&id=${id}`)
+  return axios.get(`${process.env.API_URL}/api/match/${encodeURIComponent(matchId)}?${toQuery({ faceit, steam, id })}`)
     .then(res => res.data)
-    .catch(e => {
-      console.error(e.response.status, e.response.statusText, e.response.config.url)
-      throw e.response.data.error
-    })
+    .catch(handleError)
 }
 
 const getSeasons = async (
   game = ''
 ) => {
-  const response = axios.get(`${process.env.API_URL}/api/seasons?game=${game}`)
+  const response = axios.get(`${process.env.API_URL}/api/seasons?${toQuery({ game })}`)
     .then(res => res.data)
-    .catch(e => {
-      console.error(e.response.status, e.response.statusText, e.response.config.url)
-      throw e.response.data.error
-    })
+    .catch(handleError)
   return response
 }
 

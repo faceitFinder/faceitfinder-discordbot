@@ -7,8 +7,9 @@ const { getActiveGuildsEntitlements, currentGuildIsPremium } = require('./utilit
 
 const REMOVE = 'REMOVE', ADD = 'ADD'
 
-const getRoleIds = (guildRoles) => Object.keys(Object.entries(guildRoles)[2][1])
-  .filter(e => e.startsWith('level')).map(e => guildRoles[e])
+// Role of each level (index 0 = level 1), undefined when a level has no role.
+// Works with mongoose documents and plain objects.
+const getRoleIds = (guildRoles) => Array.from({ length: 10 }, (_, i) => guildRoles[`level${i + 1}`])
 
 const getRoles = async (guildId) => {
   const roles = await GuildRoles.getRolesOf(guildId)
@@ -22,7 +23,7 @@ const getRoles = async (guildId) => {
       eloMin: range.min,
       eloMax: range.max
     }
-  })
+  }).filter(role => role.roleId)
 }
 
 const setupRoles = async (client, user, guildId, remove) => {
@@ -31,7 +32,7 @@ const setupRoles = async (client, user, guildId, remove) => {
 
   user = [user].flat().filter(e => e).filter(e => e.guildId === guild.id || !e.guildId)?.at(0)
 
-  const isPremium = await currentGuildIsPremium(guildId)
+  const isPremium = await currentGuildIsPremium(client, guildId)
   const roles = isPremium ? await GuildCustomRole.getRolesOf(guild.id) : await getRoles(guild.id)
   if (!roles?.length) return console.warn(`No roles found for guild: ${guild.name} (${guild.id})`)
 
