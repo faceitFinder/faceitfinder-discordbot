@@ -1,9 +1,9 @@
 const { Client, GatewayIntentBits } = require('discord.js')
 const fs = require('fs')
-const express = require('express')
 const AntiSpam = require('./templates/antispam')
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildMessages] })
-const { updateRoles, updateSubscribedGuilds } = require('./functions/roles')
+const { updateSubscribedGuilds } = require('./functions/roles')
+const { createApi } = require('./functions/api')
 const { guildCount } = require('./functions/client')
 
 client.antispam = new AntiSpam()
@@ -14,6 +14,7 @@ fs.readdirSync('./events').filter(file => file.endsWith('.js')).forEach(async (f
 })
 
 client.once('clientReady', async (client) => {
+  // Only the last shard runs what follows (API included): when it is ready, every shard has been spawned
   if (client.shard && client.shard.ids[0] !== client.shard.count - 1) return
 
   /**
@@ -29,23 +30,9 @@ client.once('clientReady', async (client) => {
   guildCount(client)
 
   // start the API
-  const app = express()
   const PORT = process.env.EXPRESS_PORT || 3001
 
-  app.put('/users/:id/roles', async (req, res) => {
-    const { id } = req.params
-    const { remove } = req.query
-    await updateRoles(client, id, null, remove === 'true')
-
-    res.status(200).send()
-  })
-
-  app.get('/guilds', async (req, res) => {
-    const guilds = client.guilds.cache
-    res.status(200).json(guilds)
-  })
-
-  app.listen(PORT, () => {
+  createApi(client).listen(PORT, () => {
     console.log(`🐉 API server is running on port ${PORT}`)
   })
 })
