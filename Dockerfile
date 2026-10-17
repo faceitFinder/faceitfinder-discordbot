@@ -1,27 +1,21 @@
-FROM node:24.14.0
+# Production dependencies only. canvas ships a prebuilt binary bundling its own cairo/pango
+# libraries: no compiler nor -dev package is needed.
+FROM node:24.14.0-slim AS deps
 
-ARG APP=/usr/src/app
+WORKDIR /usr/src/app
+COPY package.json yarn.lock ./
+RUN yarn install --frozen-lockfile --production --non-interactive && yarn cache clean
 
-ENV NODE_ENV=
-ENV TOKEN=
-ENV FACEIT_TOKEN=
-ENV STEAM_TOKEN=
-ENV TOPGG_TOKEN=
+FROM node:24.14.0-slim
 
-RUN apt-get update && apt-get install -y \
-  build-essential \
-  libcairo2-dev \
-  libpango1.0-dev \
-  libjpeg-dev \
-  libgif-dev \
-  librsvg2-dev
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends fontconfig-config fonts-dejavu-core \
+  && rm -rf /var/lib/apt/lists/*
 
-WORKDIR $APP
-COPY package.json .
-COPY yarn.lock .
-
-RUN yarn install
-
+WORKDIR /usr/src/app
+COPY --from=deps /usr/src/app/node_modules ./node_modules
 COPY . .
 
-CMD ["yarn", "start"]
+USER node
+
+CMD ["node", "index.js"]
