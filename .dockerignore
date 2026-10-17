@@ -1,0 +1,11 @@
+# Secrets must never end up in the image
+.env*
+.git
+.github
+node_modules
+tests
+Dockerfile*
+docker-compose*.yml
+eslint.config.js
+crowdin.yml
+yarn-error.log
