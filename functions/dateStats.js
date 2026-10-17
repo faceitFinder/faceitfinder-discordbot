@@ -235,7 +235,8 @@ const getFromTo = async (interaction, nameFrom = 'from_date', nameTo = 'to_date'
     const seasonNumber = parseInt(getInteractionOption(interaction, nameSeason))
     if (!isNaN(seasonNumber)) {
       const seasons = await getSeasons()
-      const selectedSeason = seasons.payload.cs2.seasons.find(e => e.number === seasonNumber)
+      const selectedSeason = seasons?.payload?.cs2?.seasons?.find(e => e.number === seasonNumber)
+      if (!selectedSeason) throw getTranslation('error.execution.command', interaction.locale)
 
       from = selectedSeason.from
       to = selectedSeason.to
@@ -251,8 +252,8 @@ const generateDateStatsFields = (playerLastStats, head) => {
 
   return [
     ...head,
-    { name: 'Highest Elo', value: playerLastStats['Highest Elo'].toString(), inline: true },
-    { name: 'Lowest Elo', value: playerLastStats['Lowest Elo'].toString(), inline: true },
+    { name: 'Highest Elo', value: playerLastStats['Highest Elo']?.toString() ?? 'N/A', inline: true },
+    { name: 'Lowest Elo', value: playerLastStats['Lowest Elo']?.toString() ?? 'N/A', inline: true },
     { name: 'Current Elo', value: getCurrentEloString(playerLastStats), inline: true },
     { name: 'Games', value: `${playerLastStats.games} (${playerLastStats.winrate.toFixed(2)}% Win)`, inline: true },
     {
@@ -265,7 +266,7 @@ const generateDateStatsFields = (playerLastStats, head) => {
       inline: true
     },
     { name: 'Avg MVPs', value: playerLastStats['Average MVPs'].toFixed(2), inline: true },
-    { name: 'K/D', value: playerLastStats.kd.toFixed(2), inline: true },
+    { name: 'K/D', value: playerLastStats.kd?.toFixed(2) ?? 'N/A', inline: true },
     { name: 'Kills', value: playerLastStats.kills.toString(), inline: true },
     { name: 'Deaths', value: playerLastStats.deaths.toString(), inline: true },
     { name: 'Avg K/D', value: playerLastStats['Average K/D'].toFixed(2), inline: true },

@@ -1,14 +1,15 @@
 const Big = require('big.js')
 
 const findSteamUIds = (str) => {
-  const regex = /STEAM_([0-9]):([0-9]):([0-9]*)/gi
+  const regex = /STEAM_([0-9]):([0-9]):([0-9]+)/gi
   const staticBin = '000100000000000000000001'
   const res = []
 
   while ((m = regex.exec(str)) !== null) {
     if (m.index === regex.lastIndex) regex.lastIndex++
 
-    const binaryId = `${decToBin(m[1], 8)}${staticBin}${decToBin(m[3], 32)}${m[2]}`
+    // STEAM_0 and STEAM_1 are the same public account: the SteamID64 universe is always 1
+    const binaryId = `${decToBin(1, 8)}${staticBin}${decToBin(m[3], 32)}${m[2]}`
     res.push(binToDec(binaryId).toString())
   }
   return res

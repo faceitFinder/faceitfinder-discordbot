@@ -21,7 +21,7 @@ const sendCardWithInfo = async (interaction, playerParam, type = CustomType.TYPE
   let { from, to, allSeason } = await DateStats.getFromTo(interaction)
 
   const map = getInteractionOption(interaction, 'map')
-  const maxMatch = getInteractionOption(interaction, 'match_number') ?? allSeason ? 0 : defaultMatchNumber
+  const maxMatch = getInteractionOption(interaction, 'match_number') ?? (allSeason ? 0 : defaultMatchNumber)
   const game = getGameOption(interaction)
 
   const {

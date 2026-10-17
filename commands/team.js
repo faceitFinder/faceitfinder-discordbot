@@ -79,7 +79,8 @@ const infoTeam = async (interaction, currentTeam, user) => {
 const updateTeam = async (interaction, currentTeam) => {
   const teamName = getInteractionOption(interaction, 'name')
   const teamSlug = teamName?.toLowerCase().replace(/\s/g, '-')
-  if (teamName && await Team.getTeamSlug(teamSlug)) return errorCard('error.command.teamNameAlreadyExists', interaction.locale)
+  if (teamName?.length > maxLengthTeamName) return errorCard('error.command.teamNameTooLong', interaction.locale)
+  if (teamName && teamSlug !== currentTeam.slug && await Team.getTeamSlug(teamSlug)) return errorCard('error.command.teamNameAlreadyExist', interaction.locale)
   else if (teamName) await UserTeam.updateMany(currentTeam.slug, teamSlug)
   const access = getInteractionOption(interaction, 'access')
   Team.update(currentTeam.slug, teamName || currentTeam.name, teamSlug || currentTeam.slug, access)

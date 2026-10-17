@@ -6,7 +6,12 @@ on:
       - "v*"
 
 jobs:
+  unit-tests:
+    name: Unit tests
+    uses: ./.github/workflows/unit-tests.yml
+
   push_to_registry:
+    needs: unit-tests
     name: Push Docker image to Docker Hub
     runs-on: ubuntu-latest
     steps:

@@ -70,7 +70,7 @@ const getUsers = async (
       else if ((teamCreator &&
         teamCreator.slug === team.slug) ||
         team.access ||
-        teamUsers?.find(user => user.faceitId === currentUser.faceitId)
+        (currentUser && teamUsers.find(user => user.faceitId === currentUser.faceitId))
       ) parameters.push(...teamUsers.map(e => {
         return { param: e.faceitId, faceitId: true }
       }))
