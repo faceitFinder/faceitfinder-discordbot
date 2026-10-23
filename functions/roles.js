@@ -27,7 +27,8 @@ const getRoles = async (guildId) => {
 }
 
 const setupRoles = async (client, user, guildId, remove) => {
-  const guild = await client.guilds.fetch(guildId).catch(() => null)
+  // A guild of another shard is not cached here, otherwise every shard would end up reporting it
+  const guild = await client.guilds.fetch({ guild: guildId, cache: !client.shard }).catch(() => null)
   if (!guild) return console.warn(`Guild with ID ${guildId} not found`)
 
   user = [user].flat().filter(e => e).filter(e => e.guildId === guild.id || !e.guildId)?.at(0)
@@ -48,7 +49,7 @@ const setupRoles = async (client, user, guildId, remove) => {
 
   const members = client.shard
     ? await client.shard.broadcastEval(async (c, { guildId, user }) => {
-      const g = await c.guilds.fetch(guildId).catch(() => null)
+      const g = await c.guilds.fetch({ guild: guildId, cache: false }).catch(() => null)
       if (!g || c.shard.ids[0] !== g.shardId) return []
 
       const members = await g.members.fetch({ cache: false }).catch(() => [])
