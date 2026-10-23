@@ -1,8 +1,9 @@
 const { Api } = require('@top-gg/sdk')
 
 const guildCount = async (client) => {
+  // Only the guilds owned by each shard: a shard also caches the guilds of other shards it fetched
   const guildsSize = client.shard
-    ? await client.shard.fetchClientValues('guilds.cache.size')
+    ? await client.shard.broadcastEval(c => [...c.guilds.cache.values()].filter(guild => c.shard.ids.includes(guild.shardId)).length)
       .then(results => results.reduce((acc, guildCount) => acc + guildCount, 0))
     : client.guilds.cache.size
 
