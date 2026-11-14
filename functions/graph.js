@@ -1,12 +1,48 @@
 const { color, challenger, defaultMatchNumber } = require('../config.json')
+const fs = require('fs')
 const path = require('path')
-const { createCanvas, loadImage } = require('canvas')
+const { createCanvas, loadImage, Image } = require('canvas')
 const CustomType = require('../templates/customType')
 const Chart = require('chart.js/auto')
 const { getTranslation } = require('../languages/setup')
 const { getLadder, getMatch } = require('./apiHandler')
 
 const CHALLENGER = 'challenger'
+const LEVEL_LOGO_SIZE = 28
+
+// Logos of the levels, read once: an image whose src is a buffer is loaded synchronously
+const levelImages = new Map()
+const getLevelImage = (level) => {
+  if (!levelImages.has(level)) {
+    let image = null
+    try {
+      image = new Image()
+      image.src = fs.readFileSync(path.resolve(__dirname, `../images/faceit/faceit${level}.svg`))
+    } catch (error) {
+      console.error(`Level ${level} logo:`, error)
+      image = null
+    }
+    levelImages.set(level, image)
+  }
+  return levelImages.get(level)
+}
+
+const getLevels = (game) => Object.entries(color.levels[game] ?? {})
+  .map(([level, range]) => ({ level: +level, ...range }))
+  .sort((a, b) => a.level - b.level)
+
+/**
+ * Level that follows the one of this elo, with the elo it starts at (none after the last level)
+ */
+const getNextLevel = (elo, game) => {
+  const levels = getLevels(game)
+  const value = parseFloat(elo)
+  if (isNaN(value)) return null
+
+  const current = levels.findIndex(({ min, max }) => value >= min && value <= max)
+  if (current === -1) return null
+  return levels[current + 1] ?? null
+}
 
 const generateChart = (locale, playerName, matchHistory, maxMatch = defaultMatchNumber, type = CustomType.TYPES.ELO, game) => {
   const types = type.name.split('-').map(e => CustomType.getType(e.trim()))
@@ -21,10 +57,52 @@ const generateChart = (locale, playerName, matchHistory, maxMatch = defaultMatch
   })
   const labels = slicedHistory.map(match => dateFormatter.format(new Date(match.date)))
 
-  return getChart(datas, labels, getClassicDatasets, datas.length > 1, game)
+  // Levels on the elo chart: a dashed line at the elo each level starts at, with its logo.
+  // The axis goes up to the level that follows the latest elo shown, so that the next level is always there.
+  let levelLines = null
+  const eloIndex = types.indexOf(CustomType.TYPES.ELO)
+  if (eloIndex !== -1) {
+    const latestElo = datas[eloIndex][1].findLast(elo => elo != null)
+    const next = getNextLevel(latestElo, game)
+    // The first level starts at the bottom of the elo scale: no line for it
+    const levels = getLevels(game).slice(1).map((level) => ({ ...level, image: getLevelImage(level.level) }))
+    levelLines = { axis: `y${eloIndex}`, levels, suggestedMax: next ? next.min + 10 : undefined }
+  }
+
+  return getChart(datas, labels, getClassicDatasets, datas.length > 1, game, levelLines)
 }
 
-const getChart = (datasets, labels, datasetFunc, displayY1, game) => {
+const drawLevelLines = (chart, levelLines) => {
+  const scale = chart.scales[levelLines.axis]
+  const { left, right } = chart.chartArea
+  const ctx = chart.ctx
+  const size = LEVEL_LOGO_SIZE
+  let lastLogoY = -Infinity
+
+  // From the bottom up: a logo too close to the previous one is left out, its line is kept
+  for (const level of levelLines.levels) {
+    if (level.min < scale.min || level.min > scale.max) continue
+    const y = scale.getPixelForValue(level.min)
+
+    ctx.save()
+    ctx.strokeStyle = level.color
+    ctx.globalAlpha = 0.8
+    ctx.lineWidth = 1.5
+    ctx.setLineDash([6, 4])
+    ctx.beginPath()
+    ctx.moveTo(left, y)
+    ctx.lineTo(right, y)
+    ctx.stroke()
+    ctx.restore()
+
+    if (!level.image || Math.abs(lastLogoY - y) < size) continue
+    // In the right padding, past the ticks of the right axis when it is shown
+    ctx.drawImage(level.image, chart.width - size - 2, y - size / 2, size, size)
+    lastLogoY = y
+  }
+}
+
+const getChart = (datasets, labels, datasetFunc, displayY1, game, levelLines = null) => {
   const canvas = createCanvas(600, 400)
   const ctx = canvas.getContext('2d')
 
@@ -41,6 +119,20 @@ const getChart = (datasets, labels, datasetFunc, displayY1, game) => {
     }
   }
 
+  const yAxes = {
+    y0: {
+      display: true,
+      position: 'left',
+      ...yAxisBase
+    },
+    y1: {
+      display: displayY1,
+      position: 'right',
+      ...yAxisBase
+    },
+  }
+  if (levelLines?.suggestedMax) yAxes[levelLines.axis].suggestedMax = levelLines.suggestedMax
+
   new Chart(ctx, {
     type: 'line',
     data: {
@@ -48,17 +140,11 @@ const getChart = (datasets, labels, datasetFunc, displayY1, game) => {
       datasets: datasets.map((datas, i) => datasetFunc(datas, i, ctx, game)),
     },
     options: {
+      layout: {
+        padding: { right: levelLines ? LEVEL_LOGO_SIZE + 4 : 0 }
+      },
       scales: {
-        y0: {
-          display: true,
-          position: 'left',
-          ...yAxisBase
-        },
-        y1: {
-          display: displayY1,
-          position: 'right',
-          ...yAxisBase
-        },
+        ...yAxes,
         x: {
           grid: {
             color: color.charts.grid,
@@ -85,6 +171,9 @@ const getChart = (datasets, labels, datasetFunc, displayY1, game) => {
         ctx.fillStyle = color.charts.background
         ctx.fillRect(0, 0, chart.width, chart.height)
         ctx.restore()
+      },
+      afterDatasetsDraw: (chart) => {
+        if (levelLines) drawLevelLines(chart, levelLines)
       }
     }],
   })
@@ -113,6 +202,8 @@ const getClassicDatasets = (datas, i, ctx, game) => {
     data: data,
     fill: i === 0,
     yAxisID: `y${i}`,
+    // Many matches: the points would overlap into a thick line, the colored segments are enough
+    pointRadius: getPointRadius(data.length),
     borderColor: (segment) => {
       if (segment.raw == null) return undefined
       return pointColors[segment.dataIndex] || defaultColor
@@ -141,6 +232,8 @@ const getClassicDatasets = (datas, i, ctx, game) => {
     }
   }
 }
+
+const getPointRadius = (count) => count > 100 ? 0 : count > 50 ? 2 : 3
 
 const getCompareDatasets = (datas, i, ctx, game) => {
   const [nickname, type, playerColor, data] = [...datas]
@@ -608,6 +701,8 @@ const getChallengerRankImage = (ladderRegion, size, image) => {
 
 module.exports = {
   generateChart,
+  getNextLevel,
+  getPointRadius,
   getRankImage,
   getElo,
   getKD,
