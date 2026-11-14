@@ -26,9 +26,8 @@ const sendCardWithInfo = async (
     playerHistory
   } = await getStats({
     playerParam,
-    matchNumber: 0,
-    game,
-    map
+    matchNumber: 1,
+    game
   })
 
   if (!playerHistory.length) throw getTranslation('error.user.noMatches', interaction.locale, {

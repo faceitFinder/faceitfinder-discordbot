@@ -1,9 +1,9 @@
-const { color, defaultGame } = require('../config.json')
+const { color, defaultGame, itemByPage } = require('../config.json')
 const Discord = require('discord.js')
 const Graph = require('./graph')
 const CustomType = require('../templates/customType')
 const CustomTypeFunc = require('../functions/customType')
-const { getPagination, getMaxPage, getPageSlice } = require('./pagination')
+const { getPagination } = require('./pagination')
 const { getStats, getSeasons } = require('./apiHandler')
 const { getTranslation } = require('../languages/setup')
 const { generateOption, setOptionDefault, getInteractionOption, getCurrentEloString, getGameOption } = require('./utility')
@@ -19,6 +19,40 @@ const getDates = async (playerHistory, getDay) => {
   })
 
   return dates
+}
+
+/** Matches asked to the API in the first round, for each page to fill */
+const FIRST_MATCH_NUMBER = 100
+const MAX_ROUNDS = 8
+
+/**
+ * Played periods (days, weeks, months, years) of the player, newest first, enough to fill `page`.
+ *
+ * Only the latest matches are asked to the API, more and more until the page is full or the
+ * history is over: the API only completes its cache with the older matches that are missing.
+ * One period more than the page holds is needed, so that the last period of the page is complete.
+ */
+const getPlayedPeriods = async ({ playerParam, game, map, page, functionToGetDates }) => {
+  const needed = (page + 1) * itemByPage + 1
+  let matchNumber = FIRST_MATCH_NUMBER * (page + 1)
+  let result
+
+  for (let round = 0; round < MAX_ROUNDS; round++) {
+    const { playerDatas, playerHistory = [] } = await getStats({ playerParam, matchNumber, game, map })
+    const matches = playerHistory.slice(0, matchNumber)
+    // Without map filter the API adds the match before the last one asked, when there is one
+    const ended = map ? matches.length < matchNumber : playerHistory.length <= matchNumber
+    const periods = [...(await getDates(matches, functionToGetDates)).values()]
+
+    result = { playerDatas, periods, ended }
+    if (ended || periods.length >= needed) break
+
+    // Matches the page needs, from the matches per period seen so far
+    const perPeriod = matches.length / Math.max(periods.length, 1)
+    matchNumber = Math.max(matchNumber * 2, Math.ceil((needed * perPeriod * 1.5) / 100) * 100)
+  }
+
+  return result
 }
 
 const getCardWithInfo = async ({
@@ -139,24 +173,23 @@ const generateDatasForCard = async ({
   map = ''
 }) => {
   type ??= CustomType.TYPES.ELO
+  page ??= 0
 
-  const {
-    playerDatas,
-    playerHistory
-  } = await getStats({
-    playerParam,
-    matchNumber: 0,
-    game,
-    map
+  const { playerDatas, periods, ended } = await getPlayedPeriods({
+    playerParam, game, map, page, functionToGetDates
   })
 
-  if (!playerHistory.length) throw getTranslation('error.user.noMatches', interaction.locale, {
+  if (!periods.length) throw getTranslation('error.user.noMatches', interaction.locale, {
     playerName: playerDatas.nickname
   })
 
+  // Last page: known once the whole history was read, else at least the next one
+  const maxPage = ended ? Math.ceil(periods.length / itemByPage) - 1 : page + 1
+  page = Math.max(0, Math.min(page, Math.ceil(periods.length / itemByPage) - 1))
+  const dates = periods.slice(page * itemByPage, (page + 1) * itemByPage)
+
   const playerId = playerDatas.player_id
   const optionsValues = []
-  const dates = await getDates(playerHistory, functionToGetDates)
   const maxMatch = 0
 
   dates.forEach(date => {
@@ -182,19 +215,14 @@ const generateDatasForCard = async ({
     optionsValues.push(option)
   })
 
-  const maxPage = getMaxPage(optionsValues)
   optionsValues.forEach(option => {
     option.values.maxPage = maxPage
     option.values.currentPage = page
   })
-  const pages = getPageSlice(page)
-  const paginationOptionsRaw = optionsValues.slice(pages.start, pages.end)
-  const values = paginationOptionsRaw[defaultOption].values
-  const pagination = await Promise.all(paginationOptionsRaw.map(option => generateOption(interaction, option)))
 
-  if (pagination.length === 0) return errorCard(getTranslation('error.user.noMatches', interaction.locale, {
-    playerName: playerDatas.nickname
-  }), interaction.locale)
+  if (!optionsValues[defaultOption]) defaultOption = 0
+  const values = optionsValues[defaultOption].values
+  const pagination = await Promise.all(optionsValues.map(option => generateOption(interaction, option)))
 
   pagination[defaultOption] = setOptionDefault(pagination.at(defaultOption))
 
@@ -286,6 +314,7 @@ const generateDateStatsFields = (playerLastStats, head) => {
 
 module.exports = {
   getDates,
+  getPlayedPeriods,
   getCardWithInfo,
   getFromTo,
   generateDatasForCard,

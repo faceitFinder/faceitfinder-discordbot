@@ -12,7 +12,7 @@ module.exports = {
 
     if (!newUser) {
       interaction.message.components.at(0).components.at(0).options.forEach((option) => {
-        Interaction.deleteOne(option.data.value)
+        Interaction.deleteOne(option.value ?? option.data?.value)
       })
       interaction.message.components.at(1).components.forEach((component) => {
         Interaction.deleteOne(component.data.custom_id)
