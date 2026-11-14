@@ -202,8 +202,6 @@ const getClassicDatasets = (datas, i, ctx, game) => {
     data: data,
     fill: i === 0,
     yAxisID: `y${i}`,
-    // Many matches: the points would overlap into a thick line, the colored segments are enough
-    pointRadius: getPointRadius(data.length),
     borderColor: (segment) => {
       if (segment.raw == null) return undefined
       return pointColors[segment.dataIndex] || defaultColor
@@ -232,8 +230,6 @@ const getClassicDatasets = (datas, i, ctx, game) => {
     }
   }
 }
-
-const getPointRadius = (count) => count > 100 ? 0 : count > 50 ? 2 : 3
 
 const getCompareDatasets = (datas, i, ctx, game) => {
   const [nickname, type, playerColor, data] = [...datas]
@@ -702,7 +698,6 @@ const getChallengerRankImage = (ladderRegion, size, image) => {
 module.exports = {
   generateChart,
   getNextLevel,
-  getPointRadius,
   getRankImage,
   getElo,
   getKD,

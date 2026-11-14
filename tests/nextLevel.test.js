@@ -1,6 +1,6 @@
 const { test } = require('node:test')
 const assert = require('node:assert')
-const { getNextLevel, getPointRadius, generateChart } = require('../functions/graph')
+const { getNextLevel, generateChart } = require('../functions/graph')
 const { TYPES } = require('../templates/customType')
 
 test('next level of an elo', () => {
@@ -26,10 +26,4 @@ test('charts are drawn synchronously with and without a next level', () => {
   }
   const top = history.map((match) => ({ ...match, elo: '2100' }))
   assert.ok(Buffer.isBuffer(generateChart('en-US', 'test', top, 3, TYPES.ELO, 'cs2')))
-})
-
-test('points get smaller with the number of matches', () => {
-  assert.strictEqual(getPointRadius(20), 3)
-  assert.strictEqual(getPointRadius(80), 2)
-  assert.strictEqual(getPointRadius(250), 0)
 })
