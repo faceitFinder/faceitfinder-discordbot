@@ -40,7 +40,7 @@ module.exports = {
       })
 
       components.at(0).components.at(0).options.forEach((option) => {
-        updateOptionsType(option.data.value, json.type)
+        updateOptionsType(option.value ?? option.data?.value, json.type)
       })
       components.at(0).components.at(0).data.disabled = false
       components.at(1).components = updateButtons(components.at(1).components, json.type)
